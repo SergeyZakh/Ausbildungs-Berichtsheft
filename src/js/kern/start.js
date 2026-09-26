@@ -33,6 +33,9 @@ window.__minutenAusDauer = minutenAusDauer;
 window.__datumAusText = datumAusText;
 window.__konto = function () { return KONTO; };
 window.__tage = function () { return tage; };
+// Speichert sofort, was merken() erst nach 400 ms schriebe. Tests, die den Speicher von außen
+// ändern und neu laden, rufen das vorher: Sonst überschrieb das verspätete Speichern ihren Stand.
+window.__merkenJetzt = function () { clearTimeout(speicherTimer); merkenJetzt(); };
 window.__wochendaten = function () { return wochendaten; };
 window.__wochenStand = function (montagIso) { return wochenStand(montagIso); };
 window.__kontoAbgleichen = function () { return kontoAbgleichen(); };

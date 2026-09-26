@@ -502,9 +502,14 @@ const NAME = 'Mustermann, Max';
      *
      * Der untergeschobene Tag trägt keine Buchungen; nach dem Import hat er welche. Daran
      * lässt sich beides zweifelsfrei erkennen – unabhängig davon, welcher Tag gerade offen ist.
+     *
+     * Vorher speichert die Seite, was noch aussteht: merken() schreibt 400 ms verzögert, und
+     * fiel das zwischen Unterschieben und Neuladen, stand danach wieder der alte Text im
+     * Speicher. Auf dem Bau-Server lief die Wartebedingung dann ab (zweimal in drei Läufen).
      */
     const standSetzen = async (stand) => {
       await seite.evaluate(([k, st, schluessel]) => {
+        window.__merkenJetzt();
         const roh = JSON.parse(localStorage.getItem(schluessel));
         roh.tage[k] = st;
         roh.stand = { woche: null, tag: 0 };
