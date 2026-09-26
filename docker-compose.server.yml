@@ -102,7 +102,7 @@ services:
         max-file: "3"
 
   datenbank:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     expose:
       - "5432"
@@ -130,7 +130,7 @@ services:
 
   sicherung:
     # Gleiches Image wie die Datenbank, damit pg_dump zur Serverversion passt.
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     entrypoint: ["/bin/sh", "/skripte/sicherung.sh"]
     environment:
@@ -157,7 +157,7 @@ services:
         max-file: "3"
 
   ollama:
-    image: ollama/ollama:0.34.2
+    image: ollama/ollama:0.34.3
     restart: unless-stopped
     # Kein Port nach außen; erreichbar nur über /ki des Berichtshefts.
     # Wer kein Sprachmodell will, löscht diesen Dienst und ollama-modelle; das Werkzeug zeigt die
@@ -195,7 +195,7 @@ services:
 
   ollama-modelle:
     # Lädt das Sprachmodell beim Start in das Volume und beendet sich dann (von ollama.com).
-    image: ollama/ollama:0.34.2
+    image: ollama/ollama:0.34.3
     restart: "no"
     depends_on:
       ollama:
