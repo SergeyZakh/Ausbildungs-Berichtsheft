@@ -133,4 +133,13 @@
   .blatt:last-child { page-break-after: auto; break-after: auto; }
   .blatt h1, .blatt h2, .blatt .kopfleiste, .blatt .kasten .tagkopf { break-after: avoid; page-break-after: avoid; }
   .blatt .feld.klein, .blatt .unterschriften, .blatt .kopfleiste, .blatt .kasten p { break-inside: avoid; page-break-inside: avoid; }
+
+  /* Safari auf iPhone und iPad setzt den Druck rund 22 % größer als den Bildschirm: Schrift,
+     Abstände und Ränder, nur die Breite bleibt beim Papier. Gemessen an einer Woche, die als
+     „passt“ galt und dort auf zwei Seiten lief; mit „Skalierung 80 %“ im Druckdialog passte sie.
+     Die Messung in druck.js sieht davon nichts, sie läuft auf dem Bildschirm. zoom gleicht den
+     Faktor aus (1 / 1,22). -webkit-touch-callout kennt nur WebKit auf iOS, sonst gilt das nicht. */
+  @supports (-webkit-touch-callout: none) {
+    #druck { zoom: .82; }
+  }
 }

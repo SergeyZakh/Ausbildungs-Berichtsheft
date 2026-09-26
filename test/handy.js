@@ -163,6 +163,13 @@ async function durchgang(browser, breite) {
     const s = getComputedStyle(document.documentElement);
     return (s.webkitTextSizeAdjust || s.textSizeAdjust) === '100%';
   }));
+  // Safari auf iOS setzt den Druck rund 22 % zu groß; blatt.css gleicht das nur dort aus.
+  // Chromium kennt -webkit-touch-callout nicht und kann den Druck nicht nachstellen, deshalb
+  // wird die Regel selbst geprüft.
+  pruefe('Druck unter iOS auf 82 % gesetzt (Ausgleich für Safari)' + bei, await page.evaluate(() => {
+    const css = [...document.querySelectorAll('style')].map((s) => s.textContent).join('\n');
+    return /@supports\s*\(-webkit-touch-callout:\s*none\)\s*\{\s*#druck\s*\{\s*zoom:\s*\.82/.test(css);
+  }));
   // Am iPhone druckt Safari enger als am Rechner; gemessen wird deshalb mit weniger Platz.
   pruefe('Druck am Handy mit Satzhöhe 251 mm' + bei, (await page.evaluate(() => window.__satzHoehe())) === 251);
 
