@@ -324,11 +324,30 @@ var speicherTimer = null;
 function merken() {
   clearTimeout(speicherTimer);
   speicherTimer = setTimeout(function () {
+    speicherTimer = null;
     merkenJetzt();
     // Mit Konto wandert der neue Stand kurz danach zum Server (src/js/konto/konto.js).
     if (typeof kontoAbgleichBald === "function") kontoAbgleichBald();
   }, 400);
 }
+/** Ein ausstehendes Speichern fallen lassen, etwa weil der Stand gleich ersetzt wird. */
+function speichernVerwerfen() {
+  clearTimeout(speicherTimer);
+  speicherTimer = null;
+}
+/** Steht ein Speichern aus, jetzt statt in bis zu 400 ms. */
+function speichernSofort() {
+  if (!speicherTimer) return;
+  speichernVerwerfen();
+  merkenJetzt();
+}
+// Wer ändert und die Seite gleich schließt, neu lädt oder am Handy die App wechselt, verlor die
+// Änderung der letzten 400 ms. Auf dem Bau-Server traf das den Test fürs Bundesland: gewählt,
+// 400 ms gewartet, neu geladen – und manchmal war es weg.
+window.addEventListener("pagehide", speichernSofort);
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "hidden") speichernSofort();
+});
 
 function geladen() {
   try { return JSON.parse(localStorage.getItem(SPEICHER) || "null"); } catch (e) { return null; }

@@ -323,6 +323,8 @@ function fremdenStandVerwerfen() {
   stammGeaendert = null; wochenGeaendert = {};
   zuletztGesichert = { __stamm: JSON.stringify(stammdaten()) };
 
+  // Ein ausstehendes Speichern schriebe den Stand des vorigen Kontos zurück.
+  speichernVerwerfen();
   try { localStorage.removeItem(SPEICHER); } catch (e) { /* ohne Speicher */ }
   wochenNeu();
   zeichnen();

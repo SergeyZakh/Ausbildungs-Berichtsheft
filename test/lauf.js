@@ -818,7 +818,9 @@ const NAME = 'Mustermann, Max';
     await h.stammReiter(seite, '#f-land');
     await seite.selectOption('#f-land', 'NW');
     await seite.click('#dlg-fertig');
-    await seite.waitForTimeout(400);
+    // Sofort neu laden, ohne auf das verzögerte Speichern zu warten: Beim Verlassen der Seite
+    // speichert das Werkzeug, was aussteht. Früher stand hier eine Wartezeit von 400 ms, genau
+    // so lang wie die Verzögerung, und auf dem Bau-Server ging das Bundesland manchmal verloren.
     await seite.reload();
     await seite.waitForTimeout(800);
     await h.stammdatenOeffnen(seite);

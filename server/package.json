@@ -1,6 +1,6 @@
 {
   "name": "berichtsheft-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Freiwilliger Server für das Berichtsheft: Konten, Datenbank, Ansicht für Ausbilder",
   "license": "MIT",
   "private": true,

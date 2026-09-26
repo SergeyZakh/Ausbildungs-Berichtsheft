@@ -8,6 +8,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ## Unveröffentlicht
 
+## [0.1.1] – 2026-09-26
+
 ### Geändert
 
 - **Am Handy** ist das Werkzeug nicht mehr gesperrt. Tage, Woche und Blattvorschau stehen
@@ -23,6 +25,9 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   iOS setzt den Druck rund 22 % größer als den Bildschirm. Der Druck wird dort jetzt auf 82 %
   gesetzt; außerdem misst das Werkzeug am Handy mit etwas Reserve und teilt selbst, und die
   Kopfleiste hat feste Spalten, in denen Zeitraum und Etiketten nicht mehr umbrechen.
+- **Änderung kurz vor dem Schließen verloren:** Das Werkzeug speichert 400 ms nach der letzten
+  Eingabe. Wer in dieser Zeit die Seite schloss, neu lud oder am Handy die App wechselte, verlor
+  die Änderung. Beim Verlassen der Seite wird jetzt sofort gespeichert.
 
 ## [0.1.0] – 2026-09-26
 
@@ -64,4 +69,5 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
+[0.1.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/tag/v0.1.0

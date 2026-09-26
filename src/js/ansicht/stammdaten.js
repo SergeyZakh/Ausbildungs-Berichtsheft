@@ -370,6 +370,8 @@ function allesLoeschen() {
   gefahrSchliessen();
   dlgLeerSchliessen = true;
   dlg.close();
+  // Ein ausstehendes Speichern schriebe den Speicher gleich wieder an.
+  speichernVerwerfen();
   try { localStorage.removeItem(SPEICHER); } catch (e) { /* ohne Speicher */ }
   wochenNeu(); zeichnen();
   standZeigen(null);

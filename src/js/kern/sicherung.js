@@ -7,7 +7,7 @@
  * ========================================================== */
 
 function sicherungSpeichern() {
-  clearTimeout(speicherTimer);
+  speichernVerwerfen();
   merkenJetzt();
   var stand = geladen();
   if (!stand) { sage("Es gibt noch nichts zu sichern.", "warn"); return; }
@@ -56,7 +56,8 @@ function sicherungLaden(datei) {
         "Ersetzen");
       if (!ok) return;
     }
-    clearTimeout(speicherTimer);
+    // Verwerfen, nicht nachholen: Beim Neuladen schriebe sonst der alte Stand über die Sicherung.
+    speichernVerwerfen();
     try {
       localStorage.setItem(SPEICHER, JSON.stringify(stand));
     } catch (e) {

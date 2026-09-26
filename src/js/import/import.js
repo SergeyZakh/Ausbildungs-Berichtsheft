@@ -44,7 +44,7 @@ function verarbeite(datei) {
 function importAnwenden(a, name) {
   // Noch nicht gespeicherte Eingaben zuerst sichern, sonst überschreibt
   // der gespeicherte Stand sie gleich.
-  clearTimeout(speicherTimer);
+  speichernVerwerfen();
   merkenJetzt();
   var alt = geladen();
   var vorher = {
