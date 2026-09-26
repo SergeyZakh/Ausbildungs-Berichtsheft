@@ -6,7 +6,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/SergeyZakh/berichtsheft.git",
+    "url": "https://github.com/SergeyZakh/Ausbildungs-Berichtsheft.git",
     "directory": "server"
   },
   "engines": {

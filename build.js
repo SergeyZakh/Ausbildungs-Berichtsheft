@@ -70,7 +70,7 @@ function lies(...teile) {
 const LIZENZKOPF = `/*!
  * Berichtsheft - Ausbildungsnachweis aus deiner Zeiterfassung
  * Copyright (c) 2026 Sergey Zakharov, MIT-Lizenz
- * https://github.com/SergeyZakh/berichtsheft
+ * https://github.com/SergeyZakh/Ausbildungs-Berichtsheft
  *
  * Mit eingebettet:
  * Instrument Sans, Copyright 2022 The Instrument Sans Project Authors,

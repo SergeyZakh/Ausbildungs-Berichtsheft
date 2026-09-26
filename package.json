@@ -4,12 +4,12 @@
   "description": "Ausbildungsnachweis (IHK-Berichtsheft) aus dem CSV-Export deiner Zeiterfassung – im Browser oder mit Server für Betriebe",
   "license": "MIT",
   "private": true,
-  "homepage": "https://SergeyZakh.github.io/berichtsheft/",
+  "homepage": "https://SergeyZakh.github.io/Ausbildungs-Berichtsheft/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SergeyZakh/berichtsheft.git"
+    "url": "https://github.com/SergeyZakh/Ausbildungs-Berichtsheft.git"
   },
-  "bugs": "https://github.com/SergeyZakh/berichtsheft/issues",
+  "bugs": "https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/issues",
   "engines": {
     "node": ">=20"
   },

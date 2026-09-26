@@ -23,12 +23,12 @@ Programmierung oder Servern zu beschäftigen. Die technische Dokumentation steht
 | --- | --- |
 | Einen Rechner mit Windows, macOS oder Linux | – |
 | Einen aktuellen Browser: Chrome, Edge oder Firefox | ist meist schon installiert |
-| Die Datei `Berichtsheft.html` | [Releases-Seite](https://github.com/SergeyZakh/berichtsheft/releases/latest), unter „Assets“ |
+| Die Datei `Berichtsheft.html` | [Releases-Seite](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/latest), unter „Assets“ |
 | Den Export deiner Zeiterfassung als CSV-Datei | aus deiner Zeiterfassung, siehe Schritt 2 |
 
 <br>
 
-**Ausprobieren ohne Download?** Die [Demo](https://SergeyZakh.github.io/berichtsheft/) öffnen und
+**Ausprobieren ohne Download?** Die [Demo](https://SergeyZakh.github.io/Ausbildungs-Berichtsheft/) öffnen und
 **Beispiel ansehen** klicken.
 
 ### Schritt für Schritt
@@ -40,7 +40,7 @@ zum Ausprobieren, jederzeit wieder löschbar, **3** ohne Export starten und die 
 schreiben, **4** das Menü **⋯** mit „Deine Daten“, Sicherung speichern und laden, Rundgang und
 der Konfiguration für die lokale KI.
 
-1. **Datei herunterladen.** Auf der [Releases-Seite](https://github.com/SergeyZakh/berichtsheft/releases/latest)
+1. **Datei herunterladen.** Auf der [Releases-Seite](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/latest)
    unter „Assets“ auf `Berichtsheft.html` klicken. Die Datei an einem festen Ort speichern,
    zum Beispiel in *Dokumente*. Doppelklick öffnet sie im Browser. Eine Internetverbindung
    wird nicht benötigt.
@@ -91,7 +91,7 @@ Webseite den Zugriff erlaubt, und davon raten wir ab. Mit KI öffnest du das Ber
    Das lädt rund 3,4 GB und dauert je nach Leitung einige Minuten.
 
 3. **Berichtsheft über `localhost` öffnen.** Dafür brauchst du [Node.js](https://nodejs.org) und
-   das Projekt als ZIP ([GitHub-Seite](https://github.com/SergeyZakh/berichtsheft) → grüner Knopf
+   das Projekt als ZIP ([GitHub-Seite](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft) → grüner Knopf
    **Code** → **Download ZIP**, dann entpacken). Im entpackten Ordner PowerShell öffnen und eingeben:
 
    ```powershell
@@ -121,7 +121,7 @@ Die Einträge jedes Azubis liegen weiterhin in dessen eigenem Browser.
 | Mindestens 16 GB Arbeitsspeicher und 20 GB freien Platz | Einstellungen → System → Info bzw. Speicher |
 | Aktivierte Virtualisierung | ist bei den meisten Rechnern an; sonst im BIOS/UEFI, meist Aufgabe der IT |
 | Docker Desktop | <https://www.docker.com/products/docker-desktop/> |
-| Das Berichtsheft-Projekt als ZIP | [GitHub-Seite](https://github.com/SergeyZakh/berichtsheft) → grüner Knopf **Code** → **Download ZIP** |
+| Das Berichtsheft-Projekt als ZIP | [GitHub-Seite](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft) → grüner Knopf **Code** → **Download ZIP** |
 
 Docker Desktop ist für Privatleute kostenlos; größere Firmen brauchen
 eine Lizenz. Die genauen Grenzen stehen auf der Docker-Seite.
@@ -135,8 +135,8 @@ eine Lizenz. Die genauen Grenzen stehen auf der Docker-Seite.
    Anmeldung bei Docker ist nicht nötig. Warten, bis unten links
    „Engine running“ steht.
 3. **Projekt entpacken.** Die ZIP-Datei von GitHub mit Rechtsklick → *Alle extrahieren* entpacken,
-   zum Beispiel nach `C:\Berichtsheft`. Darin liegt ein Ordner `berichtsheft-main`.
-4. **PowerShell im Ordner öffnen.** Den Ordner `berichtsheft-main` im Explorer öffnen, oben in
+   zum Beispiel nach `C:\Berichtsheft`. Darin liegt ein Ordner `Ausbildungs-Berichtsheft-main`.
+4. **PowerShell im Ordner öffnen.** Den Ordner `Ausbildungs-Berichtsheft-main` im Explorer öffnen, oben in
    die Adressleiste klicken, `powershell` tippen und Enter drücken. Es öffnet sich ein Fenster,
    das schon im richtigen Ordner steht.
 5. **Starten.** Im PowerShell-Fenster eingeben:
@@ -148,7 +148,7 @@ eine Lizenz. Die genauen Grenzen stehen auf der Docker-Seite.
    Beim ersten Mal lädt Docker mehrere GB (Programme und das Sprachmodell). Das dauert je nach
    Leitung 10 bis 30 Minuten. Die Befehlszeile kommt schon vorher zurück; das Sprachmodell lädt
    im Hintergrund weiter.
-6. **Prüfen.** In Docker Desktop unter *Containers* steht `berichtsheft-main` mit den Diensten
+6. **Prüfen.** In Docker Desktop unter *Containers* steht `ausbildungs-berichtsheft-main` mit den Diensten
    `berichtsheft` und `ollama` (grün, *Running*) und `ollama-modelle`. Letzterer steht auf
    *Exited*, sobald das Modell geladen ist. Das ist richtig so.
 7. **Öffnen.** Im Browser <http://localhost:8080> aufrufen. Andere Rechner im Netz nutzen
@@ -164,7 +164,7 @@ Danach geht es weiter wie in Weg 1 ab Schritt 2.
 
 | Aufgabe | So geht's |
 | --- | --- |
-| Anhalten | Docker Desktop → *Containers* → beim Eintrag `berichtsheft-main` auf das Stopp-Symbol |
+| Anhalten | Docker Desktop → *Containers* → beim Eintrag `ausbildungs-berichtsheft-main` auf das Stopp-Symbol |
 | Wieder starten | dort auf das Start-Symbol; startet Docker Desktop mit Windows, läuft alles von selbst |
 | Neue Version | neue ZIP von GitHub laden, alten Ordner ersetzen, Schritt 4 und 5 wiederholen. Die Einträge der Azubis liegen in deren Browsern und bleiben erhalten. |
 | Ohne KI | statt Schritt 5: `docker compose -f docker-compose.lokal.yml up -d --build berichtsheft` |
@@ -177,7 +177,7 @@ Danach geht es weiter wie in Weg 1 ab Schritt 2.
 | --- | --- |
 | Die Datei öffnet sich nicht im Browser, sondern in einem Editor | Rechtsklick auf `Berichtsheft.html` → *Öffnen mit* → Chrome, Edge oder Firefox |
 | Am Handy erscheint nur ein Hinweis | Das Werkzeug ist für Rechner gebaut. |
-| Der Export wird nicht erkannt | Die Spalten im Dialog zuordnen. Klappt es gar nicht: [Issue anlegen](https://github.com/SergeyZakh/berichtsheft/issues/new?template=format.yml) mit einer Beispielzeile ohne echte Namen. |
+| Der Export wird nicht erkannt | Die Spalten im Dialog zuordnen. Klappt es gar nicht: [Issue anlegen](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/issues/new?template=format.yml) mit einer Beispielzeile ohne echte Namen. |
 | **Verbindung prüfen** meldet „nicht erreichbar“ (Weg 1) | Läuft Ollama? Lama-Symbol in der Taskleiste suchen, sonst aus dem Startmenü starten. Ist das Berichtsheft über `localhost` geöffnet (Schritt 3 der KI-Anleitung)? Per Doppelklick geöffnet geht die KI nicht. |
 | **Verbindung prüfen** meldet „nicht erreichbar“ (Weg 2) | Als Adresse genau `/ki` eintragen. In Docker Desktop prüfen, ob `ollama` läuft. |
 | „Modell ist dort nicht installiert“ | Weg 1: `ollama pull qwen3.5:4b` wiederholen. Weg 2: warten, bis `ollama-modelle` auf *Exited* steht. |
@@ -188,4 +188,4 @@ Danach geht es weiter wie in Weg 1 ab Schritt 2.
 | „port is already allocated“ | Ein anderes Programm nutzt Port 8080. In `docker-compose.lokal.yml` die Zeile `"8080:8080"` zum Beispiel in `"8081:8080"` ändern und die Adresse entsprechend anpassen. |
 | Die KI braucht sehr lange | Beim ersten Aufruf lädt das Modell, danach geht es schneller. Ohne Grafikkarte dauert ein Tag 10 bis 20 Sekunden. |
 
-Weitere Fragen: [Issue anlegen](https://github.com/SergeyZakh/berichtsheft/issues/new).
+Weitere Fragen: [Issue anlegen](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/issues/new).

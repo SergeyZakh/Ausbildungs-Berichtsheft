@@ -48,4 +48,4 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
-[0.1.0]: https://github.com/SergeyZakh/berichtsheft/releases/tag/v0.1.0
+[0.1.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/tag/v0.1.0

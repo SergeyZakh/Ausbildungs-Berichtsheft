@@ -25,7 +25,7 @@ const { pruefe, abschluss } = h.protokoll("Einzeldatei: offline und ohne Zugriff
   pruefe('Nichts in der Datei lädt von außen', holt.length === 0, holt.join(' | '));
   const links = quelle.match(/<a\b[^>]*\bhref\s*=\s*["']https?:[^"']*/gi) || [];
   pruefe('Nach außen zeigt nur der Link zum Projekt',
-    links.length === 1 && /github\.com\/SergeyZakh\/berichtsheft/.test(links[0]), links.join(' | '));
+    links.length === 1 && /github\.com\/SergeyZakh\/Ausbildungs-Berichtsheft"?$/.test(links[0]), links.join(' | '));
   pruefe('Die Schrift liegt in der Seite',
     /@font-face[\s\S]{0,600}url\(data:font\/woff2;base64,/.test(quelle));
   pruefe('Bibliothek liegt im Klartext, nicht als ausgewertete Zeichenkette',

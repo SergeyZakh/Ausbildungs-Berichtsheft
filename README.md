@@ -2,8 +2,8 @@
 
 **Der IHK-Ausbildungsnachweis aus dem CSV-Export deiner Zeiterfassung.**
 
-[![Tests](https://github.com/SergeyZakh/berichtsheft/actions/workflows/tests.yml/badge.svg)](https://github.com/SergeyZakh/berichtsheft/actions/workflows/tests.yml)
-[![Neueste Version](https://img.shields.io/github/v/release/SergeyZakh/berichtsheft?label=Version)](https://github.com/SergeyZakh/berichtsheft/releases/latest)
+[![Tests](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/actions/workflows/tests.yml/badge.svg)](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/actions/workflows/tests.yml)
+[![Neueste Version](https://img.shields.io/github/v/release/SergeyZakh/Ausbildungs-Berichtsheft?label=Version)](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/latest)
 [![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-blue)](LICENSE)
 [![Ohne Konto nutzbar](https://img.shields.io/badge/Daten-bleiben%20im%20Browser-brightgreen)](#datenschutz)
 
@@ -16,11 +16,11 @@ oder PDF herunterladen.
 
 ---
 
-**[▶ Direkt im Browser ausprobieren](https://SergeyZakh.github.io/berichtsheft/)** — mit
+**[▶ Direkt im Browser ausprobieren](https://SergeyZakh.github.io/Ausbildungs-Berichtsheft/)** — mit
 „Beispiel ansehen“, ohne Anmeldung &nbsp;·&nbsp;
 
 
-**[⤓ Berichtsheft.html herunterladen](https://github.com/SergeyZakh/berichtsheft/releases/latest)**
+**[⤓ Berichtsheft.html herunterladen](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/latest)**
 — eine Datei, läuft offline
 
 ---
@@ -227,7 +227,7 @@ zwei Beispielzeilen – dann baue ich dein Format ein.
 - **Sprachmodell?** Anfragen gehen nur an das Ollama, das du oder dein Betrieb einträgt. Im
   Container-Betrieb über `/ki` an den Dienst im selben Stapel.
 
-- **Echte Datei?** Jedes [Release](https://github.com/SergeyZakh/berichtsheft/releases/latest)
+- **Echte Datei?** Jedes [Release](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/latest)
   nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Unter Windows zeigt
   `Get-FileHash Berichtsheft.html` in PowerShell den Wert deiner Datei. Stimmt er nicht überein,
   stammt die Datei nicht aus dem Release. Das hilft auch, wenn ein Virenscanner sie meldet.

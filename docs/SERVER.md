@@ -168,7 +168,7 @@ Claim mit den Gruppennamen trägt.
 Auf einem Linux-Rechner mit Docker und Docker Compose:
 
 ```bash
-git clone https://github.com/SergeyZakh/berichtsheft.git && cd berichtsheft
+git clone https://github.com/SergeyZakh/Ausbildungs-Berichtsheft.git && cd Ausbildungs-Berichtsheft
 cp .env.example .env
 # eintragen: APP_URL, DB_PASSWORD, SITZUNG_GEHEIMNIS, OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET
 docker compose -f docker-compose.server.yml up -d --build

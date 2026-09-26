@@ -125,8 +125,8 @@ von Hand korrigieren; diesen Fall fängt keine Prüfung zuverlässig.
 und das Repository klonen:
 
 ```powershell
-git clone https://github.com/SergeyZakh/berichtsheft.git
-cd berichtsheft
+git clone https://github.com/SergeyZakh/Ausbildungs-Berichtsheft.git
+cd Ausbildungs-Berichtsheft
 ```
 
 ### B2. Bauen und starten
