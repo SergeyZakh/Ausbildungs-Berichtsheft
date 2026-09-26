@@ -55,6 +55,9 @@
 [hidden] { display: none !important; }
 
 html, body { height: 100%; margin: 0; }
+/* Safari am iPhone vergrößert kleine Schrift sonst selbsttätig, auch im Druck: Dort war der Satz
+   rund 20 % größer als gemessen, und eine Woche, die auf ein Blatt passte, lief auf zwei Seiten. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   background: var(--grund); color: var(--text);
   font-family: var(--sans); font-size: 13.5px; line-height: 1.5;

@@ -158,6 +158,11 @@ async function durchgang(browser, breite) {
     .filter((e) => e.type !== 'file' && e.type !== 'hidden' && parseFloat(getComputedStyle(e).fontSize) < 16)
     .map((e) => (e.id || e.className) + ' ' + getComputedStyle(e).fontSize));
   pruefe('Alle Eingabefelder mindestens 16 px, sonst zoomt Safari' + bei, kleineFelder.length === 0, kleineFelder.join(' | '));
+  // Safari am iPhone vergrößerte die Schrift im Druck um rund 20 %; die Messung sah davon nichts.
+  pruefe('Keine selbsttätige Schriftvergrößerung (text-size-adjust)' + bei, await page.evaluate(() => {
+    const s = getComputedStyle(document.documentElement);
+    return (s.webkitTextSizeAdjust || s.textSizeAdjust) === '100%';
+  }));
   // Am iPhone druckt Safari enger als am Rechner; gemessen wird deshalb mit weniger Platz.
   pruefe('Druck am Handy mit Satzhöhe 251 mm' + bei, (await page.evaluate(() => window.__satzHoehe())) === 251);
 

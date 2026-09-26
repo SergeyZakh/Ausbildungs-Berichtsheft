@@ -21,7 +21,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **PDF vom iPhone:** Eine Woche, die als „passt auf ein Blatt“ galt, lief in Safari auf eine
   zweite Seite ohne Kopfleiste, und in der Kopfleiste brach der Zeitraum um. Am Handy misst das
   Werkzeug jetzt mit dem engeren Druckbereich von Safari und teilt selbst; die Kopfleiste hat
-  feste Spalten, in denen Zeitraum und Etiketten nicht mehr umbrechen.
+  feste Spalten, in denen Zeitraum und Etiketten nicht mehr umbrechen. Safari vergrößerte die
+  Schrift im Druck außerdem selbsttätig um rund 20 %; das ist abgeschaltet (`text-size-adjust`).
 
 ## [0.1.0] – 2026-09-26
 
