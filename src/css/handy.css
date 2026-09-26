@@ -2,26 +2,30 @@
  * Handy und Tablet
  * ========================================================== */
 @media (max-width: 820px) {
-  /* Auf dem Handy scrollt die Seite; am Desktop teilen sich die Blöcke
-     die Fensterhöhe. Ohne feste Höhe bekommt jeder Block die Höhe
-     seines Inhalts. */
-  html, body { height: auto; min-height: 100%; }
-  body { font-size: 14px; overflow: visible; }
+  /* Kopfleiste oben, Fußleiste unten, dazwischen scrollt allein .mitte (Reiter und Inhalt).
+     Früher scrollte die ganze Seite unter klebenden Leisten durch; dann lag der Text beim
+     Scrollen unter der Kopfleiste und unter der Meldung. dvh folgt der Adressleiste des Handys. */
+  html, body { height: 100%; }
+  body { font-size: 14px; height: 100vh; height: 100dvh; overflow: hidden; }
+  .mitte {
+    display: block; flex: 1 1 auto; min-height: 0;
+    overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  }
   #tagbereich { overflow: visible; flex: 0 0 auto; }
 
-  /* Die Kopfleiste bleibt beim Scrollen oben, als Glas über dem Text.
-     Reihe 1: Summe links, Aktionen rechts. Reihe 2: die Woche. */
+  /* Reihe 1: Summe links, Aktionen rechts. Reihe 2: die Woche. */
   .leiste {
-    position: sticky; top: 0; z-index: 30; flex-wrap: wrap;
+    position: relative; z-index: 30; flex: none; flex-wrap: wrap;
     padding: 10px 12px; gap: 8px;
-    background: rgba(243, 242, 238, .78);
-    -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
+    background: var(--grund); box-shadow: 0 1px 0 var(--linie);
   }
   .wochensumme { order: 1; }
   .leiste .schub { order: 2; margin-left: auto; gap: 6px; }
   .wochenbalken { order: 3; flex: 1 1 100%; }
   .leiste .schub .knopf { min-width: 0; padding: 6px 12px; font-size: 12px; }
-  .menue { min-width: 210px; }
+  /* Fast deckend: Über den roten Tagesreitern war das Glas sonst kaum lesbar. */
+  .menue { min-width: 210px; background: rgba(255, 255, 255, .96); }
+  .menue button { padding: 11px 12px; font-size: 14px; }
 
   .wochenschalter { gap: 6px; }
   .wochenschalter .rundknopf { width: 34px; height: 34px; }
@@ -31,7 +35,9 @@
   .wochensumme .ring { width: 18px; height: 18px; --dicke: 3px; }
 
   /* Reihe 3: sieben Tage in einer Zeile, der Wochenreiter darunter. */
-  .reiter { overflow: visible; flex-wrap: wrap; gap: 5px; padding: 0 12px 12px; }
+  /* Oben Abstand zur Kopfleiste: Ohne ihn saßen die Reiter auf deren Trennlinie, und ihr oberer
+     Rand samt Rundung wurde abgeschnitten. */
+  .reiter { overflow: visible; flex-wrap: wrap; gap: 5px; padding: 12px 12px 12px; }
   .reiter button { flex: 1 1 0; min-width: 0; padding: 7px 2px; border-radius: 10px; overflow: hidden; }
   .reiter button:last-child {
     flex: 1 1 100%; flex-direction: row; align-items: center; justify-content: center;
@@ -46,13 +52,34 @@
   .reiter button:not(:last-child) .rlage { flex-direction: column; }
 
   .tagpanel { padding: 0 12px 14px; gap: 10px; overflow: visible; }
-  .tagpanel textarea { min-height: 210px; }
+  /* Das Feld wächst mit dem Text (textfeldWachsen() in ansicht-tag.js), statt ihn abzuschneiden. */
+  .tagpanel textarea { min-height: 160px; overflow: hidden; resize: none; }
+  .tagflaeche.dreispaltig .sektion.wachsend textarea { min-height: 120px; }
   .tagflaeche { flex-direction: column; gap: 10px; }
   .tagflaeche > .sektion,
   .tagflaeche > .sektion.posten,
   .tagflaeche > .sektion.vorschau { flex: 0 0 auto; }
   .wochenspalte { flex: 0 0 auto; }
   .vorschaubuehne { height: auto; max-height: 80vh; }
+  /* Die drei Spalten der Woche untereinander, jede so breit wie der Bildschirm. Die Regeln für
+     nebeneinander (feste Breiten, flex-start, sticky) sind spezifischer und müssen hier weichen:
+     Sonst wurden aus 640 px Breite 640 px leere Höhe, und die Karten blieben halb so breit. */
+  .tagflaeche.dreispaltig { align-items: stretch; }
+  .tagflaeche.dreispaltig > .wochenspalte,
+  .tagflaeche.dreispaltig > .sektion.vorschau,
+  .tagflaeche.dreispaltig > .seitenspalte {
+    flex: 0 0 auto; width: 100%; max-width: 100%; min-width: 0; position: static;
+  }
+  /* 200 px Mindestbreite plus Beschriftung schoben die Wochenspalte rechts über den Rand. */
+  .abteilungsfeld { min-width: 0; flex: 1 1 0; width: 0; }
+  .wochenspalte .feldpaar { min-width: 0; }
+  .seitenspalte > .sektion { flex: 1 1 100%; }
+  /* Die klebende Titelzeile der Vorschau lag beim Scrollen über dem Blatt. */
+  .tagflaeche.dreispaltig > .sektion.vorschau > .sektionskopf { position: static; }
+  .seitenkarte .seitenblock { flex: 1 1 100%; }
+  .seitenkarte .seitenblock + .seitenblock { border-left: 0; border-top: 1px solid var(--linie); }
+  .leerbild .knopf { display: flex; width: 100%; justify-content: center; padding: 10px 13px; font-size: 14px; }
+  .leerbild .knopf + .knopf { margin: 8px 0 0; }
   .sektion.wachsend { min-height: 0; }
   /* Die Knöpfe rutschen unter den Titel, statt ihn zu überdecken. */
   .sektionskopf { font-size: 10.5px; padding: 7px 10px 7px 12px; gap: 6px 8px; flex-wrap: wrap; }
@@ -67,15 +94,24 @@
   .fortschritt .ftext { font-size: 11px; }
   /* Am Handy bleibt Platz für Meldung und Speicherstand, sonst für nichts. */
   .signatur { display: none; }
-  .fussleiste {
-    padding: 5px 12px 6px; gap: 10px; position: sticky; bottom: 0; z-index: 5;
-    background: rgba(255, 255, 255, .8);
-    -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
+  .fussleiste { padding: 5px 12px 6px; gap: 10px; flex: none; }
+  /* Höchstens zwei Zeilen: Die Meldung klebt unten und verdeckte mit drei Zeilen ein Sechstel
+     des Bildschirms. Ein Tippen zeigt sie ganz (zustand.js). */
+  .fussleiste #notiz {
+    font-size: 12px; line-height: 1.35;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
   }
+  .fussleiste #notiz.ganz { display: block; -webkit-line-clamp: unset; }
 
   .felder { grid-template-columns: 1fr; }
   dialog { width: calc(100% - 20px); }
-  .dfuss { flex-wrap: wrap; }
+  /* Kopf und Fuß stehen, dazwischen scrollt der Inhalt. Vorher saßen die Knöpfe direkt auf der
+     Kante des scrollenden Bereichs und wirkten übereinandergelegt. */
+  dialog[open] { display: flex; flex-direction: column; max-height: calc(100dvh - 20px); }
+  dialog[open] > .dkopf, dialog[open] > .dfuss { flex: none; }
+  dialog[open] > .dkoerper { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  #dlg-zuordnung .dkoerper { max-height: none; }
+  .dfuss { flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--linie); }
   .wpopover { width: calc(100vw - 12px); }
   .wochenliste .wkopf, .wochenliste button { grid-template-columns: 28px repeat(7, 1fr) 44px; }
   .wochenliste .wtag { height: 28px; }
@@ -88,6 +124,11 @@
   #dlg-stamm .dkoerper { height: auto; flex: 1 1 auto; }
   .blattleiste { flex: none; overflow-x: visible; flex-wrap: wrap; margin: 12px 12px 0; }
   .blattleiste button { flex: 1 1 auto; min-width: 30%; padding: 8px 8px; font-size: 12px; }
+}
+
+/* Dieselbe Bedingung wie amHandy in start.js: Der Rundgang zeigt auf Stellen im breiten Fenster. */
+@media (pointer: coarse) and (max-width: 820px) {
+  #btn-hilfe { display: none; }
 }
 
 @media (max-width: 620px) {

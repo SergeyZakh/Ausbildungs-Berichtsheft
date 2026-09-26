@@ -47,6 +47,9 @@
   </div>
 </header>
 
+<!-- Am Rechner ohne Wirkung (display: contents). Am Handy scrollt nur dieser Rahmen zwischen
+     Kopf- und Fußleiste, damit nichts unter den Leisten durchläuft (handy.css). -->
+<div class="mitte" id="mitte">
 <div class="fortschritt" id="fortschritt" hidden>
   <span class="ftext" id="ftext"></span>
   <span class="fuhr" id="fuhr"></span>
@@ -58,6 +61,7 @@
 
 <!-- Ansicht für Ausbilder (src/js/konto/ausbilder.js); für Azubis bleibt sie versteckt. -->
 <main id="ausbilder" hidden></main>
+</div>
 
 <!-- Die Signatur steht nur hier im Werkzeug, nicht im Nachweis: Was unterschrieben
      wird, trägt keine Werbung. Im Druck fällt die ganze Fußleiste weg (blatt.css). -->
@@ -250,16 +254,6 @@
       <button type="button" class="knopf" id="onb-zurueck">Zurück</button>
       <button type="button" class="knopf voll" id="onb-weiter">Weiter</button>
     </div>
-  </div>
-</div>
-
-<!-- Sperre am Handy: Das Werkzeug ist für den Rechner gedacht -->
-<div class="handyhinweis" id="handyhinweis" hidden>
-  <div class="hh-karte" role="dialog" aria-modal="true" aria-labelledby="hh-titel">
-    <div class="hh-kreis" aria-hidden="true"></div>
-    <h2 id="hh-titel">Am Handy?</h2>
-    <p>Das Berichtsheft ist für den Rechner gebaut. Öffne die Seite am Laptop oder PC –
-      deine Daten bleiben dort im Browser.</p>
   </div>
 </div>
 

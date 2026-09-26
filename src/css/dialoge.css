@@ -259,32 +259,6 @@
 .onb-fuss { display: flex; align-items: center; gap: 8px; }
 .onb-still { margin-right: auto; border-color: transparent; color: var(--schiefer); background: transparent; }
 
-/* ---------- Hinweis am Handy ---------- */
-.handyhinweis {
-  position: fixed; inset: 0; z-index: 95; padding: 20px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(40, 38, 34, .3);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-}
-.hh-karte {
-  width: 100%; max-width: 340px; padding: 28px 24px 22px; text-align: center;
-  background: var(--glas); border: 1px solid var(--glas-kante); border-radius: 22px;
-  -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
-  box-shadow: var(--schatten-hoch);
-}
-/* Ein Kreis im Kreis, wie ein Handy von oben gesehen. */
-.hh-kreis {
-  width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
-  border: 2px solid var(--text);
-  background: radial-gradient(circle, var(--text) 0 7px, transparent 7.5px);
-}
-.hh-karte h2 { margin: 0 0 8px; font-size: 18px; }
-.hh-karte p { margin: 0 0 20px; font-size: 14.5px; line-height: 1.5; color: var(--schiefer); }
-.hh-karte p:last-child { margin-bottom: 0; }
-/* Hinter der Sperre scrollt und reagiert nichts. */
-body.gesperrt { overflow: hidden; height: 100vh; }
-body.gesperrt > *:not(.handyhinweis) { pointer-events: none; user-select: none; }
-
 /* ---------- Datei ins Fenster ziehen ---------- */
 .ablage {
   position: fixed; inset: 0; z-index: 80;

@@ -348,6 +348,9 @@ function sage(text, art) {
   var dlg = offenerDialog();
   if (dlg && text) dialogNotiz(dlg, text, art);
 }
+// Am Handy kürzt handy.css die Meldung auf zwei Zeilen; ein Tippen zeigt sie ganz. Die nächste
+// Meldung setzt className neu und ist damit wieder gekürzt.
+if ($("notiz")) $("notiz").addEventListener("click", function () { this.classList.toggle("ganz"); });
 
 /** Der oberste offene modale Dialog, sonst null. */
 function offenerDialog() {

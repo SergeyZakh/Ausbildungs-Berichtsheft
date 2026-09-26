@@ -102,14 +102,10 @@ if (wochen.length) {
     " Tage, " + wochen.length + (wochen.length === 1 ? " Woche." : " Wochen."));
 }
 
-/* Am Handy (Touch und schmal) sperrt eine Karte das Werkzeug, ohne Weg
-   daran vorbei. Der Rundgang startet dann gar nicht erst. */
+/* Am Handy (Touch und schmal) startet der Rundgang nicht: Er zeigt auf Stellen, die es nur im
+   breiten Fenster nebeneinander gibt. Das Werkzeug selbst geht, die Ansicht steht in handy.css. */
 var amHandy = false;
 try { amHandy = window.matchMedia("(pointer: coarse) and (max-width: 820px)").matches; } catch (e) {}
-if (amHandy) {
-  $("handyhinweis").hidden = false;
-  document.body.classList.add("gesperrt");
-}
 
 
 /* Konto: Liegt das Werkzeug auf einem Berichtsheft-Server, anmelden und abgleichen

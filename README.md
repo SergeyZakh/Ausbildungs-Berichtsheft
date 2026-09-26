@@ -17,7 +17,7 @@ oder PDF herunterladen.
 ---
 
 **[▶ Direkt im Browser ausprobieren](https://SergeyZakh.github.io/Ausbildungs-Berichtsheft/)** — mit
-„Beispiel ansehen“, ohne Anmeldung &nbsp;·&nbsp;
+„Beispiel ansehen“, ohne Anmeldung, auch am Handy
 
 
 **[⤓ Berichtsheft.html herunterladen](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/latest)**
@@ -299,7 +299,9 @@ Einrichten, Abgleich, Rechte und Sicherung → [docs/SERVER.md](docs/SERVER.md)
 
 ## Gut zu wissen
 
-- **Am Handy** ist das Werkzeug vorerst gesperrt.
+- **Am Handy** läuft das Werkzeug auch. Tage, Woche und Blattvorschau stehen dann untereinander.
+  Zum Gegenlesen vieler Wochen ist ein Rechner bequemer, und „PDF drucken“ hängt vom Druckdialog
+  des Handys ab.
 - **Als Datei per Doppelklick** kann Chrome oder Edge in seltenen Fällen einen Tab öffnen, der den
   gespeicherten Stand nicht sieht. Das Werkzeug prüft das beim Start und lädt dann einmal neu. Mit
   `npm start` oder Docker tritt es gar nicht auf. Sichern unter **⋯ → Sicherung speichern** schadet nie.

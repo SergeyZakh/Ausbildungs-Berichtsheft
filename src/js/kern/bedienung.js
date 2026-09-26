@@ -43,8 +43,8 @@ document.addEventListener("keydown", function (e) {
   }
   var imFeld = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || "").toUpperCase());
 
-  // Hinter einem Dialog, dem Rundgang oder der Handy-Sperre wirkt nichts.
-  if (document.querySelector("dialog[open]") || !$("onboarding").hidden || !$("handyhinweis").hidden) {
+  // Hinter einem Dialog oder dem Rundgang wirkt nichts.
+  if (document.querySelector("dialog[open]") || !$("onboarding").hidden) {
     if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")) e.preventDefault();
     return;
   }

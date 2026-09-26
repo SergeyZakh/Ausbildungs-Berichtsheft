@@ -8,6 +8,13 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ## Unveröffentlicht
 
+### Geändert
+
+- **Am Handy** ist das Werkzeug nicht mehr gesperrt. Tage, Woche und Blattvorschau stehen
+  untereinander in voller Breite. Kopfleiste und Meldung stehen fest, dazwischen scrollt der
+  Inhalt, ohne unter ihnen durchzulaufen. Textfelder wachsen mit dem Text, die Meldung belegt
+  höchstens zwei Zeilen und zeigt sich beim Tippen ganz. Der Rundgang bleibt am Handy aus.
+
 ## [0.1.0] – 2026-09-26
 
 Erste öffentliche Version.

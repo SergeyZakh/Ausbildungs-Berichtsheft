@@ -176,7 +176,6 @@ Danach geht es weiter wie in Weg 1 ab Schritt 2.
 | Was du siehst | Was hilft |
 | --- | --- |
 | Die Datei öffnet sich nicht im Browser, sondern in einem Editor | Rechtsklick auf `Berichtsheft.html` → *Öffnen mit* → Chrome, Edge oder Firefox |
-| Am Handy erscheint nur ein Hinweis | Das Werkzeug ist für Rechner gebaut. |
 | Der Export wird nicht erkannt | Die Spalten im Dialog zuordnen. Klappt es gar nicht: [Issue anlegen](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/issues/new?template=format.yml) mit einer Beispielzeile ohne echte Namen. |
 | **Verbindung prüfen** meldet „nicht erreichbar“ (Weg 1) | Läuft Ollama? Lama-Symbol in der Taskleiste suchen, sonst aus dem Startmenü starten. Ist das Berichtsheft über `localhost` geöffnet (Schritt 3 der KI-Anleitung)? Per Doppelklick geöffnet geht die KI nicht. |
 | **Verbindung prüfen** meldet „nicht erreichbar“ (Weg 2) | Als Adresse genau `/ki` eintragen. In Docker Desktop prüfen, ob `ollama` läuft. |

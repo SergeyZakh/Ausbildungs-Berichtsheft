@@ -37,6 +37,7 @@ function zeichneWochenblatt(bereich) {
     wocheDaten(aktiveWoche).unterweisungen = e.target.value;
     merken(); vorschau.spaeter();
   });
+  textfeldWachsen(ta);
   sUnt.leib.appendChild(ta);
   spalte.appendChild(sUnt.wurzel);
 

@@ -95,6 +95,24 @@ function zeichneTag() {
   bereich.appendChild(panel);
 }
 
+/**
+ * Am Handy wächst ein Textfeld mit seinem Text. Dort scrollt der ganze Inhalt; ein Feld mit
+ * eigenem Scrollbalken schnitt den Text unten ab. Am Rechner bleibt die feste Höhe der Karte.
+ * Gemessen wird erst im nächsten Bild, wenn das Feld im Dokument steht.
+ */
+function textfeldWachsen(ta) {
+  var anpassen = function () {
+    if (!window.matchMedia || !window.matchMedia("(max-width: 820px)").matches) {
+      ta.style.height = "";
+      return;
+    }
+    ta.style.height = "auto";
+    ta.style.height = (ta.scrollHeight + 2) + "px";
+  };
+  ta.addEventListener("input", anpassen);
+  requestAnimationFrame(anpassen);
+}
+
 function zeichneLeerbild(bereich) {
   var leer = document.createElement("div");
   leer.className = "leerbild";
@@ -192,6 +210,7 @@ function textSektion(key, t, art, istSchule) {
     zeichneReiter(); zeichneWochenwahl();
     merken();
   });
+  textfeldWachsen(ta);
   s.leib.appendChild(ta);
 
   var uebernehmen = sektionsknopf("Fertig", "uebernehmen");
