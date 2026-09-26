@@ -1,0 +1,60 @@
+{
+  "realm": "berichtsheft",
+  "displayName": "Berichtsheft",
+  "displayNameHtml": "Berichtsheft",
+  "loginTheme": "berichtsheft",
+  "enabled": true,
+  "sslRequired": "external",
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "bruteForceProtected": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["de", "en"],
+  "defaultLocale": "de",
+  "groups": [
+    { "name": "berichtsheft-azubi", "path": "/berichtsheft-azubi" },
+    { "name": "berichtsheft-ausbilder", "path": "/berichtsheft-ausbilder" }
+  ],
+  "clients": [
+    {
+      "clientId": "berichtsheft",
+      "name": "Berichtsheft",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${BERICHTSHEFT_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "implicitFlowEnabled": false,
+      "frontchannelLogout": true,
+      "rootUrl": "${BERICHTSHEFT_URL}",
+      "baseUrl": "${BERICHTSHEFT_URL}",
+      "redirectUris": ["${BERICHTSHEFT_URL}/anmeldung/rueckkehr"],
+      "webOrigins": ["${BERICHTSHEFT_URL}"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "${BERICHTSHEFT_URL}/"
+      },
+      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "basic", "email"],
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "claim.name": "groups",
+            "id.token.claim": "true",
+            "access.token.claim": "false",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
+}

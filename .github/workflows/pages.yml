@@ -1,0 +1,47 @@
+# Die Demo auf GitHub Pages: dist/ nach jedem Push auf main.
+# Einmalig in den Repo-Einstellungen: Pages → Source → "GitHub Actions".
+#
+# Läuft nur, solange das Repository öffentlich ist: Im kostenlosen Tarif gibt es Pages für
+# private Repositories nicht, und der Schritt bräche mit "Not Found" ab. Solange das
+# Repository privat ist, wird der Ablauf übersprungen statt rot zu melden.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  bauen:
+    if: github.event.repository.visibility == 'public'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --omit=dev
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  veroeffentlichen:
+    needs: bauen
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

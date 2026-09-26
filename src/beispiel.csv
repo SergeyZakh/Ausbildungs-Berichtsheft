@@ -1,0 +1,24 @@
+Datum;Beginn;Ende;Kunde;Projekt;Tätigkeit;Beschreibung
+07.09.2026;08:00;08:15;Intern;Ausbildung;Besprechung;Kurze Teambesprechung zum Tagesstart
+07.09.2026;08:15;10:30;Intern;Ausbildung;Einarbeitung;Einführung in das Ticketsystem und die Supportabläufe
+07.09.2026;10:30;12:00;Bäckerei Sonnenschein GmbH;Kundensupport;Support;Lagerdrucker am PC-LAGER02 wieder eingebunden, Ticket #48213 geschlossen
+07.09.2026;12:45;15:00;Intern;Infrastruktur;Hardware;Zwei Notebooks für neue Kolleginnen mit Windows 11 eingerichtet
+07.09.2026;15:00;16:30;Intern;Infrastruktur;Dokumentation;Einrichtungsschritte in der Wissensdatenbank ergänzt
+08.09.2026;08:00;08:15;Intern;Ausbildung;Besprechung;Kurze Teambesprechung zum Tagesstart
+08.09.2026;08:15;11:45;Kanzlei Weber & Partner;Netzwerk;Vor Ort;Switch im Serverraum getauscht und VLANs nach Plan konfiguriert
+08.09.2026;12:30;14:00;Kanzlei Weber & Partner;Netzwerk;Vor Ort;Verbindungstests mit Herr Weber durchgeführt, Protokoll erstellt
+08.09.2026;14:00;16:30;Intern;Ausbildung;Lernen;Subnetting geübt (IPv4, CIDR) für die Berufsschule
+09.09.2026;08:00;12:00;Intern;Infrastruktur;Server;Backup-Job auf SRV-BACKUP01 geprüft, Wiederherstellung einer Testdatei geübt
+09.09.2026;12:45;14:15;Autohaus Brandt;Support;Fernwartung;Outlook-Profil neu angelegt, Postfach synchronisiert
+09.09.2026;14:15;16:30;Intern;Ausbildung;Unterweisung;Unterweisung Datenschutz und Umgang mit Kundendaten
+10.09.2026;08:00;16:00;Intern;Ausbildung;Berufsschule;Berufsschule: Lernfeld 4 IT-Sicherheit, Lernfeld 5 Software
+11.09.2026;08:00;10:00;Intern;Infrastruktur;Monitoring;Warnmeldungen im Monitoring ausgewertet, zwei Schwellwerte angepasst
+11.09.2026;10:00;12:00;Bäckerei Sonnenschein GmbH;Kundensupport;Support;Netzteil am Kassen-PC getauscht, Ticket #48290 geschlossen
+11.09.2026;12:45;14:30;Intern;Ausbildung;Projekt;Eigenes Projekt: Ansible-Playbook für Standardsoftware begonnen
+11.09.2026;14:30;15:00;Intern;Ausbildung;Feedback;Wochenrückblick mit dem Ausbilder
+14.09.2026;08:00;08:15;Intern;Ausbildung;Besprechung;Kurze Teambesprechung zum Tagesstart
+14.09.2026;08:15;12:00;Intern;Ausbildung;Projekt;Ansible-Playbook erweitert: Browser, Office, PDF-Reader
+14.09.2026;12:45;16:30;Autohaus Brandt;Netzwerk;Vor Ort;WLAN-Ausleuchtung im Verkaufsraum, zweiten Access Point montiert
+15.09.2026;08:00;11:00;Intern;Infrastruktur;Server;Windows-Updates auf Testservern eingespielt und Neustarts überwacht
+15.09.2026;11:00;12:00;Intern;Ausbildung;Meeting;Wöchentliche Teambesprechung
+15.09.2026;12:45;16:30;Kanzlei Weber & Partner;Support;Fernwartung;Neue Mitarbeiterin angelegt: Benutzerkonto, Postfach, Gruppenrechte

@@ -1,0 +1,23 @@
+{
+  "name": "berichtsheft-server",
+  "version": "0.1.0",
+  "description": "Freiwilliger Server für das Berichtsheft: Konten, Datenbank, Ansicht für Ausbilder",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SergeyZakh/berichtsheft.git",
+    "directory": "server"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/anmeldung.js && node test/server.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}

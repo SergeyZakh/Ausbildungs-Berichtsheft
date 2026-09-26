@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Berichtsheft – Ausbildungsnachweis aus deiner Zeiterfassung</title>
+<!-- Favicon im Dokument, damit die Einzeldatei auch offline ihr Symbol zeigt. -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2316161A'/%3E%3Cpath d='M18 12h20l9 9v31H18z' fill='%23FFFFFF'/%3E%3Cpath d='M38 12v9h9z' fill='%23BDBAB2'/%3E%3Cpath d='M24 30h16M24 37h16M24 44h10' stroke='%2316161A' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<!-- build:docx -->
+<!-- build:css -->
+</head>
+<body>
+
+<header class="leiste">
+  <div class="wochenbalken">
+    <div class="wochenschalter">
+      <button type="button" class="rundknopf" id="woche-zurueck" aria-label="Vorige Woche">‹</button>
+      <button type="button" class="wochenknopf" id="wochenlabel" aria-haspopup="dialog" aria-expanded="false"></button>
+      <button type="button" class="rundknopf" id="woche-vor" aria-label="Nächste Woche">›</button>
+    </div>
+  </div>
+  <div class="wochensumme" id="wochensumme"></div>
+  <div class="schub">
+    <!-- Nur mit Berichtsheft-Server: Anmelden bzw. angemeldete Person (src/js/konto/konto.js). -->
+    <div class="konto" id="konto" hidden></div>
+    <div class="menuehalter">
+      <button type="button" class="knopf voll" id="btn-export" aria-haspopup="true" aria-expanded="false">Exportieren</button>
+      <div class="menue" id="menue-export" hidden role="menu">
+        <button type="button" role="menuitem" id="btn-wochenblatt">Wochenblatt als Word</button>
+        <button type="button" role="menuitem" id="btn-pdf-woche">Wochenblatt als PDF drucken</button>
+        <div class="menuetrenner" role="separator"></div>
+        <button type="button" role="menuitem" id="btn-heft">Gesamtheft als Word</button>
+        <button type="button" role="menuitem" id="btn-pdf-heft">Gesamtheft als PDF drucken</button>
+      </div>
+    </div>
+    <div class="menuehalter">
+      <button type="button" class="rundknopf" id="btn-mehr" aria-label="Weitere Aktionen" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <div class="menue" id="menue-mehr" hidden role="menu">
+        <button type="button" role="menuitem" id="btn-laden">Zeiten importieren (CSV)</button>
+        <button type="button" role="menuitem" id="btn-sicherung">Sicherung speichern</button>
+        <button type="button" role="menuitem" id="btn-sicherung-laden">Sicherung laden</button>
+        <button type="button" role="menuitem" id="btn-stamm">Deine Daten</button>
+        <button type="button" role="menuitem" id="btn-hilfe">Rundgang noch einmal</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="fortschritt" id="fortschritt" hidden>
+  <span class="ftext" id="ftext"></span>
+  <span class="fuhr" id="fuhr"></span>
+  <button type="button" class="knopf" id="f-abbrechen">Abbrechen</button>
+</div>
+
+<div class="reiter" id="reiter" role="tablist"></div>
+<main id="tagbereich"></main>
+
+<!-- Ansicht für Ausbilder (src/js/konto/ausbilder.js); für Azubis bleibt sie versteckt. -->
+<main id="ausbilder" hidden></main>
+
+<!-- Die Signatur steht nur hier im Werkzeug, nicht im Nachweis: Was unterschrieben
+     wird, trägt keine Werbung. Im Druck fällt die ganze Fußleiste weg (blatt.css). -->
+<footer class="fussleiste">
+  <p class="notiz" id="notiz"></p>
+  <p class="signatur">
+    <a href="https://github.com/SergeyZakh/berichtsheft" target="_blank" rel="noopener noreferrer">Berichtsheft</a>
+    von Sergey Zakharov · für Azubis und Ausbilder · freie Software (MIT)
+  </p>
+  <span class="speicherstand" id="speicherstand"></span>
+</footer>
+
+<!-- Wochenwahl: Monatsraster unter dem Wochenknopf -->
+<div class="wpopover" id="dlg-wochen" hidden role="dialog" aria-labelledby="wtitel">
+  <div class="dkopf">
+    <h2 id="wtitel">Woche wählen</h2>
+    <button type="button" class="knopf" id="w-zu">Schließen</button>
+  </div>
+  <div class="dkoerper">
+    <div class="monatszeile">
+      <button type="button" class="rundknopf" id="monat-zurueck" aria-label="Voriger Monat">‹</button>
+      <span id="monatslabel"></span>
+      <button type="button" class="rundknopf" id="monat-vor" aria-label="Nächster Monat">›</button>
+    </div>
+    <div class="wochenliste" id="wochenliste"></div>
+    <div class="sprungzeile">
+      <button type="button" class="knopf" id="sprung-offen">Erste offene Woche</button>
+      <button type="button" class="knopf" id="sprung-heute">Heute</button>
+    </div>
+    <label class="suchzeile">
+      <span>Datum</span>
+      <input id="wochensuche" type="text" inputmode="numeric" autocomplete="off" placeholder="TT.MM.JJJJ">
+    </label>
+    <p class="suchhinweis" id="suchhinweis"></p>
+  </div>
+</div>
+
+<!-- Stammdaten und Einstellungen. Die Feld-IDs entsprechen den Schlüsseln
+     in stammdaten(): f-name ↔ name, f-ki-adresse ↔ kiAdresse. -->
+<dialog id="dlg-stamm">
+  <div class="dkopf">
+    <h2 id="dlg-titel">Deine Daten</h2>
+    <button type="button" class="knopf" id="dlg-zu">Schließen</button>
+  </div>
+  <div class="blattleiste" role="tablist">
+    <button type="button" role="tab" data-ziel="person" aria-selected="true">Person</button>
+    <button type="button" role="tab" data-ziel="ausbildung" aria-selected="false">Ausbildung</button>
+    <button type="button" role="tab" data-ziel="verarbeitung" aria-selected="false">Verarbeitung</button>
+    <button type="button" role="tab" data-ziel="ki" aria-selected="false">Sprachmodell</button>
+    <button type="button" role="tab" data-ziel="gefahr" aria-selected="false" class="rot">Gefahr</button>
+  </div>
+  <div class="dkoerper">
+    <div class="dlg-blatt" data-blatt="person">
+      <div class="felder">
+        <label><span>Name, Vorname <i>*</i></span><input id="f-name" type="text" placeholder="Mustermann, Max"></label>
+        <label><span>Geburtsdatum</span><input id="f-geburtsdatum" type="date"></label>
+        <label><span>Geburtsort</span><input id="f-geburtsort" type="text"></label>
+        <label class="weit"><span>Anschrift</span>
+          <input id="f-anschrift" type="text" placeholder="Straße Nr., PLZ Ort"></label>
+        <label><span>Gesetzl. Vertreter, Name</span><input id="f-vertreterName" type="text"></label>
+        <label class="weit"><span>Gesetzl. Vertreter, Anschrift</span>
+          <input id="f-vertreterAnschrift" type="text" placeholder="Straße Nr., PLZ Ort"></label>
+      </div>
+    </div>
+
+    <div class="dlg-blatt" data-blatt="ausbildung" hidden>
+      <div class="felder">
+        <label><span>Ausbildungsberuf <i>*</i></span><input id="f-beruf" type="text" placeholder="Fachinformatiker/in"></label>
+        <label><span>Ausbildungsfirma <i>*</i></span><input id="f-betrieb" type="text" placeholder="Muster GmbH"></label>
+        <label><span>Geschäftszweig</span><input id="f-zweig" type="text" placeholder="z. B. IT-Dienstleistung"></label>
+        <label><span>Ausbildungsabteilung</span><input id="f-abteilung" type="text" placeholder="z. B. IT"></label>
+        <label><span>Ausbilder/in</span><input id="f-ausbilder" type="text"></label>
+        <label><span>Berufsschule</span><input id="f-schule" type="text"></label>
+        <label><span>Vertragliche Laufzeit – Beginn <i>*</i></span><input id="f-beginn" type="date"></label>
+        <label><span>Vertragliche Laufzeit – Ende <i>*</i></span><input id="f-ende" type="date"></label>
+        <label><span>Lehrjahr</span><output id="f-jahr" class="leer" aria-live="polite">Beginn eintragen</output></label>
+        <label><span>Vertrag abgeschlossen am</span><input id="f-vertragAm" type="date"></label>
+      </div>
+    </div>
+
+    <div class="dlg-blatt" data-blatt="verarbeitung" hidden>
+      <div class="felder">
+        <label class="weit"><span>Nicht ins Heft übernehmen</span>
+          <input id="f-ausblenden" type="text" placeholder="Allgemein, Daily, Orga"></label>
+        <label class="weit"><span>Projektnamen nicht voranstellen</span>
+          <input id="f-projektraus" type="text" value="Ausbildung, intern" placeholder="Ausbildung, intern"></label>
+        <label class="weit"><span>Namen und Kürzel entfernen</span>
+          <input id="f-namen" type="text" placeholder="Weber, Schmidt, MW, SZ"></label>
+        <label class="weit"><span>Feiertage beim Import (Bundesland)</span><select id="f-land">
+          <option value="">nur bundesweite Feiertage</option>
+          <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option>
+          <option value="BE">Berlin</option><option value="BB">Brandenburg</option>
+          <option value="HB">Bremen</option><option value="HH">Hamburg</option>
+          <option value="HE">Hessen</option><option value="MV">Mecklenburg-Vorpommern</option>
+          <option value="NI">Niedersachsen</option><option value="NW">Nordrhein-Westfalen</option>
+          <option value="RP">Rheinland-Pfalz</option><option value="SL">Saarland</option>
+          <option value="SN">Sachsen</option><option value="ST">Sachsen-Anhalt</option>
+          <option value="SH">Schleswig-Holstein</option><option value="TH">Thüringen</option>
+        </select></label>
+      </div>
+    </div>
+
+    <div class="dlg-blatt" data-blatt="ki" hidden>
+      <div class="felder">
+        <label><span>Adresse</span>
+          <input id="f-ki-adresse" type="text" placeholder="/ki  oder  http://rechner:11434"></label>
+        <label><span>Modell</span>
+          <!-- Eigene Auswahl statt <datalist>: Die native Liste lässt sich nicht gestalten und
+               sieht in jedem Browser anders aus. Gefüllt aus /api/tags (kiModelleLaden()). -->
+          <div class="kombifeld">
+            <input id="f-ki-modell" type="text" placeholder="qwen3.5:4b" autocomplete="off">
+            <button type="button" class="kombipfeil" id="btn-ki-modelle" hidden
+              aria-haspopup="listbox" aria-expanded="false" aria-label="Installierte Modelle zeigen">▾</button>
+            <div class="kombiliste" id="ki-modelle" hidden role="listbox"></div>
+          </div></label>
+        <div class="weit pruefzeile">
+          <button type="button" class="knopf" id="btn-ki-pruefen">Verbindung prüfen</button>
+          <span class="ampel" id="ki-ampel" hidden></span>
+          <span class="pruefhinweis" id="ki-pruefhinweis"></span>
+        </div>
+        <label class="weit anweisungszeile"><span>Eigene Anweisungen</span>
+          <textarea id="f-ki-anweisungen" maxlength="500" rows="4"
+            placeholder="z. B. Fachbegriffe aus der Netzwerktechnik nicht umschreiben. Lieber „Einrichtung“ als „Konfiguration“."></textarea>
+          <small><span>Kommen zu unseren Regeln dazu. Format und Zeilenzahl bleiben, wie unten eingestellt.</span><span class="zaehler" id="ki-anweisungen-zahl">0 / 500</span></small>
+        </label>
+        <label><span>Stichpunkte je Tag</span>
+          <input id="f-ki-stichpunkte" type="number" min="1" max="6" step="1" inputmode="numeric" placeholder="4">
+          <small>Vorgabe deines Ausbilders, höchstens 6. Die KI fasst jeden Tag auf so viele Zeilen zusammen.</small></label>
+      </div>
+    </div>
+
+    <div class="dlg-blatt" data-blatt="gefahr" hidden>
+      <div class="gefahrkasten">
+        <div class="gefahrzeile">
+          <div>
+            <b>Importierte Daten verwerfen</b>
+            <span>Entfernt alles, was aus einem Import kam: Buchungen, Stunden, Entwürfe und
+              daraus entstandene Texte, auch überarbeitete. Nur komplett selbst
+              geschriebene Texte, Stammdaten und Wochenangaben bleiben. Gilt nur für Importe
+              in diesem Browser.</span>
+          </div>
+          <button type="button" class="knopf gefahrknopf" id="btn-import-weg">Verwerfen</button>
+        </div>
+        <div class="gefahrzeile" id="zeile-alles-weg">
+          <div>
+            <b>Alles löschen</b>
+            <span>Löscht den gesamten Stand aus diesem Browser: Wochen, Texte,
+              Stammdaten. Das lässt sich nicht rückgängig machen.</span>
+          </div>
+          <button type="button" class="knopf gefahrknopf" id="btn-alles-weg">Löschen</button>
+        </div>
+        <div class="gefahrzeile" id="zeile-konto-loeschen" hidden>
+          <div>
+            <b>Alles löschen</b>
+            <span>Deine Einträge liegen in deinem Konto und kämen sofort zurück. Löschen im
+              Konto geht nur über deinen Betrieb.</span>
+          </div>
+        </div>
+        <!-- Im Dialog statt in der Fußleiste, die hinter dem Dialog liegt. -->
+        <p class="gefahrhinweis" id="gefahrhinweis" role="status" hidden></p>
+        <div class="gefahrfrage" id="gefahrfrage" hidden>
+          <p id="gefahrtext"></p>
+          <label>
+            <span>Tippe <b>LÖSCHEN</b>, um zu bestätigen</span>
+            <input id="gefahrwort" type="text" autocomplete="off" placeholder="LÖSCHEN">
+          </label>
+          <div class="gefahrfuss">
+            <button type="button" class="knopf" id="gefahr-nein">Abbrechen</button>
+            <button type="button" class="knopf voll" id="gefahr-ja" disabled>Endgültig löschen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dfuss">
+    <p class="hinweis-stamm" id="stamm-stand"></p>
+    <button type="button" class="knopf voll" id="dlg-fertig">Speichern</button>
+  </div>
+</dialog>
+
+<!-- Rundgang beim ersten Start -->
+<div class="onb" id="onboarding" hidden>
+  <div class="onb-loch" id="onb-loch"></div>
+  <div class="onb-karte" id="onb-karte" role="dialog" aria-modal="true" aria-labelledby="onb-titel">
+    <p class="onb-zaehler" id="onb-zaehler"></p>
+    <h2 id="onb-titel"></h2>
+    <p class="onb-text" id="onb-text"></p>
+    <div class="onb-fuss">
+      <button type="button" class="knopf onb-still" id="onb-ueberspringen">Überspringen</button>
+      <button type="button" class="knopf" id="onb-zurueck">Zurück</button>
+      <button type="button" class="knopf voll" id="onb-weiter">Weiter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sperre am Handy: Das Werkzeug ist für den Rechner gedacht -->
+<div class="handyhinweis" id="handyhinweis" hidden>
+  <div class="hh-karte" role="dialog" aria-modal="true" aria-labelledby="hh-titel">
+    <div class="hh-kreis" aria-hidden="true"></div>
+    <h2 id="hh-titel">Am Handy?</h2>
+    <p>Das Berichtsheft ist für den Rechner gebaut. Öffne die Seite am Laptop oder PC –
+      deine Daten bleiben dort im Browser.</p>
+  </div>
+</div>
+
+<div class="ablage" id="ablage" hidden><div class="ablage-kasten">CSV oder Sicherung hier ablegen</div></div>
+
+<!-- Spalten zuordnen, wenn die Erkennung unsicher ist (zuordnung.js) -->
+<dialog id="dlg-zuordnung">
+  <div class="dkopf">
+    <h2>Spalten zuordnen</h2>
+  </div>
+  <div class="dkoerper">
+    <p class="pruef-vorwort" id="zu-vorwort"></p>
+    <ul class="zu-gruende" id="zu-gruende" hidden></ul>
+    <div class="felder" id="zu-felder"></div>
+    <div class="felder zu-reihe">
+      <label class="weit"><span>Datum mit Schrägstrich lesen als – <em id="zu-reihenfolge-hinweis"></em></span>
+        <select id="zu-reihenfolge">
+          <option value="tm">Tag/Monat/Jahr (11/09/2026 = 11. September)</option>
+          <option value="mt">Monat/Tag/Jahr (09/11/2026 = 11. September)</option>
+        </select>
+      </label>
+    </div>
+    <p class="zu-stand" id="zu-stand"></p>
+    <div class="zu-vorschau"><table id="zu-vorschau"></table></div>
+  </div>
+  <div class="dfuss">
+    <button type="button" class="knopf" id="zu-nein">Abbrechen</button>
+    <button type="button" class="knopf voll" id="zu-ja">Importieren</button>
+  </div>
+</dialog>
+
+<!-- Anmeldung nötig (Server mit ANMELDUNG_PFLICHT): nicht wegklickbar, nur „Anmelden“ -->
+<dialog id="dlg-anmelden" aria-labelledby="anmelden-titel">
+  <div class="dkopf">
+    <h2 id="anmelden-titel">Bitte anmelden</h2>
+  </div>
+  <div class="dkoerper">
+    <p class="pruef-vorwort" id="anmelden-text"></p>
+  </div>
+  <div class="dfuss">
+    <span></span>
+    <a class="knopf voll" id="anmelden-los" href="anmeldung">Anmelden</a>
+  </div>
+</dialog>
+
+<!-- Rückfrage, etwa bevor eine Sicherung den Stand ersetzt -->
+<dialog id="dlg-frage">
+  <div class="dkopf">
+    <h2 id="frage-titel"></h2>
+  </div>
+  <div class="dkoerper">
+    <p class="pruef-vorwort" id="frage-text"></p>
+  </div>
+  <div class="dfuss">
+    <button type="button" class="knopf" id="frage-nein">Abbrechen</button>
+    <button type="button" class="knopf voll" id="frage-ja"></button>
+  </div>
+</dialog>
+
+<!-- Kontrolle vor dem Export -->
+<dialog id="dlg-pruefung">
+  <div class="dkopf">
+    <h2 id="pruef-titel">Vor dem Export</h2>
+  </div>
+  <div class="dkoerper">
+    <p class="pruef-vorwort" id="pruef-vorwort"></p>
+    <div id="pruef-liste"></div>
+  </div>
+  <div class="dfuss">
+    <button type="button" class="knopf" id="pruef-nein">Zurück</button>
+    <button type="button" class="knopf voll" id="pruef-ja">Trotzdem exportieren</button>
+  </div>
+</dialog>
+
+<dialog id="dlg-gruppe">
+  <div class="dkopf"><h2>Gruppe verwalten</h2></div>
+  <div class="dkoerper" id="dlg-gruppe-inhalt"></div>
+  <div class="dfuss">
+    <button type="button" class="knopf" id="gruppe-zu">Schließen</button>
+  </div>
+</dialog>
+
+<!-- #druck nimmt die Blätter für den Druckdialog auf, #messung misst sie vorher aus. -->
+<div id="druck" aria-hidden="true"></div>
+<div id="messung" aria-hidden="true"></div>
+
+<input id="datei" type="file" accept=".csv,.tsv,.txt,text/csv" hidden>
+<input id="sicherungsdatei" type="file" accept=".json,application/json" hidden>
+
+<!-- build:js -->
+</body>
+</html>

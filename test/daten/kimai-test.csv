@@ -1,0 +1,14 @@
+Datum;Von;Bis;Dauer;Benutzer;Kunde;Projekt;Tätigkeit;Beschreibung
+2026-08-31;08:00;12:00;04:00;azubi;Meyer AG;Kundenportal;Entwicklung;Suchindex neu aufgebaut
+2026-08-31;12:45;16:20;03:35;azubi;Meyer AG;Kundenportal;Entwicklung;Laufzeiten gemessen
+2026-09-01;08:00;10:00;02:00;azubi;Intern;Netzwerk;Unterweisung;VLAN-Grundlagen
+2026-09-01;10:15;12:00;01:45;azubi;Intern;Netzwerk;Übung;Testrechner konfiguriert
+2026-09-01;12:45;16:30;03:45;azubi;Schmidt GmbH;Warenwirtschaft;Entwicklung;CSV-Import erweitert
+2026-09-02;08:00;12:00;04:00;azubi;Intern;Datenbank;Unterweisung;Indizes und JOINs
+2026-09-02;12:45;16:00;03:15;azubi;Intern;Datenbank;Übung;Abfragen optimiert
+2026-09-04;08:00;12:00;04:00;azubi;Meyer AG;Kundenportal;Dokumentation;Schnittstelle beschrieben
+2026-09-04;12:45;15:30;02:45;azubi;Intern;Allgemein;Meeting;Sprint-Review
+2026-09-07;08:00;12:00;04:00;azubi;Schmidt GmbH;Warenwirtschaft;Entwicklung;Artikelsuche erweitert
+2026-09-07;12:45;16:45;04:00;azubi;Schmidt GmbH;Warenwirtschaft;Entwicklung;Code-Review eingearbeitet
+2026-09-08;08:00;12:00;04:00;azubi;Intern;Qualitätssicherung;Unterweisung;Teststufen
+2026-09-08;12:45;16:15;03:30;azubi;Meyer AG;Kundenportal;Entwicklung;Fehler behoben

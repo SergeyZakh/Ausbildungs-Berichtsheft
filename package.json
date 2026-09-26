@@ -1,0 +1,31 @@
+{
+  "name": "berichtsheft",
+  "version": "0.1.0",
+  "description": "Ausbildungsnachweis (IHK-Berichtsheft) aus dem CSV-Export deiner Zeiterfassung – im Browser oder mit Server für Betriebe",
+  "license": "MIT",
+  "private": true,
+  "homepage": "https://SergeyZakh.github.io/berichtsheft/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SergeyZakh/berichtsheft.git"
+  },
+  "bugs": "https://github.com/SergeyZakh/berichtsheft/issues",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "start": "node skripte/servieren.js",
+    "test": "node test/lokal.js && node test/vorbehandlung.js && node test/import.js && node test/ki.js && node test/lauf.js && node test/sicherung.js",
+    "test:bereinigung": "node test/vorbehandlung.js",
+    "test:import": "node test/import.js",
+    "docker:up": "docker compose -f docker-compose.lokal.yml up -d --build"
+  },
+  "dependencies": {
+    "docx": "9.7.1"
+  },
+  "devDependencies": {
+    "jszip": "^3.10.2",
+    "playwright": "^1.47.0"
+  }
+}

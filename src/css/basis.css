@@ -1,0 +1,137 @@
+/* ============================================================
+ * Grundlagen: Schrift, Farben, Elementvorgaben
+ * ========================================================== */
+
+/* Instrument Sans liegt in der Seite (der Build bettet die woff2-Dateien
+   ein), damit das Werkzeug ohne Internet gleich aussieht und keine
+   Anfrage nach draußen stellt. SIL Open Font License 1.1. */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(../fonts/instrument-sans-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(../fonts/instrument-sans-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Weiße Karten auf warmem Grau, weiche Kanten. Kreise sind Marken
+   (Stand eines Tages, Fortschritt, runde Symbolknöpfe), Glas nur dort,
+   wo Inhalt dahinter liegt: Menüs, Wochenwahl, Dialoggrund, Modelllauf.
+   Die einzigen Farben sind Grün ("passt") und Rot ("sieh hin"); sie
+   stehen nie allein, daneben steht immer ein Wort oder eine Zahl. */
+:root {
+  --text:      #16161A;
+  --linie:     #DEDCD6;   /* Kanten von Karten und Feldern */
+  --linie-fest:#BDBAB2;   /* Kanten von Eingaben beim Hover */
+  --grund:     #F3F2EE;   /* Seitengrund hinter den Karten */
+  --flaeche:   #FFFFFF;
+  --band:      #F6F5F1;   /* Beschriftungsband, Hover */
+  --schiefer:  #62615C;   /* Sekundärtext */
+  --gut:       #1A7F37;
+  --gut-hell:  #E6F4EA;
+  --acht:      #B42318;
+  --acht-hell: #FDECEA;
+  --glas:      rgba(255, 255, 255, .68);
+  --glas-kante:rgba(255, 255, 255, .9);
+  --unschaerfe: blur(16px) saturate(1.5);
+  --rund:      14px;      /* Karten und Dialoge */
+  --rund-klein: 9px;      /* Knöpfe und Felder */
+  --schatten:  0 1px 2px rgba(22, 22, 26, .04), 0 6px 20px rgba(22, 22, 26, .05);
+  --schatten-hoch: 0 2px 6px rgba(22, 22, 26, .06), 0 18px 48px rgba(22, 22, 26, .16);
+  --sans: "Instrument Sans", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--grund); color: var(--text);
+  font-family: var(--sans); font-size: 13.5px; line-height: 1.5;
+  display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation-duration: .01ms !important; }
+}
+
+/* ---------- Knöpfe ---------- */
+.knopf {
+  border: 1px solid var(--linie); border-radius: var(--rund-klein);
+  background: var(--flaeche); color: var(--text);
+  padding: 6px 13px; font-size: 12.5px; white-space: nowrap;
+  transition: background-color .15s, border-color .15s, box-shadow .15s;
+}
+.knopf:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
+.knopf.voll { background: var(--text); border-color: var(--text); color: var(--flaeche); }
+.knopf.voll:hover:not(:disabled) { background: #33333A; border-color: #33333A; }
+.knopf:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Symbolknöpfe (⋯, ‹, ›) sind Kreise, Textknöpfe nicht. */
+.rundknopf {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; padding: 0; border-radius: 50%;
+  border: 1px solid var(--linie); background: var(--flaeche); color: var(--text);
+  font-size: 16px; line-height: 1;
+  transition: background-color .15s, border-color .15s;
+}
+.rundknopf:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
+.rundknopf:disabled { color: #B8B6B0; cursor: not-allowed; }
+
+/* ---------- Dialoge ---------- */
+dialog {
+  border: 1px solid var(--linie); border-radius: var(--rund); padding: 0;
+  background: var(--flaeche); color: var(--text); max-width: 540px; width: calc(100% - 32px);
+  box-shadow: var(--schatten-hoch);
+}
+dialog::backdrop {
+  background: rgba(40, 38, 34, .3);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.dkopf {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--linie);
+}
+.dkopf h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.dkoerper { padding: 18px 20px; }
+.dfuss {
+  padding: 0 20px 18px; display: flex; align-items: center; gap: 14px;
+  justify-content: space-between;
+}
+
+/* ---------- Formularfelder im Dialog ---------- */
+.felder { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+.felder label { display: block; }
+.felder label span { display: block; font-size: 12px; color: var(--schiefer); margin-bottom: 4px; }
+.felder label span i { font-style: normal; color: var(--text); }
+.felder input, .felder select, .felder output, .felder textarea {
+  width: 100%; font: inherit; font-size: 13.5px; color: var(--text);
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-klein);
+  padding: 7px 10px; transition: border-color .15s, box-shadow .15s;
+}
+.felder input:hover, .felder textarea:hover { border-color: var(--linie-fest); }
+.felder input:focus, .felder textarea:focus {
+  outline: none; border-color: var(--text); box-shadow: 0 0 0 3px rgba(22, 22, 26, .08);
+}
+.felder textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
+.felder small { display: block; margin-top: 4px; font-size: 11.5px; color: var(--schiefer); }
+.felder output { display: flex; align-items: center; min-height: 36px; background: var(--band); }
+.felder output.leer { color: var(--schiefer); }
+.felder .weit { grid-column: 1 / -1; }
+
+/* Auf einem Server mit Anmeldepflicht: unsichtbar, bis feststeht, ob es gleich
+   zum Anmeldedienst geht (grundlagen.js setzt die Klasse, konto.js nimmt sie weg). */
+html.konto-prueft body { visibility: hidden; }

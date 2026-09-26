@@ -1,0 +1,15 @@
+Datum;Von;Bis;Dauer;Benutzer;Kunde;Projekt;Tätigkeit;Beschreibung
+2026-09-07;07:58;08:05;00:07;azubi;Intern;Allgemein;Organisation;Mails gesichtet
+2026-09-07;08:05;08:15;00:10;azubi;Intern;Allgemein;Daily;Daily Standup
+2026-09-07;08:15;09:40;01:25;azubi;Meyer AG;Kundenportal;Entwicklung;Suchindex neu aufgebaut
+2026-09-07;09:40;10:05;00:25;azubi;Meyer AG;Kundenportal;Entwicklung;Suchindex neu aufgebaut
+2026-09-07;10:05;10:12;00:07;azubi;Intern;Allgemein;Organisation;Rückfrage Kollege
+2026-09-07;10:12;11:55;01:43;azubi;Meyer AG;Kundenportal;Entwicklung;Laufzeiten der Suche gemessen und protokolliert
+2026-09-07;12:40;13:35;00:55;azubi;Schmidt GmbH;Warenwirtschaft;Entwicklung;CSV-Import erweitert
+2026-09-07;13:35;14:00;00:25;azubi;Schmidt GmbH;Warenwirtschaft;Entwicklung;CSV-Import erweitert.
+2026-09-07;14:00;14:08;00:08;azubi;Intern;Allgemein;Organisation;Ticket zugewiesen
+2026-09-07;14:08;15:20;01:12;azubi;Schmidt GmbH;Warenwirtschaft;Fehlerbehebung;Abbruch beim Import großer Dateien behoben
+2026-09-07;15:20;15:30;00:10;azubi;Intern;Dokumentation;Doku;Wiki-Seite ergänzt
+2026-09-07;15:30;16:45;01:15;azubi;Intern;Netzwerk;Unterweisung;VLAN-Grundlagen und Firewall-Regeln
+2026-09-08;08:00;12:00;04:00;azubi;Meyer AG;Kundenportal;Dokumentation;Schnittstelle beschrieben
+2026-09-08;12:45;16:00;03:15;azubi;Meyer AG;Kundenportal;Entwicklung;Fehler behoben

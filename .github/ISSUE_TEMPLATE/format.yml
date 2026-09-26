@@ -1,0 +1,29 @@
+name: Neues Exportformat
+description: Dein Export aus der Zeiterfassung wird nicht (gut) erkannt.
+title: "Exportformat: "
+labels: [exportformat]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke! Bitte **keine echten Namen, Kunden oder Ticketnummern** – ausgedachte Inhalte reichen völlig.
+  - type: input
+    id: werkzeug
+    attributes:
+      label: Werkzeug und Version
+      placeholder: z. B. Clockify (Web), Oberfläche auf Deutsch
+    validations:
+      required: true
+  - type: textarea
+    id: kopf
+    attributes:
+      label: Kopfzeile und zwei Beispielzeilen
+      description: Genau so, wie sie in der CSV-Datei stehen (mit Semikolons oder Kommas).
+      render: csv
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Was passiert?
+      placeholder: z. B. Die Dauer wird nicht erkannt, ich muss jedes Mal die Spalte „Arbeitszeit“ zuordnen.

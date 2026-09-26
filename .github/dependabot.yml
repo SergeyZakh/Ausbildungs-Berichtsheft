@@ -1,0 +1,66 @@
+# Schlägt Updates als Pull Request vor. Vor dem Übernehmen: npm run build, npm test und bei
+# Änderungen am Server bash server/test/testen.sh (siehe CONTRIBUTING.md).
+#
+# Je Bereich ein gesammelter Pull Request statt einem je Abhängigkeit: Beim ersten Lauf kamen
+# sonst sieben auf einmal, und jeder davon startet die Tests und verbraucht Freiminuten.
+#
+# Hauptversionen der Images bleiben außen vor. Node steht bewusst auf einer LTS-Fassung
+# (22); der Sprung auf die nächste gehört von Hand gemacht, zusammen mit einem Testlauf.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directories:
+      - /
+      - /server
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      entwicklung:
+        dependency-type: development
+      abhaengigkeiten:
+        dependency-type: production
+
+  - package-ecosystem: docker
+    directories:
+      - /
+      - /server
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      images:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+
+  # Dependabot liest nur Dateien, die wie Compose-Dateien heißen (docker-compose.*.yml); deshalb
+  # heißt der Teststapel mit Keycloak server/test/docker-compose.betrieb.yml.
+  - package-ecosystem: docker-compose
+    directories:
+      - /
+      - /server/test
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      compose:
+        patterns:
+          - "*"
+    # berichtsheft und berichtsheft-server baut Compose selbst (build:); auf Docker Hub gibt es sie
+    # nicht, und die Suche dort ließ den ganzen Lauf mit „private_source_authentication_failure“ scheitern.
+    ignore:
+      - dependency-name: "berichtsheft"
+      - dependency-name: "berichtsheft-server"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      actions:
+        patterns:
+          - "*"

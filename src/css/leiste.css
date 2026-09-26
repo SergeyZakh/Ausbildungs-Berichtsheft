@@ -1,0 +1,148 @@
+/* ============================================================
+ * Kopfleiste, Wochenbalken und Reiter
+ * ========================================================== */
+
+/* ---------- Kopfleiste: Woche links, Summe, Aktionen rechts ---------- */
+.leiste {
+  flex: none; display: flex; align-items: center; gap: 10px;
+  padding: 12px 20px;
+}
+.leiste .schub { flex: none; display: flex; align-items: center; gap: 8px; }
+.leiste .schub .knopf { text-align: center; padding: 7px 14px 7px 16px; border-radius: 999px; }
+/* Pfeil am Exportknopf: Er öffnet ein Menü. */
+#btn-export { display: inline-flex; align-items: center; gap: 8px; }
+#btn-export::after { content: "\25BE"; font-size: 10px; opacity: .7; }
+#btn-mehr { width: 34px; height: 34px; font-size: 16px; }
+
+.menuehalter { position: relative; display: flex; }
+.menue {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 40;
+  min-width: 232px; padding: 5px;
+  background: var(--glas); border: 1px solid var(--glas-kante); border-radius: 12px;
+  -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
+  box-shadow: var(--schatten-hoch);
+  display: flex; flex-direction: column; gap: 1px;
+}
+.menue button {
+  text-align: left; background: transparent; color: var(--text); border: none;
+  border-radius: 8px; padding: 8px 11px; font-size: 12.5px; white-space: nowrap;
+}
+.menue button:hover:not(:disabled) { background: rgba(22, 22, 26, .06); }
+.menue button:disabled { color: #9A9A9A; cursor: not-allowed; }
+.menuetrenner { height: 1px; margin: 4px 8px; background: rgba(22, 22, 26, .1); }
+
+/* ---------- Wochenbalken: Blättern, Wochenknopf, Summe ---------- */
+.wochenbalken { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }
+.wochenschalter { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; }
+.wochenschalter .rundknopf { width: 36px; height: 36px; font-size: 18px; }
+/* block statt flex, sonst schneidet ein zu langes Etikett links und rechts ab
+   statt mit Auslassungspunkten zu enden. */
+.wochenknopf {
+  font: inherit; cursor: pointer; display: block; text-align: center; line-height: 34px;
+  flex: 1 1 auto; min-width: 0; height: 36px; padding: 0 16px; font-size: 13px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: var(--flaeche); color: var(--text);
+  border: 1px solid var(--linie); border-radius: 999px;
+  transition: background-color .15s, border-color .15s;
+}
+.wochenknopf:hover { background: var(--band); border-color: var(--linie-fest); }
+/* Derselbe Stand wie im Monatsraster: rot = Ungelesenes, grün = durch. */
+.wochenknopf.pruefen { color: var(--acht); font-weight: 500; border-color: #EDC6C1; }
+.wochenknopf.fertig  { color: var(--gut); font-weight: 500; border-color: #BFDDC8; }
+.wochenknopf.pruefen:hover { background: var(--acht-hell); }
+.wochenknopf.fertig:hover  { background: var(--gut-hell); }
+.wochensumme {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 12px; height: 36px; padding: 0 14px 0 8px;
+  font-size: 13.5px; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: 999px;
+}
+.wochensumme:empty { display: none; }
+.wsanteil { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--schiefer); }
+.wsanteil.fertig { color: var(--gut); }
+
+/* Fortschrittsring: --anteil in Prozent, Füllung in der Textfarbe. */
+.ring {
+  --anteil: 0; --dicke: 3.5px;
+  flex: none; width: 22px; height: 22px; border-radius: 50%;
+  background: conic-gradient(currentColor calc(var(--anteil) * 1%), color-mix(in srgb, currentColor 22%, transparent) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--dicke)), #000 calc(100% - var(--dicke) + .5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - var(--dicke)), #000 calc(100% - var(--dicke) + .5px));
+}
+
+.ring.voll {
+  display: grid; place-items: center; background: var(--gut); color: #fff;
+  font-size: 12px; font-weight: 700; line-height: 1; -webkit-mask: none; mask: none;
+}
+.reiter .ring.voll { font-size: 9px; }
+
+/* ---------- Reiter: sieben Tage und die Woche ---------- */
+.reiter {
+  flex: none; display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 14px;
+}
+.reiter button {
+  flex: 1 1 0; min-width: 98px; margin: 0; padding: 8px 10px 9px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-align: center; color: var(--schiefer); background: var(--flaeche);
+  border: 1px solid var(--linie); border-radius: 12px;
+  transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s, transform .15s;
+}
+.reiter button:hover { background: var(--band); border-color: var(--linie-fest); }
+.reiter button[aria-selected="true"] {
+  background: var(--text); color: var(--flaeche); border-color: var(--text);
+  box-shadow: 0 6px 16px rgba(22, 22, 26, .18);
+}
+.reiter button[aria-selected="true"] .rlage { color: var(--flaeche); }
+/* Gewählt, aber ohne Stand (kein Text, frei): grau statt schwarz. */
+.reiter button[aria-selected="true"]:not(.fertig):not(.pruefen) {
+  background: #7A7973; border-color: #7A7973; box-shadow: 0 6px 16px rgba(22, 22, 26, .12);
+}
+.reiter .rtag {
+  display: flex; gap: 5px; justify-content: center;
+  font-size: 12.5px; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; white-space: nowrap;
+}
+.reiter .rlage {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 11.5px; white-space: nowrap;
+}
+
+/* Marken im Reiter, alle rund:
+   hohler Ring = kein Text, Buchstabe = ungelesen, Haken = fertig. */
+.reiter .punkt {
+  width: 9px; height: 9px; border-radius: 50%; flex: none;
+  border: 1.5px solid currentColor; background: transparent;
+}
+.reiter .marke,
+.reiter .haken {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px;
+  font-size: 8.5px; font-weight: 700; letter-spacing: .02em; line-height: 1;
+  background: var(--schiefer); color: #fff;
+}
+.reiter .haken { font-size: 9.5px; }
+.reiter button.pruefen .marke { background: var(--acht); }
+.reiter button.fertig .haken { background: var(--gut); }
+/* Im gewählten Reiter kehrt sich die Marke um: weißer Kreis, farbige Schrift. */
+.reiter button[aria-selected="true"] .marke,
+.reiter button[aria-selected="true"] .haken { background: #fff; color: var(--text); }
+.reiter button.pruefen[aria-selected="true"] .marke { color: var(--acht); }
+.reiter button.fertig[aria-selected="true"] .haken { color: var(--gut); }
+.reiter .ring { width: 14px; height: 14px; --dicke: 2.5px; }
+.reiter .dreht {
+  display: inline-block; width: 10px; height: 10px; flex: none;
+  border: 1.5px solid currentColor; border-right-color: transparent;
+  border-radius: 50%; animation: dreh .8s linear infinite;
+}
+@keyframes dreh { to { transform: rotate(360deg); } }
+
+/* Der Reiter färbt mit dem Stand des Tages: grün durch, rot ungelesen. */
+.reiter button.fertig { background: var(--gut-hell); color: var(--gut); border-color: #BFDDC8; }
+.reiter button.fertig .rlage { color: var(--gut); }
+.reiter button.fertig:hover { background: #D6EBDC; }
+.reiter button.fertig[aria-selected="true"] { background: var(--gut); border-color: var(--gut); color: #fff; box-shadow: 0 6px 16px rgba(26, 127, 55, .25); }
+.reiter button.fertig[aria-selected="true"] .rlage { color: #fff; }
+.reiter button.pruefen { background: var(--acht-hell); color: var(--acht); border-color: #EDC6C1; }
+.reiter button.pruefen .rlage { color: var(--acht); }
+.reiter button.pruefen:hover { background: #F8D7D3; }
+.reiter button.pruefen[aria-selected="true"] { background: var(--acht); border-color: var(--acht); color: #fff; box-shadow: 0 6px 16px rgba(180, 35, 24, .25); }
+.reiter button.pruefen[aria-selected="true"] .rlage { color: #fff; }

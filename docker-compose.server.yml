@@ -1,0 +1,214 @@
+# Berichtsheft mit Konten: Azubis melden sich an, die Einträge liegen in der Datenbank,
+# Ausbilder sehen die Hefte ihrer Gruppe. Anleitung in docs/SERVER.md.
+#
+#   cp .env.example .env    # Werte eintragen
+#   docker compose -f docker-compose.server.yml up -d --build
+#
+# Davor gehört ein Reverse Proxy mit TLS (Caddy, nginx, Traefik …), der die Adresse aus APP_URL
+# an BERICHTSHEFT_PORT weiterleitet. Ohne Konten genügt docker-compose.lokal.yml (docs/KI.md).
+#
+# Dienste
+#   berichtsheft    nginx: die Seite, /api und /anmeldung an den Server, /ki an Ollama. Einziger Port nach außen.
+#   server          Node: Anmeldung über OIDC, Abgleich, Ausbilder-Ansicht
+#   datenbank       Postgres 17
+#   sicherung       wartet bis SICHERUNG_UHRZEIT und sichert die Datenbank
+#   ollama          Sprachmodell für „Mit KI kürzen“ (optional, siehe unten)
+#   ollama-modelle  lädt beim Start KI_MODELL und beendet sich
+#
+# Einen Anmeldedienst (Keycloak, Authentik, Entra ID …) bringt der Stapel nicht mit.
+# Für Keycloak liegt der Realm in keycloak/realm-berichtsheft.json.
+
+services:
+  berichtsheft:
+    build: .
+    image: berichtsheft:0.1.0
+    restart: unless-stopped
+
+    # Nur für den Reverse Proxy auf demselben Rechner. Ohne Proxy, etwa zum Ausprobieren im
+    # Hausnetz: BERICHTSHEFT_PORT=0.0.0.0:8080 (dann ohne https, das Cookie ist nicht Secure).
+    ports:
+      - "${BERICHTSHEFT_PORT:-127.0.0.1:8080}:8080"
+
+    environment:
+      OLLAMA_HOST: "ollama:11434"
+      SERVER_HOST: "server:8080"
+
+    depends_on:
+      server:
+        condition: service_healthy
+
+    read_only: true
+    tmpfs:
+      # Gehören dem Benutzer nginx (uid 101); dort liegen PID-Datei und Zwischendateien.
+      - /tmp:size=24m,uid=101,gid=101
+      - /etc/nginx/conf.d:size=1m,uid=101,gid=101
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    pids_limit: 64
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  server:
+    build: ./server
+    image: berichtsheft-server:0.1.0
+    restart: unless-stopped
+    expose:
+      - "8080"
+
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      DATENBANK_URL: postgres://berichtsheft:${DB_PASSWORD:?DB_PASSWORD fehlt}@datenbank:5432/berichtsheft
+      # Genau die Adresse, unter der das Berichtsheft aufgerufen wird (mit https://, ohne Schrägstrich).
+      # Daraus entstehen die Rückkehradresse für die Anmeldung und das Secure-Cookie.
+      APP_URL: ${APP_URL:?APP_URL fehlt}
+      # Signiert das Sitzungs-Cookie. Ändern meldet alle ab, sonst passiert nichts.
+      SITZUNG_GEHEIMNIS: ${SITZUNG_GEHEIMNIS:?SITZUNG_GEHEIMNIS fehlt}
+      SITZUNG_STUNDEN: ${SITZUNG_STUNDEN:-10}
+      # 1: Wer das Berichtsheft öffnet, landet gleich beim Anmeldedienst. 0: Anmelden ist ein Angebot,
+      # ohne Konto bleibt alles im Browser (und kein Ausbilder sieht es).
+      ANMELDUNG_PFLICHT: ${ANMELDUNG_PFLICHT:-1}
+      OIDC_ISSUER: ${OIDC_ISSUER:?OIDC_ISSUER fehlt}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-berichtsheft}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      OIDC_GRUPPEN_CLAIM: ${OIDC_GRUPPEN_CLAIM:-groups}
+      OIDC_GRUPPEN_PRAEFIX: ${OIDC_GRUPPEN_PRAEFIX:-berichtsheft-}
+      OIDC_NAME_CLAIM: ${OIDC_NAME_CLAIM:-name}
+      OIDC_SCOPES: ${OIDC_SCOPES:-openid profile email}
+      # TESTANMELDUNG gehört nie hierher: Damit könnte sich jeder per Kopfzeile als Ausbilder ausgeben.
+
+    depends_on:
+      datenbank:
+        condition: service_healthy
+
+    read_only: true
+    tmpfs:
+      - /tmp:size=8m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    pids_limit: 64
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  datenbank:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    expose:
+      - "5432"
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      POSTGRES_DB: berichtsheft
+      POSTGRES_USER: berichtsheft
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD fehlt}
+    volumes:
+      - datenbank:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U berichtsheft -d berichtsheft"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  sicherung:
+    # Gleiches Image wie die Datenbank, damit pg_dump zur Serverversion passt.
+    image: postgres:17-alpine
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/skripte/sicherung.sh"]
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      PGHOST: datenbank
+      PGDATABASE: berichtsheft
+      PGUSER: berichtsheft
+      PGPASSWORD: ${DB_PASSWORD:?DB_PASSWORD fehlt}
+      SICHERUNG_UHRZEIT: ${SICHERUNG_UHRZEIT:-02:30}
+      SICHERUNG_TAGE: ${SICHERUNG_TAGE:-14}
+    volumes:
+      - ./skripte/sicherung.sh:/skripte/sicherung.sh:ro
+      - ./skripte/wiederherstellen.sh:/skripte/wiederherstellen.sh:ro
+      - sicherungen:/sicherungen
+    depends_on:
+      datenbank:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  ollama:
+    image: ollama/ollama:0.34.2
+    restart: unless-stopped
+    # Kein Port nach außen; erreichbar nur über /ki des Berichtshefts.
+    # Wer kein Sprachmodell will, löscht diesen Dienst und ollama-modelle; das Werkzeug zeigt die
+    # Funktion dann nicht.
+    expose:
+      - "11434"
+    volumes:
+      # Modelle überleben Neustarts; geladen werden sie vom Dienst ollama-modelle.
+      - ollama-modelle:/root/.ollama
+    environment:
+      OLLAMA_HOST: "0.0.0.0:11434"
+      OLLAMA_KEEP_ALIVE: "30m"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 6g
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+    # Mit Grafikkarte (NVIDIA Container Toolkit auf dem Host nötig):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  ollama-modelle:
+    # Lädt das Sprachmodell beim Start in das Volume und beendet sich dann (von ollama.com).
+    image: ollama/ollama:0.34.2
+    restart: "no"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: "ollama:11434"
+      # Im Werkzeug unter „Deine Daten → Sprachmodell“ denselben Namen eintragen.
+      KI_MODELL: ${KI_MODELL:-qwen3.5:4b}
+    entrypoint: ["/bin/sh", "-c", "ollama pull \"$$KI_MODELL\""]
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  datenbank:
+  sicherungen:
+  ollama-modelle:

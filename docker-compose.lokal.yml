@@ -1,0 +1,100 @@
+# Einzelner Rechner: docker compose -f docker-compose.lokal.yml up -d --build
+# Ohne Konten, fester Port 8080. Das Sprachmodell läuft im Container ollama und wird beim ersten
+# Start geladen (rund 2,5 GB). Mit Konten für Azubis und Ausbilder: docker-compose.server.yml.
+#
+# Ohne Sprachmodell oder mit einem schon laufenden Ollama nur das Berichtsheft starten:
+#   docker compose -f docker-compose.lokal.yml up -d --build berichtsheft
+# und OLLAMA_HOST auf das vorhandene Ollama setzen (siehe unten).
+# Anleitung: docs/KI.md, Teil B.
+
+services:
+  berichtsheft:
+    build: .
+    image: berichtsheft:0.1.0
+    container_name: berichtsheft
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+
+    environment:
+      # Vorgabe ist der Container ollama aus diesem Stapel. Ein anderes Ollama als "host:port":
+      #   auf demselben Rechner:   host.docker.internal:11434
+      #   im selben Netz:          192.168.1.50:11434
+      # Im Werkzeug steht als Adresse immer "/ki".
+      OLLAMA_HOST: "${OLLAMA_HOST:-ollama:11434}"
+
+    extra_hosts:
+      # host.docker.internal auch unter Linux
+      - "host.docker.internal:host-gateway"
+
+    # Abschottung: statische Seite plus Weiterleitung an Ollama, mehr nicht.
+    read_only: true
+    tmpfs:
+      # Gehören dem Benutzer nginx (uid 101); dort liegen PID-Datei und Zwischendateien.
+      - /tmp:size=24m,uid=101,gid=101
+      # Hier schreibt nginx beim Start die Konfiguration aus nginx.conf.template.
+      - /etc/nginx/conf.d:size=1m,uid=101,gid=101
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    pids_limit: 64
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  ollama:
+    image: ollama/ollama:0.34.2
+    restart: unless-stopped
+    # Kein Port nach außen; erreichbar nur über /ki des Berichtshefts.
+    expose:
+      - "11434"
+    volumes:
+      - ollama-modelle:/root/.ollama
+    environment:
+      OLLAMA_HOST: "0.0.0.0:11434"
+      OLLAMA_KEEP_ALIVE: "30m"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    # Ein 4B-Modell braucht auf der CPU rund 4 GB.
+    mem_limit: 6g
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+    # Mit NVIDIA-Grafikkarte (Docker Desktop mit WSL 2 oder NVIDIA Container Toolkit):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  ollama-modelle:
+    # Lädt das Sprachmodell beim Start in das Volume und beendet sich dann (von ollama.com).
+    image: ollama/ollama:0.34.2
+    restart: "no"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: "ollama:11434"
+      # Im Werkzeug unter „Deine Daten → Sprachmodell“ denselben Namen eintragen.
+      KI_MODELL: ${KI_MODELL:-qwen3.5:4b}
+    entrypoint: ["/bin/sh", "-c", "ollama pull \"$$KI_MODELL\""]
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  ollama-modelle:

@@ -1,0 +1,22 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie erwartet.
+labels: [fehler]
+body:
+  - type: textarea
+    id: schritte
+    attributes:
+      label: Was hast du gemacht?
+      placeholder: 1. Export geladen 2. Woche geöffnet 3. …
+    validations:
+      required: true
+  - type: textarea
+    id: ergebnis
+    attributes:
+      label: Was ist passiert, und was hättest du erwartet?
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser und Fassung
+      placeholder: z. B. Chrome 140, Berichtsheft.html per Doppelklick

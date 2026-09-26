@@ -1,0 +1,289 @@
+/* ============================================================
+ * Druck: dieselben Blätter wie im Word-Dokument, als HTML
+ *
+ * Die Blätter kommen in #druck und werden über window.print() gedruckt
+ * (oder als PDF gesichert). Die Regeln dafür stehen in css/blatt.css.
+ *
+ * Eine Woche ist ein Blatt. Passt sie nicht, wird sie in mehrere Blätter
+ * geteilt, jedes mit eigener Kopfleiste und eigenem Kasten "Betriebliche
+ * Tätigkeit"; die Schlussfelder und Unterschriften stehen auf dem
+ * letzten. Ob etwas passt, wird im Drucksatz gemessen (#messung), nicht
+ * geschätzt – Schriftgrad, Mindesthöhen und Umbrüche bestimmen die Höhe.
+ * ========================================================== */
+
+/* A4 hoch, 16 mm Rand oben und unten, 1 mm Sicherheit für Druckertreiber. */
+var SATZ_HOEHE_MM = 297 - 2 * 16 - 1;
+
+var mmProPixel = null;
+function mmInPixel() {
+  if (mmProPixel) return mmProPixel;
+  var probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;left:-9999px;width:100mm;height:0";
+  document.body.appendChild(probe);
+  mmProPixel = probe.getBoundingClientRect().width / 100 || 3.7795;
+  document.body.removeChild(probe);
+  return mmProPixel;
+}
+
+/** Höhe eines Blatt-HTML in Millimetern. */
+function blattHoehe(html) {
+  var m = $("messung");
+  if (!m) return 0;
+  m.innerHTML = html;
+  var el = m.firstElementChild;
+  var px = el ? el.getBoundingClientRect().height : 0;
+  m.innerHTML = "";
+  return px / mmInPixel();
+}
+
+/* Misst gar nichts (kein Layout), wird nicht geteilt: Ein zu langes Blatt
+   ist besser als ein grundlos zerrissenes. */
+function passtAufEineSeite(html) {
+  var h = blattHoehe(html);
+  return !h || h <= SATZ_HOEHE_MM;
+}
+
+/* ---------- HTML der Blätter ---------- */
+
+/** Ein Feld des Vordrucks. Jede Zeile ein Stichpunkt, nichts fett – wie in stichpunkt(). */
+function druckAbschnitt(titel, liste, klasse) {
+  var inhalt = liste.map(function (e) {
+    var kopf = (e.kopf && e.kopf.tag)
+      ? '<p class="tagkopf"><b>' + sicher(e.kopf.tag) + "</b>" +
+        (e.kopf.rest ? "<span>" + sicher(e.kopf.rest) + "</span>" : "") + "</p>"
+      : "";
+    var text = zeilen(e.text).map(function (z) {
+      var roh = String(z).replace(/^\s*[-*•·]\s*/, "").trim();
+      if (!roh) return "";
+      // Das Zeichen steht im Markup, damit es beim Kopieren aus dem PDF mitkommt.
+      return '<p class="sp"><span class="pkt">•</span>' + sicher(roh) + "</p>";
+    }).join("");
+    return kopf + text;
+  }).join("");
+  return '<section class="feld ' + klasse + '">' +
+         "<h2>" + sicher(titel) + "</h2>" +
+         '<div class="kasten">' + inhalt + "</div></section>";
+}
+
+/**
+ * Ein Blatt einer Woche. `fortsetzung` markiert Folgeblätter, `letzte`
+ * hängt Unterweisungen, Berufsschule und Unterschriften an.
+ */
+function druckBlattSeite(nummer, montag, s, texte, fortsetzung, letzte) {
+  var wd = wochendaten[iso(montag)] || {};
+  var abteilung = wd.abteilung || s.abteilung || "";
+  var jahr = ausbildungsjahr(s, montag) || s.jahr || "";
+
+  function kopfFeld(etikett, wert) {
+    return "<td><span>" + sicher(etikett) + "</span>" + sicher(wert || "") + "</td>";
+  }
+
+  return '<article class="blatt dicht-' + dichte(texte) + (fortsetzung ? " fortsetzung" : "") + '">' +
+    "<h1>Ausbildungsnachweis" + (fortsetzung ? " – Fortsetzung" : "") + "</h1>" +
+    '<table class="kopfleiste"><tr>' +
+      // Zwei eigene Felder wie im Vordruck: "3 / 1" unter einem Etikett las niemand richtig.
+      kopfFeld("Nr.", nummer) +
+      kopfFeld("Ausbildungsjahr", jahr ? jahr + "." : "") +
+      kopfFeld("Ausbildungswoche", dmy(montag) + " – " + dmy(plus(montag, 6))) +
+      kopfFeld("Ausbildungsabteilung", abteilung) +
+      kopfFeld("Name", s.name) +
+    "</tr></table>" +
+    druckAbschnitt("Betriebliche Tätigkeit", texte.betrieb, "gross") +
+    (letzte ?
+      druckAbschnitt("Unterweisungen, Lehrgespräche, betrieblicher Unterricht, sonstige Schulungsveranstaltungen",
+                     texte.unterweisung, "klein") +
+      druckAbschnitt("Berufsschule (Unterrichtsthemen)", texte.schule, "klein") +
+      '<div class="unterschriften">' +
+        "<div>Auszubildender / Datum</div>" +
+        "<div>Ausbilder / Datum</div>" +
+        "<div>Gesetzlicher Vertreter / Datum</div>" +
+      "</div>" : "") +
+    "</article>";
+}
+
+function druckBlattEinseitig(nummer, montag, s) {
+  return druckBlattSeite(nummer, montag, s, wochenTexte(montag), false, true);
+}
+
+/* ---------- Aufteilen einer vollen Woche ---------- */
+
+/* Eine sehr lange Zeile wortweise in Stücke brechen, damit die Aufteilung
+   Stellen hat, an denen sie trennen darf. Der Inhalt bleibt gleich. */
+function druckWortzeilen(text, max) {
+  var worte = String(text || "").trim().split(/\s+/).filter(Boolean);
+  if (!worte.length) return [];
+  var out = [], aktuell = "";
+  worte.forEach(function (wort) {
+    var probe = aktuell ? aktuell + " " + wort : wort;
+    if (aktuell && probe.length > max) {
+      out.push(aktuell);
+      aktuell = wort;
+    } else aktuell = probe;
+  });
+  if (aktuell) out.push(aktuell);
+  return out;
+}
+
+/** Die kleinsten trennbaren Stücke: je eine (Teil-)Zeile mit dem Tageskopf. */
+function druckEinheiten(liste) {
+  var out = [];
+  (liste || []).forEach(function (e) {
+    var teile = [];
+    zeilen(e.text).forEach(function (z) {
+      druckWortzeilen(z, 105).forEach(function (t) { teile.push(t); });
+    });
+    teile.forEach(function (z, i) {
+      out.push({ kopf: e.kopf, text: z, erste: i === 0 });
+    });
+  });
+  return out;
+}
+
+/** Aufeinanderfolgende Einheiten desselben Tages wieder bündeln. Ein Tag,
+ *  der über zwei Blätter läuft, trägt seinen Kopf auf beiden. */
+function druckBuendeln(einheiten) {
+  var out = [];
+  einheiten.forEach(function (e) {
+    var letzte = out[out.length - 1];
+    if (letzte && letzte.kopf === e.kopf) letzte.text += "\n" + e.text;
+    else out.push({ kopf: e.kopf, text: e.text });
+  });
+  return out;
+}
+
+/** Das längste Präfix, das auf ein Blatt passt (Intervallhalbierung,
+ *  mindestens eine Einheit, damit die Aufteilung endet). */
+function druckPraefix(einheiten, bauen) {
+  if (!einheiten.length) return 0;
+  if (passtAufEineSeite(bauen(einheiten))) return einheiten.length;
+  var tief = 1, hoch = einheiten.length, beste = 1;
+  while (tief <= hoch) {
+    var mitte = (tief + hoch) >> 1;
+    if (passtAufEineSeite(bauen(einheiten.slice(0, mitte)))) {
+      beste = mitte; tief = mitte + 1;
+    } else hoch = mitte - 1;
+  }
+  return beste;
+}
+
+function druckBlatt(nummer, montag, s) {
+  var einseitig = druckBlattEinseitig(nummer, montag, s);
+  if (passtAufEineSeite(einseitig)) return einseitig;
+
+  var texte = wochenTexte(montag);
+  var rest = druckEinheiten(texte.betrieb);
+  var seiten = [], wache = 0;
+
+  var bauen = function (teil, fortsetzung, letzte) {
+    return druckBlattSeite(nummer, montag, s, {
+      betrieb: druckBuendeln(teil),
+      unterweisung: letzte ? texte.unterweisung : [],
+      schule: letzte ? texte.schule : []
+    }, fortsetzung, letzte);
+  };
+
+  /* Vor jedem Blatt: Passt der ganze Rest samt Schlussfeldern? Dann ist es
+     das letzte. Sonst so viel wie möglich ohne Schlussfelder – aber nie
+     alles, sonst stünden die Schlussfelder allein auf einem leeren Blatt. */
+  while (rest.length && wache++ < 200) {
+    var fortsetzung = seiten.length > 0;
+
+    var mitSchluss = druckPraefix(rest, function (teil) { return bauen(teil, fortsetzung, true); });
+    if (mitSchluss === rest.length) { seiten.push(rest); break; }
+
+    var ohneSchluss = druckPraefix(rest, function (teil) { return bauen(teil, fortsetzung, false); });
+    var n = Math.max(1, Math.min(ohneSchluss, rest.length - 1));
+    seiten.push(rest.slice(0, n));
+    rest = rest.slice(n);
+  }
+  if (!seiten.length) seiten = [[]];
+
+  return seiten.map(function (betrieb, i) {
+    return bauen(betrieb, i > 0, i === seiten.length - 1);
+  }).join("");
+}
+
+/** Wie druckBlatt, aber ohne Ausnahmen: Scheitert die Aufteilung, kommt
+ *  die Woche ungeteilt aufs Papier. */
+function druckBlattSicher(nummer, montag, s) {
+  try {
+    return druckBlatt(nummer, montag, s);
+  } catch (fehler) {
+    try { return druckBlattEinseitig(nummer, montag, s); }
+    catch (zweiter) { return ""; }
+  }
+}
+
+/** Deckblatt und Ausbildungsgang für das gedruckte Gesamtheft. */
+function druckVorseiten(s) {
+  function zeile(b, w) {
+    return "<tr><th>" + sicher(b) + "</th><td>" + sicher(w || "") + "</td></tr>";
+  }
+  var deck = '<article class="blatt deck">' +
+    '<h1 class="gross">Berichtsheft</h1>' +
+    '<p class="untertitel">(Ausbildungsnachweis – wöchentliche Notierung –)</p>' +
+    '<table class="stammliste">' +
+      deckblattAngaben(s).map(function (a) { return zeile(a[0], a[1]); }).join("") +
+    "</table>" +
+    '<h2 class="block">Gesetzlicher Vertreter des Auszubildenden</h2>' +
+    '<table class="stammliste">' + zeile("Name", s.vertreterName) +
+      zeile("Anschrift", s.vertreterAnschrift) + "</table>" +
+    '<div class="unterschriften eins">' +
+      "<div>Unterschrift der Eltern bzw. der gesetzlichen Vertreter</div>" +
+    "</div></article>";
+
+  var reihen = "", abschnitte = abteilungsAbschnitte(s);
+  for (var i = 0; i < Math.max(GANG_ZEILEN, abschnitte.length); i++) {
+    var a = abschnitte[i];
+    reihen += "<tr><td>" + (a ? sicher(a.name) : "") + "</td>" +
+      "<td>" + (a ? dmy(a.von) : "") + "</td>" +
+      "<td>" + (a ? dmy(a.bis) : "") + "</td><td></td></tr>";
+  }
+  var gang = '<article class="blatt">' +
+    "<h1>Ausbildungsgang</h1>" +
+    '<table class="gang"><thead><tr>' +
+      "<th>Abteilung (Arbeitsgebiet oder Sparte)</th><th>Dauer vom</th><th>bis</th>" +
+      "<th>Unterschrift des Abteilungsleiters oder des Ausbildenden</th>" +
+    "</tr></thead><tbody>" + reihen + "</tbody></table></article>";
+
+  return deck + gang;
+}
+
+/**
+ * Druckansicht aufbauen und den Druckdialog öffnen. Messen braucht
+ * Layout, und daran kann in einem fremden Browser mehr scheitern als an
+ * reiner Rechnung – deshalb ist alles abgesichert.
+ */
+function drucken(alleWochen) {
+  if (!aktiveWoche) return;
+  try {
+    var s = stammdaten();
+    var blaetter = "";
+
+    if (alleWochen) {
+      blaetter = druckVorseiten(s) + alleExportMontage(s).map(function (montag, i) {
+        return druckBlattSicher(i + 1, montag, s);
+      }).join("");
+    } else {
+      var m = vonIso(aktiveWoche);
+      blaetter = druckBlattSicher(wochenNummer(m, startMontag(s)), m, s);
+    }
+
+    if (!blaetter) {
+      sage("Für den Druck kam kein Blatt zustande.", "warn");
+      return;
+    }
+
+    $("druck").innerHTML = blaetter;
+    menueSchliessen();
+    // Kurz warten, damit der Browser die Blätter vor dem Dialog zeichnet.
+    setTimeout(function () {
+      try { window.print(); }
+      catch (fehler) { sage("Der Druckdialog ließ sich nicht öffnen.", "warn"); }
+    }, 60);
+  } catch (fehler) {
+    // Reste abräumen, sonst druckt der nächste Versuch sie mit.
+    $("druck").innerHTML = "";
+    sage("Der Druck ist gescheitert: " + fehler.message, "warn");
+  }
+}

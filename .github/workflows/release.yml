@@ -1,0 +1,36 @@
+# Ein Tag wie v0.1.0 erzeugt ein Release mit Berichtsheft.html zum Herunterladen.
+#   git tag v0.1.0 && git push origin v0.1.0
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --omit=dev
+      - run: npm run build
+      - name: Release anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Die Prüfsumme steht in den Notizen, damit jeder bei einer Meldung des Virenscanners
+        # nachsehen kann, ob er genau die Datei aus diesem Release hat.
+        run: |
+          SUMME=$(sha256sum dist/Berichtsheft.html | cut -d' ' -f1)
+          gh release create "$GITHUB_REF_NAME" dist/Berichtsheft.html \
+            --title "Berichtsheft $GITHUB_REF_NAME" \
+            --notes "Berichtsheft.html herunterladen und doppelklicken. Die Datei läuft ohne Installation und ohne Internet.
+
+          SHA-256 der Datei \`$SUMME\`
+
+          Unter Windows prüfst du sie in PowerShell mit \`Get-FileHash Berichtsheft.html\`, unter Linux mit \`sha256sum Berichtsheft.html\` und unter macOS mit \`shasum -a 256 Berichtsheft.html\`. Steht dort ein anderer Wert, stammt die Datei nicht aus diesem Release."

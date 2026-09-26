@@ -1,0 +1,5 @@
+# Ins Image gehören nur package*.json und die Quelldateien.
+*
+!package.json
+!package-lock.json
+!*.js

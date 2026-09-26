@@ -1,0 +1,131 @@
+/* ============================================================
+ * Das gedruckte Blatt
+ *
+ * Dieselbe Seite wie im Word-Dokument, als HTML. Über den Druckdialog
+ * des Browsers wird daraus ein PDF.
+ *
+ * Die Regeln stehen außerhalb von @media print, weil das Werkzeug die
+ * Höhe eines Blatts vor dem Druck in #messung ausmisst (siehe druck.js).
+ * Auf dem Schirm sichtbar ist davon nichts: .blatt steht nur in #druck
+ * (versteckt) und in #messung (außerhalb des Bildes).
+ * ========================================================== */
+#druck { display: none; }
+#druck, #messung, .bogen {
+  font-family: Cambria, Georgia, "Times New Roman", serif;
+  color: #000; background: #fff;
+}
+
+/* Genau so breit wie der Satzspiegel (A4 minus 2 × 15 mm). Nicht
+   display: none, sonst setzt der Browser nichts, was sich messen ließe. */
+#messung {
+  position: absolute; left: -9999px; top: 0;
+  width: 180mm; visibility: hidden; pointer-events: none;
+}
+
+.blatt h1 {
+  font-size: 13pt; text-align: center; margin: 2mm 0 8mm;
+  letter-spacing: .2em; text-transform: uppercase; font-weight: bold;
+}
+.blatt h1.gross { font-size: 24pt; margin: 30mm 0 3mm; letter-spacing: 0; text-transform: none; }
+.blatt .untertitel { text-align: center; font-size: 10pt; color: #555; margin: 0 0 18mm; }
+
+/* Kopfleiste: fünf Angaben nebeneinander, Etikett über dem Wert. */
+.blatt .kopfleiste { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.blatt .kopfleiste td {
+  border-bottom: .5pt solid #000; padding: 0 4mm 1.5mm 0;
+  font-size: 10pt; vertical-align: bottom;
+}
+.blatt .kopfleiste td:nth-child(1) { width: 8%; }
+.blatt .kopfleiste td:nth-child(2) { width: 18%; }
+.blatt .kopfleiste td:nth-child(3) { width: 27%; }
+.blatt .kopfleiste td:nth-child(4) { width: 23%; }
+.blatt .kopfleiste td span {
+  display: block; font-size: 6.5pt; letter-spacing: .09em; white-space: nowrap;
+  text-transform: uppercase; color: #777; margin-bottom: .8mm;
+}
+
+/* Feld: Überschrift darüber, darunter die umrandete Fläche. */
+.blatt .feld { margin-top: 6mm; }
+.blatt h2 {
+  font-size: 7pt; font-weight: normal; margin: 0 0 1.8mm;
+  letter-spacing: .14em; text-transform: uppercase; color: #000;
+  background: none; border: 0; padding: 0;
+}
+.blatt .kasten { border: .5pt solid #000; padding: 3mm 4mm; font-size: 10pt; line-height: 1.45; }
+.blatt .kasten p { margin: 0 0 .6mm; }
+.blatt .kasten p:last-child { margin-bottom: 0; }
+/* Stichpunkt mit hängendem Einzug. 3,5 mm entsprechen dem Einzug im
+   Word-Dokument (hanging: 200 Twips), damit beide Ausgaben gleich aussehen. */
+.blatt .kasten p.sp { margin-left: 3.5mm; padding-left: 3.5mm; text-indent: -3.5mm; }
+.blatt .kasten p.sp .pkt { display: inline-block; width: 3.5mm; }
+.blatt .kasten .tagkopf { font-size: 8.5pt; font-weight: normal; margin-top: 4mm; }
+.blatt .kasten .tagkopf:first-child { margin-top: 0; }
+.blatt .kasten .tagkopf b { font-weight: bold; }
+.blatt .kasten .tagkopf span { color: #555; }
+.blatt .kasten .tagkopf b + span::before { content: "   ·   "; }
+.blatt .kasten .tagkopf + p { margin-top: .8mm; }
+.blatt .feld.gross .kasten { min-height: 76mm; }
+.blatt .feld.klein .kasten { min-height: 26mm; }
+
+/* Dichtestufen (siehe dichte()): Erst wird enger gesetzt, und erst wenn
+   das nicht reicht, bekommt die Woche ein zweites Blatt. */
+.blatt.dicht-1 .feld { margin-top: 4.5mm; }
+.blatt.dicht-1 .kasten { font-size: 8.5pt; line-height: 1.35; padding: 2.2mm 4mm; }
+.blatt.dicht-1 .kasten p { margin-bottom: .4mm; }
+.blatt.dicht-1 .kasten .tagkopf { font-size: 8pt; margin-top: 2.8mm; }
+.blatt.dicht-1 .feld.gross .kasten { min-height: 58mm; }
+.blatt.dicht-1 .feld.klein .kasten { min-height: 22mm; }
+.blatt.dicht-1 .unterschriften { margin-top: 10mm; }
+.blatt.dicht-2 .feld { margin-top: 4mm; }
+.blatt.dicht-2 .kasten { font-size: 8.5pt; line-height: 1.32; padding: 2mm 4mm; }
+.blatt.dicht-2 .kasten p { margin-bottom: .35mm; }
+.blatt.dicht-2 .kasten .tagkopf { font-size: 8pt; margin-top: 2.5mm; }
+.blatt.dicht-2 .feld.gross .kasten { min-height: 36mm; }
+.blatt.dicht-2 .feld.klein .kasten { min-height: 17mm; }
+.blatt.dicht-2 h1 { margin: 1mm 0 6mm; }
+.blatt.dicht-2 .unterschriften { margin-top: 8mm; }
+
+.blatt .unterschriften { display: flex; gap: 10mm; margin-top: 14mm; }
+.blatt .unterschriften div {
+  flex: 1 1 0; border-top: .5pt solid #000; padding-top: 1.5mm;
+  font-size: 7pt; color: #555;
+}
+.blatt .unterschriften.eins { margin-top: 24mm; }
+.blatt .unterschriften.eins div { flex: 0 0 58%; }
+
+/* Deckblatt */
+.blatt .stammliste { width: 100%; border-collapse: collapse; }
+.blatt .stammliste th {
+  text-align: left; font-weight: normal; color: #555; font-size: 10.5pt;
+  width: 38%; padding: 7pt 8pt 3pt 0; vertical-align: bottom;
+}
+.blatt .stammliste td {
+  font-size: 11.5pt; padding: 7pt 0 3pt; vertical-align: bottom;
+  border-bottom: .5pt solid #000;
+}
+.blatt h2.block { margin: 14mm 0 3pt; font-size: 7pt; letter-spacing: .14em; text-transform: uppercase; }
+
+/* Ausbildungsgang */
+.blatt .gang { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 4mm; }
+.blatt .gang th, .blatt .gang td { border: .5pt solid #000; padding: 5pt 6pt; font-size: 10pt; height: 9mm; }
+.blatt .gang th {
+  font-size: 7pt; font-weight: normal;
+  letter-spacing: .12em; text-transform: uppercase; text-align: left; vertical-align: bottom;
+}
+.blatt .gang td:nth-child(2), .blatt .gang td:nth-child(3),
+.blatt .gang th:nth-child(2), .blatt .gang th:nth-child(3) { text-align: center; width: 17%; }
+.blatt .gang th:last-child, .blatt .gang td:last-child { width: 26%; }
+
+@media print {
+  @page { size: A4 portrait; margin: 16mm 15mm; }
+  body > *:not(#druck) { display: none !important; }
+  body { display: block; height: auto; overflow: visible; background: #fff; color: #000; }
+  #druck { display: block; }
+
+  /* Ein Blatt ist eine Seite. Reicht der Inhalt trotz der gemessenen
+     Aufteilung weiter, soll wenigstens sauber umbrochen werden. */
+  .blatt { page-break-after: always; break-after: page; }
+  .blatt:last-child { page-break-after: auto; break-after: auto; }
+  .blatt h1, .blatt h2, .blatt .kopfleiste, .blatt .kasten .tagkopf { break-after: avoid; page-break-after: avoid; }
+  .blatt .feld.klein, .blatt .unterschriften, .blatt .kopfleiste, .blatt .kasten p { break-inside: avoid; page-break-inside: avoid; }
+}

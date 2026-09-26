@@ -1,0 +1,17 @@
+Datum;Von;Bis;Dauer;Benutzer;Kunde;Projekt;Tätigkeit;Beschreibung
+2026-09-01;08:00;16:30;02:50;azubi;Muster GmbH;;;Möbel- & Arbeitsplatzaufbau: Montage von Bürostühlen, Schränken und Schreibtischen zur Einrichtung der physischen Arbeitsplätze.
+2026-09-01;08:00;16:30;02:50;azubi;Muster GmbH;;;IT-Einrichtung & Debugging: Konfiguration eines neuen Notebooks inklusive Betriebssystem sowie Installation und Fehlersuche bei Arbeitsanwendungen (unter anderem OpenProject und Kimai).
+2026-09-01;08:00;16:30;02:50;azubi;Muster GmbH;;;Software-Installation & Admin: Durchführen der Nextcloud-Installation über die Verwaltungssysteme nach Freigabe abgelaufener Einladungslinks.
+2026-09-02;08:00;16:30;02:50;azubi;Muster GmbH;;;Einführung in Admin-Tools: Erstweisungen und Einarbeitung in die Plattformen GitLab und Proxmox erhalten.
+2026-09-02;08:00;16:30;02:50;azubi;Muster GmbH;;;Sicherheits- & Benutzerverwaltung: Einrichtung eines zentralen Passwort-Tresors für das sichere Zugangsdaten-Management.
+2026-09-02;08:00;16:30;02:50;azubi;Muster GmbH;;;Einarbeitung & Dokumentation: Sichtung, Erstellung und Durcharbeiten von internen System-Dokumentationen in OneNote.
+2026-09-02;08:00;16:30;02:50;azubi;Muster GmbH;;;Fachgespräche & Analyse: Teilnahme an technischen Besprechungen zur Evaluierung einer neuen Telefonanlage sowie Durchsprache von Systemdiagrammen in OneNote und draw.io.
+2026-09-02;08:00;16:30;02:50;azubi;Muster GmbH;;;Aufgabenbearbeitung: Selbstständige Durchführung und Bearbeitung von vorgegebenen Praxis-Übungsaufgaben.
+2026-09-03;08:00;16:30;02:50;azubi;Muster GmbH;;;Netzwerk- & Infrastruktursichtung: Teilnahme an einem Rundgang durch den Serverraum zur Übersicht über Switches, Patchfelder und Verkabelung.
+2026-09-03;08:00;16:30;02:50;azubi;Muster GmbH;;;Medien-Erstellung & OS-Vorbereitung: Erstellung von bootfähigen USB-Sticks mit Ubuntu Server LTS sowie dem Antiviren-System Desinfect zur Vorbereitung neuer Systeme.
+2026-09-03;08:00;16:30;02:50;azubi;Muster GmbH;;;Kommunikations-Konfiguration: Einrichtung und Freischaltung des zentralen Nextcloud-Accounts inklusive vollständiger Kontaktdatenpflege.
+2026-09-03;08:00;16:30;02:50;azubi;Muster GmbH;;;Container-Vorbereitung: Technische Ersteinrichtung und Netzwerkkonfiguration von Systemen zur späteren Bereitstellung einer Docker-Umgebung.
+2026-09-04;08:00;16:30;02:50;azubi;Muster GmbH;;;Dokumentation & Checklisten: Erstellung und Überarbeitung von Notfall-Checklisten sowie Erfassung eines Vorfalls zur E-Mail-Infrastruktur inklusive gemeinsamer Fehlersuche im Team.
+2026-09-04;08:00;16:30;02:50;azubi;Muster GmbH;;;Security & Testverfahren: Durchführung des Virenschutz-Onboardings sowie technische Validierung von Antiviren-USB-Sticks bezüglich der Speicherung aktueller Signaturen.
+2026-09-04;08:00;16:30;02:50;azubi;Muster GmbH;;;Physische Infrastruktur: Verlegung von LAN-Kabeln zur Anbindung von Arbeitsplätzen mit dem Netzwerk.
+2026-09-04;08:00;16:30;02:50;azubi;Muster GmbH;;;Abstimmung & Organisation: Teilnahme an internen Abstimmungen, Führung von Feedbackgesprächen mit der Geschäftsführung sowie Strukturierung der eigenen Berichtsdokumentation.

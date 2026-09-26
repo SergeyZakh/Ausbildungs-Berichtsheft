@@ -1,0 +1,312 @@
+/* ============================================================
+ * Dialoge und Überlagerungen: Monatsraster, Deine Daten, Zuordnung, Rundgang
+ * ========================================================== */
+
+/* ---------- Wochenwahl: Monatsraster ---------- */
+.wpopover {
+  position: absolute; z-index: 50; width: 420px; max-width: calc(100vw - 16px);
+  background: rgba(255, 255, 255, .84); border: 1px solid var(--glas-kante); border-radius: 16px;
+  -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
+  box-shadow: var(--schatten-hoch);
+}
+.wpopover .dkopf { border-bottom-color: rgba(22, 22, 26, .08); padding: 12px 12px 12px 18px; }
+.wpopover .dkoerper { padding: 14px 16px 16px; }
+.monatszeile {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+}
+.monatszeile span { flex: 1 1 auto; text-align: center; font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+
+/* Eine Zeile je Woche: Kalenderwoche, sieben Tageszellen, Stunden. */
+.wochenliste {
+  max-height: 320px; overflow-y: auto;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: 12px;
+}
+.wochenliste .wkopf,
+.wochenliste button {
+  display: grid; grid-template-columns: 34px repeat(7, 1fr) 52px;
+  width: 100%; align-items: center; text-align: left;
+  background: var(--flaeche); border: none; border-bottom: 1px solid #EFEEEA;
+  padding: 0; color: var(--text);
+}
+.wochenliste .wkopf {
+  background: var(--band); font-size: 9.5px; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--schiefer); position: sticky; top: 0; z-index: 1;
+}
+.wochenliste .wkopf span { padding: 5px 0; text-align: center; }
+.wochenliste button:last-child { border-bottom: none; }
+.wochenliste button:hover:not(:disabled) { background: var(--band); }
+.wochenliste button:disabled { color: #A8A8A8; cursor: not-allowed; }
+/* Leere Woche: blass, mit "+" statt Stunden; ein Klick legt sie an. */
+.wochenliste button.neu, .wochenliste button.neu .wkw { color: #B0AEA8; }
+.wochenliste button.neu .wstd { color: #B0AEA8; font-size: 14px; }
+.wochenliste button.neu:hover, .wochenliste button.neu:hover .wkw, .wochenliste button.neu:hover .wstd { color: var(--text); }
+.wochenliste .wkw { font-size: 10px; color: var(--schiefer); text-align: center; font-variant-numeric: tabular-nums; }
+.wochenliste .wstd {
+  font-size: 11.5px; text-align: center; color: var(--schiefer);
+  font-variant-numeric: tabular-nums; padding-right: 4px;
+}
+.wochenliste .leerzeile { padding: 14px 12px; font-size: 12.5px; color: var(--schiefer); }
+
+/* Tageszelle als Kreis: rot = Text ungelesen, grün = gegengelesen,
+   Ring = Stunden ohne Text, durchgestrichen = frei. */
+.wochenliste .wtag {
+  display: flex; align-items: center; justify-content: center;
+  height: 32px; font-size: 12px; font-variant-numeric: tabular-nums;
+}
+.wochenliste .wtag b {
+  display: flex; align-items: center; justify-content: center;
+  width: 23px; height: 23px; border-radius: 50%; font-weight: 400; font-size: 11px;
+}
+.wochenliste .wtag.voll b   { background: var(--acht); color: #fff; }
+.wochenliste .wtag.fertig b { background: var(--gut); color: #fff; }
+.wochenliste .wtag.offen b  { border: 1.5px solid var(--text); }
+.wochenliste .wtag.frei b   { color: #A8A8A8; text-decoration: line-through; }
+.wochenliste .wtag.nichts b { color: #C8C8C8; }
+
+.wochenliste button.pruefen,
+.wochenliste button.pruefen .wkw,
+.wochenliste button.pruefen .wstd { color: var(--acht); }
+.wochenliste button.fertig,
+.wochenliste button.fertig .wkw,
+.wochenliste button.fertig .wstd { color: var(--gut); }
+.wochenliste button.pruefen:hover:not(:disabled) { background: var(--acht-hell); }
+.wochenliste button.fertig:hover:not(:disabled) { background: var(--gut-hell); }
+
+/* Die gewählte Woche bekommt einen Balken links statt einer anderen
+   Grundfarbe, damit die Tagesfarben in jeder Zeile gleich bleiben. */
+.wochenliste button[aria-current="true"] {
+  background: var(--band); box-shadow: inset 3px 0 0 0 var(--text); font-weight: 600;
+}
+.wochenliste button.pruefen[aria-current="true"] { background: var(--acht-hell); box-shadow: inset 3px 0 0 0 var(--acht); }
+.wochenliste button.fertig[aria-current="true"]  { background: var(--gut-hell); box-shadow: inset 3px 0 0 0 var(--gut); }
+
+.sprungzeile { display: flex; gap: 8px; margin-top: 10px; }
+.sprungzeile .knopf { flex: 1 1 0; font-size: 12px; padding: 7px 8px; }
+.suchzeile { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.suchzeile span { font-size: 12.5px; color: var(--schiefer); white-space: nowrap; }
+.suchzeile input {
+  flex: 1 1 auto; font: inherit; font-size: 13.5px; padding: 6px 10px;
+  border: 1px solid var(--linie); border-radius: var(--rund-klein); background: var(--flaeche);
+}
+.suchhinweis { margin: 8px 0 0; font-size: 12.5px; color: var(--schiefer); min-height: 18px; }
+
+/* ---------- Dialog "Deine Daten" ----------
+   Feste Höhe, damit das Fenster beim Reiterwechsel nicht springt. */
+#dlg-stamm {
+  width: min(560px, calc(100% - 32px));
+  height: 580px; max-height: calc(100vh - 24px);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+#dlg-stamm:not([open]) { display: none; }
+#dlg-stamm .dkoerper { flex: 1 1 384px; min-height: 0; height: 384px; overflow-y: auto; }
+#dlg-stamm .dfuss { flex: none; padding-top: 14px; border-top: 1px solid var(--linie); }
+.dlg-blatt { min-height: 100%; }
+
+/* Reiter im Dialog als Segmentschalter. */
+.blattleiste {
+  display: flex; gap: 2px; margin: 14px 20px 0; padding: 3px;
+  background: var(--band); border: 1px solid var(--linie); border-radius: 11px; overflow-x: auto;
+}
+.blattleiste button {
+  flex: 1 1 0; white-space: nowrap; background: transparent; color: var(--schiefer);
+  border: none; border-radius: 8px; padding: 6px 10px;
+  font-size: 12px; letter-spacing: .02em;
+  transition: background-color .15s, color .15s, box-shadow .15s;
+}
+.blattleiste button:hover { color: var(--text); }
+.blattleiste button[aria-selected="true"] {
+  background: var(--flaeche); color: var(--text); font-weight: 600;
+  box-shadow: 0 1px 3px rgba(22, 22, 26, .12);
+}
+.blattleiste button.rot { color: var(--acht); }
+.blattleiste button.rot[aria-selected="true"] { background: var(--acht); color: #fff; }
+
+.hinweis-stamm { margin: 0; flex: 1 1 auto; font-size: 12px; line-height: 1.5; color: var(--schiefer); }
+.hinweis-stamm.fehlt { color: var(--acht); }
+
+/* Verbindungsprüfung zum Sprachmodell */
+/* Feld mit Auswahl: Man kann tippen oder aus den Modellen des Dienstes wählen. Die Liste ist
+   dieselbe Machart wie die Menüs in der Kopfleiste; ein <datalist> ließe sich nicht gestalten. */
+.kombifeld { position: relative; display: flex; }
+.kombifeld input { padding-right: 32px; }
+.kombipfeil {
+  position: absolute; right: 2px; top: 2px; bottom: 2px; width: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: 8px;
+  color: var(--schiefer); font-size: 11px; line-height: 1;
+}
+.kombipfeil:hover, .kombipfeil[aria-expanded="true"] { background: var(--band); color: var(--text); }
+.kombiliste {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 40;
+  max-height: 210px; overflow-y: auto; padding: 5px;
+  background: var(--glas); border: 1px solid var(--glas-kante); border-radius: 12px;
+  -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
+  box-shadow: var(--schatten-hoch);
+  display: flex; flex-direction: column; gap: 1px;
+}
+.kombiliste button {
+  display: flex; align-items: center; gap: 8px;
+  text-align: left; background: transparent; color: var(--text); border: none;
+  border-radius: 8px; padding: 8px 11px; font-size: 12.5px;
+}
+.kombiliste button span {
+  flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.kombiliste button em { flex: none; font-style: normal; color: var(--gut); visibility: hidden; }
+.kombiliste button:hover { background: rgba(22, 22, 26, .06); }
+.kombiliste button[aria-selected="true"] { font-weight: 600; }
+.kombiliste button[aria-selected="true"] em { visibility: visible; }
+
+.pruefzeile { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pruefzeile .knopf { flex: none; }
+.ampel { flex: none; width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid currentColor; }
+.ampel.gut { background: var(--gut); border-color: var(--gut); box-shadow: 0 0 0 3px rgba(26, 127, 55, .18); }
+.ampel.schlecht { background: var(--acht); border-color: var(--acht); box-shadow: 0 0 0 3px rgba(180, 35, 24, .18); }
+.pruefhinweis { flex: 1 1 140px; font-size: 12px; color: var(--schiefer); }
+.pruefhinweis.gut { color: var(--gut); }
+.pruefhinweis.schlecht { color: var(--acht); }
+.anweisungszeile small { display: flex; justify-content: space-between; gap: 12px; }
+.felder .anweisungszeile small span { display: inline; margin: 0; font-size: inherit; }
+.anweisungszeile .zaehler { font-variant-numeric: tabular-nums; }
+
+/* Gefahrenbereich */
+.gefahrkasten { border: 1.5px solid #E3A9A2; border-radius: 12px; color: var(--acht); overflow: hidden; }
+.gefahrzeile {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 12px 14px; border-bottom: 1px solid #F1CFCA;
+}
+.gefahrzeile:last-child { border-bottom: none; }
+.gefahrzeile > div { flex: 1 1 auto; min-width: 0; }
+.gefahrzeile b { display: block; font-size: 13px; margin-bottom: 3px; }
+.gefahrzeile span { display: block; font-size: 12px; line-height: 1.45; }
+.gefahrknopf { flex: none; align-self: center; border-color: var(--acht); color: var(--acht); font-weight: 500; }
+.gefahrknopf:hover:not(:disabled) { background: var(--acht); border-color: var(--acht); color: #fff; }
+.gefahrhinweis {
+  margin: 0; padding: 10px 14px; font-size: 12.5px; line-height: 1.5; color: var(--text);
+  border-top: 1px solid #E3A9A2; background: var(--band);
+}
+.gefahrfrage { padding: 12px 14px; border-top: 1px solid #E3A9A2; background: var(--acht-hell); }
+.gefahrfrage p { margin: 0 0 10px; font-size: 12.5px; line-height: 1.5; }
+.gefahrfrage label span { display: block; font-size: 12px; margin-bottom: 4px; }
+.gefahrfrage input {
+  width: 100%; font: inherit; font-size: 13.5px; letter-spacing: .08em;
+  color: var(--acht); background: #fff; border: 1px solid var(--acht); border-radius: var(--rund-klein);
+  padding: 6px 10px;
+}
+.gefahrfrage input::placeholder { color: #D99; }
+.gefahrfuss { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+.gefahrfuss .knopf { border-color: var(--acht); color: var(--acht); }
+.gefahrfuss .knopf:hover:not(:disabled) { background: var(--acht-hell); border-color: var(--acht); }
+#gefahr-ja { background: var(--acht); border-color: var(--acht); color: #fff; }
+#gefahr-ja:hover:not(:disabled) { filter: brightness(1.12); background: var(--acht); }
+#gefahr-ja:disabled { background: #fff; color: var(--acht); border-color: #C9A5A1; }
+
+/* ---------- Spalten zuordnen ---------- */
+#dlg-zuordnung { max-width: 680px; }
+#dlg-zuordnung .dkoerper { max-height: min(70vh, 640px); overflow-y: auto; }
+.zu-gruende {
+  margin: 0 0 14px; padding: 8px 12px 8px 28px; font-size: 12.5px; color: var(--acht);
+  background: var(--acht-hell); border-radius: var(--rund-klein);
+}
+.zu-reihe { margin-top: 12px; }
+.zu-reihe em { font-style: normal; color: var(--schiefer); }
+.zu-stand { margin: 14px 0 8px; font-size: 12.5px; font-weight: 500; color: var(--gut); }
+.zu-stand.warn { color: var(--acht); }
+.zu-vorschau { overflow-x: auto; border: 1px solid var(--linie); border-radius: var(--rund-klein); }
+.zu-vorschau table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.zu-vorschau th {
+  text-align: left; font-weight: 600; color: var(--schiefer); background: var(--band);
+  padding: 6px 10px; border-bottom: 1px solid var(--linie);
+}
+.zu-vorschau td { padding: 6px 10px; border-bottom: 1px solid var(--linie); vertical-align: top; white-space: nowrap; }
+.zu-vorschau td:last-child { white-space: normal; }
+.zu-vorschau tr:last-child td { border-bottom: 0; }
+
+/* ---------- Kontrolle vor dem Export ---------- */
+#dlg-pruefung { width: min(520px, calc(100% - 32px)); }
+.pruef-vorwort { margin: 0 0 14px; font-size: 13px; color: var(--schiefer); }
+.pruefgruppe { margin-bottom: 16px; }
+.pruefgruppe:last-child { margin-bottom: 0; }
+.pruefgruppe h3 {
+  margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--acht);
+  text-transform: uppercase; border-bottom: 1px solid currentColor; padding-bottom: 4px;
+}
+.pruefgruppe ul { margin: 0; padding: 0; list-style: none; }
+.pruefgruppe li { font-size: 12.5px; padding: 4px 0; color: var(--text); border-bottom: 1px solid var(--linie); }
+.pruefgruppe li:last-child { border-bottom: none; }
+.pruefgruppe .pruefrest { color: var(--schiefer); font-style: italic; }
+
+/* ---------- Rundgang beim ersten Start ----------
+   Der dunkle Grund ist ein übergroßer Schatten um das ausgesparte Loch. */
+.onb { position: fixed; inset: 0; z-index: 90; }
+.onb-loch {
+  position: absolute; border: 2px solid #fff; border-radius: var(--rund);
+  box-shadow: 0 0 0 9999px rgba(22, 22, 26, .66);
+  transition: all .22s ease; pointer-events: none;
+}
+.onb-karte {
+  position: absolute; width: 340px; max-width: calc(100vw - 24px);
+  background: var(--flaeche); color: var(--text); border-radius: 16px;
+  padding: 18px 20px 16px; transition: all .22s ease; box-shadow: var(--schatten-hoch);
+}
+.onb-zaehler {
+  display: inline-block; margin: 0 0 8px; padding: 2px 9px; border-radius: 999px;
+  background: var(--band); border: 1px solid var(--linie);
+  font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--schiefer);
+}
+.onb-karte h2 { margin: 0 0 8px; font-size: 16px; }
+.onb-text { margin: 0 0 16px; font-size: 13.5px; line-height: 1.55; }
+.onb-fuss { display: flex; align-items: center; gap: 8px; }
+.onb-still { margin-right: auto; border-color: transparent; color: var(--schiefer); background: transparent; }
+
+/* ---------- Hinweis am Handy ---------- */
+.handyhinweis {
+  position: fixed; inset: 0; z-index: 95; padding: 20px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(40, 38, 34, .3);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.hh-karte {
+  width: 100%; max-width: 340px; padding: 28px 24px 22px; text-align: center;
+  background: var(--glas); border: 1px solid var(--glas-kante); border-radius: 22px;
+  -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
+  box-shadow: var(--schatten-hoch);
+}
+/* Ein Kreis im Kreis, wie ein Handy von oben gesehen. */
+.hh-kreis {
+  width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
+  border: 2px solid var(--text);
+  background: radial-gradient(circle, var(--text) 0 7px, transparent 7.5px);
+}
+.hh-karte h2 { margin: 0 0 8px; font-size: 18px; }
+.hh-karte p { margin: 0 0 20px; font-size: 14.5px; line-height: 1.5; color: var(--schiefer); }
+.hh-karte p:last-child { margin-bottom: 0; }
+/* Hinter der Sperre scrollt und reagiert nichts. */
+body.gesperrt { overflow: hidden; height: 100vh; }
+body.gesperrt > *:not(.handyhinweis) { pointer-events: none; user-select: none; }
+
+/* ---------- Datei ins Fenster ziehen ---------- */
+.ablage {
+  position: fixed; inset: 0; z-index: 80;
+  background: rgba(40, 38, 34, .35); display: flex;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  align-items: center; justify-content: center; pointer-events: none;
+}
+.ablage-kasten {
+  border: 2px dashed var(--text); border-radius: 24px; color: var(--text);
+  background: var(--glas); padding: 40px 56px; font-size: 17px; letter-spacing: .02em;
+  box-shadow: var(--schatten-hoch);
+}
+
+/* ---------- Meldung über einem offenen Dialog ----------
+   Die Fußleiste liegt hinter jedem modalen Dialog; sage() legt die Meldung dann hier hinein. */
+.dlgnotiz {
+  /* Über dem Fuß des Dialogs, damit Knöpfe und Hinweis dort frei bleiben. */
+  position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%); z-index: 5;
+  max-width: calc(100% - 32px); margin: 0; padding: 8px 14px; border-radius: 999px;
+  font-size: 12.5px; line-height: 1.4; color: var(--text);
+  background: var(--flaeche); border: 1px solid var(--linie-fest); box-shadow: var(--schatten-hoch);
+}
+.dlgnotiz.gut  { color: var(--gut); background: var(--gut-hell); border-color: #BFDDC8; }
+.dlgnotiz.warn { color: var(--acht); background: var(--acht-hell); border-color: #EDC6C1; }
+.dlgnotiz[hidden] { display: none; }

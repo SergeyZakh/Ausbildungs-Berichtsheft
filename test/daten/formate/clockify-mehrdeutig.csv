@@ -1,0 +1,3 @@
+Project,Client,Description,Task,User,Email,Start Date,Start Time,End Date,End Time,Duration (h),Duration (decimal)
+Intern,,Daily standup,Meeting,Max Muster,max@example.com,09/07/2026,08:00:00 AM,09/07/2026,08:15:00 AM,00:15:00,0.25
+Intern,,Switch getauscht,Netzwerk,Max Muster,max@example.com,09/08/2026,09:00:00 AM,09/08/2026,11:00:00 AM,02:00:00,2.00

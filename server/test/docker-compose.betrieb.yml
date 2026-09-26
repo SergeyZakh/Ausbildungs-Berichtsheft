@@ -1,0 +1,55 @@
+# Betriebstest für server/test/betrieb.sh: der Stapel aus docker-compose.server.yml, dazu ein echter
+# Keycloak mit dem Realm aus keycloak/realm-berichtsheft.json. Nie direkt starten; das Skript setzt
+# die Testwerte, legt Konten an und räumt danach alles ab.
+#
+# Browser und Rechner erreichen Keycloak über 127.0.0.1 und KEYCLOAK_PORT (Vorgabe 8180), der Server
+# im Container-Netz über http://keycloak:8080. Der Port ist überschreibbar, damit der Test neben einem
+# laufenden Stapel starten kann; sonst ist 8180 belegt. Dank KC_HOSTNAME_BACKCHANNEL_DYNAMIC steht
+# in beiden Fällen dieselbe Adresse als Aussteller im Token, wie später hinter dem Reverse Proxy.
+#
+# Das Berichtsheft liegt auf 127.0.0.1:8090; betrieb.sh setzt dafür BERICHTSHEFT_PORT (Ports aus
+# mehreren Compose-Dateien würden sich addieren statt ersetzen).
+
+services:
+  berichtsheft:
+    # /ki geht an das Ollama auf dem eigenen Rechner (der Dienst ollama ist hier aus). Zum Ausprobieren
+    # mit --behalten; die Tests selbst brauchen kein Sprachmodell.
+    environment:
+      OLLAMA_HOST: "host.docker.internal:11434"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  server:
+    environment:
+      OIDC_ISSUER: http://keycloak:8080/realms/berichtsheft
+
+  datenbank:
+    ports:
+      - "127.0.0.1:55433:5432"
+
+  sicherung:
+    # Im Test wird von Hand gesichert, nicht nachts.
+    environment:
+      SICHERUNG_UHRZEIT: "04:00"
+
+  # Das Modell wird hier nicht gebraucht; das Profil hält die Dienste an.
+  ollama:
+    profiles: ["nie"]
+  ollama-modelle:
+    profiles: ["nie"]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.4
+    command: ["start-dev", "--import-realm"]
+    ports:
+      - "127.0.0.1:${KEYCLOAK_PORT:-8180}:8080"
+    environment:
+      KC_HOSTNAME: http://127.0.0.1:${KEYCLOAK_PORT:-8180}
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: betrieb-test-admin
+      BERICHTSHEFT_URL: http://localhost:8090
+      BERICHTSHEFT_CLIENT_SECRET: betrieb-test-geheimnis
+    volumes:
+      - ./keycloak/realm-berichtsheft.json:/opt/keycloak/data/import/realm-berichtsheft.json:ro
+      - ./keycloak/themes/berichtsheft:/opt/keycloak/themes/berichtsheft:ro

@@ -1,0 +1,108 @@
+/* ============================================================
+ * Reiterzeile: je Werktag ein Reiter, dazu der Reiter der Woche
+ * ========================================================== */
+
+function zeichnen() {
+  zeichneWochenwahl();
+  zeichneReiter();
+  zeichneTag();
+  lehrjahrZeigen();
+  $("btn-heft").disabled = !wochen.length;
+  $("btn-wochenblatt").disabled = !aktiveWoche;
+}
+
+/** Das berechnete Lehrjahr im Stammdatendialog. */
+function lehrjahrZeigen() {
+  var feld = $("f-jahr");
+  if (!feld) return;
+  var jahr = ausbildungsjahr({ beginn: $("f-beginn").value }, berichtsdatum());
+  feld.value = jahr;
+  feld.textContent = jahr ? jahr + ". Ausbildungsjahr" : "Beginn eintragen";
+  feld.className = jahr ? "" : "leer";
+}
+
+/* ---------- Reiterzeile ---------- */
+
+function zeichneReiter() {
+  var reiter = $("reiter");
+  reiter.innerHTML = "";
+  if (!aktiveWoche) { reiter.hidden = true; return; }
+  reiter.hidden = false;
+  var montag = vonIso(aktiveWoche);
+  if (aktiverTag > TAGE_JE_WOCHE) aktiverTag = 0;
+
+  for (var i = 0; i < TAGE_JE_WOCHE; i++) reiter.appendChild(tagReiter(montag, i));
+  reiter.appendChild(wochenReiter());
+}
+
+/** Reiter eines Tages: Farbe und Marke zeigen, was der Tag noch braucht. */
+function tagReiter(montag, i) {
+  var datum = plus(montag, i), t = tage[iso(datum)];
+  var art = t && t.art ? t.art : "";
+  var schule = istSchultag(art);
+  var frei = !!art && !schule;
+  var fehlt = !frei && !!(t && (t.stunden || schule)) && !((t && t.text ? t.text : "").trim());
+  var laeuftHier = kiLaufIndex() === i;
+
+  var b = document.createElement("button");
+  b.type = "button";
+  b.setAttribute("role", "tab");
+  b.setAttribute("aria-selected", String(i === aktiverTag));
+
+  var stand = tagStand(t);
+  var klassen = [];
+  if (laeuftHier) klassen.push("laeuft");
+  if (!frei && stand === "fertig") klassen.push("fertig");
+  else if (stand !== "fertig" && stand !== "leer") klassen.push("pruefen");
+  b.className = klassen.join(" ");
+
+  var marke = "";
+  if (laeuftHier) marke = '<span class="dreht" title="wird gekürzt"></span>';
+  else if (stand === "ki") marke = '<span class="marke" title="vom Sprachmodell formuliert — bitte gegenlesen">KI</span>';
+  else if (stand === "roh") marke = '<span class="marke" title="Entwurf: noch unverändert aus dem Import">E</span>';
+  else if (stand === "eigen") marke = '<span class="marke" title="selbst geschrieben, aber noch nicht als fertig markiert">!</span>';
+  else if (stand === "fertig" && !frei) marke = '<span class="haken" title="gegengelesen">✓</span>';
+  else if (fehlt) marke = '<span class="punkt" title="noch kein Text"></span>';
+
+  b.innerHTML =
+    '<span class="rtag"><span class="rkurz">' + KURZ[datum.getDay()].toUpperCase() +
+    '</span><span class="rdatum">' + dm(datum) + "</span></span>" +
+    '<span class="rlage">' + marke +
+    (frei ? sicher(art) : t && t.stunden ? stundenText(t.stunden) + "\u2009h" : schule ? "Schule" : "—") +
+    "</span>";
+  b.addEventListener("click", function () {
+    aktiverTag = i; zeichneReiter(); zeichneTag(); merken();
+  });
+  b.addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    var n = TAGE_JE_WOCHE;
+    aktiverTag = (i + (e.key === "ArrowRight" ? 1 : n - 1)) % n;
+    zeichneReiter(); zeichneTag();
+    var neuKnopf = $("reiter").children[aktiverTag];
+    if (neuKnopf) neuKnopf.focus();
+  });
+  return b;
+}
+
+/** Der achte Reiter zeigt den Stand der ganzen Woche, nicht nur sein eigenes Feld. */
+function wochenReiter() {
+  var w = document.createElement("button");
+  w.type = "button";
+  w.setAttribute("role", "tab");
+  w.setAttribute("aria-selected", String(aktiverTag === 7));
+  var wd = wocheDaten(aktiveWoche);
+
+  var wstand = wochenStand(aktiveWoche);
+  var wocheVoll = !!(wd.unterweisungen || "").trim();
+  if (wstand) w.className = wstand;
+  var anteil = wochenAnteil(aktiveWoche);
+  var marke = wstand === "fertig"
+    ? '<span class="haken" title="alle Tage gegengelesen">✓</span>'
+    : ringHtml(anteil.fertig, anteil.von, anteil.fertig + " von " + anteil.von + " Tagen gegengelesen");
+  w.innerHTML =
+    '<span class="rtag"><span class="rkurz">WOCHE</span></span>' +
+    '<span class="rlage">' + marke + (wocheVoll ? "ausgefüllt" : "offen") + "</span>";
+  w.addEventListener("click", function () { aktiverTag = 7; zeichneReiter(); zeichneTag(); });
+  return w;
+}

@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.woff2 binary
+# Testdatei im Excel-Format: Windows-1252 mit CRLF, Git soll sie nicht umwandeln.
+test/daten/formate/excel-windows1252.csv binary

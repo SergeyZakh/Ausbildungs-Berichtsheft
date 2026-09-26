@@ -1,0 +1,85 @@
+# Die Seite nie zwischenspeichern, damit eine neue Fassung sofort ankommt. Die Bibliothek
+# darf lange liegen bleiben. Über eine map statt über add_header in eigenen location-Blöcken:
+# Ein add_header dort verdrängt alle add_header des Servers, und die Seite stünde ohne CSP da.
+map $uri $zwischenspeicher {
+    /index.html  "no-cache";
+    ~^/vendor/   "public, max-age=31536000, immutable";
+    default      "";
+}
+
+server {
+    listen       8080;
+    server_name  _;
+    root         /usr/share/nginx/html;
+    index        index.html;
+
+    gzip              on;
+    gzip_min_length   1024;
+    gzip_types        text/css application/javascript;  # text/html komprimiert nginx immer
+
+    # Leerer Wert: keine Kopfzeile.
+    add_header Cache-Control $zwischenspeicher;
+    add_header X-Content-Type-Options "nosniff";
+    add_header Referrer-Policy "no-referrer";
+    add_header X-Frame-Options "DENY";
+
+    # Die Seite darf nichts von draußen laden und nur mit der eigenen
+    # Herkunft sprechen – also mit /ki/. 'unsafe-inline' ist nötig, weil
+    # Stil und Skript in der Seite stehen (damit sie auch per Doppelklick
+    # läuft). Folge: Im Container muss als Modelladresse "/ki" stehen,
+    # eine direkte Adresse wie http://rechner:11434 wird abgewiesen.
+    add_header Content-Security-Policy "default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'" always;
+
+    # Weiterleitung an Ollama. Über denselben Ursprung wie die Seite gibt
+    # es kein CORS-Problem und nichts auf dem Ollama-Rechner einzustellen.
+    # OLLAMA_HOST setzt docker compose; ohne erreichbaren Dienst antwortet
+    # der Pfad mit 502, und das Werkzeug meldet das verständlich.
+    location /ki/ {
+        resolver 127.0.0.11 valid=30s ipv6=off;
+        set $ollama "${OLLAMA_HOST}";
+        # Mit einer Variablen in proxy_pass schneidet nginx das Präfix NICHT ab: „http://$ollama/“
+        # machte aus jedem /ki/api/… nur „/“, und Ollama antwortete mit seiner Startseite. Deshalb
+        # das Präfix selbst entfernen und proxy_pass ohne Pfad; dann geht der umgeschriebene Pfad durch.
+        rewrite ^/ki/(.*)$ /$1 break;
+        proxy_pass http://$ollama;
+
+        proxy_set_header Host $ollama;
+        # Ollama weist Anfragen mit fremdem Origin ab.
+        proxy_set_header Origin "";
+        proxy_http_version 1.1;
+
+        # Ein Modell auf der CPU braucht länger als die üblichen 60 Sekunden.
+        proxy_read_timeout    300s;
+        proxy_send_timeout    300s;
+        proxy_connect_timeout 10s;
+
+        proxy_buffering off;
+    }
+
+    # Weiterleitung an den Berichtsheft-Server: Anmeldung, Abgleich, Ausbilder-Ansicht.
+    # SERVER_HOST setzt docker-compose.server.yml. Ohne Server ist der Wert leer, die Wege
+    # antworten mit 404, und das Werkzeug läuft wie bisher ohne Konto.
+    location ~ ^/(api/|anmeldung(/|$)|abmeldung$) {
+        set $server "${SERVER_HOST}";
+        if ($server = "") {
+            return 404;
+        }
+        resolver 127.0.0.11 valid=30s ipv6=off;
+        # Ohne Pfad hinter der Adresse geht die Anfrage unverändert weiter.
+        proxy_pass http://$server;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+
+        # Ein ganzes Heft im ersten Abgleich; der Server selbst begrenzt auf 2 MB.
+        client_max_body_size 4m;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout    60s;
+    }
+
+    # Eine Seite, alles Unbekannte führt auf sie.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

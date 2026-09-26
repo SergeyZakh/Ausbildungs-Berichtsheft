@@ -1,0 +1,399 @@
+/* ============================================================
+ * Tagbereich: Sektionen, Wochenansicht, Eingaben, Meldungen
+ * ========================================================== */
+
+/* ---------- Tagbereich ---------- */
+#tagbereich {
+  flex: 1 1 auto; min-height: 0; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.tagpanel {
+  flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px;
+  overflow: hidden; padding: 0 20px 16px;
+  animation: auftauchen .18s ease-out;
+}
+@keyframes auftauchen { from { opacity: 0; transform: translateY(3px); } }
+/* Freier Tag: Karten im Grau. */
+.tagpanel.frei .sektion { background: var(--band); }
+.ruhig { color: var(--schiefer); font-size: 13px; }
+
+.leerbild {
+  margin: 8px 20px; padding: 40px 36px; max-width: 520px;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund);
+  box-shadow: var(--schatten);
+}
+.leerbild h2 { margin: 0 0 8px; font-size: 17px; }
+.leerbild p { margin: 0 0 18px; color: var(--schiefer); }
+.leerbild .knopf + .knopf { margin-left: 8px; }
+
+/* ---------- Sektion: Beschriftungsband über einem umrandeten Feld ----------
+   Dieselbe Gliederung wie der amtliche Vordruck, als Karte. */
+.sektion {
+  flex: none; background: var(--flaeche); overflow: hidden;
+  border: 1px solid var(--linie); border-radius: var(--rund); box-shadow: var(--schatten);
+}
+.sektion.wachsend { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 110px; }
+.sektionskopf {
+  margin: 0; padding: 7px 10px 7px 14px; min-height: 38px; display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; letter-spacing: .09em; line-height: 1.35;
+  text-transform: uppercase; color: var(--text);
+  background: var(--band); border-bottom: 1px solid var(--linie);
+}
+.sektionskopf > span:first-child { flex: 1 1 auto; min-width: 0; }
+.sektionsleib { padding: 10px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 26px; }
+.sektion.wachsend .sektionsleib {
+  flex: 1 1 auto; padding: 0; min-height: 0;
+  display: flex; flex-direction: column; align-items: stretch;
+}
+
+/* Text links, Buchungen rechts (nach .sektion.wachsend, damit flex hier gilt). */
+.tagflaeche { flex: 1 1 auto; display: flex; gap: 12px; min-height: 0; align-items: stretch; }
+.tagflaeche > .sektion { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.tagflaeche > .sektion.posten { flex: 0 0 340px; }
+.tagflaeche > .sektion > .sektionsleib { flex: 1 1 auto; min-height: 0; }
+
+/* Rot heißt "da muss noch jemand drüber" (roher Entwurf oder ungelesene
+   Modellausgabe), grün heißt gegengelesen. */
+.sektion.pruefen { border-color: #EDC6C1; }
+.sektion.pruefen > .sektionskopf {
+  background: var(--acht-hell); border-bottom-color: #EDC6C1; color: var(--acht);
+}
+.sektion.fertig { border-color: #BFDDC8; }
+.sektion.fertig > .sektionskopf {
+  background: var(--gut-hell); border-bottom-color: #BFDDC8; color: var(--gut);
+}
+
+/* Drei Gewichte im Band: Fahne = Marke, Knopf = Möglichkeit,
+   gefüllter Knopf = nächster Schritt. Alle als Pillen. */
+.sektionsfahne {
+  flex: none; padding: 2px 9px; border: 1px solid currentColor; border-radius: 999px;
+  background: transparent; font-size: 9.5px; font-weight: 600; letter-spacing: .1em; color: var(--acht);
+}
+.sektionsknopf {
+  flex: none; display: inline-flex; align-items: center; gap: 5px;
+  font: inherit; font-size: 10.5px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; white-space: nowrap;
+  background: var(--flaeche); color: var(--text);
+  border: 1px solid var(--linie); border-radius: 999px; padding: 5px 12px;
+  transition: background-color .15s, color .15s, border-color .15s;
+}
+.sektionsknopf:hover { background: var(--band); border-color: var(--linie-fest); }
+.sektionsknopf:disabled { opacity: .45; cursor: default; }
+.sektionsknopf.uebernehmen { background: var(--acht); color: #fff; border-color: var(--acht); }
+.sektionsknopf.uebernehmen::before { content: "\2713"; font-size: 11px; }
+.sektionsknopf.uebernehmen:hover { background: #8F1C13; border-color: #8F1C13; }
+.sektionsknopf.bearbeiten { border-color: var(--gut); color: var(--gut); background: var(--flaeche); }
+.sektionsknopf.bearbeiten:hover { background: var(--gut); color: #fff; }
+.sektionsknopf .stift { font-size: 12px; line-height: 1; }
+
+/* ---------- Wochenansicht: Angaben links, Blattvorschau rechts ---------- */
+.wochenspalte { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+
+/* Woche (Azubi) und Heft eines Azubis (Ausbilder): das Blatt in der Mitte, links was man
+   einträgt bzw. der Stand der Tage, rechts Stand des Blatts, KI und Export. */
+.tagflaeche.dreispaltig { justify-content: center; }
+.tagflaeche.dreispaltig > .wochenspalte { flex: 1 1 0; max-width: 440px; }
+.tagflaeche.dreispaltig > .sektion.vorschau { flex: 0 1 640px; }
+.tagflaeche.dreispaltig > .sektion.vorschau .textfuss { display: none; }
+.seitenspalte { flex: 0 1 300px; min-width: 220px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Scrollen wie im Heft eines Azubis: Das ganze Feld scrollt, das Blatt steht in voller Länge,
+   links und rechts bleiben stehen. Beim Azubi scrollt dafür das Panel selbst, beim Ausbilder
+   .abereich. Sticky klebt am nächsten Vorfahren, der scrollen KANN – overflow: hidden am
+   Panel zählt dazu und hätte es beim Ausbilder verhindert, deshalb dort visible. */
+.tagpanel.woche { overflow: visible; }
+#tagbereich > .tagpanel.woche { overflow-y: auto; }
+/* So hoch wie der Inhalt: Sticky klebt nur innerhalb seines Elternkastens. War der auf Fensterhöhe
+   begrenzt, schob seine Unterkante die Spalten beim Scrollen mit nach oben. */
+.tagflaeche.dreispaltig { align-items: flex-start; flex: 0 0 auto; }
+.tagflaeche.dreispaltig > .wochenspalte,
+.tagflaeche.dreispaltig > .seitenspalte { position: sticky; top: 0; }
+.tagflaeche.dreispaltig > .sektion.vorschau .sektionsleib,
+.tagflaeche.dreispaltig .vorschaubuehne { flex: none; overflow: visible; }
+.tagflaeche.dreispaltig .sektion.wachsend textarea { min-height: 260px; }
+/* Auch die Titelzeile des Blatts bleibt stehen, sonst scrollte sie weg, während die Köpfe links und
+   rechts stehen blieben, und das Blatt wurde oben hart abgeschnitten. overflow: clip schneidet wie
+   hidden an den runden Ecken, macht die Sektion aber nicht zum Scroll-Behälter, an dem Sticky
+   hängen bliebe. Der Schatten nach oben ersetzt den Rand der Karte, sobald die Zeile klebt. */
+.tagflaeche.dreispaltig > .sektion.vorschau { overflow: clip; }
+.tagflaeche.dreispaltig > .sektion.vorschau > .sektionskopf {
+  position: sticky; top: 1px; z-index: 2;
+  /* Oben die Randlinie, darüber ein Streifen in Grundfarbe: Bei 125 % oder 150 % Skalierung landet
+     die Zeile beim Scrollen mal auf halben Pixeln, und zwischen Kante und Zeile schaute das Blatt
+     durch. Der Streifen deckt das zu; oberhalb des Scrollbereichs wird er ohnehin abgeschnitten. */
+  box-shadow: 0 -1px 0 var(--linie), 0 -8px 0 var(--grund);
+}
+/* Die Ecken: Die Zeile selbst ist eckig, sonst schaute das Blatt, das hinter ihr durchscrollt, in den
+   runden Ecken hervor. Je Ecke deckt ein Stück in Grundfarbe ab, was dahinter liegt, und zeichnet den
+   Bogen des Kartenrands nach. Es liegt 1px über dem Rand der Karte; overflow-clip-margin lässt es zu. */
+/* Ohne Schatten: Er tönte den Spalt neben der Karte, die Eckstücke in reiner Grundfarbe standen
+   darin als helleres Viereck. Zwischen zwei Spalten reicht der Rand. */
+.tagflaeche.dreispaltig > .sektion.vorschau { overflow-clip-margin: 1px; box-shadow: none; }
+.tagflaeche.dreispaltig > .sektion.vorschau > .sektionskopf::before,
+.tagflaeche.dreispaltig > .sektion.vorschau > .sektionskopf::after {
+  content: ""; position: absolute; top: -1px;
+  width: calc(var(--rund) + 1px); height: calc(var(--rund) + 1px);
+  pointer-events: none;
+}
+.tagflaeche.dreispaltig > .sektion.vorschau > .sektionskopf::before {
+  left: -1px;
+  background: radial-gradient(circle at 100% 100%, transparent calc(var(--rund) - .5px),
+    var(--linie) calc(var(--rund) - .5px) calc(var(--rund) + .5px), var(--grund) calc(var(--rund) + 1px));
+}
+.tagflaeche.dreispaltig > .sektion.vorschau > .sektionskopf::after {
+  right: -1px;
+  background: radial-gradient(circle at 0 100%, transparent calc(var(--rund) - .5px),
+    var(--linie) calc(var(--rund) - .5px) calc(var(--rund) + .5px), var(--grund) calc(var(--rund) + 1px));
+}
+/* Rechte Spalte: eine Karte, darin Umfang, KI und Herunterladen als Blöcke mit gleichem Rand.
+   Der Kartenkörper ist sonst eine Flex-Zeile und schob die Knöpfe auf Textbreite zusammen. */
+.seitenspalte .sektionsleib { display: block; padding: 0; }
+.seitenblock { padding: 12px 14px 14px; }
+.seitenblock + .seitenblock { border-top: 1px solid var(--linie); }
+.seitenblock[hidden] { display: none; }
+.seitentitel {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--schiefer); margin-bottom: 8px;
+}
+.seitenwert { margin: 0; font-size: 13px; line-height: 1.45; white-space: pre-line; overflow-wrap: anywhere; }
+.seitenspalte .textfuss { border: 0; padding: 0; }
+.seitenspalte .textstand { margin-left: 0; font-size: 13px; }
+.seitenspalte .kislot { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; }
+.seitenspalte .kislot > * { width: 100%; justify-content: center; }
+.exportknoepfe { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.exportknoepfe .knopf { width: 100%; justify-content: center; }
+@media (max-width: 1180px) {
+  .tagflaeche.dreispaltig { flex-wrap: wrap; }
+  .tagflaeche.dreispaltig > .seitenspalte { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; max-width: none; position: static; }
+  .seitenspalte > .sektion { flex: 1 1 220px; }
+  .seitenkarte .sektionsleib { display: flex; flex-wrap: wrap; }
+  .seitenkarte .seitenblock { flex: 1 1 200px; }
+  .seitenkarte .seitenblock + .seitenblock { border-top: 0; border-left: 1px solid var(--linie); }
+}
+.tagflaeche > .sektion.vorschau { flex: 0 0 min(46%, 560px); }
+.sektion.vorschau .sektionsleib {
+  padding: 0; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; overflow: hidden;
+}
+.sektion.vorschau .textfuss { border-top: 1px solid var(--linie); gap: 10px; flex-wrap: wrap; }
+.vorschaubuehne {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  background: #ECEBE6;
+}
+/* Ein A4-Bogen in echter Größe, verkleinert per transform; der Rahmen
+   bekommt die verkleinerte Höhe, damit nichts Leeres darunter bleibt. */
+.bogenrahmen { flex: none; position: relative; overflow: hidden; border-radius: 3px; box-shadow: 0 1px 3px rgba(0, 0, 0, .1), 0 8px 24px rgba(0, 0, 0, .08); }
+.bogen {
+  position: absolute; left: 0; top: 0; transform-origin: 0 0;
+  width: 210mm; min-height: 297mm; padding: 16mm 15mm;
+  background: #fff; color: #000; pointer-events: none; user-select: none;
+}
+
+/* ---------- Eingaben im Tag ---------- */
+.feldpaar { display: flex; align-items: center; gap: 8px; }
+.feldetikett { font-size: 12px; color: var(--schiefer); white-space: nowrap; }
+
+.tagpanel select {
+  font: inherit; font-size: 13px; color: var(--text); width: auto;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-klein);
+  padding: 5px 8px;
+}
+.tagpanel select:hover, .tagpanel select:focus { background: var(--band); border-color: var(--linie-fest); }
+
+.tagpanel textarea {
+  flex: 1 1 auto; width: 100%; min-height: 100px; padding: 12px 14px;
+  font: inherit; font-size: 14.5px; line-height: 1.6;
+  color: var(--text); background: var(--flaeche);
+  border: none; resize: none; overflow: auto;
+}
+.tagpanel textarea::placeholder { color: var(--schiefer); }
+/* Ein Fokusrahmen würde von .sektion { overflow: hidden } seitlich
+   abgeschnitten. Eine Kante oben unter dem Band markiert dasselbe. */
+.tagpanel textarea:focus-visible,
+.tagpanel textarea:focus { outline: none; box-shadow: inset 0 2px 0 0 var(--text); }
+.sektion.pruefen textarea:focus-visible,
+.sektion.pruefen textarea:focus { box-shadow: inset 0 2px 0 0 var(--acht); }
+.sektion.fertig textarea:focus-visible,
+.sektion.fertig textarea:focus { box-shadow: inset 0 2px 0 0 var(--gut); }
+/* Übernommen = gesperrt, aber gut lesbar. */
+.tagpanel textarea[readonly] { cursor: default; background: var(--flaeche); }
+.tagpanel textarea[readonly]:focus,
+.tagpanel textarea[readonly]:focus-visible { box-shadow: none; }
+
+.stdwrap { display: inline-flex; align-items: baseline; gap: 3px; }
+.stdwrap .einheit { font-size: 12.5px; color: var(--schiefer); }
+.stdfeld {
+  display: inline-block; min-width: 52px; text-align: right;
+  font: inherit; font-size: 13.5px; font-weight: 600;
+  color: var(--text); font-variant-numeric: tabular-nums;
+}
+
+.abteilungsfeld {
+  font: inherit; font-size: 13.5px; color: var(--text); background: var(--flaeche);
+  border: 1px solid var(--linie); border-radius: var(--rund-klein); padding: 6px 10px;
+  min-width: 200px; flex: 1 1 320px; max-width: 420px;
+}
+.abteilungsfeld:hover { border-color: var(--linie-fest); }
+.abteilungsfeld:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px rgba(22, 22, 26, .08); }
+
+/* Zeilenstand unter dem Text: passt der Text in den Vordruck? */
+.textfuss {
+  flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 12px 10px 10px;
+  font-size: 11.5px; font-variant-numeric: tabular-nums; font-weight: 500;
+}
+.textstand { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.textstand::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: currentColor; flex: none;
+}
+.textfuss.passt .textstand { color: var(--gut); }
+.textfuss.eng   .textstand { color: var(--acht); }
+.textfuss.leer  .textstand { color: var(--schiefer); }
+.textfuss.leer .textstand::before { background: transparent; border: 1.5px solid #9A9A9A; }
+
+/* KI unten links im Feld: schwarze Pille mit ✦ im weißen Kreis. Während
+   des Laufs steht an derselben Stelle eine gleich gebaute Statuspille. */
+.kislot { display: flex; gap: 6px; min-width: 0; flex-wrap: wrap; }
+.sektionsknopf.kiknopf,
+.kistatus {
+  display: inline-flex; align-items: center; gap: 8px; height: 30px;
+  border-radius: 999px; font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none;
+  background: var(--text); color: #fff; border: 1px solid var(--text);
+}
+.sektionsknopf.kiknopf { padding: 0 16px 0 3px; }
+.sektionsknopf.kiknopf::before {
+  content: "\2726"; flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%; font-size: 11px;
+  background: #fff; color: var(--text);
+}
+.sektionsknopf.kiknopf:hover:not(:disabled) { background: #33333A; border-color: #33333A; }
+.sektionsknopf.kiknopf:disabled { opacity: .35; }
+/* "Original zurück": helle Pille, Pfeil im dunklen Kreis. */
+.sektionsknopf.kiknopf.zurueck { background: var(--flaeche); color: var(--text); border-color: var(--linie); }
+.sektionsknopf.kiknopf.zurueck::before { content: "\21BA"; font-size: 13px; background: var(--text); color: #fff; }
+.sektionsknopf.kiknopf.zurueck:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
+.sektionsknopf.kiknopf.zurueck.sicher,
+.sektionsknopf.kiknopf.zurueck.sicher:hover:not(:disabled) { background: var(--acht); border-color: var(--acht); color: #fff; }
+.sektionsknopf.kiknopf.zurueck.sicher::before { background: #fff; color: var(--acht); }
+
+.kistatus { padding: 0 3px 0 6px; white-space: nowrap; }
+.kistatus .fpunkt {
+  flex: none; width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .25); border-top-color: #fff;
+  animation: dreh .9s linear infinite;
+}
+.kistatus b { font-weight: 500; }
+.kistatus .ksek { font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, .6); }
+.kistatus .ksek:empty { display: none; }
+.kiabbruch {
+  font: inherit; font-size: 11.5px; color: #fff; cursor: pointer;
+  background: rgba(255, 255, 255, .14); border: none; border-radius: 999px; padding: 3px 11px;
+}
+.kiabbruch:hover:not(:disabled) { background: rgba(255, 255, 255, .24); }
+.kiabbruch:disabled { opacity: .5; cursor: default; }
+
+/* Buchungen aus Kimai neben dem Text. */
+.postenzahl {
+  flex: none; font-size: 10px; letter-spacing: .07em; color: var(--schiefer);
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: 999px; padding: 1px 8px;
+}
+.sektion.posten .sektionsleib { padding: 0; display: block; overflow: hidden; }
+.postenliste {
+  flex: none; height: 100%; overflow-y: auto;
+  background: #FBFBF9; padding: 8px 14px 10px;
+}
+.postenliste p {
+  margin: 0; padding: 5px 0; font-size: 12.5px; color: var(--schiefer);
+  display: flex; gap: 12px; align-items: baseline;
+  border-bottom: 1px solid #EFEEEA;
+}
+.postenliste p:last-child { border-bottom: none; }
+.postenliste .pzeit { flex: 0 0 92px; font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--text); }
+/* Zwei Zeilen je Buchung, der Rest auf Klick. */
+.postenliste p:has(.ptext) { cursor: pointer; }
+.postenliste p:has(.ptext):hover .ptext { color: var(--text); }
+.postenliste .ptext {
+  min-width: 0; display: -webkit-box; -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; overflow: hidden;
+}
+.postenliste p.offen .ptext { display: block; -webkit-line-clamp: unset; color: var(--text); }
+.postenliste .pleer { color: #9A9A9A; font-style: italic; border-bottom: none; }
+
+/* ---------- Fortschritt eines Modelllaufs ----------
+   Kein Balken: Wie weit ein Sprachmodell ist, weiß niemand. Angezeigt
+   werden der Tag und die verstrichene Zeit, als schwebende Glasleiste
+   über dem Text. */
+.fortschritt {
+  flex: none; display: flex; align-items: center; gap: 12px;
+  margin: 0 20px 12px; padding: 7px 7px 7px 14px;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund);
+  box-shadow: var(--schatten);
+  animation: auftauchen .2s ease-out;
+}
+.ftext {
+  flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px;
+  font-size: 12.5px; font-variant-numeric: tabular-nums;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text);
+}
+/* Statt eines Punkts ein drehender Ring: Es arbeitet, wie lange, weiß keiner. */
+.ftext .fpunkt {
+  flex: none; width: 16px; height: 16px; margin: 0; border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--text) 15%, transparent); border-top-color: var(--text);
+  animation: dreh .9s linear infinite;
+}
+.fuhr {
+  flex: none; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--schiefer);
+  padding: 2px 9px; border-radius: 999px; background: var(--band); border: 1px solid var(--linie);
+}
+.fortschritt .knopf { flex: none; padding: 5px 13px; font-size: 12px; border-radius: 999px; }
+.ftext b { font-weight: 600; }
+.fzahl { color: var(--schiefer); }
+.fuhr:empty { display: none; }
+
+/* ---------- Fußleiste mit Meldung und Speicherstand ----------
+   Bei Erfolg oder Warnung färbt sich die ganze Leiste; der Wortlaut
+   trägt die Aussage trotzdem allein. */
+.fussleiste {
+  flex: none; display: flex; align-items: center; gap: 14px;
+  padding: 5px 20px 6px; border-top: 1px solid var(--linie); background: var(--flaeche);
+  min-height: 28px; transition: background-color .15s, border-color .15s;
+}
+.fussleiste.gut  { background: var(--gut-hell); border-top-color: #BFDDC8; }
+.fussleiste.warn { background: var(--acht-hell); border-top-color: #EDC6C1; }
+.notiz { flex: 1 1 auto; margin: 0; font-size: 11.5px; color: var(--schiefer); }
+.notiz.gut  { color: var(--gut); font-weight: 500; }
+.notiz.warn { color: var(--acht); font-weight: 500; }
+/* Knopf hinter einer Meldung, etwa „Spalten prüfen“ nach dem Import. */
+.notizknopf {
+  margin-left: 10px; padding: 1px 8px; font: inherit; font-weight: 500; color: inherit;
+  background: transparent; border: 1px solid currentColor; border-radius: 999px; cursor: pointer; opacity: .85;
+}
+.notizknopf:hover { opacity: 1; background: rgba(255, 255, 255, .6); }
+/* Wer das Werkzeug gebaut hat, für wen und unter welcher Lizenz. Leise gesetzt:
+   Sie steht immer da und soll nie mit einer Meldung um Aufmerksamkeit ringen. */
+.signatur {
+  flex: none; margin: 0; font-size: 10.5px; color: var(--schiefer);
+  white-space: nowrap; opacity: .7;
+}
+/* Kein eigener Farbton: Grün und Rot sind hier die einzigen Farben (basis.css). */
+.signatur a { color: inherit; text-decoration-color: var(--linie); }
+.signatur a:hover { color: var(--text); text-decoration-color: currentColor; }
+.fussleiste.gut .signatur, .fussleiste.warn .signatur { opacity: .55; }
+
+/* Speicherstand mit Punkt, der nach jedem Speichern kurz aufleuchtet. */
+.speicherstand {
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10.5px; color: var(--schiefer); white-space: nowrap;
+}
+/* Der Punkt nimmt die Farbe der Leiste an, damit er einer roten Meldung
+   nicht widerspricht. */
+.speicherstand:not(:empty)::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor;
+}
+.speicherstand.frisch::before { animation: gespeichert 1.1s ease-out; }
+@keyframes gespeichert {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent); transform: scale(1.35); }
+  100% { box-shadow: 0 0 0 8px color-mix(in srgb, currentColor 0%, transparent); transform: scale(1); }
+}
+.fussleiste.gut .speicherstand  { color: var(--gut); }
+.fussleiste.warn .speicherstand { color: var(--acht); }

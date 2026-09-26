@@ -1,0 +1,8 @@
+# Der Bau braucht nur package*.json, build.js, src/ und die nginx-Vorlage.
+*
+!package.json
+!package-lock.json
+!build.js
+!src
+!src/**
+!nginx.conf.template

@@ -1,0 +1,324 @@
+/* ============================================================
+ * Anmeldeseite im Aussehen des Berichtshefts
+ *
+ * Farben und Maße wie in src/css/basis.css: weiße Karte auf warmem Grau,
+ * weiche Kanten, dunkler Hauptknopf. Überschrieben werden die Variablen von
+ * PatternFly 5, auf dem keycloak.v2 aufbaut, und nur wo nötig die Regeln selbst.
+ * ========================================================== */
+
+/* Instrument Sans wie im Werkzeug, SIL Open Font License 1.1. */
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url(../fonts/instrument-sans-latin-ext.woff2) format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url(../fonts/instrument-sans-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --text:       #16161A;
+  --linie:      #DEDCD6;
+  --linie-fest: #BDBAB2;
+  --grund:      #F3F2EE;
+  --band:       #F6F5F1;
+  --schiefer:   #62615C;
+  --acht:       #B42318;
+  --acht-hell:  #FDECEA;
+  --gut:        #1A7F37;
+  --gut-hell:   #E6F4EA;
+  --rund:       14px;
+  --rund-klein: 9px;
+  --schatten:   0 1px 2px rgba(22, 22, 26, .04), 0 6px 20px rgba(22, 22, 26, .05);
+  --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --pf-v5-global--FontFamily--text: var(--sans);
+  --pf-v5-global--FontFamily--heading: var(--sans);
+  --pf-v5-global--FontFamily--sans-serif: var(--sans);
+  --pf-v5-global--Color--100: var(--text);
+  --pf-v5-global--Color--200: var(--schiefer);
+  --pf-v5-global--link--Color: var(--text);
+  --pf-v5-global--link--Color--hover: var(--text);
+  --pf-v5-global--primary-color--100: var(--text);
+  --pf-v5-global--primary-color--200: #000;
+  --pf-v5-global--active-color--100: var(--text);
+  --pf-v5-global--BorderColor--100: var(--linie);
+  --pf-v5-global--danger-color--100: var(--acht);
+  --keycloak-card-top-color: transparent;
+}
+
+/* ---------- Grund und Kopf ---------- */
+
+.login-pf body,
+body#keycloak-bg {
+  background: var(--grund);
+  font-family: var(--sans);
+  color: var(--text);
+}
+
+.pf-v5-c-login__container {
+  grid-template-columns: minmax(0, 26rem);
+}
+
+/* „Berichtsheft“ über der Karte: ruhig, wie die Überschriften im Werkzeug. */
+#kc-header-wrapper {
+  color: var(--text) !important;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* ---------- Karte ---------- */
+
+.pf-v5-c-login__main {
+  --pf-v5-c-login__main--BackgroundColor: #fff;
+  border: 1px solid var(--linie);
+  border-radius: var(--rund);
+  box-shadow: var(--schatten);
+  overflow: hidden;
+}
+
+.pf-v5-c-login__main-header {
+  border-top: 0;
+  padding-top: 28px;
+}
+
+.pf-v5-c-login__main-header .pf-v5-c-title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pf-v5-c-login__main-body {
+  padding-bottom: 28px;
+}
+
+.pf-v5-c-login__main-footer-band {
+  background: var(--band);
+  border-top: 1px solid var(--linie);
+  color: var(--schiefer);
+}
+
+/* ---------- Felder ---------- */
+
+.pf-v5-c-form {
+  --pf-v5-c-form--GridGap: 18px;
+}
+.pf-v5-c-form__label {
+  padding-bottom: 6px;
+}
+.pf-v5-c-form__label-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Größer und ruhiger als PatternFly: 44 px hoch, Text in Lesegröße. */
+.pf-v5-c-login .pf-v5-c-form-control > input {
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: var(--text);
+}
+.pf-v5-c-login .pf-v5-c-form-control > input::placeholder { color: #9A9891; }
+.pf-v5-c-login .pf-v5-c-form-control {
+  background: #fff;
+  transition: box-shadow .15s;
+}
+.pf-v5-c-login .pf-v5-c-form-control:focus-within {
+  box-shadow: 0 0 0 3px rgba(22, 22, 26, .08);
+}
+.pf-v5-c-form__helper-text,
+.pf-v5-c-helper-text {
+  margin-top: 6px;
+  font-size: 12.5px;
+}
+
+/* PatternFly zeichnet den Rahmen mit ::before und die Unterkante mit ::after; im Werkzeug
+   ist es ein ringsum gleicher Rahmen, der beim Fokus dunkel wird. */
+.pf-v5-c-form-control {
+  --pf-v5-c-form-control--before--BorderTopColor: var(--linie);
+  --pf-v5-c-form-control--before--BorderRightColor: var(--linie);
+  --pf-v5-c-form-control--before--BorderBottomColor: var(--linie);
+  --pf-v5-c-form-control--before--BorderLeftColor: var(--linie);
+  --pf-v5-c-form-control--after--BorderBottomColor: var(--linie);
+  --pf-v5-c-form-control--hover--after--BorderBottomColor: var(--linie-fest);
+  --pf-v5-c-form-control--focus--after--BorderBottomColor: var(--text);
+  --pf-v5-c-form-control--after--BorderBottomWidth: 1px;
+  --pf-v5-c-form-control--focus--after--BorderBottomWidth: 1px;
+  border-radius: var(--rund-klein);
+}
+.pf-v5-c-form-control:focus-within::before {
+  --pf-v5-c-form-control--before--BorderTopColor: var(--text);
+  --pf-v5-c-form-control--before--BorderRightColor: var(--text);
+  --pf-v5-c-form-control--before--BorderBottomColor: var(--text);
+  --pf-v5-c-form-control--before--BorderLeftColor: var(--text);
+}
+.pf-v5-c-form-control.pf-m-error::before {
+  --pf-v5-c-form-control--before--BorderTopColor: var(--acht);
+  --pf-v5-c-form-control--before--BorderRightColor: var(--acht);
+  --pf-v5-c-form-control--before--BorderBottomColor: var(--acht);
+  --pf-v5-c-form-control--before--BorderLeftColor: var(--acht);
+}
+.pf-v5-c-form-control > input,
+.pf-v5-c-form-control > select {
+  outline: none;
+}
+.pf-v5-c-form-control::before,
+.pf-v5-c-form-control::after {
+  border-radius: var(--rund-klein);
+}
+
+/* Auge im Kennwortfeld: sitzt im Feld, statt als eigener Kasten daneben zu hängen.
+   Die Gruppe zeichnet den gemeinsamen Rahmen, Feld und Knopf verlieren ihre eigenen. */
+.pf-v5-c-login .pf-v5-c-input-group {
+  position: relative;
+  border: 1px solid var(--linie);
+  border-radius: var(--rund-klein);
+  background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+}
+.pf-v5-c-login .pf-v5-c-input-group:hover { border-color: var(--linie-fest); }
+.pf-v5-c-login .pf-v5-c-input-group:focus-within {
+  border-color: var(--text);
+  box-shadow: 0 0 0 3px rgba(22, 22, 26, .08);
+}
+.pf-v5-c-login .pf-v5-c-input-group:has(.pf-m-error) { border-color: var(--acht); }
+.pf-v5-c-login .pf-v5-c-input-group .pf-v5-c-form-control::before,
+.pf-v5-c-login .pf-v5-c-input-group .pf-v5-c-form-control::after,
+.pf-v5-c-login .pf-v5-c-input-group .pf-v5-c-button.pf-m-control::after {
+  border: 0;
+}
+.pf-v5-c-login .pf-v5-c-input-group .pf-v5-c-form-control:focus-within { box-shadow: none; }
+.pf-v5-c-login .pf-v5-c-input-group .pf-v5-c-button.pf-m-control {
+  height: 100%;
+  min-width: 44px;
+  background: transparent;
+  color: var(--schiefer);
+  border-radius: 0 var(--rund-klein) var(--rund-klein) 0;
+}
+.pf-v5-c-login .pf-v5-c-input-group .pf-v5-c-button.pf-m-control:hover { color: var(--text); }
+/* Alte Regeln für das Auge als eigener Kasten, falls die Gruppe fehlt. */
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control {
+  --pf-v5-c-button--m-control--BorderRadius: var(--rund-klein);
+  --pf-v5-c-button--m-control--after--BorderColor: var(--linie);
+  --pf-v5-c-button--m-control--hover--after--BorderBottomColor: var(--linie-fest);
+  --pf-v5-c-button--m-control--focus--after--BorderBottomColor: var(--text);
+  --pf-v5-c-button--m-control--active--after--BorderBottomColor: var(--text);
+}
+.pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control,
+.pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control::before,
+.pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control::after {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* ---------- Knöpfe und Links ---------- */
+
+.pf-v5-c-button {
+  --pf-v5-c-button--BorderRadius: var(--rund-klein);
+  font-family: var(--sans);
+}
+
+.pf-v5-c-login .pf-v5-c-button.pf-m-primary.pf-m-block {
+  min-height: 44px;
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.pf-v5-c-button.pf-m-primary {
+  --pf-v5-c-button--m-primary--BackgroundColor: var(--text);
+  --pf-v5-c-button--m-primary--hover--BackgroundColor: #000;
+  --pf-v5-c-button--m-primary--focus--BackgroundColor: #000;
+  --pf-v5-c-button--m-primary--active--BackgroundColor: #000;
+  font-weight: 600;
+}
+
+.pf-v5-c-button.pf-m-secondary {
+  --pf-v5-c-button--m-secondary--Color: var(--text);
+  --pf-v5-c-button--m-secondary--after--BorderColor: var(--linie);
+  --pf-v5-c-button--m-secondary--hover--after--BorderColor: var(--linie-fest);
+  --pf-v5-c-button--m-secondary--hover--Color: var(--text);
+}
+
+.pf-v5-c-login a,
+.pf-v5-c-button.pf-m-link {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--linie-fest);
+  text-underline-offset: 2px;
+}
+.pf-v5-c-login a:hover {
+  text-decoration-color: var(--text);
+}
+
+/* ---------- Meldungen ---------- */
+
+.pf-v5-c-alert {
+  border-radius: var(--rund-klein);
+  box-shadow: none;
+  border: 1px solid var(--linie);
+}
+.pf-v5-c-alert.pf-m-danger,
+.pf-v5-c-alert.pf-m-error {
+  background: var(--acht-hell);
+  border-color: #F4C7C3;
+  --pf-v5-c-alert--m-danger__title--Color: var(--acht);
+  --pf-v5-c-alert--m-danger__icon--Color: var(--acht);
+}
+.pf-v5-c-alert.pf-m-success {
+  background: var(--gut-hell);
+  --pf-v5-c-alert--m-success__title--Color: var(--gut);
+}
+.pf-v5-c-helper-text__item.pf-m-error {
+  --pf-v5-c-helper-text__item--m-error--Color: var(--acht);
+}
+
+/* ---------- Sprachwahl ----------
+   js/sprache.js macht aus dem Klappmenü zwei Umschalter „DE | EN“ wie die Pillen im Werkzeug.
+   Ohne JavaScript bleibt das Menü; dann wenigstens bündig und ohne dicken Pfeil. */
+.pf-v5-c-login__main-header {
+  align-items: center;
+}
+.pf-v5-c-login__main-header-utilities {
+  margin-right: 0;
+}
+.bh-sprache {
+  display: inline-flex; padding: 2px; gap: 2px;
+  background: var(--band); border: 1px solid var(--linie); border-radius: 999px;
+}
+.pf-v5-c-login .bh-sprache a {
+  min-width: 34px; padding: 4px 9px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-align: center;
+  color: var(--schiefer); text-decoration: none;
+  transition: background-color .15s, color .15s;
+}
+.pf-v5-c-login .bh-sprache a:hover { color: var(--text); }
+.pf-v5-c-login .bh-sprache a[aria-current="true"] {
+  background: #fff; color: var(--text);
+  box-shadow: 0 1px 2px rgba(22, 22, 26, .08), 0 0 0 1px var(--linie);
+}
+.pf-v5-c-login .bh-sprache a:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+.pf-v5-c-login__main-header-utilities select {
+  font-size: 13px;
+  padding-right: 30px;
+  color: var(--schiefer);
+}
+
+/* Abmelden bestätigen: Frage, Knopf und Rückweg brauchen Luft. */
+#kc-logout-confirm .instruction {
+  margin-bottom: 18px;
+}
+#kc-logout-confirm #kc-info-message {
+  margin-top: 16px;
+  text-align: center;
+}
