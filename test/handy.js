@@ -152,6 +152,15 @@ async function durchgang(browser, breite) {
   const offen = await page.evaluate(() => document.getElementById('notiz').getBoundingClientRect().height);
   pruefe('Ein Tippen zeigt die ganze Meldung' + bei, offen > notiz.hoehe, offen + ' statt ' + notiz.hoehe);
 
+  // Safari am iPhone zoomt beim Tippen in Felder unter 16 px; danach ließ sich „Deine Daten“
+  // seitlich verschieben. Chromium zoomt nicht, deshalb wird die Ursache geprüft.
+  const kleineFelder = await page.evaluate(() => [...document.querySelectorAll('input, select, textarea')]
+    .filter((e) => e.type !== 'file' && e.type !== 'hidden' && parseFloat(getComputedStyle(e).fontSize) < 16)
+    .map((e) => (e.id || e.className) + ' ' + getComputedStyle(e).fontSize));
+  pruefe('Alle Eingabefelder mindestens 16 px, sonst zoomt Safari' + bei, kleineFelder.length === 0, kleineFelder.join(' | '));
+  // Am iPhone druckt Safari enger als am Rechner; gemessen wird deshalb mit weniger Platz.
+  pruefe('Druck am Handy mit Satzhöhe 251 mm' + bei, (await page.evaluate(() => window.__satzHoehe())) === 251);
+
   await page.click('#btn-mehr');
   pruefe('Kein „Rundgang noch einmal“ im Menü' + bei, !(await page.locator('#btn-hilfe').isVisible()));
   await nichtsRaus('Menü');

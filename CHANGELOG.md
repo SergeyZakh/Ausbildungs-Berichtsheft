@@ -14,6 +14,14 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   untereinander in voller Breite. Kopfleiste und Meldung stehen fest, dazwischen scrollt der
   Inhalt, ohne unter ihnen durchzulaufen. Textfelder wachsen mit dem Text, die Meldung belegt
   höchstens zwei Zeilen und zeigt sich beim Tippen ganz. Der Rundgang bleibt am Handy aus.
+  Eingabefelder haben dort mindestens 16 px, sonst zoomt Safari beim Tippen hinein.
+
+### Behoben
+
+- **PDF vom iPhone:** Eine Woche, die als „passt auf ein Blatt“ galt, lief in Safari auf eine
+  zweite Seite ohne Kopfleiste, und in der Kopfleiste brach der Zeitraum um. Am Handy misst das
+  Werkzeug jetzt mit dem engeren Druckbereich von Safari und teilt selbst; die Kopfleiste hat
+  feste Spalten, in denen Zeitraum und Etiketten nicht mehr umbrechen.
 
 ## [0.1.0] – 2026-09-26
 

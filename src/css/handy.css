@@ -104,12 +104,18 @@
   .fussleiste #notiz.ganz { display: block; -webkit-line-clamp: unset; }
 
   .felder { grid-template-columns: 1fr; }
-  dialog { width: calc(100% - 20px); }
+  /* Safari am iPhone zoomt beim Tippen in jedes Feld unter 16 px hinein; danach ließ sich die
+     Seite seitlich schieben, und die Blöcke wanderten. 16 px verhindert das Zoomen. !important,
+     weil es eine Untergrenze für jedes Feld ist, gleich welche Regel sonst seine Größe setzt. */
+  input, select, textarea { font-size: 16px !important; }
+  /* Datumsfelder hält Safari sonst auf ihrer eigenen Breite, breiter als der Dialog. */
+  input[type="date"] { -webkit-appearance: none; appearance: none; min-width: 0; max-width: 100%; display: block; }
+  dialog { width: calc(100% - 20px); overflow-x: hidden; }
   /* Kopf und Fuß stehen, dazwischen scrollt der Inhalt. Vorher saßen die Knöpfe direkt auf der
      Kante des scrollenden Bereichs und wirkten übereinandergelegt. */
   dialog[open] { display: flex; flex-direction: column; max-height: calc(100dvh - 20px); }
   dialog[open] > .dkopf, dialog[open] > .dfuss { flex: none; }
-  dialog[open] > .dkoerper { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  dialog[open] > .dkoerper { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
   #dlg-zuordnung .dkoerper { max-height: none; }
   .dfuss { flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--linie); }
   .wpopover { width: calc(100vw - 12px); }

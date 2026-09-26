@@ -19,7 +19,7 @@ window.__montagVon = function (datumIso) { return iso(montagVon(vonIso(datumIso)
 window.__fehlenderWerktag = function (datumIso) { return fehlenderWerktag(datumIso); };
 window.__kalenderwoche = function (montagIso) { return kalenderwoche(vonIso(montagIso)); };
 window.__blattHoehe = function (html) { return blattHoehe(html); };
-window.__satzHoehe = SATZ_HOEHE_MM;
+window.__satzHoehe = function () { return satzHoehe(); };
 window.__druckBlatt = function (n, m, st) { return druckBlatt(n, vonIso(m), st); };
 /* Import: Analyse einer CSV ohne Oberfläche, Bytes als Array (für den Zeichensatz). */
 window.__csvAnalysieren = function (text) {

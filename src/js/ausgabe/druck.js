@@ -14,6 +14,20 @@
 /* A4 hoch, 16 mm Rand oben und unten, 1 mm Sicherheit für Druckertreiber. */
 var SATZ_HOEHE_MM = 297 - 2 * 16 - 1;
 
+/* Am Handy druckt der Browser enger. Safari am iPhone ließ rund 174 mm Breite und setzte eigene
+   Kopf- und Fußzeilen (Adresse, Datum, Seitenzahl). Eine Woche, die als passend gemessen war,
+   lief dort auf eine zweite Seite, und die trug keine Kopfleiste, weil der Browser statt des
+   Werkzeugs umbrach. Mit 170 mm Breite und 251 mm Höhe teilt das Werkzeug selbst, bevor es der
+   Browser tut. Am Rechner bleibt es bei 180 × 264 mm; dort gab es das Problem nicht, und jede
+   Reserve kostet eine volle Woche ihr einziges Blatt. */
+var SATZ_HOEHE_HANDY_MM = 297 - 20 - 26;
+var SATZ_BREITE_HANDY_MM = 170;
+
+function druckAmHandy() {
+  try { return window.matchMedia("(pointer: coarse)").matches; } catch (e) { return false; }
+}
+function satzHoehe() { return druckAmHandy() ? SATZ_HOEHE_HANDY_MM : SATZ_HOEHE_MM; }
+
 var mmProPixel = null;
 function mmInPixel() {
   if (mmProPixel) return mmProPixel;
@@ -29,6 +43,7 @@ function mmInPixel() {
 function blattHoehe(html) {
   var m = $("messung");
   if (!m) return 0;
+  m.style.width = druckAmHandy() ? SATZ_BREITE_HANDY_MM + "mm" : "";
   m.innerHTML = html;
   var el = m.firstElementChild;
   var px = el ? el.getBoundingClientRect().height : 0;
@@ -40,7 +55,7 @@ function blattHoehe(html) {
    ist besser als ein grundlos zerrissenes. */
 function passtAufEineSeite(html) {
   var h = blattHoehe(html);
-  return !h || h <= SATZ_HOEHE_MM;
+  return !h || h <= satzHoehe();
 }
 
 /* ---------- HTML der Blätter ---------- */

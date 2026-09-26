@@ -367,6 +367,27 @@ const NAME = 'Mustermann, Max';
     await page.locator('#druck .blatt').getAttribute('class'));
   const seiten = await pdfSeiten();
   pruefe('Volle Woche passt auf eine Seite', seiten === 1, seiten + ' Seiten');
+  // Am iPhone blieben rund 174 mm Satzbreite; der Zeitraum brach um, die Etiketten liefen
+  // ineinander. Gemessen wird deshalb bei 170 mm.
+  const kopfZeilen = await page.evaluate(() => {
+    const m = document.getElementById('messung');
+    m.style.width = '170mm';
+    m.innerHTML = document.querySelector('#druck .blatt').outerHTML;
+    const tds = [...m.querySelectorAll('.kopfleiste td')];
+    const ergebnis = tds.map((td) => {
+      const etikett = td.querySelector('span');
+      const zeile = parseFloat(getComputedStyle(td).lineHeight) || parseFloat(getComputedStyle(td).fontSize) * 1.3;
+      return { text: etikett.textContent, zuBreit: etikett.scrollWidth > td.clientWidth,
+        zeilen: Math.round((td.getBoundingClientRect().height - etikett.getBoundingClientRect().height) / zeile) };
+    });
+    m.innerHTML = '';
+    m.style.width = '';
+    return ergebnis;
+  });
+  pruefe('Kopfleiste bei 170 mm: Zeitraum in einer Zeile',
+    kopfZeilen[2].zeilen <= 1, JSON.stringify(kopfZeilen[2]));
+  pruefe('Kopfleiste bei 170 mm: kein Etikett breiter als seine Spalte',
+    kopfZeilen.every((k) => !k.zuBreit), JSON.stringify(kopfZeilen.filter((k) => k.zuBreit)));
   const druckKopf = await page.locator('#druck .blatt .kopfleiste td span').allTextContents();
   pruefe('Druck: Kopfleiste beginnt links mit Nr. und Ausbildungsjahr',
     druckKopf.join(' | ') === 'Nr. | Ausbildungsjahr | Ausbildungswoche | Ausbildungsabteilung | Name',
@@ -395,6 +416,33 @@ const NAME = 'Mustermann, Max';
   const seitenMehrseitig = await pdfSeiten();
   pruefe('Logische Druckseiten entsprechen den PDF-Seiten',
     seitenMehrseitig === druckseiten.length, seitenMehrseitig + ' PDF-Seiten');
+
+  /* ---------- 16b. Die vollste Woche, die noch auf ein Blatt kommt ----------
+     Am Grenzfall zeigt sich, ob die Messung reicht: Eine Woche, die das Werkzeug knapp als
+     passend misst, darf beim Druck nicht auf eine zweite Seite ohne Kopfleiste laufen.
+     Gesucht wird die größte Zeilenzahl, bei der noch ein einziges Blatt entsteht. Den engeren
+     Druck am iPhone kann Chromium nicht nachstellen; dafür gilt am Handy eine eigene Satzhöhe
+     (test/handy.js). */
+  pruefe('Am Rechner gilt die Satzhöhe 264 mm', (await page.evaluate(() => window.__satzHoehe())) === 264);
+  const blaetterBei = async (n) => {
+    await page.locator('.tagpanel textarea').fill(Array.from({ length: n }, (_, i) =>
+      'Systemarbeit: Testeintrag ' + (i + 1) + ' mit etwas Kontext für die Zeilenlänge im Blatt.').join('\n'));
+    await page.waitForTimeout(250);
+    await druckeWoche();
+    return page.locator('#druck .blatt').count();
+  };
+  let wenig = 1, viel = 70;
+  while (viel - wenig > 1) {
+    const mitte = Math.floor((wenig + viel) / 2);
+    if ((await blaetterBei(mitte)) === 1) wenig = mitte; else viel = mitte;
+  }
+  await blaetterBei(wenig);
+  const grenzeRechner = await pdfSeiten();
+  pruefe('Grenzfall (' + wenig + ' Zeilen, ein Blatt) passt am Rechner auf eine Seite', grenzeRechner === 1, grenzeRechner + ' Seiten');
+  await blaetterBei(wenig + 1);
+  const drueber = await pdfSeiten();
+  pruefe('Eine Zeile mehr: zwei Blätter, jedes auf seiner eigenen Seite',
+    drueber === (await page.locator('#druck .blatt').count()), drueber + ' Seiten');
 
   /* ---------- 17. Tastatur ---------- */
   await page.setInputFiles('#datei', CSV);   // zum Blättern braucht es zwei Wochen
