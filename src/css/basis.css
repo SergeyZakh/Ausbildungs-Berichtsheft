@@ -27,11 +27,8 @@
 /* Weiße Karten auf warmem Grau, weiche Kanten. Kreise sind Marken
    (Stand eines Tages, Fortschritt, runde Symbolknöpfe), Glas nur dort,
    wo Inhalt dahinter liegt: Menüs, Wochenwahl, Dialoggrund, Modelllauf.
-   Drei Farben, jede mit einer Bedeutung: Grün ("passt"), Bernstein ("noch
-   gegenlesen") und Rot ("fehlt oder passt nicht"). Nach einem Import ist
-   fast alles noch zu lesen; war das rot, stand die ganze Woche in
-   Alarmfarbe, und ein Text, der nicht aufs Blatt passt, ging darin unter.
-   Keine Farbe steht allein, daneben steht immer ein Wort oder eine Zahl. */
+   Die einzigen Farben sind Grün ("passt") und Rot ("sieh hin"); sie
+   stehen nie allein, daneben steht immer ein Wort oder eine Zahl. */
 :root {
   --text:      #16161A;
   --linie:     #DEDCD6;   /* Kanten von Karten und Feldern */
@@ -42,9 +39,6 @@
   --schiefer:  #62615C;   /* Sekundärtext */
   --gut:       #1A7F37;
   --gut-hell:  #E6F4EA;
-  --offen:     #8F5A00;   /* 5,3 : 1 auf --offen-hell */
-  --offen-hell:#FFF5E3;
-  --offen-kante:#EFD6A6;
   --acht:      #B42318;
   --acht-hell: #FDECEA;
   --glas:      rgba(255, 255, 255, .68);

@@ -136,8 +136,7 @@ flowchart TD
 
 - **Gegenlesen und zusammenfassen.** Aus den Tätigkeiten des Tages machst du die Sätze, die ins
   Heft kommen; das Sprachmodell liefert dafür höchstens einen Vorschlag. Ein Tag ist erst fertig,
-  wenn du ihn übernimmst. Gelb heißt noch gegenlesen, grün fertig, rot: fehlt oder passt nicht
-  aufs Blatt.
+  wenn du ihn übernimmst. Rot heißt offen, grün fertig.
 
 - **Ausgabe** als Word – Wochenblatt oder Gesamtheft mit Deckblatt – und als PDF über den
   Druckdialog, mit Live-Vorschau des Blatts.

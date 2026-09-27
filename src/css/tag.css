@@ -56,9 +56,9 @@
 
 /* Rot heißt "da muss noch jemand drüber" (roher Entwurf oder ungelesene
    Modellausgabe), grün heißt gegengelesen. */
-.sektion.pruefen { border-color: var(--offen-kante); }
+.sektion.pruefen { border-color: #EDC6C1; }
 .sektion.pruefen > .sektionskopf {
-  background: var(--offen-hell); border-bottom-color: var(--offen-kante); color: var(--offen);
+  background: var(--acht-hell); border-bottom-color: #EDC6C1; color: var(--acht);
 }
 .sektion.fertig { border-color: #BFDDC8; }
 .sektion.fertig > .sektionskopf {
@@ -69,7 +69,7 @@
    gefüllter Knopf = nächster Schritt. Alle als Pillen. */
 .sektionsfahne {
   flex: none; padding: 2px 9px; border: 1px solid currentColor; border-radius: 999px;
-  background: transparent; font-size: 9.5px; font-weight: 600; letter-spacing: .1em; color: var(--offen);
+  background: transparent; font-size: 9.5px; font-weight: 600; letter-spacing: .1em; color: var(--acht);
 }
 .sektionsknopf {
   flex: none; display: inline-flex; align-items: center; gap: 5px;
@@ -81,10 +81,9 @@
 }
 .sektionsknopf:hover { background: var(--band); border-color: var(--linie-fest); }
 .sektionsknopf:disabled { opacity: .45; cursor: default; }
-/* „Fertig“ macht den Tag grün, also ist der Knopf es schon. */
-.sektionsknopf.uebernehmen { background: var(--gut); color: #fff; border-color: var(--gut); }
+.sektionsknopf.uebernehmen { background: var(--acht); color: #fff; border-color: var(--acht); }
 .sektionsknopf.uebernehmen::before { content: "\2713"; font-size: 11px; }
-.sektionsknopf.uebernehmen:hover { background: #146B2E; border-color: #146B2E; }
+.sektionsknopf.uebernehmen:hover { background: #8F1C13; border-color: #8F1C13; }
 .sektionsknopf.bearbeiten { border-color: var(--gut); color: var(--gut); background: var(--flaeche); }
 .sektionsknopf.bearbeiten:hover { background: var(--gut); color: #fff; }
 .sektionsknopf .stift { font-size: 12px; line-height: 1; }
@@ -215,7 +214,7 @@
 .tagpanel textarea:focus-visible,
 .tagpanel textarea:focus { outline: none; box-shadow: inset 0 2px 0 0 var(--text); }
 .sektion.pruefen textarea:focus-visible,
-.sektion.pruefen textarea:focus { box-shadow: inset 0 2px 0 0 var(--offen); }
+.sektion.pruefen textarea:focus { box-shadow: inset 0 2px 0 0 var(--acht); }
 .sektion.fertig textarea:focus-visible,
 .sektion.fertig textarea:focus { box-shadow: inset 0 2px 0 0 var(--gut); }
 /* Übernommen = gesperrt, aber gut lesbar. */

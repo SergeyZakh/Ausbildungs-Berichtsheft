@@ -191,7 +191,7 @@ function artSektion(datum, key, t, art, istFrei) {
  * Das Textfeld des Tages mit Herkunftsfahne, Fertig/Bearbeiten,
  * optionalem KI-Knopf und Zeilenstand.
  *
- * Solange der Text nicht übernommen ist, ist der Kasten gelb. Übernommen
+ * Solange der Text nicht übernommen ist, ist der Kasten rot. Übernommen
  * ist er grün und schreibgeschützt; "Bearbeiten" öffnet ihn wieder. Jede
  * Änderung hebt die Freigabe auf.
  */
