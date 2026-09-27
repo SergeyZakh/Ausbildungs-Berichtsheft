@@ -336,7 +336,7 @@ function azubiTagLeer(t) {
 
 /**
  * Lage eines Tages im Raster, mit denselben Klassen wie im Heft (tagLage()):
- *   voll    Text da, noch nicht übernommen (roter Kreis)
+ *   voll    Text da, noch nicht übernommen (gelber Kreis)
  *   fertig  übernommen (grüner Kreis)
  *   offen   Stunden oder Berufsschule, aber kein Text (Ring)
  *   frei    Urlaub, Krank, Feiertag (durchgestrichen)

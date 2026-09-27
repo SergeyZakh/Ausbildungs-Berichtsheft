@@ -111,7 +111,9 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 Reihenfolge wie in der Liste `CSS` in `build.js`: `basis.css` (Farben, Schrift, Grundgerüst),
 `leiste.css` (Kopfleiste, Wochenbalken, Reiter), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
 Eingaben, Meldungen), `dialoge.css` (Monatsraster, „Deine Daten“, Zuordnung, Rundgang),
-`handy.css` (alle `@media`-Regeln für Handy und Tablet), `ausbilder.css` (Konto und Ausbilderansicht),
+`handy.css` (alle `@media`-Regeln für Handy und Tablet; dort stehen die Tagesreiter in einer Zeile
+und der Tageskopf `.artkopf` mit Datum, Art und Stunden ebenfalls, damit das Schreibfeld auch mit
+offener Tastatur Platz hat), `ausbilder.css` (Konto und Ausbilderansicht),
 `blatt.css` (der Drucksatz des Vordrucks).
 
 ## Datenmodell
@@ -178,13 +180,18 @@ die Rolle kennt.
 | Stand | Bedeutung | Farbe |
 | --- | --- | --- |
 | `leer` | kein Text | – |
-| `roh` | `text === entwurf` | rot, Marke „E“ |
-| `ki` | `text === kiText` | rot, Marke „KI“ |
-| `eigen` | selbst geschrieben, nicht übernommen | rot, Marke „!“ |
+| `roh` | `text === entwurf` | gelb (`--offen`), Marke „E“ |
+| `ki` | `text === kiText` | gelb, Marke „KI“ |
+| `eigen` | selbst geschrieben, nicht übernommen | gelb, Marke „!“ |
 | `fertig` | `geprueft` | grün, Haken |
 
 Jede Änderung am Text hebt `geprueft` auf. Übernommene Tage sind
 schreibgeschützt, bis man **Bearbeiten** drückt.
+
+Rot (`--acht`) steht nicht für einen Stand, sondern für ein Problem: ein Text, der nicht aufs Blatt
+passt, Warnungen, der Bereich „Gefahr“. Nach einem Import ist fast jeder Tag noch zu lesen; in Rot
+stand dann die ganze Woche in Alarmfarbe, und „wird im Blatt eng“ ging darin unter. Der gewählte
+Reiter trägt einen dunklen Rahmen, bei jedem Stand gleich; seine Farbe bleibt die seines Stands.
 
 ### Stand einer Woche (`wochenStand()`)
 

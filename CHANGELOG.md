@@ -15,6 +15,16 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   für die Unterrichtsthemen. Feiertage, Tage außerhalb der Vertragslaufzeit und Tage mit Buchungen
   oder Text ändert der Plan nicht. Das Beispiel hat donnerstags Schule.
 
+### Geändert
+
+- **Farben:** Was noch gegenzulesen ist (Entwurf, KI, eigener Text), ist gelb statt rot. Rot bleibt
+  für Probleme wie „wird im Blatt eng“ und für Warnungen. Nach einem Import stand sonst die ganze
+  Woche in Alarmfarbe. „Fertig“ ist ein grüner Knopf, der gewählte Tag trägt bei jedem Stand
+  denselben dunklen Rahmen.
+- **Am Handy** stehen die Tagesreiter mit der Woche in einer Zeile, Datum, Art und Stunden des Tages
+  ebenfalls. Das Schreibfeld beginnt rund 140 px weiter oben und bleibt mit offener Tastatur
+  sichtbar.
+
 ### Behoben
 
 - **„Arbeitstag“ von Hand** an einem Feiertag wurde beim nächsten Import derselben Datei wieder

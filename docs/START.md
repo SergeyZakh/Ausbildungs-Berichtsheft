@@ -60,7 +60,8 @@ der Konfiguration für die lokale KI.
    an diesen Tagen stehen dann schon auf „Berufsschule“.
 
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere
-   ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig. Im Reiter **Woche**
+   ihn bei Bedarf und klicke **Fertig**. Gelb heißt noch gegenlesen, grün heißt fertig, rot heißt:
+   fehlt oder passt nicht aufs Blatt. Im Reiter **Woche**
    trägst du Abteilung und Unterweisungen ein.
 
 6. **Exportieren.** Auf **Exportieren** und dann **Wochenblatt als Word** oder

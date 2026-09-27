@@ -23,7 +23,7 @@ var RUNDGANG = [
           "die Mitte öffnet den Kalender." },
   { ziel: ["#reiter"],
     titel: "Ein Reiter je Tag",
-    text: "Der achte Reiter gehört der ganzen Woche. Grün heißt fertig, rot heißt: " +
+    text: "Der achte Reiter gehört der ganzen Woche. Grün heißt fertig, gelb heißt: " +
           "da musst du noch drüber." },
   { ziel: ["#tagbereich .tagpanel"],
     titel: "Schreiben",
@@ -31,7 +31,7 @@ var RUNDGANG = [
           "Nachschauen. Unten am Feld siehst du, ob der Text auf das Blatt passt." },
   { ziel: [".sektion.wachsend > .sektionskopf", "#tagbereich .tagpanel"],
     titel: "Erst prüfen, dann fertig",
-    text: "Solange der Kasten rot ist, hat den Text noch niemand freigegeben. " +
+    text: "Solange der Kasten gelb ist, hat den Text noch niemand freigegeben. " +
           "Ein Klick auf „Fertig“ macht ihn grün — „Bearbeiten“ öffnet ihn wieder." },
   { ziel: [".leiste .schub", "#btn-mehr"],
     titel: "Fertig? Dann raus damit",
@@ -48,7 +48,7 @@ var RUNDGANG_AUSBILDER = [
           "Word oder PDF. Schreiben und ändern können nur die Azubis selbst." },
   { ziel: [".aauswahl"],
     titel: "Wen möchtest du ansehen?",
-    text: "Oben stehen die Azubis, bei denen etwas zu tun ist. Rot heißt: Wochen warten aufs " +
+    text: "Oben stehen die Azubis, bei denen etwas zu tun ist. Gelb heißt: Wochen warten aufs " +
           "Gegenlesen. Grün heißt: alles übernommen." },
   { ziel: ["#btn-gruppe"],
     titel: "Deine Gruppe",

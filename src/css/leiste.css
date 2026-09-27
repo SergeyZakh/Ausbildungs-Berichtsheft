@@ -46,10 +46,10 @@
   transition: background-color .15s, border-color .15s;
 }
 .wochenknopf:hover { background: var(--band); border-color: var(--linie-fest); }
-/* Derselbe Stand wie im Monatsraster: rot = Ungelesenes, grün = durch. */
-.wochenknopf.pruefen { color: var(--acht); font-weight: 500; border-color: #EDC6C1; }
+/* Derselbe Stand wie im Monatsraster: Bernstein = Ungelesenes, grün = durch. */
+.wochenknopf.pruefen { color: var(--offen); font-weight: 500; border-color: var(--offen-kante); }
 .wochenknopf.fertig  { color: var(--gut); font-weight: 500; border-color: #BFDDC8; }
-.wochenknopf.pruefen:hover { background: var(--acht-hell); }
+.wochenknopf.pruefen:hover { background: var(--offen-hell); }
 .wochenknopf.fertig:hover  { background: var(--gut-hell); }
 .wochensumme {
   flex: 0 0 auto; display: flex; align-items: center; gap: 12px; height: 36px; padding: 0 14px 0 8px;
@@ -87,15 +87,14 @@
   transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s, transform .15s;
 }
 .reiter button:hover { background: var(--band); border-color: var(--linie-fest); }
+/* Gewählt heißt: dunkler Rahmen, gleich bei jedem Stand. Früher füllte sich der Reiter in der
+   Farbe seines Stands – dunkelrot, grün oder grau –, und ob ein Tag gewählt oder nur offen war,
+   las man an der Sättigung ab. Die Farbe bleibt jetzt dem Stand. */
 .reiter button[aria-selected="true"] {
-  background: var(--text); color: var(--flaeche); border-color: var(--text);
-  box-shadow: 0 6px 16px rgba(22, 22, 26, .18);
+  border-color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--text), 0 6px 16px rgba(22, 22, 26, .14);
 }
-.reiter button[aria-selected="true"] .rlage { color: var(--flaeche); }
-/* Gewählt, aber ohne Stand (kein Text, frei): grau statt schwarz. */
-.reiter button[aria-selected="true"]:not(.fertig):not(.pruefen) {
-  background: #7A7973; border-color: #7A7973; box-shadow: 0 6px 16px rgba(22, 22, 26, .12);
-}
+.reiter button[aria-selected="true"]:not(.fertig):not(.pruefen) { color: var(--text); }
 .reiter .rtag {
   display: flex; gap: 5px; justify-content: center;
   font-size: 12.5px; font-weight: 600; letter-spacing: .04em;
@@ -120,13 +119,8 @@
   background: var(--schiefer); color: #fff;
 }
 .reiter .haken { font-size: 9.5px; }
-.reiter button.pruefen .marke { background: var(--acht); }
+.reiter button.pruefen .marke { background: var(--offen); }
 .reiter button.fertig .haken { background: var(--gut); }
-/* Im gewählten Reiter kehrt sich die Marke um: weißer Kreis, farbige Schrift. */
-.reiter button[aria-selected="true"] .marke,
-.reiter button[aria-selected="true"] .haken { background: #fff; color: var(--text); }
-.reiter button.pruefen[aria-selected="true"] .marke { color: var(--acht); }
-.reiter button.fertig[aria-selected="true"] .haken { color: var(--gut); }
 .reiter .ring { width: 14px; height: 14px; --dicke: 2.5px; }
 .reiter .dreht {
   display: inline-block; width: 10px; height: 10px; flex: none;
@@ -135,14 +129,12 @@
 }
 @keyframes dreh { to { transform: rotate(360deg); } }
 
-/* Der Reiter färbt mit dem Stand des Tages: grün durch, rot ungelesen. */
+/* Der Reiter färbt mit dem Stand des Tages: grün durch, Bernstein ungelesen. */
 .reiter button.fertig { background: var(--gut-hell); color: var(--gut); border-color: #BFDDC8; }
 .reiter button.fertig .rlage { color: var(--gut); }
 .reiter button.fertig:hover { background: #D6EBDC; }
-.reiter button.fertig[aria-selected="true"] { background: var(--gut); border-color: var(--gut); color: #fff; box-shadow: 0 6px 16px rgba(26, 127, 55, .25); }
-.reiter button.fertig[aria-selected="true"] .rlage { color: #fff; }
-.reiter button.pruefen { background: var(--acht-hell); color: var(--acht); border-color: #EDC6C1; }
-.reiter button.pruefen .rlage { color: var(--acht); }
-.reiter button.pruefen:hover { background: #F8D7D3; }
-.reiter button.pruefen[aria-selected="true"] { background: var(--acht); border-color: var(--acht); color: #fff; box-shadow: 0 6px 16px rgba(180, 35, 24, .25); }
-.reiter button.pruefen[aria-selected="true"] .rlage { color: #fff; }
+.reiter button.pruefen { background: var(--offen-hell); color: var(--offen); border-color: var(--offen-kante); }
+.reiter button.pruefen .rlage { color: var(--offen); }
+.reiter button.pruefen:hover { background: #FCEBCB; }
+/* Nach den Standfarben, sonst gewönne deren Rand. */
+.reiter button[aria-selected="true"] { border-color: var(--text); }

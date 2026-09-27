@@ -143,7 +143,12 @@ function zeichneLeerbild(bereich) {
 /** Kopf des Tages: Art des Tages und Stunden. Die Stunden kommen aus dem Import
  *  und sind nur Anzeige; im Nachweis steht keine Stundenzahl. */
 function artSektion(datum, key, t, art, istFrei) {
-  var s = sektion(WOCHENTAGE[datum.getDay()] + ", " + dmy(datum));
+  var s = sektion(dmy(datum), "artkopf");
+  // Am Handy steht der Wochentag schon im gewählten Reiter; dort fällt er hier weg (handy.css).
+  var wochentag = document.createElement("span");
+  wochentag.className = "wochentag";
+  wochentag.textContent = WOCHENTAGE[datum.getDay()] + ", ";
+  s.kopf.firstChild.insertBefore(wochentag, s.kopf.firstChild.firstChild);
 
   var wahl = document.createElement("select");
   wahl.id = "feld-art";
@@ -186,7 +191,7 @@ function artSektion(datum, key, t, art, istFrei) {
  * Das Textfeld des Tages mit Herkunftsfahne, Fertig/Bearbeiten,
  * optionalem KI-Knopf und Zeilenstand.
  *
- * Solange der Text nicht übernommen ist, ist der Kasten rot. Übernommen
+ * Solange der Text nicht übernommen ist, ist der Kasten gelb. Übernommen
  * ist er grün und schreibgeschützt; "Bearbeiten" öffnet ihn wieder. Jede
  * Änderung hebt die Freigabe auf.
  */

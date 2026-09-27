@@ -52,7 +52,7 @@ body.alsausbilder .leiste { display: none; }
 .atagstand { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; letter-spacing: .02em; color: var(--schiefer); }
 .atag.offen .atagstand { color: var(--acht); }
 .atag.fertig .atagstand { color: var(--gut); }
-.atagstand .marke { background: var(--acht); }
+.atagstand .marke { background: var(--offen); }
 .atagstand .haken { background: var(--gut); }
 .atagstand .marke, .atagstand .haken {
   display: inline-flex; align-items: center; justify-content: center;
@@ -111,12 +111,12 @@ body.alsausbilder .leiste { display: none; }
   transition: background-color .15s, border-color .15s;
 }
 .aauswahlknopf:hover { background: var(--band); border-color: var(--linie-fest); }
-.aauswahlknopf.pruefen { border-color: #EDC6C1; background: var(--acht-hell); }
-.aauswahlknopf.pruefen:hover { background: #F8D7D3; }
+.aauswahlknopf.pruefen { border-color: var(--offen-kante); background: var(--offen-hell); }
+.aauswahlknopf.pruefen:hover { background: #FCEBCB; }
 .aauswahlknopf.fertig { border-color: #BFDDC8; background: var(--gut-hell); }
 .aauswahlknopf .aname { font-weight: 600; font-size: 14.5px; min-width: 12em; }
 .aauswahlknopf .alage { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
-.aauswahlknopf.pruefen .alage { color: var(--acht); }
+.aauswahlknopf.pruefen .alage { color: var(--offen); }
 .aauswahlknopf.fertig .alage { color: var(--gut); }
 .aauswahlknopf .azuletzt { margin-left: auto; font-size: 12.5px; color: var(--schiefer); }
 .aauswahlknopf .marke, .aauswahlknopf .haken {
@@ -124,7 +124,7 @@ body.alsausbilder .leiste { display: none; }
   min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px;
   font-size: 9px; font-weight: 700; color: #fff; background: var(--schiefer);
 }
-.aauswahlknopf.pruefen .marke { background: var(--acht); }
+.aauswahlknopf.pruefen .marke { background: var(--offen); }
 .aauswahlknopf.fertig .haken { background: var(--gut); }
 .aauswahlknopf .punkt { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid currentColor; }
 .aauswahl { width: 100%; flex: 1 1 100%; }
