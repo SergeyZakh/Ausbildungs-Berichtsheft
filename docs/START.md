@@ -56,6 +56,8 @@ der Konfiguration für die lokale KI.
 
 4. **Deine Daten eintragen.** Oben rechts auf **⋯ → Deine Daten**: Name, Ausbildungsberuf,
    Betrieb, Vertragslaufzeit und das Bundesland für die automatische Erfassung der Feiertage.
+   Unter **Schule** wählst du deine festen Schultage oder trägst Blockunterricht ein. Leere Tage
+   an diesen Tagen stehen dann schon auf „Berufsschule“.
 
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere
    ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig. Im Reiter **Woche**

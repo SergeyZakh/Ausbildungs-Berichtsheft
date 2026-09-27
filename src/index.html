@@ -109,6 +109,7 @@
   <div class="blattleiste" role="tablist">
     <button type="button" role="tab" data-ziel="person" aria-selected="true">Person</button>
     <button type="button" role="tab" data-ziel="ausbildung" aria-selected="false">Ausbildung</button>
+    <button type="button" role="tab" data-ziel="schule" aria-selected="false">Schule</button>
     <button type="button" role="tab" data-ziel="verarbeitung" aria-selected="false">Verarbeitung</button>
     <button type="button" role="tab" data-ziel="ki" aria-selected="false">Sprachmodell</button>
     <button type="button" role="tab" data-ziel="gefahr" aria-selected="false" class="rot">Gefahr</button>
@@ -133,12 +134,36 @@
         <label><span>Ausbildungsfirma <i>*</i></span><input id="f-betrieb" type="text" placeholder="Muster GmbH"></label>
         <label><span>Geschäftszweig</span><input id="f-zweig" type="text" placeholder="z. B. IT-Dienstleistung"></label>
         <label><span>Ausbildungsabteilung</span><input id="f-abteilung" type="text" placeholder="z. B. IT"></label>
-        <label><span>Ausbilder/in</span><input id="f-ausbilder" type="text"></label>
-        <label><span>Berufsschule</span><input id="f-schule" type="text"></label>
+        <label class="weit"><span>Ausbilder/in</span><input id="f-ausbilder" type="text"></label>
         <label><span>Vertragliche Laufzeit – Beginn <i>*</i></span><input id="f-beginn" type="date"></label>
         <label><span>Vertragliche Laufzeit – Ende <i>*</i></span><input id="f-ende" type="date"></label>
         <label><span>Lehrjahr</span><output id="f-jahr" class="leer" aria-live="polite">Beginn eintragen</output></label>
         <label><span>Vertrag abgeschlossen am</span><input id="f-vertragAm" type="date"></label>
+      </div>
+    </div>
+
+    <!-- Schulplan (schultagLautPlan() in zustand.js). Die Schalter spiegeln das versteckte Feld
+         f-schultage, das wie jedes Stammdatenfeld gespeichert und abgeglichen wird. -->
+    <div class="dlg-blatt" data-blatt="schule" hidden>
+      <div class="felder">
+        <label class="weit"><span>Name der Berufsschule</span>
+          <input id="f-schule" type="text" placeholder="Berufskolleg Musterstadt"></label>
+        <fieldset class="weit tagwahl" id="schultage-wahl">
+          <legend>Feste Schultage</legend>
+          <label><input type="checkbox" value="Mo"><span>Mo</span></label>
+          <label><input type="checkbox" value="Di"><span>Di</span></label>
+          <label><input type="checkbox" value="Mi"><span>Mi</span></label>
+          <label><input type="checkbox" value="Do"><span>Do</span></label>
+          <label><input type="checkbox" value="Fr"><span>Fr</span></label>
+          <input id="f-schultage" type="hidden">
+        </fieldset>
+        <label class="weit"><span>Blockunterricht</span>
+          <input id="f-schulbloecke" type="text" autocomplete="off"
+            placeholder="02.03.2026–20.03.2026; 04.05.2026–22.05.2026">
+          <small id="schulbloecke-stand"></small></label>
+        <small class="weit">Leere Tage an diesen Schultagen stehen schon auf „Berufsschule“. Feiertage
+          und Tage mit Buchungen oder Text bleiben, wie sie sind, etwa in den Schulferien. Am Tag
+          selbst lässt sich die Art jederzeit umstellen.</small>
       </div>
     </div>
 

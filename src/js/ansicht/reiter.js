@@ -38,7 +38,7 @@ function zeichneReiter() {
 /** Reiter eines Tages: Farbe und Marke zeigen, was der Tag noch braucht. */
 function tagReiter(montag, i) {
   var datum = plus(montag, i), t = tage[iso(datum)];
-  var art = t && t.art ? t.art : "";
+  var art = tagArt(iso(datum));
   var schule = istSchultag(art);
   var frei = !!art && !schule;
   var fehlt = !frei && !!(t && (t.stunden || schule)) && !((t && t.text ? t.text : "").trim());

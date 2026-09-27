@@ -126,6 +126,7 @@ Array.prototype.forEach.call(dlg.querySelectorAll(".blattleiste button"), functi
 
 $("btn-stamm").addEventListener("click", function () {
   menueSchliessen(); lehrjahrZeigen(); stammStandZeigen(); anweisungenZaehlen(); gefahrZeilenZeigen();
+  schulplanZeigen();
   blattZeigen("person"); dlg.showModal();
 });
 $("dlg-zu").addEventListener("click", function () { dlg.close(); });
@@ -146,7 +147,7 @@ dlg.addEventListener("close", function () {
   $(id).addEventListener("change", function () { entwuerfeNeu(); zeichnen(); merken(); });
 });
 
-["f-name", "f-beruf", "f-betrieb", "f-abteilung", "f-ausbilder", "f-schule", "f-beginn", "f-ende",
+["f-name", "f-beruf", "f-betrieb", "f-abteilung", "f-ausbilder", "f-schule", "f-schulbloecke", "f-beginn", "f-ende",
  "f-geburtsort", "f-geburtsdatum", "f-anschrift", "f-zweig", "f-land", "f-vertragAm", "f-vertreterName", "f-vertreterAnschrift",
  "f-ausblenden", "f-namen", "f-projektraus", "f-ki-adresse", "f-ki-modell", "f-ki-anweisungen", "f-ki-stichpunkte"]
   .forEach(function (id) {
@@ -159,6 +160,44 @@ dlg.addEventListener("close", function () {
       $(id).addEventListener("change", function () { lehrjahrZeigen(); merken(); stammStandZeigen(); });
     }
   });
+
+/* ---------- Schulplan ----------
+   Gespeichert und abgeglichen wird nur das versteckte Feld f-schultage ("Di, Mi"). Beim Laden
+   und aus dem Konto kommt allein sein Wert; die Schalter holen ihn sich, wenn der Dialog aufgeht. */
+var schultagSchalter = Array.prototype.slice.call($("schultage-wahl").querySelectorAll("input[type=checkbox]"));
+
+function schulplanZeigen() {
+  var gewaehlt = schultageLesen($("f-schultage").value);
+  schultagSchalter.forEach(function (k) {
+    k.checked = gewaehlt.indexOf(WERKTAGE_KURZ.indexOf(k.value)) !== -1;
+  });
+  bloeckeStandZeigen();
+}
+
+schultagSchalter.forEach(function (k) {
+  k.addEventListener("change", function () {
+    $("f-schultage").value = schultagSchalter
+      .filter(function (x) { return x.checked; })
+      .map(function (x) { return x.value; }).join(", ");
+    merken();
+  });
+});
+
+/** Unter dem Feld steht, was gelesen wurde – oder was nicht. */
+function bloeckeStandZeigen() {
+  var feld = $("schulbloecke-stand");
+  var gelesen = schulbloeckeLesen($("f-schulbloecke").value);
+  feld.className = gelesen.unklar.length ? "fehlt" : "";
+  if (gelesen.unklar.length) {
+    feld.textContent = "Nicht erkannt: " + gelesen.unklar.join(" · ") + ". Bitte als TT.MM.JJJJ–TT.MM.JJJJ.";
+  } else if (gelesen.bloecke.length) {
+    feld.textContent = mehrzahl(gelesen.bloecke.length, " Block", " Blöcke") + ": " +
+      gelesen.bloecke.map(function (b) { return dmy(vonIso(b.von)) + "–" + dmy(vonIso(b.bis)); }).join(", ");
+  } else {
+    feld.textContent = "Zeiträume, getrennt durch Semikolon. Jeder Werktag darin gilt als Schultag.";
+  }
+}
+$("f-schulbloecke").addEventListener("input", bloeckeStandZeigen);
 
 /** Zeichenzähler unter den eigenen Anweisungen. */
 function anweisungenZaehlen() {

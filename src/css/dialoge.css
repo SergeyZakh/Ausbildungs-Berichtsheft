@@ -169,6 +169,25 @@
 .felder .anweisungszeile small span { display: inline; margin: 0; font-size: inherit; }
 .anweisungszeile .zaehler { font-variant-numeric: tabular-nums; }
 
+/* Feste Schultage: fünf Pillen statt fünf Häkchen. Das Häkchen bleibt im Dokument, damit
+   Tastatur und Vorleser es finden, sichtbar ist nur die Pille dahinter. */
+.tagwahl { margin: 0; padding: 0; border: 0; min-width: 0; }
+.tagwahl legend { padding: 0; margin-bottom: 6px; font-size: 12px; color: var(--schiefer); }
+.felder .tagwahl label { display: inline-block; position: relative; margin: 0 6px 0 0; }
+.felder .tagwahl label span {
+  display: inline-block; min-width: 46px; margin: 0; padding: 6px 12px; text-align: center;
+  font-size: 13px; color: var(--text); cursor: pointer;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: 999px;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.felder .tagwahl label span:hover { border-color: var(--linie-fest); }
+.felder .tagwahl input {
+  position: absolute; left: 0; top: 0; width: 1px; height: 1px; margin: 0; padding: 0; opacity: 0;
+}
+.felder .tagwahl input:checked + span { background: var(--text); border-color: var(--text); color: #fff; }
+.felder .tagwahl input:focus-visible + span { outline: 2px solid var(--text); outline-offset: 2px; }
+.felder small.fehlt { color: var(--acht); }
+
 /* Gefahrenbereich */
 .gefahrkasten { border: 1.5px solid #E3A9A2; border-radius: 12px; color: var(--acht); overflow: hidden; }
 .gefahrzeile {

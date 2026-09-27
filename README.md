@@ -195,7 +195,8 @@ zwei Beispielzeilen – dann baue ich dein Format ein.
 ## So wird gearbeitet 
 
 1. Zeiten als CSV exportieren und ins Fenster ziehen. Ohne Export? **Ohne Export starten**.
-2. Unter **⋯ → Deine Daten** Name, Beruf, Betrieb und Vertragslaufzeit eintragen.
+2. Unter **⋯ → Deine Daten** Name, Beruf, Betrieb und Vertragslaufzeit eintragen, unter **Schule**
+   deine festen Schultage oder den Blockunterricht.
 3. Tag für Tag den Entwurf überarbeiten und auf **Fertig** drücken. Im Reiter **Woche** stehen **Abteilung und Unterweisungen**.
 4. **Exportieren** → Wochenblatt oder Gesamtheft, als Word oder PDF.
 
@@ -306,6 +307,9 @@ Einrichten, Abgleich, Rechte und Sicherung → [docs/SERVER.md](docs/SERVER.md)
   gespeicherten Stand nicht sieht. Das Werkzeug prüft das beim Start und lädt dann einmal neu. Mit
   `npm start` oder Docker tritt es gar nicht auf. Sichern unter **⋯ → Sicherung speichern** schadet nie.
 - **Im Dokument stehen keine Uhrzeiten.**
+- **Schultage** aus *Deine Daten → Schule* setzen nur leere Tage auf „Berufsschule“. Tage mit
+  Buchungen bleiben, wie der Import sie liefert, denn sie können in den Schulferien liegen. Am Tag
+  selbst lässt sich die Art jederzeit umstellen.
 - **Feiertage** werden bundesweit erkannt. Mit deinem Bundesland unter *Deine Daten → Verarbeitung*
   kommen die Feiertage des Landes dazu. Was nur in einzelnen Gemeinden gilt, etwa Mariä Himmelfahrt
   in Teilen Bayerns, trägst du als Art des Tages ein. Ein Feiertag ohne Eintrag zählt nicht als Lücke.

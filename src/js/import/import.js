@@ -65,7 +65,9 @@ function importAnwenden(a, name) {
       Object.keys(frisch).forEach(function (k) {
         var g = gespeicherte[k], t = tage[k];
         if (!g || !t) return;
-        if (g.art) t.art = g.art;
+        // Eine von Hand gewählte Art bleibt, auch „Arbeitstag“ an einem Feiertag.
+        if (g.art || g.artVonHand) t.art = g.art || "";
+        if (g.artVonHand) t.artVonHand = true;
         var warEntwurf = g.entwurf != null && g.text === g.entwurf;
         // Ältere Stände ohne kiText: gesetztes vorKi heißt Modellausgabe.
         var warKi = g.kiText != null ? g.text === g.kiText : g.vorKi != null;

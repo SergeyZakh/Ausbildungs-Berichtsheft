@@ -71,7 +71,7 @@ function zeichneTag() {
   if (aktiverTag === 7) { zeichneWochenblatt(bereich); return; }
 
   var datum = plus(vonIso(aktiveWoche), aktiverTag), key = iso(datum), t = tage[key];
-  var art = t && t.art ? t.art : "";
+  var art = tagArt(key);
   var istSchule = istSchultag(art);
   var istFrei = !!art && !istSchule;
 
@@ -155,9 +155,11 @@ function artSektion(datum, key, t, art, istFrei) {
     wahl.appendChild(o);
   });
   wahl.value = art;
+  if (art && !(t && t.art)) wahl.title = "Schultag laut Deine Daten → Schule";
   wahl.addEventListener("change", function (e) {
     if (!tage[key]) tage[key] = { von: null, bis: null, pausen: [], stunden: null, text: "" };
     tage[key].art = e.target.value;
+    tage[key].artVonHand = true;
     merken(); zeichnen();
   });
   s.leib.appendChild(feldPaar("Art des Tages", wahl, "feld-art"));
@@ -202,6 +204,8 @@ function textSektion(key, t, art, istSchule) {
     : "Was hast du an diesem Tag gemacht?";
   ta.addEventListener("input", function (e) {
     if (!tage[key]) tage[key] = { von: null, bis: null, pausen: [], stunden: null, art: art };
+    // Zeigt der Schulplan den leeren Tag als Berufsschule, wird er mit dem ersten Zeichen eine.
+    else if (art && !tage[key].art) tage[key].art = art;
     tage[key].text = e.target.value;
     delete tage[key].geprueft;
     standAnzeigen();
