@@ -34,20 +34,23 @@
   .wsanteil { gap: 5px; }
   .wochensumme .ring { width: 18px; height: 18px; --dicke: 3px; }
 
-  /* Reihe 3: sieben Tage und die Woche in einer Zeile. Neben einer Marke steht kein Text mehr,
-     Art und Stunden nennt der Tageskopf darunter. In zwei Reihen mit Stunden lagen Reiter und
-     Tageskopf zusammen rund 230 px über dem Schreibfeld, mit offener Tastatur blieb davon kaum
-     etwas zum Schreiben. */
+  /* Reihe 3: sieben Tage in einer Zeile, der Wochenreiter breit darunter. Neben der Marke eines
+     Tages steht kein Text, Art und Stunden nennt der Tageskopf darunter: Mit Stunden in den
+     Reitern lagen Reiter und Tageskopf zusammen rund 230 px über dem Schreibfeld, mit offener
+     Tastatur blieb davon kaum etwas zum Schreiben. Die breite Woche war dabei nie das Problem. */
   /* Oben Abstand zur Kopfleiste: Ohne ihn saßen die Reiter auf deren Trennlinie, und ihr oberer
      Rand samt Rundung wurde abgeschnitten. */
-  .reiter { overflow: visible; flex-wrap: nowrap; gap: 4px; padding: 12px 12px 10px; }
+  .reiter { overflow: visible; flex-wrap: wrap; gap: 5px; padding: 12px 12px 10px; }
   .reiter button { flex: 1 1 0; min-width: 0; padding: 7px 1px 6px; gap: 4px; border-radius: 10px; overflow: hidden; }
-  .reiter button:last-child { flex: 1.8 1 0; }
+  .reiter button:last-child {
+    flex: 1 1 100%; flex-direction: row; align-items: center; justify-content: center;
+    gap: 10px; padding: 8px 12px;
+  }
   .reiter .rdatum { display: none; }
-  .reiter .rtag { font-size: 11.5px; letter-spacing: .02em; }
-  .reiter .rlage { font-size: 10px; gap: 3px; max-width: 100%; min-height: 16px; overflow: hidden; }
+  .reiter .rtag { font-size: 11.5px; letter-spacing: .04em; }
+  .reiter .rlage { font-size: 10.5px; gap: 3px; max-width: 100%; min-height: 16px; overflow: hidden; }
   .reiter .rtext { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-  .reiter .rlage:not(.ohnemarke) .rtext { display: none; }
+  .reiter button:not(:last-child) .rlage:not(.ohnemarke) .rtext { display: none; }
 
   /* Tageskopf in einer Zeile: Datum, Art, Stunden. Die Beschriftungen stehen nur noch für
      Vorleser da, Auswahl und Stundenzahl sprechen für sich. Reicht die Breite nicht, rutschen

@@ -112,7 +112,7 @@ Reihenfolge wie in der Liste `CSS` in `build.js`: `basis.css` (Farben, Schrift, 
 `leiste.css` (Kopfleiste, Wochenbalken, Reiter), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
 Eingaben, Meldungen), `dialoge.css` (Monatsraster, „Deine Daten“, Zuordnung, Rundgang),
 `handy.css` (alle `@media`-Regeln für Handy und Tablet; dort stehen die Tagesreiter in einer Zeile
-und der Tageskopf `.artkopf` mit Datum, Art und Stunden ebenfalls, damit das Schreibfeld auch mit
+mit der Woche breit darunter, und der Tageskopf `.artkopf` mit Datum, Art und Stunden in einer Zeile, damit das Schreibfeld auch mit
 offener Tastatur Platz hat; die Regeln greifen auch beim Drucken, denn A4 ist schmaler als 820 px,
 also dort keine Klassen aus dem Blatt wie `.tagkopf` oder `.kasten` verwenden),
 `ausbilder.css` (Konto und Ausbilderansicht),

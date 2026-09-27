@@ -17,9 +17,9 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ### Geändert
 
-- **Am Handy** stehen die Tagesreiter mit der Woche in einer Zeile, Datum, Art und Stunden des Tages
-  ebenfalls. Das Schreibfeld beginnt rund 140 px weiter oben und bleibt mit offener Tastatur
-  sichtbar.
+- **Am Handy** stehen die Tagesreiter kompakt in einer Zeile, die Woche breit darunter; Datum, Art
+  und Stunden des Tages stehen ebenfalls in einer Zeile. Das Schreibfeld beginnt deutlich weiter
+  oben und bleibt mit offener Tastatur sichtbar.
 
 ### Behoben
 
