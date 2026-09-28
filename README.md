@@ -326,8 +326,6 @@ Einrichten, Abgleich, Rechte und Sicherung → [docs/SERVER.md](docs/SERVER.md)
   einmal für die ganze Woche statt an fünf Tagen – so wie der Vordruck ein Feld je Woche hat. Wer
   an einem Tag krank war, stellt es in der Liste darunter um. Beim täglichen Vordruck bleibt es bei
   einem Text je Tag.
-- **Fächer zum Antippen:** Schreibst du Schultage als „LF5: Subnetting“, stehen die Fächer beim
-  nächsten Mal als Knöpfe über dem Feld; „Fächer wie am …“ übernimmt alle vom letzten Schultag.
 - **Nach „Fertig“** geht es gleich zum nächsten Tag, der noch etwas braucht, auch in der nächsten
   Woche. „Zurück“ hinter der Meldung führt wieder hin. Ist danach nichts mehr offen, aber früher,
   bietet die Meldung den frühesten offenen Tag an.

@@ -235,10 +235,8 @@ function textSektion(key, t, art, istSchule) {
   var ta = document.createElement("textarea");
   ta.id = "feld-" + key;
   ta.value = (t && t.text) || "";
-  // Der Platzhalter zeigt „Fach: Thema“: So geschrieben, kennt das Werkzeug die Fächer beim nächsten Mal.
-  ta.placeholder = art === "Berufsschule"
-    ? "Welche Themen wurden im Unterricht behandelt?\nz. B. LF5: Subnetting und VLANs"
-    : istSchule ? "Welche Themen wurden behandelt?"
+  ta.placeholder = istSchule
+    ? "Welche Themen wurden im Unterricht behandelt?"
     : "Was hast du an diesem Tag gemacht?";
   ta.addEventListener("input", function (e) {
     if (!tage[key]) tage[key] = { von: null, bis: null, pausen: [], stunden: null, art: art };
@@ -253,7 +251,6 @@ function textSektion(key, t, art, istSchule) {
     merken();
   });
   textfeldWachsen(ta);
-  if (art === "Berufsschule") s.leib.appendChild(faecherLeiste(ta, key, key));
   s.leib.appendChild(ta);
 
   var uebernehmen = sektionsknopf("Fertig", "uebernehmen");
