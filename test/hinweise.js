@@ -309,6 +309,69 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await ctx.close();
   }
 
+  /* ---------- Hell oder dunkel per Knopf ---------- */
+  {
+    /** Alle Farbvariablen, die ein :root-Block setzt, mit ihrem berechneten Wert. */
+    const variablen = (page) => page.evaluate(() => {
+      const namen = new Set();
+      const sammeln = (regeln) => [...regeln].forEach((r) => {
+        if (r.cssRules) sammeln(r.cssRules);
+        if (r.style && /:root/.test(r.selectorText || '')) {
+          [...r.style].filter((n) => n.startsWith('--')).forEach((n) => namen.add(n));
+        }
+      });
+      [...document.styleSheets].forEach((s) => sammeln(s.cssRules));
+      const st = getComputedStyle(document.documentElement);
+      return Object.fromEntries([...namen].sort().map((n) => [n, st.getPropertyValue(n).trim()]));
+    });
+    const grundHell = (page) => page.evaluate(() => {
+      const z = getComputedStyle(document.body).backgroundColor.match(/\d+/g).map(Number);
+      return (z[0] + z[1] + z[2]) / 3;
+    });
+
+    const ctx = await browser.newContext({ viewport: { width: 1300, height: 850 }, colorScheme: 'light' });
+    const page = await ctx.newPage();
+    const fehler = h.fehlerSammeln(page);
+    await h.ohneRundgang(page);
+    await h.oeffnen(page);
+    await page.waitForTimeout(600);
+    pruefe('Knopf für hell/dunkel in der Kopfleiste, auch ohne Woche', await page.locator('#btn-farbe').isVisible());
+    pruefe('Gerät hell: Seite hell, Knopf zeigt den Mond',
+      (await grundHell(page)) > 200 && (await page.locator('#btn-farbe .mond').isVisible()) &&
+        (await page.getAttribute('#btn-farbe', 'aria-pressed')) === 'false');
+    await page.click('#btn-farbe');
+    pruefe('Ein Klick: dunkel, gemerkt, Knopf zeigt die Sonne',
+      (await grundHell(page)) < 40 && (await page.locator('#btn-farbe .sonne').isVisible()) &&
+        (await page.getAttribute('#btn-farbe', 'aria-pressed')) === 'true' &&
+        (await page.evaluate(() => localStorage.getItem('berichtsheft-farbe'))) === 'dunkel');
+    const vonHand = await variablen(page);
+    await page.reload();
+    await page.waitForTimeout(600);
+    pruefe('Nach dem Neuladen bleibt es dunkel', (await grundHell(page)) < 40 &&
+      (await page.evaluate(() => document.documentElement.getAttribute('data-farbe'))) === 'dunkel');
+    await page.click('#btn-farbe');
+    pruefe('Zurück auf hell wie das Gerät: nichts mehr gemerkt',
+      (await grundHell(page)) > 200 && (await page.evaluate(() =>
+        localStorage.getItem('berichtsheft-farbe') === null && !document.documentElement.hasAttribute('data-farbe'))));
+    pruefe('Keine JavaScript-Fehler (hell/dunkel)', fehler.length === 0, fehler.join(' | '));
+    await ctx.close();
+
+    // Die Farben stehen zweimal in basis.css, einmal für das Gerät und einmal für den Knopf.
+    const dunkel = await browser.newContext({ viewport: { width: 1300, height: 850 }, colorScheme: 'dark' });
+    const seite = await dunkel.newPage();
+    await h.ohneRundgang(seite);
+    await h.oeffnen(seite);
+    await seite.waitForTimeout(600);
+    const vomGeraet = await variablen(seite);
+    const abweichend = Object.keys(vomGeraet).filter((n) => vomGeraet[n] !== vonHand[n]);
+    pruefe('Dunkel per Knopf und dunkel vom Gerät haben dieselben Farben',
+      Object.keys(vomGeraet).length > 20 && abweichend.length === 0, abweichend.join(', '));
+    await seite.click('#btn-farbe');
+    pruefe('Gerät dunkel: ein Klick macht hell und merkt es',
+      (await grundHell(seite)) > 200 && (await seite.evaluate(() => localStorage.getItem('berichtsheft-farbe'))) === 'hell');
+    await dunkel.close();
+  }
+
   /* ---------- Am Handy: kurze Überschrift, Meldung wird leise ---------- */
   {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 780 }, isMobile: true, hasTouch: true });

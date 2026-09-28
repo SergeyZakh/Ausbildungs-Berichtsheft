@@ -184,26 +184,8 @@ schultagSchalter.forEach(function (k) {
   });
 });
 
-/** Unter einem Feld mit Zeiträumen steht, was gelesen wurde – oder was nicht. */
-function zeitraeumeStandZeigen(feldId, standId, eins, viele, leer) {
-  var feld = $(standId);
-  var gelesen = schulbloeckeLesen($(feldId).value);
-  feld.className = gelesen.unklar.length ? "fehlt" : "";
-  if (gelesen.unklar.length) {
-    feld.textContent = "Nicht erkannt: " + gelesen.unklar.join(" · ") + ". Bitte als TT.MM.JJJJ–TT.MM.JJJJ.";
-  } else if (gelesen.bloecke.length) {
-    feld.textContent = mehrzahl(gelesen.bloecke.length, eins, viele) + ": " +
-      gelesen.bloecke.map(function (b) { return dmy(vonIso(b.von)) + "–" + dmy(vonIso(b.bis)); }).join(", ");
-  } else {
-    feld.textContent = leer;
-  }
-}
-function bloeckeStandZeigen() {
-  zeitraeumeStandZeigen("f-schulbloecke", "schulbloecke-stand", " Block", " Blöcke",
-    "Zeiträume, getrennt durch Semikolon. Jeder Werktag darin gilt als Schultag.");
-  zeitraeumeStandZeigen("f-schulferien", "schulferien-stand", " Zeitraum", " Zeiträume",
-    "Darin entfallen die festen Schultage. Blockunterricht gilt weiter.");
-}
+/* Blockunterricht und Ferien stehen als Marken da, gewählt im Kalender (zeitraum.js). */
+function bloeckeStandZeigen() { zeitraeumeZeigen(); }
 $("f-schulbloecke").addEventListener("input", bloeckeStandZeigen);
 $("f-schulferien").addEventListener("input", bloeckeStandZeigen);
 

@@ -312,13 +312,15 @@ Einrichten, Abgleich, Rechte und Sicherung → [docs/SERVER.md](docs/SERVER.md)
 - **Am iPhone** löscht Safari die Daten einer Seite, die du sieben Tage nicht öffnest. Leg das
   Berichtsheft über *Teilen → Zum Home-Bildschirm* ab; dort beginnt es leer, deinen Stand bringst
   du mit **⋯ → Sicherung speichern** und *Sicherung laden* mit.
-- **Dunkel** wird die Oberfläche, wenn dein Gerät es so eingestellt hat. Das Blatt bleibt weiß.
+- **Dunkel** wird die Oberfläche, wenn dein Gerät es so eingestellt hat, oder mit dem Mond oben in
+  der Leiste. Das Blatt bleibt weiß.
 - **Als Datei per Doppelklick** kann Chrome oder Edge in seltenen Fällen einen Tab öffnen, der den
   gespeicherten Stand nicht sieht. Das Werkzeug prüft das beim Start und lädt dann einmal neu. Mit
   `npm start` oder Docker tritt es gar nicht auf. Sichern unter **⋯ → Sicherung speichern** schadet nie.
 - **Im Dokument stehen keine Uhrzeiten.**
 - **Schultage** aus *Deine Daten → Schule* setzen nur leere Tage auf „Berufsschule“, in den dort
-  eingetragenen Schulferien nicht. Tage mit Buchungen bleiben, wie der Import sie liefert. Am Tag
+  eingetragenen Schulferien nicht. Blockunterricht und Ferien wählst du im Kalender: ersten Tag
+  antippen, dann den letzten. Tage mit Buchungen bleiben, wie der Import sie liefert. Am Tag
   selbst lässt sich die Art jederzeit umstellen.
 - **Eine Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den
   Text des Tages.

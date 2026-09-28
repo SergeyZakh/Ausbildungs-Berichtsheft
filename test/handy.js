@@ -134,6 +134,16 @@ async function durchgang(browser, breite) {
   });
   pruefe('Wochentage mit Abstand zur Kopfleiste' + bei, reiter.abstand >= 8, reiter.abstand.toFixed(1) + ' px');
   pruefe('Wochentage: kein Text über den Reiter hinaus' + bei, reiter.raus.length === 0, reiter.raus.join(' | '));
+  // Die Summe füllt die erste Zeile bis zu den Knöpfen; vorher stand dazwischen eine leere Lücke.
+  // Und auch bei 320 px bleibt es bei zwei Zeilen: Summe und Knöpfe, darunter die Woche.
+  const kopf = await page.evaluate(() => {
+    const r = (s) => document.querySelector(s).getBoundingClientRect();
+    return { summeRechts: r('#wochensumme').right, knopfLinks: r('#btn-farbe').left,
+      summeOben: r('#wochensumme').top, knopfOben: r('#btn-farbe').top, hoehe: r('.leiste').height };
+  });
+  pruefe('Kopfleiste: keine Lücke zwischen Summe und Knöpfen' + bei,
+    kopf.knopfLinks - kopf.summeRechts <= 10 && Math.abs(kopf.summeOben - kopf.knopfOben) < 2, JSON.stringify(kopf));
+  pruefe('Kopfleiste: zwei Zeilen' + bei, kopf.hoehe < 110, kopf.hoehe + ' px');
   // Tippen lässt das Feld mitwachsen, statt den Text in einen Scrollbalken zu schieben.
   await page.locator('.tagpanel textarea').first().press('End');
   await page.keyboard.type('\nNoch eine Zeile\nUnd noch eine\nUnd eine dritte');

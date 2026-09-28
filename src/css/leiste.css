@@ -17,6 +17,16 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
 #btn-export { display: inline-flex; align-items: center; gap: 8px; }
 #btn-export::after { content: "\25BE"; font-size: 10px; opacity: .7; }
 #btn-mehr { width: 34px; height: 34px; font-size: 16px; }
+/* Hell/dunkel (farbe.js): Mond im Hellen, Sonne im Dunkeln – gezeigt wird, wohin der Knopf schaltet. */
+.farbknopf { width: 34px; height: 34px; color: var(--text); }
+.farbknopf svg { width: 16px; height: 16px; }
+.farbknopf .sonne { display: none; }
+:root[data-farbe="dunkel"] .farbknopf .mond { display: none; }
+:root[data-farbe="dunkel"] .farbknopf .sonne { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-farbe="hell"]) .farbknopf .mond { display: none; }
+  :root:not([data-farbe="hell"]) .farbknopf .sonne { display: block; }
+}
 
 .menuehalter { position: relative; display: flex; }
 .menue {

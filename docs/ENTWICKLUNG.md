@@ -89,6 +89,8 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: Text, Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche |
 | `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang, Vordruck (`vordruckSchalter()`), KI und Herunterladen |
 | `stammdaten.js` | Dialog „Deine Daten“, Verbindungsprüfung, Löschen und Verwerfen |
+| `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
+| `farbe.js` | Knopf hell/dunkel in der Kopfleiste |
 | `rundgang.js` | Rundgänge beim ersten Start, für Azubis und für Ausbilder |
 | `hinweise.js` | Hinweis über den Reitern: Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
 | `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Kästchen pro Woche und die Tage je Art (`uebersichtDaten()`) |
@@ -183,6 +185,12 @@ die Rolle kennt.
 `localStorage["berichtsheft-zuordnungen"]`: bestätigte Zuordnungen je Kopfzeile,
 `Signatur → { felder, reihenfolge }`.
 
+`localStorage["berichtsheft-farbe"]`: `"hell"` oder `"dunkel"`, wenn der Knopf in der Kopfleiste vom
+Gerät abweicht; sonst fehlt der Eintrag, und die Seite folgt `prefers-color-scheme`. Ein kleines
+Skript im Kopf von `index.html` setzt daraus `data-farbe` am `html`-Element, bevor etwas gezeichnet
+wird. `basis.css` führt die dunklen Farben deshalb zweimal (für das Gerät und für `data-farbe`);
+`test/hinweise.js` prüft, dass beide gleich sind.
+
 ### Stand eines Tages (`tagStand()`)
 
 | Stand | Bedeutung | Farbe |
@@ -211,7 +219,12 @@ vergleicht beide Seiten Fall für Fall.
 
 Unter „Deine Daten → Schule“ stehen feste Schultage (Mo–Fr), Blockunterricht und Schulferien als
 Zeiträume (`schulbloeckeLesen()`: `02.03.–20.03.2026; 04.05.2026–22.05.2026`, auch ISO-Daten und ein
-einzelner Tag). In den Ferien entfallen die festen Schultage; ein Block gilt auch dort. `tagArt()` liefert für einen Tag die gespeicherte Art oder, wenn der Tag nichts
+einzelner Tag). In den Ferien entfallen die festen Schultage; ein Block gilt auch dort.
+Getippt werden Blöcke und Ferien nicht mehr: `zeitraum.js` zeigt sie als Marken mit ×, und „Im
+Kalender wählen“ öffnet ein Monatsraster (am Rechner zwei Monate, am Handy einer). Erster Tag, letzter
+Tag, in beliebiger Richtung; Überlappendes wird ein Zeitraum (`zeitraeumeOrdnen()`). Gespeichert wird
+weiter der Text in `f-schulbloecke` und `f-schulferien`, den ältere Stände und das Konto kennen; was
+darin unlesbar ist, steht als rote Marke da, bis man es entfernt. `tagArt()` liefert für einen Tag die gespeicherte Art oder, wenn der Tag nichts
 Eigenes hat (keine Art, kein Text, keine Buchungen, keine Stunden, nicht `artVonHand`), laut Plan
 „Berufsschule“. Feiertage und Tage außerhalb der Vertragslaufzeit sind nie Schultage.
 
@@ -484,10 +497,10 @@ npm test
 | `test/ki.js` | Anbindung gegen einen nachgebauten Ollama: Prompt, Warnungen, Fehler, Wochenlauf, Abbruch; Anfragen nur an das eigene Ollama |
 | `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Rundgang, Löschen; Feiertage und Wochenstand gleich wie auf dem Server |
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
-| `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
+| `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten neben der Vorschau, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
-| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus, leise Meldung und kurzer Titel am Handy |
-| `test/handy.js` | Bei 390 und 320 px: keine Sperre, nichts ragt über den Rand, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
+| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), leise Meldung und kurzer Titel am Handy |
+| `test/handy.js` | Bei 390 und 320 px: keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
 mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).
