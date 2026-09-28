@@ -154,6 +154,9 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
 }
 @keyframes dreh { to { transform: rotate(360deg); } }
 
+/* Eine Blockwoche hat nur einen Reiter: breit, Beschriftung und Stand in einer Zeile. */
+.reiter.block button { flex: 1 1 100%; flex-direction: row; justify-content: center; gap: 14px; }
+
 /* Der Reiter färbt mit dem Stand des Tages: grün durch, rot ungelesen. */
 .reiter button.fertig { background: var(--gut-hell); color: var(--gut); border-color: var(--gut-kante); }
 .reiter button.fertig .rlage { color: var(--gut); }

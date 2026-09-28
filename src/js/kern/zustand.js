@@ -120,11 +120,16 @@ function schultagLautPlan(datumIso) {
   var tag = tagIndex(vonIso(datumIso));
   if (tag > 4) return false;
   if (feiertagAn(datumIso, $("f-land").value)) return false;
-  var beginn = $("f-beginn").value, ende = $("f-ende").value;
-  if ((beginn && datumIso < beginn) || (ende && datumIso > ende)) return false;
+  if (ausserhalbAusbildung(datumIso)) return false;
   if (inZeitraeumen("f-schulbloecke", datumIso)) return true;
   if (inZeitraeumen("f-schulferien", datumIso)) return false;
   return schultageLesen($("f-schultage").value).indexOf(tag) !== -1;
+}
+
+/** Liegt der Tag vor dem Ausbildungsbeginn oder nach dem Ende aus den Stammdaten? */
+function ausserhalbAusbildung(datumIso) {
+  var beginn = $("f-beginn").value, ende = $("f-ende").value;
+  return !!((beginn && datumIso < beginn) || (ende && datumIso > ende));
 }
 
 /** Hat der Tag etwas Eigenes: Text, Buchungen, Stunden oder eine gewählte Art? */
@@ -143,6 +148,52 @@ function tagArt(datumIso) {
   return schultagLautPlan(datumIso) ? "Berufsschule" : "";
 }
 
+/* ---------- Blockwoche ----------
+   Der wöchentliche Vordruck hat für die Berufsschule ein Feld je Woche, nicht je Tag. Ist jeder
+   Werktag einer Woche Schule oder frei, schreibt man deshalb einmal die Themen der Woche statt
+   fünf Tagestexte: wochendaten[montag].schule, übernommen mit schuleGeprueft. */
+
+/**
+ * Bekommt die Woche das Themenfeld statt der Tagesreiter? Nur beim wöchentlichen Vordruck (der
+ * tägliche braucht eine Zeile je Tag) und nur ohne eigene Tagestexte: Geschriebenes bleibt, wo es
+ * steht. Jeder Werktag ist Berufsschule oder frei (Urlaub, Krank, Feiertag, außerhalb der
+ * Ausbildung), und Schule ist an mindestens zwei Tagen – ein fester Schultag in einer
+ * Urlaubswoche ist kein Block. Ein von Hand gewählter Arbeitstag macht die Woche wieder tageweise.
+ */
+function blockwoche(montagIso) {
+  if (!montagIso || $("f-vordruck").value === "taeglich") return false;
+  var montag = vonIso(montagIso), land = $("f-land").value, schule = 0;
+  for (var i = 0; i < 5; i++) {
+    var d = iso(plus(montag, i)), t = tage[d];
+    if (t && (t.text || "").trim()) return false;
+    var art = tagArt(d);
+    if (art === "Berufsschule") schule++;
+    else if (art && !istSchultag(art)) continue;
+    else if (art || tagHatInhalt(t) || !(feiertagAn(d, land) || ausserhalbAusbildung(d))) return false;
+  }
+  return schule >= 2;
+}
+
+/** Die Woche, wenn sie Themen für die Berufsschule hat, sonst null. */
+function wochenSchule(montagIso) {
+  var w = wochendaten[montagIso];
+  return w && (w.schule || "").trim() ? w : null;
+}
+
+/**
+ * Steht der Tag unter den Themen seiner Woche? Jeder Werktag ohne eigenen Text, der nicht frei ist,
+ * sobald die Woche Themen hat, mit Eintrag oder ohne. Nicht nur die Schultage laut Plan: Der Server
+ * kennt den Plan nicht und zählt genauso (server/stand.js).
+ */
+function tagImWochenfeld(datumIso) {
+  var datum = vonIso(datumIso);
+  if (tagIndex(datum) > 4 || !wochenSchule(iso(montagVon(datum)))) return false;
+  var t = tage[datumIso];
+  if (t && ((t.text || "").trim() || (t.art && !istSchultag(t.art)))) return false;
+  if (!tagHatInhalt(t) && feiertagAn(datumIso, $("f-land").value)) return false;
+  return !ausserhalbAusbildung(datumIso);
+}
+
 /**
  * Stand der ganzen Woche:
  *
@@ -157,9 +208,15 @@ function tagArt(datumIso) {
 function wochenStand(montagIso) {
   if (!montagIso) return "";
   var montag = vonIso(montagIso), offen = false, fertig = 0, luecke = false;
+  var feld = wochenSchule(montagIso);
   for (var i = 0; i < TAGE_JE_WOCHE; i++) {
     var datum = iso(plus(montag, i));
     var t = tage[datum];
+    // Unter den Themen der Woche zählt der Tag mit deren Stand.
+    if (feld && tagImWochenfeld(datum)) {
+      if (feld.schuleGeprueft) fertig++; else offen = true;
+      continue;
+    }
     if (!t) {
       if (fehlenderWerktag(datum)) luecke = true;
       continue;
@@ -182,9 +239,15 @@ function wochenStand(montagIso) {
  */
 function wochenAnteil(montagIso) {
   var montag = vonIso(montagIso), fertig = 0, von = 0;
+  var feld = wochenSchule(montagIso);
   for (var i = 0; i < TAGE_JE_WOCHE; i++) {
     var datum = iso(plus(montag, i));
     var t = tage[datum];
+    if (feld && tagImWochenfeld(datum)) {
+      von++;
+      if (feld.schuleGeprueft) fertig++;
+      continue;
+    }
     if (!t) {
       if (fehlenderWerktag(datum)) von++;
       continue;
@@ -210,9 +273,15 @@ function wochenAnteil(montagIso) {
 function wochenBilanz(montagIso) {
   var montag = vonIso(montagIso), b = { ohneText: 0, ungelesen: 0, fertig: 0, erster: -1 };
   var merke = function (i) { if (b.erster === -1) b.erster = i; };
+  var feld = wochenSchule(montagIso);
   for (var i = 0; i < TAGE_JE_WOCHE; i++) {
     var datum = iso(plus(montag, i));
     var t = tage[datum];
+    if (feld && tagImWochenfeld(datum)) {
+      if (feld.schuleGeprueft) b.fertig++;
+      else { b.ungelesen++; merke(i); }
+      continue;
+    }
     if (!t) {
       if (fehlenderWerktag(datum)) { b.ohneText++; merke(i); }
       continue;
@@ -227,6 +296,51 @@ function wochenBilanz(montagIso) {
   return b;
 }
 
+/** Braucht der Tag noch etwas, Text oder „Fertig“? Die Regeln von wochenBilanz(), für einen Tag. */
+function tagBrauchtNoch(datumIso) {
+  if (tagImWochenfeld(datumIso)) return !wochenSchule(iso(montagVon(vonIso(datumIso)))).schuleGeprueft;
+  var t = tage[datumIso];
+  if (!t) return fehlenderWerktag(datumIso);
+  var schule = istSchultag(t.art);
+  if (t.art && !schule) return false;
+  var stand = tagStand(t);
+  if (stand === "fertig") return false;
+  if (stand !== "leer") return true;
+  return !!(t.stunden || schule || fehlenderWerktag(datumIso));
+}
+
+/**
+ * Der erste Tag von `von` bis `bis` (einschließlich), der noch etwas braucht, sonst null. Ohne
+ * `bis` bis heute oder bis zum letzten Eintrag, wenn der später liegt: Vorgeschriebenes will auch
+ * gelesen sein.
+ */
+function offenerTagAb(von, bis) {
+  if (!bis) {
+    bis = iso(new Date());
+    Object.keys(tage).forEach(function (k) { if (k > bis) bis = k; });
+    Object.keys(wochendaten).forEach(function (m) {
+      var freitag = iso(plus(vonIso(m), 4));
+      if (wochenSchule(m) && freitag > bis) bis = freitag;
+    });
+  }
+  for (var d = vonIso(von); iso(d) <= bis; d = plus(d, 1)) {
+    if (tagBrauchtNoch(iso(d))) return iso(d);
+  }
+  return null;
+}
+
+/** Der nächste Tag nach `datumIso`, der noch etwas braucht. Nur nach vorn: Wer den heutigen Tag
+ *  fertig macht, soll nicht zur ältesten Lücke der Ausbildung zurückgeworfen werden. */
+function naechsterOffenerTag(datumIso) {
+  return offenerTagAb(iso(plus(vonIso(datumIso), 1)));
+}
+
+/** Der früheste Tag, der noch etwas braucht, ab Ausbildungsbeginn (ohne ihn ab dem ersten Eintrag). */
+function ersterOffenerTag(bis) {
+  var anfang = $("f-beginn").value || ersterEingetragenerTag();
+  return anfang ? offenerTagAb(anfang, bis) : null;
+}
+
 /** Ein Fortschrittsring als HTML. */
 function ringHtml(fertig, von, titel) {
   var anteil = von ? Math.round(fertig / von * 100) : 0;
@@ -238,6 +352,7 @@ function ringHtml(fertig, von, titel) {
 /** Zustand eines Tages für seine Zelle im Monatsraster. */
 function tagLage(key) {
   var t = tage[key];
+  if (tagImWochenfeld(key)) return wochenSchule(iso(montagVon(vonIso(key)))).schuleGeprueft ? "fertig" : "voll";
   if (!t) return "nichts";
   var schule = istSchultag(t.art);
   if (t.art && !schule) return "frei";
@@ -249,9 +364,10 @@ function tagLage(key) {
 function lage(montagIso) {
   var montag = vonIso(montagIso), summe = 0, offen = 0;
   for (var i = 0; i < TAGE_JE_WOCHE; i++) {
-    var t = tage[iso(plus(montag, i))];
+    var key = iso(plus(montag, i)), t = tage[key];
     if (!t) continue;
     if (t.stunden) summe += t.stunden;
+    if (tagImWochenfeld(key)) continue;
     var schule = istSchultag(t.art);
     var frei = !!t.art && !schule;
     if (!frei && (t.stunden || schule) && !(t.text || "").trim()) offen++;
@@ -266,6 +382,8 @@ function lage(montagIso) {
 function wochenNeu() {
   var g = {};
   Object.keys(tage).forEach(function (t) { g[iso(montagVon(vonIso(t)))] = true; });
+  // Eine Blockwoche kann ohne einen einzigen Tageseintrag auskommen und gehört doch ins Heft.
+  Object.keys(wochendaten).forEach(function (m) { if (wochenSchule(m)) g[m] = true; });
   wochen = Object.keys(g).sort().reverse();
   if (!aktiveWoche) aktiveWoche = wochen[0] || null;
 }
@@ -313,7 +431,7 @@ function stammdaten() {
    Aufbau unter SPEICHER:
      stamm   Stammdaten und Einstellungen
      tage    je Tag Text, Art, Zeiten, Buchungen und Herkunft des Texts
-     wochen  Abteilung und Unterweisungen je Woche
+     wochen  Abteilung und Unterweisungen je Woche, in Blockwochen die Themen der Berufsschule
      kunden  Kundennamen aus dem letzten Import
      stand   zuletzt offene Woche und Reiter
      hinweise  letzte Sicherung und weggeklickte Hinweise (hinweise.js), nur für diesen Browser */
@@ -341,7 +459,8 @@ function tagKennung(t) {
 
 /** Dasselbe für eine Woche. */
 function wocheKennung(w) {
-  return JSON.stringify([(w && w.abteilung) || "", (w && w.unterweisungen) || ""]);
+  return JSON.stringify([(w && w.abteilung) || "", (w && w.unterweisungen) || "",
+    (w && w.schule) || "", !!(w && w.schuleGeprueft)]);
 }
 var LEERE_WOCHE = wocheKennung(null);
 

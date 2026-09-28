@@ -458,3 +458,45 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 }
 .fussleiste.gut .speicherstand  { color: var(--gut); }
 .fussleiste.warn .speicherstand { color: var(--acht); }
+
+/* ---------- Berufsschule: Fächer, Blockwoche (schulwoche.js) ---------- */
+
+/* Fächer zum Antippen über dem Schultext. Leise Pillen: Sie bieten an, der Text bleibt die Hauptsache. */
+.faecher {
+  flex: none; display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 10px 14px 0;
+}
+.fach {
+  font: inherit; font-size: 12.5px; line-height: 1; padding: 6px 11px;
+  color: var(--text); background: var(--band);
+  border: 1px solid var(--linie); border-radius: 999px; cursor: pointer;
+  transition: background-color .15s, border-color .15s;
+}
+.fach:hover { background: var(--flaeche); border-color: var(--linie-fest); }
+.fach::before { content: "+"; margin-right: 4px; color: var(--schiefer); }
+.fach.fachwie { background: var(--flaeche); border-style: dashed; }
+.fach.fachwie::before { content: "\21BA"; }
+/* Übernommen ist schreibgeschützt: nichts mehr anzubieten. */
+.sektion.fertig .faecher { display: none; }
+
+/* Der Satz über dem Themenfeld der Woche. */
+.schulhinweis { flex: none; margin: 0; padding: 10px 14px 0; line-height: 1.45; }
+.sektion.fertig .schulhinweis { display: none; }
+
+/* Die Tage einer Blockwoche, je eine Zeile mit ihrer Art. */
+.blocktage .sektionsleib { display: block; padding: 4px 14px 8px; }
+.blocktag {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid var(--linie);
+}
+.blocktag:last-child { border-bottom: none; }
+.blocktagname { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.blocktagfest { font-size: 13px; color: var(--schiefer); padding: 5px 8px; }
+.blocktag select { flex: 0 1 180px; min-width: 0; }
+
+/* Ein Tag unter den Themen seiner Woche: sagt, wo die Themen stehen. */
+.wochenfeldhinweis {
+  flex: none; margin: 0 0 12px; padding: 10px 14px;
+  font-size: 13px; line-height: 1.45; color: var(--schiefer);
+  background: var(--flaeche); border: 1px solid var(--gut-kante); border-radius: var(--rund);
+}

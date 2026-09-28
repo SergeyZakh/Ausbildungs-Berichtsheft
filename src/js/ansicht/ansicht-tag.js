@@ -89,6 +89,8 @@ function zeichneTag() {
     ruhig.textContent = art + " — für diesen Tag ist kein Eintrag erforderlich.";
     panel.appendChild(ruhig);
   } else {
+    // Hat die Woche Themen für die Berufsschule, zählt ein Tag ohne eigenen Text schon dazu.
+    if (tagImWochenfeld(key)) panel.appendChild(wochenfeldHinweis());
     var flaeche = document.createElement("div");
     flaeche.className = "tagflaeche";
     var textKarte = textSektion(key, t, art, istSchule);
@@ -98,6 +100,20 @@ function zeichneTag() {
   }
 
   bereich.appendChild(panel);
+}
+
+/** Hinweis an einem Tag, der unter den Themen seiner Woche steht, mit dem Weg dorthin. */
+function wochenfeldHinweis() {
+  var p = document.createElement("p");
+  p.className = "wochenfeldhinweis";
+  p.appendChild(document.createTextNode("Diese Woche hat Themen für die Berufsschule im Reiter „Woche“. Ohne eigenen Text zählt dieser Tag dazu. "));
+  var hin = document.createElement("button");
+  hin.type = "button";
+  hin.className = "textknopf";
+  hin.textContent = "Themen ansehen";
+  hin.addEventListener("click", function () { aktiverTag = 7; zeichneReiter(); zeichneTag(); });
+  p.appendChild(hin);
+  return p;
 }
 
 /**
@@ -219,8 +235,10 @@ function textSektion(key, t, art, istSchule) {
   var ta = document.createElement("textarea");
   ta.id = "feld-" + key;
   ta.value = (t && t.text) || "";
-  ta.placeholder = istSchule
-    ? "Welche Themen wurden im Unterricht behandelt?"
+  // Der Platzhalter zeigt „Fach: Thema“: So geschrieben, kennt das Werkzeug die Fächer beim nächsten Mal.
+  ta.placeholder = art === "Berufsschule"
+    ? "Welche Themen wurden im Unterricht behandelt?\nz. B. LF5: Subnetting und VLANs"
+    : istSchule ? "Welche Themen wurden behandelt?"
     : "Was hast du an diesem Tag gemacht?";
   ta.addEventListener("input", function (e) {
     if (!tage[key]) tage[key] = { von: null, bis: null, pausen: [], stunden: null, art: art };
@@ -235,6 +253,7 @@ function textSektion(key, t, art, istSchule) {
     merken();
   });
   textfeldWachsen(ta);
+  if (art === "Berufsschule") s.leib.appendChild(faecherLeiste(ta, key, key));
   s.leib.appendChild(ta);
 
   var uebernehmen = sektionsknopf("Fertig", "uebernehmen");
@@ -245,7 +264,7 @@ function textSektion(key, t, art, istSchule) {
     merken();
     pruefstandAnzeigen();
     zeichneWochenwahl(); zeichneReiter();
-    sage("Als fertig markiert.", "gut");
+    weiterNachFertig(key, "Als fertig markiert.");
   });
 
   var bearbeiten = sektionsknopf("", "bearbeiten");

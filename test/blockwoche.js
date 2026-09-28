@@ -1,0 +1,267 @@
+#!/usr/bin/env node
+/**
+ * Berufsschule schneller eintragen:
+ *
+ *   Blockwoche   Ist jeder Werktag einer Woche Berufsschule oder frei (ab zwei Schultagen, ohne
+ *                eigene Tagestexte, wöchentlicher Vordruck), gibt es statt der Tagesreiter ein
+ *                Feld für die Themen der ganzen Woche. Es deckt jeden Werktag ohne eigenen Text.
+ *   Fächer       Aus „Fach: Thema“-Zeilen früherer Schultage werden Knöpfe über dem Schultext.
+ *   Weiter       „Fertig“ springt zum nächsten Tag, der noch etwas braucht, auch in eine andere Woche.
+ *
+ *   node test/blockwoche.js
+ */
+const h = require('./hilfen');
+
+const { pruefe, abschluss } = h.protokoll('Blockwoche, Fächer zum Antippen, weiter nach „Fertig“');
+
+/* Blöcke: 01.–12.06.2026 (Fronleichnam am Do 04.06. ist in NRW frei) und 14.–25.09.2026.
+   Fester Schultag Donnerstag. Die Woche ab 07.09. ist eine gewöhnliche mit Schule am Donnerstag. */
+const STAND = {
+  stamm: {
+    name: 'Max Muster', beruf: 'Fachinformatiker', betrieb: 'Beispiel IT GmbH', land: 'NW', abteilung: 'IT',
+    schule: 'Berufskolleg Musterstadt', schultage: 'Do', schulbloecke: '01.06.2026–12.06.2026; 14.09.2026–25.09.2026',
+    beginn: '2025-09-01', ende: '2028-08-31', vordruck: '',
+  },
+  tage: {
+    '2026-09-07': { text: 'Drucker eingerichtet', art: '', geprueft: true },
+    '2026-09-08': { text: 'Switch getauscht', art: '', geprueft: true },
+    '2026-09-09': { text: 'Monitoring angepasst', art: '', geprueft: true },
+    '2026-09-10': { text: 'LF5: Schleifen und Arrays\nDeutsch: Bewerbungsschreiben\nWiSo: Tarifvertrag', art: 'Berufsschule', geprueft: true },
+    '2026-09-11': { text: 'Notebooks eingerichtet', art: '', geprueft: true },
+  },
+  wochen: {},
+  stand: { woche: '2026-09-14', tag: 0 },
+};
+
+const reiter = (page) => page.$$eval('#reiter button', (b) => b.map((x) => x.id || x.textContent));
+const auf = (page, fn, arg) => page.evaluate(fn, arg);
+
+(async () => {
+  const browser = await h.starteBrowser();
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const jsFehler = h.fehlerSammeln(page);
+  await h.ohneRundgang(page);
+  await h.oeffnen(page);
+  await page.evaluate(([k, s]) => localStorage.setItem(k, JSON.stringify(s)), [h.SPEICHER, STAND]);
+  await page.reload();
+  await page.waitForSelector('#reiter button');
+
+  /* ---------- Erkennen ---------- */
+  const erkannt = await auf(page, () => ({
+    block: window.__blockwoche('2026-09-14'),
+    zweite: window.__blockwoche('2026-09-21'),
+    gewoehnlich: window.__blockwoche('2026-09-07'),
+    feiertag: window.__blockwoche('2026-06-01'),
+  }));
+  pruefe('Blockwoche erkannt, auch mit Feiertag darin; eine Woche mit einem Schultag ist keine',
+    erkannt.block && erkannt.zweite && erkannt.feiertag && !erkannt.gewoehnlich, JSON.stringify(erkannt));
+
+  /* ---------- Ansicht ---------- */
+  pruefe('Blockwoche: ein einziger Reiter statt sieben Tagen und der Woche',
+    (await reiter(page)).join() === 'reiter-block', (await reiter(page)).join());
+  pruefe('Der Reiter nennt die Woche und dass Mo–Fr Schule ist',
+    (await page.locator('#reiter-block').innerText()).replace(/\s+/g, ' ').includes('Berufsschule Mo–Fr'));
+  pruefe('Themenfeld der Woche und die fünf Tage mit ihrer Art',
+    await page.locator('#feld-schulwoche').isVisible() &&
+    (await page.locator('.blocktag select').count()) === 5 &&
+    (await page.$$eval('.blocktag select', (s) => s.every((x) => x.value === 'Berufsschule'))));
+  pruefe('Leere Blockwoche: fünf Tage ohne Text, wie fünf leere Schultage',
+    await auf(page, () => window.__wochenBilanz('2026-09-14').ohneText === 5 && window.__wochenStand('2026-09-14') === ''));
+
+  /* ---------- Fächer ---------- */
+  const knoepfe = await page.$$eval('.schulwoche .faecher .fach', (b) => b.map((x) => x.textContent));
+  pruefe('Fächer aus dem letzten Schultag als Knöpfe, dazu „Fächer wie am Do 10.09.“',
+    knoepfe.join('|') === 'Fächer wie am Do 10.09.|LF5|Deutsch|WiSo', knoepfe.join('|'));
+  await page.click('.schulwoche .fachwie');
+  pruefe('„Fächer wie am …“ schreibt die Fächer untereinander, Cursor hinter dem ersten',
+    (await page.inputValue('#feld-schulwoche')) === 'LF5: \nDeutsch: \nWiSo: ' &&
+    await auf(page, () => document.getElementById('feld-schulwoche').selectionStart === 5));
+  await page.keyboard.type('Subnetting');
+  pruefe('Mit Text verschwindet „Fächer wie am …“', await page.locator('.schulwoche .fachwie').isHidden());
+  await page.click('.schulwoche .fach:not(.fachwie) >> text=LF5');
+  await page.keyboard.type('VLANs');
+  await page.click('.schulwoche .fach:not(.fachwie) >> text=Deutsch');
+  await page.keyboard.type('Protokoll');
+  pruefe('Ein Fach, das schon dasteht: Komma am Ende seiner Zeile, nicht noch eine Zeile',
+    (await page.inputValue('#feld-schulwoche')) === 'LF5: Subnetting, VLANs\nDeutsch: Protokoll\nWiSo: ',
+    JSON.stringify(await page.inputValue('#feld-schulwoche')));
+  await page.fill('#feld-schulwoche', 'LF5: Subnetting, VLANs\nDeutsch: Protokoll\nWiSo: Kündigungsschutz');
+  await page.waitForTimeout(500);
+
+  /* ---------- Stand ---------- */
+  const offen = await auf(page, () => ({
+    stand: window.__wochenStand('2026-09-14'), anteil: window.__wochenAnteil('2026-09-14'),
+    bilanz: window.__wochenBilanz('2026-09-14'), lage: window.__tagLage('2026-09-16'),
+  }));
+  pruefe('Mit Themen, noch nicht fertig: fünf Tage ungelesen, rot im Raster',
+    offen.stand === 'pruefen' && offen.anteil.von === 5 && offen.anteil.fertig === 0 &&
+    offen.bilanz.ungelesen === 5 && offen.lage === 'voll', JSON.stringify(offen));
+  pruefe('Reiter der Blockwoche rot, solange nicht übernommen',
+    (await page.getAttribute('#reiter-block', 'class')) === 'pruefen');
+
+  await page.click('#btn-export');
+  await page.click('#btn-pdf-woche');
+  await page.waitForSelector('#dlg-pruefung[open]');
+  pruefe('Vor dem Export: nicht übernommene Themen der Blockwoche werden genannt',
+    (await page.locator('#dlg-pruefung').innerText()).includes('Blockwoche 14.–20. Sep — Themen nicht übernommen'));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+
+  const druck = await auf(page, () => window.__druckBlatt(1, '2026-09-14', { name: 'Max Muster', vordruck: '' }));
+  pruefe('Wochenblatt: die Themen im Feld Berufsschule, ohne Wochentag davor',
+    /LF5: Subnetting, VLANs/.test(druck) && !/>Montag</.test(druck));
+
+  await page.click('.schulwoche .sektionsknopf.uebernehmen');
+  await page.waitForTimeout(300);
+  const nachFertig = await auf(page, () => ({
+    w: window.__wochendaten()['2026-09-14'], woche: document.getElementById('wochenlabel').textContent,
+    notiz: document.getElementById('notiz').textContent,
+  }));
+  pruefe('„Fertig“ übernimmt die Themen der Woche', nachFertig.w.schuleGeprueft === true, JSON.stringify(nachFertig.w));
+  pruefe('… und springt zur nächsten offenen Stelle, hier die zweite Blockwoche',
+    nachFertig.woche.startsWith('21.–27. Sep') && nachFertig.notiz.includes('Weiter mit der Blockwoche 21.–27. Sep.'),
+    JSON.stringify(nachFertig));
+  const fertig = await auf(page, () => ({
+    stand: window.__wochenStand('2026-09-14'), anteil: window.__wochenAnteil('2026-09-14'), lage: window.__tagLage('2026-09-14'),
+  }));
+  pruefe('Übernommen: die Woche ist fertig, 5/5, grün im Raster',
+    fertig.stand === 'fertig' && fertig.anteil.fertig === 5 && fertig.anteil.von === 5 && fertig.lage === 'fertig', JSON.stringify(fertig));
+  await page.click('#notiz .notizknopf');
+  await page.waitForTimeout(200);
+  pruefe('„Zurück“ hinter der Meldung führt wieder zur Woche davor',
+    (await page.textContent('#wochenlabel')).startsWith('14.–20. Sep') && await page.locator('#reiter-block').isVisible());
+  pruefe('Übernommen ist schreibgeschützt, ohne Fächerknöpfe',
+    await page.locator('#feld-schulwoche').getAttribute('readonly') !== null &&
+    await page.locator('.schulwoche .faecher').isHidden());
+
+  /* ---------- Tage der Blockwoche ---------- */
+  await page.selectOption('.blocktag select[data-datum="2026-09-16"]', 'Krank');
+  await page.waitForTimeout(200);
+  pruefe('Krank an einem Tag: bleibt Blockwoche, der Reiter nennt den freien Tag',
+    await auf(page, () => window.__blockwoche('2026-09-14')) &&
+    (await page.locator('#reiter-block').innerText()).includes('frei: Mi'));
+  pruefe('… und der kranke Tag zählt nicht mehr mit', await auf(page, () => window.__wochenAnteil('2026-09-14').von === 4));
+  await page.selectOption('.blocktag select[data-datum="2026-09-18"]', '');
+  await page.waitForTimeout(200);
+  pruefe('Ein Arbeitstag von Hand macht die Woche wieder tageweise, mit Hinweis',
+    !(await auf(page, () => window.__blockwoche('2026-09-14'))) && (await reiter(page)).length === 8 &&
+    (await page.textContent('#notiz')).includes('Keine Blockwoche mehr'));
+  pruefe('Die Themen bleiben im Reiter „Woche“ stehen', await page.locator('#feld-schulwoche').isVisible());
+  // Zurück auf Berufsschule über den Tag selbst.
+  await page.click('#reiter button >> nth=4');
+  await page.selectOption('#feld-art', 'Berufsschule');
+  await page.waitForTimeout(200);
+  pruefe('Wieder Berufsschule: wieder Blockwoche', await auf(page, () => window.__blockwoche('2026-09-14')));
+
+  // Ein eigener Tagestext bleibt, wo er steht: Die Woche bleibt dann tageweise.
+  await auf(page, () => window.__tagSetzen('2026-09-22', { text: 'LF6: Tickets', art: 'Berufsschule' }));
+  pruefe('Ein Tag mit eigenem Text: keine Blockwoche', !(await auf(page, () => window.__blockwoche('2026-09-21'))));
+  await auf(page, () => { delete window.__tage()['2026-09-22']; window.__merkenJetzt(); });
+
+  /* ---------- Feiertag im Block, ein einzelner Schultag ---------- */
+  await page.click('#wochenlabel');
+  await page.fill('#wochensuche', '04.06.2026');
+  await page.waitForTimeout(300);
+  pruefe('Fronleichnam im Block: steht als Feiertag, der Reiter nennt ihn frei',
+    (await page.locator('.blocktag', { hasText: 'Do 04.06.' }).innerText()).includes('Feiertag') &&
+    (await page.locator('#reiter-block').innerText()).includes('frei: Do'));
+  await auf(page, () => {
+    ['2026-10-05', '2026-10-06', '2026-10-07', '2026-10-09'].forEach((d) => { window.__tage()[d] = { art: 'Urlaub', artVonHand: true, text: '' }; });
+    window.__merkenJetzt();
+  });
+  pruefe('Urlaubswoche mit dem festen Schultag: keine Blockwoche', !(await auf(page, () => window.__blockwoche('2026-10-05'))));
+
+  /* ---------- Speichern, Heft ---------- */
+  await page.reload();
+  await page.waitForSelector('#reiter button');
+  const nachLaden = await auf(page, () => window.__wochendaten()['2026-09-14']);
+  pruefe('Nach dem Neuladen sind die Themen und „übernommen“ noch da',
+    nachLaden && nachLaden.schule.startsWith('LF5: Subnetting') && nachLaden.schuleGeprueft === true, JSON.stringify(nachLaden));
+
+  /* ---------- Tägliche Notierung ---------- */
+  await auf(page, () => {
+    document.getElementById('f-vordruck').value = 'taeglich';
+    window.__merkenJetzt();
+  });
+  await page.click('#wochenlabel');
+  await page.fill('#wochensuche', '14.09.2026');
+  await page.waitForTimeout(300);
+  pruefe('Tägliche Notierung: wieder Tagesreiter, der Vordruck braucht eine Zeile je Tag',
+    !(await auf(page, () => window.__blockwoche('2026-09-14'))) && (await reiter(page)).length === 8);
+  pruefe('Ein Tag unter den Themen sagt, wo sie stehen', await page.locator('.wochenfeldhinweis').isVisible());
+  const taeglich = await auf(page, () => window.__druckBlatt(1, '2026-09-14', { name: 'Max Muster', vordruck: 'taeglich' }));
+  pruefe('Tägliches Blatt: die Tage als Berufsschule, die Themen als eigene Zeile der Woche',
+    (taeglich.match(/class="tart">Berufsschule</g) || []).length === 4 && /wochenzeile[\s\S]*Berufsschule[\s\S]*LF5: Subnetting/.test(taeglich));
+  await page.click('.wochenfeldhinweis .textknopf');
+  pruefe('„Themen ansehen“ öffnet den Reiter der Woche', await page.locator('#feld-schulwoche').isVisible());
+  await auf(page, () => { document.getElementById('f-vordruck').value = ''; window.__merkenJetzt(); });
+
+  /* ---------- Fächer an einem gewöhnlichen Schultag, weiter nach „Fertig“ ----------
+     Der Schultag liegt in der Vergangenheit: Nur Tage bis heute können fehlen. */
+  await page.click('#wochenlabel');
+  await page.fill('#wochensuche', '03.09.2026');
+  await page.waitForTimeout(300);
+  const tagesKnoepfe = await page.$$eval('.faecher .fach', (b) => b.map((x) => x.textContent));
+  pruefe('Schultag: die zuletzt benutzten Fächer, ohne „wie am“, wenn davor nichts steht',
+    tagesKnoepfe.join('|') === 'LF5|Deutsch|WiSo', tagesKnoepfe.join('|'));
+  await page.click('.faecher .fach >> text=WiSo');
+  await page.keyboard.type('Betriebsrat');
+  pruefe('Ein Tipp aufs Fach schreibt „Fach: “, der Tag wird Berufsschule',
+    (await page.inputValue('#feld-2026-09-03')) === 'WiSo: Betriebsrat' &&
+    await auf(page, () => { window.__merkenJetzt(); return window.__tage()['2026-09-03'].art === 'Berufsschule'; }));
+  await page.click('.sektion .uebernehmen');
+  await page.waitForTimeout(300);
+  pruefe('„Fertig“ am Tag springt zum nächsten offenen Tag',
+    (await page.textContent('#notiz')).includes('Weiter mit Freitag, 04.09.') &&
+    await page.locator('#reiter button[aria-selected="true"]', { hasText: '04.09.' }).isVisible(),
+    await page.textContent('#notiz'));
+  pruefe('Gesucht wird nur nach vorn; der früheste offene Tag liegt am Beginn der Ausbildung',
+    await auf(page, () => window.__naechsterOffenerTag('2099-01-01') === null && window.__ersterOffenerTag() === '2025-09-01'));
+  // Nach dem letzten offenen Tag kein Sprung zurück an den Anfang, nur ein Knopf dorthin. Alles
+  // nach dem 28.09. bis heute ist erledigt, egal wann der Test läuft.
+  await auf(page, () => {
+    const tage = window.__tage();
+    ['2026-09-04', '2026-09-21', '2026-09-22', '2026-09-23', '2026-09-24', '2026-09-25'].forEach((d) => {
+      tage[d] = { text: 'erledigt', art: '', geprueft: true };
+    });
+    Object.keys(tage).filter((d) => d > '2026-09-28').forEach((d) => { delete tage[d]; });
+    for (const d = new Date('2026-09-29T12:00:00'); d <= new Date(); d.setDate(d.getDate() + 1)) {
+      tage[d.toISOString().slice(0, 10)] = { text: 'erledigt', art: '', geprueft: true };
+    }
+    window.__merkenJetzt();
+  });
+  await page.click('#wochenlabel');
+  await page.fill('#wochensuche', '28.09.2026');
+  await page.waitForTimeout(300);
+  await page.fill('#feld-2026-09-28', 'Server gepatcht');
+  await page.click('.sektion .uebernehmen');
+  await page.waitForTimeout(300);
+  pruefe('Nach dem letzten offenen Tag: bleibt stehen, Knopf zum frühesten offenen Tag',
+    (await page.textContent('#notiz')).includes('Danach ist nichts mehr offen') &&
+    (await page.textContent('#notiz .notizknopf')).includes('01.09.') &&
+    (await page.textContent('#wochenlabel')).startsWith('28. Sep'), await page.textContent('#notiz'));
+  await page.click('#notiz .notizknopf');
+  await page.waitForTimeout(200);
+  pruefe('… der Knopf öffnet ihn', (await page.textContent('#wochenlabel')).startsWith('1.–7. Sep'),
+    await page.textContent('#wochenlabel'));
+
+  /* ---------- Am Handy ---------- */
+  const handy = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const handyFehler = h.fehlerSammeln(handy);
+  await h.ohneRundgang(handy);
+  await h.oeffnen(handy);
+  await handy.evaluate(([k, s]) => localStorage.setItem(k, JSON.stringify(s)), [h.SPEICHER, STAND]);
+  await handy.reload();
+  await handy.waitForSelector('#reiter-block');
+  const breit = await handy.evaluate(() => ({
+    seite: document.documentElement.scrollWidth,
+    reiter: document.getElementById('reiter-block').getBoundingClientRect().width,
+  }));
+  pruefe('Handy: ein breiter Reiter, nichts ragt über den Rand', breit.seite <= 390 && breit.reiter > 300, JSON.stringify(breit));
+  pruefe('Handy: Themenfeld und Fächer stehen oben', await handy.locator('.schulwoche .faecher').isVisible());
+  pruefe('Handy ohne JavaScript-Fehler', handyFehler.length === 0, handyFehler.join(' | '));
+
+  pruefe('Keine JavaScript-Fehler', jsFehler.length === 0, jsFehler.join(' | '));
+  await browser.close();
+  abschluss();
+})();

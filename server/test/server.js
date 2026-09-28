@@ -121,6 +121,22 @@ const WOCHE = ['2026-09-07', '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-
     return nrw.fehlt === 1 && nrw.frei === 1 && nrw.stand === 'fehlt' ? true : nrw;
   })());
 
+  // Blockwoche: Die Themen der Woche decken jeden Werktag ohne eigenen Text, der nicht frei ist.
+  // Den Schulplan kennt der Server nicht; so rechnet auch das Heft (tagImWochenfeld()).
+  pruefe('Wochenübersicht: Themen einer Blockwoche decken die Tage ohne eigenen Text', (() => {
+    const tage = [
+      { datum: '2026-09-15', text: '', art: 'Krank', geprueft: false },
+      { datum: '2026-09-17', text: '', art: 'Berufsschule', geprueft: false },
+      { datum: '2026-09-18', text: 'Eigener Text', art: 'Berufsschule', geprueft: false },
+    ];
+    const themen = [{ montag: '2026-09-14', schule: 'LF5: Subnetting', schuleGeprueft: true }];
+    const [block] = wochenUebersicht('2026-09-14', '2026-09-18', tage, 'NW', themen);
+    const [offen] = wochenUebersicht('2026-09-14', '2026-09-18', tage, 'NW', [{ ...themen[0], schuleGeprueft: false }]);
+    const [leer] = wochenUebersicht('2026-09-14', '2026-09-18', tage, 'NW', [{ ...themen[0], schule: '  ' }]);
+    return block.fertig === 3 && block.frei === 1 && block.offen === 1 && block.stand === 'offen'
+      && offen.offen === 4 && leer.fehlt === 3 && leer.offen === 1 ? true : { block, offen, leer };
+  })());
+
   abschnitt('Anmeldung und Rechte');
 
   const ohne = await ruf(null, '/api/ich');
@@ -207,6 +223,28 @@ const WOCHE = ['2026-09-07', '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-
   });
   pruefe('Neuerer Stand gewinnt', neuer.daten.tage.find((t) => t.datum === WOCHE[1]).geprueft === true);
 
+  // Blockwoche: die Themen der ganzen Woche, mit eigenem „übernommen“.
+  const BLOCK = '2026-09-14';
+  const block = await ruf(AZUBI, '/api/abgleich', {
+    koerper: {
+      von: BLOCK, bis: '2026-09-18',
+      wochen: [{ montag: BLOCK, abteilung: '', unterweisungen: '', schule: 'LF5: Subnetting', schuleGeprueft: true, geaendert: JETZT }],
+    },
+  });
+  const blockWoche = block.daten.wochen.find((w) => w.montag === BLOCK);
+  pruefe('Themen einer Blockwoche gehen hin und kommen zurück',
+    !!blockWoche && blockWoche.schule === 'LF5: Subnetting' && blockWoche.schuleGeprueft === true, block.daten.wochen);
+  // Ein Browser von vor den Blockwochen kennt „schule“ nicht und ändert nur die Abteilung.
+  const altBrowser = await ruf(AZUBI, '/api/abgleich', {
+    koerper: {
+      von: BLOCK, bis: '2026-09-18',
+      wochen: [{ montag: BLOCK, abteilung: 'Berufskolleg', unterweisungen: '', geaendert: new Date(Date.now() + 2000).toISOString() }],
+    },
+  });
+  const nachAlt = altBrowser.daten.wochen.find((w) => w.montag === BLOCK);
+  pruefe('Ein älterer Browser ohne „schule“ leert die Themen nicht',
+    !!nachAlt && nachAlt.abteilung === 'Berufskolleg' && nachAlt.schule === 'LF5: Subnetting' && nachAlt.schuleGeprueft === true, nachAlt);
+
   // Vorab eingetragener Urlaub in der Zukunft gehört genauso dazu.
   await ruf(AZUBI, '/api/abgleich', { koerper: { tage: [{ datum: '2099-07-01', text: '', art: 'Urlaub', geaendert: JETZT }] } });
   const zukunft = await ruf(AZUBI, '/api/abgleich', { koerper: {} });
@@ -234,6 +272,15 @@ const WOCHE = ['2026-09-07', '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-
   pruefe('Wochenampel: drei Werktage ohne Text, also „fehlt“',
     alex.wochen.length === 1 && alex.wochen[0].fertig === 2 && alex.wochen[0].frei === 0
     && alex.wochen[0].fehlt === 3 && alex.wochen[0].stand === 'fehlt', alex.wochen);
+
+  const blockAmpel = await ruf(AUSBILDER, `/api/azubis?von=${BLOCK}&bis=2026-09-18`);
+  const blockAlex = blockAmpel.daten.azubis.find((a) => a.id === AZUBI.id);
+  pruefe('Wochenampel: Blockwoche mit übernommenen Themen ist fertig, ohne einen Tageseintrag',
+    blockAlex.wochen.length === 1 && blockAlex.wochen[0].fertig === 5 && blockAlex.wochen[0].stand === 'fertig', blockAlex.wochen);
+  const blockHeft = await ruf(AUSBILDER, `/api/azubis/${AZUBI.id}?von=${BLOCK}&bis=2026-09-18`);
+  pruefe('Ausbilder bekommt die Themen der Blockwoche und ihren Stand',
+    blockHeft.daten.wochen.some((w) => w.schule === 'LF5: Subnetting') && blockHeft.daten.wochenstand[0].stand === 'fertig',
+    blockHeft.daten);
 
   const einzeln = await ruf(AUSBILDER, `/api/azubis/${AZUBI.id}?von=${WOCHE[0]}&bis=${WOCHE[4]}`);
   pruefe('Ausbilder liest die Einträge seines Azubis',

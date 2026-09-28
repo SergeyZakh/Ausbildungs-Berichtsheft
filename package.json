@@ -16,7 +16,7 @@
   "scripts": {
     "build": "node build.js",
     "start": "node skripte/servieren.js",
-    "test": "node test/lokal.js && node test/vorbehandlung.js && node test/import.js && node test/ki.js && node test/lauf.js && node test/sicherung.js && node test/schulplan.js && node test/vordruck.js && node test/hinweise.js && node test/handy.js",
+    "test": "node test/lokal.js && node test/vorbehandlung.js && node test/import.js && node test/ki.js && node test/lauf.js && node test/sicherung.js && node test/schulplan.js && node test/vordruck.js && node test/hinweise.js && node test/blockwoche.js && node test/handy.js",
     "test:bereinigung": "node test/vorbehandlung.js",
     "test:import": "node test/import.js",
     "docker:up": "docker compose -f docker-compose.lokal.yml up -d --build"

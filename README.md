@@ -322,6 +322,15 @@ Einrichten, Abgleich, Rechte und Sicherung → [docs/SERVER.md](docs/SERVER.md)
   eingetragenen Schulferien nicht. Blockunterricht und Ferien wählst du im Kalender: ersten Tag
   antippen, dann den letzten. Tage mit Buchungen bleiben, wie der Import sie liefert. Am Tag
   selbst lässt sich die Art jederzeit umstellen.
+- **Blockwoche:** Ist jeder Werktag einer Woche Berufsschule oder frei, schreibst du die Themen
+  einmal für die ganze Woche statt an fünf Tagen – so wie der Vordruck ein Feld je Woche hat. Wer
+  an einem Tag krank war, stellt es in der Liste darunter um. Beim täglichen Vordruck bleibt es bei
+  einem Text je Tag.
+- **Fächer zum Antippen:** Schreibst du Schultage als „LF5: Subnetting“, stehen die Fächer beim
+  nächsten Mal als Knöpfe über dem Feld; „Fächer wie am …“ übernimmt alle vom letzten Schultag.
+- **Nach „Fertig“** geht es gleich zum nächsten Tag, der noch etwas braucht, auch in der nächsten
+  Woche. „Zurück“ hinter der Meldung führt wieder hin. Ist danach nichts mehr offen, aber früher,
+  bietet die Meldung den frühesten offenen Tag an.
 - **Eine Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den
   Text des Tages.
 - **Feiertage** werden bundesweit erkannt. Mit deinem Bundesland unter *Deine Daten → Verarbeitung*
