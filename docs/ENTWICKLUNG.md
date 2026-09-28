@@ -88,7 +88,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“; in einer Blockwoche nur der Reiter „Blockwoche“ |
 | `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: Text, Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche |
 | `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang, Vordruck (`vordruckSchalter()`), KI und Herunterladen |
-| `schulwoche.js` | Themen einer Blockwoche (`schulwocheSektion()`), die Tage der Blockwoche mit ihrer Art, Fächer zum Antippen über Schultexten (`faecherLeiste()`) |
+| `schulwoche.js` | Themen einer Blockwoche (`schulwocheSektion()`) und die Tage der Blockwoche mit ihrer Art |
 | `stammdaten.js` | Dialog „Deine Daten“, Verbindungsprüfung, Löschen und Verwerfen |
 | `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
 | `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
@@ -254,7 +254,8 @@ Eigenes hat (keine Art, kein Text, keine Buchungen, keine Stunden, nicht `artVon
 Der wöchentliche Vordruck hat für die Berufsschule ein Feld je Woche. Ist in einer Woche jeder
 Werktag Berufsschule oder frei, gibt es deshalb statt der sieben Tagesreiter nur den Reiter
 „Blockwoche“ und im Reiter „Woche“ oben ein Feld für die Themen der ganzen Woche, darunter die fünf
-Tage mit ihrer Art. Einmal schreiben, einmal „Fertig“: Die Woche ist dann 5/5.
+Tage mit ihrer Art. Einmal schreiben, einmal „Fertig“: Die Woche ist dann 5/5. Über dem Feld
+steht nichts, weder Vorschläge noch Erklärungen; der Reiter sagt schon, dass es eine Blockwoche ist.
 
 `blockwoche()` verlangt:
 
@@ -271,16 +272,6 @@ Tag sagt das in der Tagesansicht (`wochenfeldHinweis()`).
 Die Themen stehen in `wochen[montag].schule`, übernommen mit `schuleGeprueft`, und gehen mit
 Abteilung und Unterweisungen ins Konto (`wocheKennung()` enthält beide). Eine Woche mit Themen
 gehört zu `wochen` (`wochenNeu()`), auch ohne einen Tageseintrag: Sonst fehlte sie im Gesamtheft.
-
-### Fächer zum Antippen (`faecherLeiste()`)
-
-Über jedem Text an einem Tag „Berufsschule“ und über den Themen einer Blockwoche stehen die
-Fächer als Knöpfe. Sie kommen aus dem Geschriebenen: jede Zeile „Fach: Thema“ an Schultagen und in
-Blockwochen (`fachAusZeile()`, höchstens vier Wörter vor dem Doppelpunkt), zuletzt benutzte zuerst,
-höchstens acht. Ein Tipp schreibt „Fach: “ als neue Zeile; steht das Fach schon da, kommt ein Komma
-ans Ende seiner Zeile. Im leeren Feld schreibt „Fächer wie am …“ alle Fächer des letzten Schultexts
-davor untereinander. Einrichten muss man nichts; der Platzhalter zeigt „LF5: Subnetting und VLANs“,
-damit es beim nächsten Mal Knöpfe gibt.
 
 ### Weiter nach „Fertig“ (`naechsterOffenerTag()`)
 
@@ -553,7 +544,7 @@ npm test
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten neben der Vorschau, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
-| `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), Themen schreiben und übernehmen, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; Fächer zum Antippen und „Fächer wie am …“; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy |
+| `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), Themen schreiben und übernehmen, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy |
 | `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), leise Meldung und kurzer Titel am Handy |
 | `test/handy.js` | Bei 390 und 320 px: keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 

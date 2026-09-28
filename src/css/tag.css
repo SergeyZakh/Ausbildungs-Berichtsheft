@@ -459,27 +459,9 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 .fussleiste.gut .speicherstand  { color: var(--gut); }
 .fussleiste.warn .speicherstand { color: var(--acht); }
 
-/* ---------- Berufsschule: Fächer, Blockwoche (schulwoche.js) ---------- */
+/* ---------- Blockwoche (schulwoche.js) ---------- */
 
-/* Fächer zum Antippen über dem Schultext. Leise Pillen: Sie bieten an, der Text bleibt die Hauptsache. */
-.faecher {
-  flex: none; display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 10px 14px 0;
-}
-.fach {
-  font: inherit; font-size: 12.5px; line-height: 1; padding: 6px 11px;
-  color: var(--text); background: var(--band);
-  border: 1px solid var(--linie); border-radius: 999px; cursor: pointer;
-  transition: background-color .15s, border-color .15s;
-}
-.fach:hover { background: var(--flaeche); border-color: var(--linie-fest); }
-.fach::before { content: "+"; margin-right: 4px; color: var(--schiefer); }
-.fach.fachwie { background: var(--flaeche); border-style: dashed; }
-.fach.fachwie::before { content: "\21BA"; }
-/* Übernommen ist schreibgeschützt: nichts mehr anzubieten. */
-.sektion.fertig .faecher { display: none; }
-
-/* Der Satz über dem Themenfeld der Woche. */
+/* Der Satz über den Themen einer Woche, die keine Blockwoche mehr ist. */
 .schulhinweis { flex: none; margin: 0; padding: 10px 14px 0; line-height: 1.45; }
 .sektion.fertig .schulhinweis { display: none; }
 

@@ -5,14 +5,14 @@
  *   Blockwoche   Ist jeder Werktag einer Woche Berufsschule oder frei (ab zwei Schultagen, ohne
  *                eigene Tagestexte, wöchentlicher Vordruck), gibt es statt der Tagesreiter ein
  *                Feld für die Themen der ganzen Woche. Es deckt jeden Werktag ohne eigenen Text.
- *   Fächer       Aus „Fach: Thema“-Zeilen früherer Schultage werden Knöpfe über dem Schultext.
+ *                Über dem Feld steht nichts, was vom Schreiben ablenkt.
  *   Weiter       „Fertig“ springt zum nächsten Tag, der noch etwas braucht, auch in eine andere Woche.
  *
  *   node test/blockwoche.js
  */
 const h = require('./hilfen');
 
-const { pruefe, abschluss } = h.protokoll('Blockwoche, Fächer zum Antippen, weiter nach „Fertig“');
+const { pruefe, abschluss } = h.protokoll('Blockwoche und weiter nach „Fertig“');
 
 /* Blöcke: 01.–12.06.2026 (Fronleichnam am Do 04.06. ist in NRW frei) und 14.–25.09.2026.
    Fester Schultag Donnerstag. Die Woche ab 07.09. ist eine gewöhnliche mit Schule am Donnerstag. */
@@ -68,23 +68,14 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   pruefe('Leere Blockwoche: fünf Tage ohne Text, wie fünf leere Schultage',
     await auf(page, () => window.__wochenBilanz('2026-09-14').ohneText === 5 && window.__wochenStand('2026-09-14') === ''));
 
-  /* ---------- Fächer ---------- */
-  const knoepfe = await page.$$eval('.schulwoche .faecher .fach', (b) => b.map((x) => x.textContent));
-  pruefe('Fächer aus dem letzten Schultag als Knöpfe, dazu „Fächer wie am Do 10.09.“',
-    knoepfe.join('|') === 'Fächer wie am Do 10.09.|LF5|Deutsch|WiSo', knoepfe.join('|'));
-  await page.click('.schulwoche .fachwie');
-  pruefe('„Fächer wie am …“ schreibt die Fächer untereinander, Cursor hinter dem ersten',
-    (await page.inputValue('#feld-schulwoche')) === 'LF5: \nDeutsch: \nWiSo: ' &&
-    await auf(page, () => document.getElementById('feld-schulwoche').selectionStart === 5));
-  await page.keyboard.type('Subnetting');
-  pruefe('Mit Text verschwindet „Fächer wie am …“', await page.locator('.schulwoche .fachwie').isHidden());
-  await page.click('.schulwoche .fach:not(.fachwie) >> text=LF5');
-  await page.keyboard.type('VLANs');
-  await page.click('.schulwoche .fach:not(.fachwie) >> text=Deutsch');
-  await page.keyboard.type('Protokoll');
-  pruefe('Ein Fach, das schon dasteht: Komma am Ende seiner Zeile, nicht noch eine Zeile',
-    (await page.inputValue('#feld-schulwoche')) === 'LF5: Subnetting, VLANs\nDeutsch: Protokoll\nWiSo: ',
-    JSON.stringify(await page.inputValue('#feld-schulwoche')));
+  /* ---------- Schreiben ---------- */
+  pruefe('Blockwoche: das Feld steht gleich unter der Überschrift, ohne Knöpfe und Sätze darüber',
+    await auf(page, () => {
+      const leib = document.querySelector('.schulwoche .sektionsleib');
+      return leib.firstElementChild.id === 'feld-schulwoche' && !document.querySelector('.faecher, .fach, .schulhinweis');
+    }));
+  pruefe('Platzhalter ist eine schlichte Frage, ohne Beispiel',
+    (await page.getAttribute('#feld-schulwoche', 'placeholder')) === 'Welche Themen wurden diese Woche im Unterricht behandelt?');
   await page.fill('#feld-schulwoche', 'LF5: Subnetting, VLANs\nDeutsch: Protokoll\nWiSo: Kündigungsschutz');
   await page.waitForTimeout(500);
 
@@ -130,9 +121,7 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   await page.waitForTimeout(200);
   pruefe('„Zurück“ hinter der Meldung führt wieder zur Woche davor',
     (await page.textContent('#wochenlabel')).startsWith('14.–20. Sep') && await page.locator('#reiter-block').isVisible());
-  pruefe('Übernommen ist schreibgeschützt, ohne Fächerknöpfe',
-    await page.locator('#feld-schulwoche').getAttribute('readonly') !== null &&
-    await page.locator('.schulwoche .faecher').isHidden());
+  pruefe('Übernommen ist schreibgeschützt', await page.locator('#feld-schulwoche').getAttribute('readonly') !== null);
 
   /* ---------- Tage der Blockwoche ---------- */
   await page.selectOption('.blocktag select[data-datum="2026-09-16"]', 'Krank');
@@ -196,18 +185,16 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   pruefe('„Themen ansehen“ öffnet den Reiter der Woche', await page.locator('#feld-schulwoche').isVisible());
   await auf(page, () => { document.getElementById('f-vordruck').value = ''; window.__merkenJetzt(); });
 
-  /* ---------- Fächer an einem gewöhnlichen Schultag, weiter nach „Fertig“ ----------
+  /* ---------- Ein gewöhnlicher Schultag, weiter nach „Fertig“ ----------
      Der Schultag liegt in der Vergangenheit: Nur Tage bis heute können fehlen. */
   await page.click('#wochenlabel');
   await page.fill('#wochensuche', '03.09.2026');
   await page.waitForTimeout(300);
-  const tagesKnoepfe = await page.$$eval('.faecher .fach', (b) => b.map((x) => x.textContent));
-  pruefe('Schultag: die zuletzt benutzten Fächer, ohne „wie am“, wenn davor nichts steht',
-    tagesKnoepfe.join('|') === 'LF5|Deutsch|WiSo', tagesKnoepfe.join('|'));
-  await page.click('.faecher .fach >> text=WiSo');
-  await page.keyboard.type('Betriebsrat');
-  pruefe('Ein Tipp aufs Fach schreibt „Fach: “, der Tag wird Berufsschule',
-    (await page.inputValue('#feld-2026-09-03')) === 'WiSo: Betriebsrat' &&
+  pruefe('Schultag: nur das Feld mit schlichter Frage, keine Vorschläge darüber',
+    !(await page.locator('.faecher, .fach').count()) &&
+    (await page.getAttribute('#feld-2026-09-03', 'placeholder')) === 'Welche Themen wurden im Unterricht behandelt?');
+  await page.fill('#feld-2026-09-03', 'WiSo: Betriebsrat');
+  pruefe('Wer schreibt, macht den Tag zur Berufsschule',
     await auf(page, () => { window.__merkenJetzt(); return window.__tage()['2026-09-03'].art === 'Berufsschule'; }));
   await page.click('.sektion .uebernehmen');
   await page.waitForTimeout(300);
@@ -258,7 +245,8 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     reiter: document.getElementById('reiter-block').getBoundingClientRect().width,
   }));
   pruefe('Handy: ein breiter Reiter, nichts ragt über den Rand', breit.seite <= 390 && breit.reiter > 300, JSON.stringify(breit));
-  pruefe('Handy: Themenfeld und Fächer stehen oben', await handy.locator('.schulwoche .faecher').isVisible());
+  pruefe('Handy: das Themenfeld steht oben, gleich unter seiner Überschrift',
+    await handy.locator('.schulwoche .sektionsleib > textarea:first-child').isVisible());
   pruefe('Handy ohne JavaScript-Fehler', handyFehler.length === 0, handyFehler.join(' | '));
 
   pruefe('Keine JavaScript-Fehler', jsFehler.length === 0, jsFehler.join(' | '));

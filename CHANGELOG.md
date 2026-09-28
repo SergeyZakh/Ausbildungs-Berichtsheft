@@ -36,8 +36,6 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   wöchentliche Vordruck hat für die Berufsschule ohnehin ein Feld je Woche. Darunter stehen die
   Tage mit ihrer Art, etwa für einen Krankheitstag. Beim Ausbilder zählt die Woche genauso; der
   Server speichert die Themen in zwei neuen Spalten der Tabelle `wochen`.
-- **Fächer zum Antippen:** Wer Schultage als „Fach: Thema“ schreibt, bekommt die Fächer über dem
-  Feld als Knöpfe, zuletzt benutzte zuerst; „Fächer wie am …“ übernimmt alle vom letzten Schultag.
 - **Nach „Fertig“ weiter** zum nächsten Tag, der noch Text oder „Fertig“ braucht, auch in die
   nächste Woche; „Zurück“ hinter der Meldung führt wieder hin. Zurück an ältere Lücken springt es
   nicht von selbst, die Meldung bietet den frühesten offenen Tag als Knopf an.
