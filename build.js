@@ -50,6 +50,7 @@ const JS = [
   'ansicht/stammdaten.js',
   'ansicht/zeitraum.js',
   'ansicht/rundgang.js',
+  'ansicht/einrichtung.js',
   'ansicht/hinweise.js',
   'ansicht/uebersicht.js',
   'konto/konto.js',

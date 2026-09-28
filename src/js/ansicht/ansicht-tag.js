@@ -134,40 +134,43 @@ function textfeldWachsen(ta) {
   requestAnimationFrame(anpassen);
 }
 
+/**
+ * Die Startkarte ohne Woche: zwei Wege, die Tage zu füllen, als Knöpfe; Beispiel und Sicherung
+ * als leise Links darunter. Fehlen noch Angaben für den Vordruck, bietet sie die Einrichtung an.
+ */
 function zeichneLeerbild(bereich) {
   var leer = document.createElement("div");
   leer.className = "leerbild";
-  leer.innerHTML = "<h2>Noch kein Export geladen</h2>" +
-    "<p>Exportiere deine Zeiten als CSV – aus Clockify, Harvest, Jira/Tempo, Kimai, Toggl " +
-    "oder einer Excel-Liste – und lade sie hier. Ziehen geht auch, " +
-    "irgendwo ins Fenster. Daraus entstehen die Wochenblätter für deinen " +
-    "Ausbildungsnachweis. Ohne Export beginnst du mit dieser Woche und schreibst die Tage selbst.</p>";
-  var lb = document.createElement("button");
-  lb.type = "button"; lb.className = "knopf voll"; lb.textContent = "Export laden";
-  lb.addEventListener("click", function () { $("datei").click(); });
-  leer.appendChild(lb);
-  var bsp = document.createElement("button");
-  bsp.type = "button"; bsp.className = "knopf"; bsp.id = "btn-beispiel"; bsp.textContent = "Beispiel ansehen";
-  bsp.addEventListener("click", beispielLaden);
-  leer.appendChild(bsp);
-  // Ohne Export: mit der aktuellen Woche beginnen und von Hand schreiben.
-  var ohne = document.createElement("button");
-  ohne.type = "button"; ohne.className = "knopf"; ohne.textContent = "Ohne Export starten";
-  ohne.addEventListener("click", function () {
+  leer.innerHTML = "<h2>Womit fängst du an?</h2>" +
+    "<p>Lädst du den Export deiner Zeiterfassung, steht für jeden Tag schon ein Entwurf da. Das geht " +
+    "mit Clockify, Harvest, Jira/Tempo, Kimai, Toggl und Excel, auch per Ziehen ins Fenster. " +
+    "Ohne Zeiterfassung schreibst du die Tage selbst.</p>";
+  var knopf = function (text, klasse, tat, id) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = klasse; b.textContent = text;
+    if (id) b.id = id;
+    b.addEventListener("click", tat);
+    return b;
+  };
+  leer.appendChild(knopf("Zeiterfassung laden (CSV)", "knopf voll", function () { $("datei").click(); }));
+  leer.appendChild(knopf("Selbst schreiben", "knopf", function () {
     var heute = new Date();
     wocheZeigen(iso(montagVon(heute)), Math.min(tagIndex(heute), 4));
-  });
-  leer.appendChild(ohne);
+  }));
   // Wer vom Home-Bildschirm aus neu anfängt oder das Gerät wechselt, bringt sein Heft als Sicherung mit.
-  var weiter = document.createElement("p");
-  weiter.className = "leerfuss";
-  weiter.appendChild(document.createTextNode("Schon ein Heft angefangen? "));
-  var laden = document.createElement("button");
-  laden.type = "button"; laden.className = "textknopf"; laden.id = "btn-leer-sicherung";
-  laden.textContent = "Sicherung laden";
-  laden.addEventListener("click", function () { $("sicherungsdatei").click(); });
-  weiter.appendChild(laden);
-  leer.appendChild(weiter);
+  var fuss = document.createElement("p");
+  fuss.className = "leerfuss";
+  fuss.appendChild(knopf("Beispiel ansehen", "textknopf", beispielLaden, "btn-beispiel"));
+  fuss.appendChild(document.createTextNode(" · "));
+  fuss.appendChild(knopf("Sicherung laden", "textknopf", function () { $("sicherungsdatei").click(); }, "btn-leer-sicherung"));
+  leer.appendChild(fuss);
+  if (angabenFehlen()) {
+    var einrichten = document.createElement("p");
+    einrichten.className = "leerfehlt";
+    einrichten.appendChild(document.createTextNode("Für den Vordruck fehlen noch deine Angaben. "));
+    einrichten.appendChild(knopf("Jetzt einrichten", "textknopf", einrichtungStarten, "btn-leer-einrichtung"));
+    leer.appendChild(einrichten);
+  }
   bereich.appendChild(leer);
 }
 
