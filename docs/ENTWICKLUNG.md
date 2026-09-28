@@ -58,7 +58,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `zustand.js` | Stand je Tag/Woche (`wochenBilanz()`: was eine Woche noch braucht), Schulplan (`tagArt()`), Blockwoche (`blockwoche()`, `tagImWochenfeld()`), nächster offener Tag (`naechsterOffenerTag()`), Stammdaten, Speichern, Zeitstempel für den Abgleich, Fußleistenmeldung `sage()` (bei offenem Dialog auch im Dialog, am Handy nach acht Sekunden leise) |
 | `sicherung.js` | Sicherung als JSON speichern und laden, Rückfrage `frage()` |
 | `bedienung.js` | Menüs und Tastatur |
-| `start.js` | Testzugänge (`window.__…`), Wiederherstellen des letzten Stands, Start des Rundgangs (am Handy nicht, `amHandy`) |
+| `start.js` | Testzugänge (`window.__…`), Wiederherstellen des letzten Stands, beim ersten Start die Einrichtung (Azubis) oder der Rundgang (Ausbilder, am Handy nicht, `amHandy`) |
 
 **`import/`**
 
@@ -89,10 +89,11 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: Text, Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche |
 | `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang, Vordruck (`vordruckSchalter()`), KI und Herunterladen |
 | `schulwoche.js` | Themen einer Blockwoche (`schulwocheSektion()`) und die Tage der Blockwoche mit ihrer Art |
-| `stammdaten.js` | Dialog „Deine Daten“, Verbindungsprüfung, Löschen und Verwerfen |
+| `stammdaten.js` | Dialog „Deine Daten“ (Reiter Ausbildung, Schule, Vordruck, Deckblatt, KI, Löschen), Verbindungsprüfung, Löschen und Verwerfen |
 | `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
 | `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
-| `rundgang.js` | Rundgänge beim ersten Start, für Azubis und für Ausbilder |
+| `rundgang.js` | Rundgang über das Menü; beim ersten Start nur für Ausbilder |
+| `einrichtung.js` | Einrichtung beim ersten Start: die Angaben fürs Wochenblatt in sechs Schritten, jede Eingabe geht sofort in das Feld von „Deine Daten“ (`data-feld`) |
 | `hinweise.js` | Hinweis über den Reitern: Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
 | `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Kästchen pro Woche und die Tage je Art (`uebersichtDaten()`) |
 
@@ -181,8 +182,9 @@ Datenbank beim letzten Abgleich und steuert, was herunterkommt; `gesendet` die B
 erfolgreichen Hochladen und steuert, was hochgeht. Mit nur einer Marke gingen Eingaben verloren, die
 während eines Abgleichs entstanden oder deren Rechneruhr nachging.
 
-`localStorage["berichtsheft-onboarding"] = "1"`: Rundgang gesehen; `berichtsheft-onboarding-ausbilder`
-dasselbe für den Rundgang der Ausbilder (`RUNDGANG_AUSBILDER`). Er startet erst, wenn `kontoStarten()`
+`localStorage["berichtsheft-onboarding"] = "1"`: Einrichtung gesehen (früher: Rundgang gesehen, darum
+derselbe Schlüssel); `berichtsheft-onboarding-ausbilder` dasselbe für den Rundgang der Ausbilder
+(`RUNDGANG_AUSBILDER`). Beides startet erst, wenn `kontoStarten()`
 die Rolle kennt.
 
 `localStorage["berichtsheft-zuordnungen"]`: bestätigte Zuordnungen je Kopfzeile,
@@ -223,6 +225,24 @@ vergleicht beide Seiten Fall für Fall.
 - Hat die Woche Themen für die Berufsschule (`wochen.schule`), steht jeder Werktag ohne eigenen
   Text, der nicht frei ist, unter ihnen und hat ihren Stand (`tagImWochenfeld()`). Das gilt für
   jeden solchen Tag, nicht nur für Schultage laut Plan: Der Server kennt den Plan nicht.
+
+### Einrichtung beim ersten Start (`einrichtung.js`)
+
+Statt eines Rundgangs über eine leere Seite fragt das Werkzeug beim ersten Start in sechs Schritten,
+was im Kopf jedes Wochenblatts steht: Willkommen (mit „Beispiel ansehen“ und „Sicherung laden“),
+Name/Beruf/Betrieb, Beginn/Ende und Bundesland, Berufsschule (feste Schultage, Blockunterricht im
+Kalender), Vordruck, zuletzt „Zeiterfassung laden (CSV)“ oder „Selbst schreiben“. Pflicht sind die
+Angaben aus `PFLICHT` in `stammdaten.js`; „Weiter“ nennt, was fehlt, und ein Ende vor dem Beginn.
+
+- Die Felder der Einrichtung sind eigene (`w-…`), jedes nennt in `data-feld` sein Feld in „Deine
+  Daten“. Jede Eingabe geht sofort dorthin und löst dort `input` aus; gespeichert und abgeglichen
+  wird wie beim Tippen im Dialog. Schultage schreiben `f-schultage`, der Blockunterricht nutzt die
+  Marken und den Kalender aus `zeitraum.js`.
+- Sie kommt nur, wenn noch nichts eingetragen ist (`einrichtungNoetig()`: keine Tage, kein Name,
+  kein Beginn), nicht für Ausbilder, und erst nach `kontoStarten()`: Mit Konto bringt der Abgleich
+  vorher mit, was schon eingetragen ist. Am Handy steht sie im Vollbild.
+- „Später“, Escape und jeder Ausgang merken sie als gesehen (`berichtsheft-onboarding`). Fehlen
+  dann noch Pflichtangaben, bietet die Startkarte „Jetzt einrichten“ an (`angabenFehlen()`).
 
 ### Schulplan (`tagArt()`, `schultagLautPlan()`)
 
@@ -512,7 +532,7 @@ verkleinert per `transform`. Dieselbe Quelle wie der Druck, also auch
 dieselbe Aufteilung auf mehrere Blätter.
 
 **Tägliche Notierung:** der zweite Vordruck der IHK, gewählt mit `stamm.vordruck = "taeglich"`
-(„Deine Daten → Verarbeitung“ oder der Schalter neben der Vorschau). `tagesZeilen()` in `word.js`
+(„Deine Daten → Vordruck“, die Einrichtung oder der Schalter neben der Vorschau). `tagesZeilen()` in `word.js`
 liefert je Tag eine Zeile mit Datum und Art, Montag bis Freitag immer, das Wochenende nur mit
 Eintrag, zuletzt die Themen einer Blockwoche (die Tage darunter stehen als „Berufsschule“) und die
 Unterweisungen der Woche. Stunden stehen auch hier nicht im Blatt: Die IHK fragt
@@ -540,13 +560,13 @@ npm test
 | `test/import.js` | Formate unter `test/daten/formate/`, Werte, Zeichensatz, Zuordnungsdialog, gemerkte Zuordnung, Beispiel |
 | `test/vorbehandlung.js` | Bereinigung gegen `test/korpus.js`, Vorlage für das Modell |
 | `test/ki.js` | Anbindung gegen einen nachgebauten Ollama: Prompt, Warnungen, Fehler, Wochenlauf, Abbruch; Anfragen nur an das eigene Ollama |
-| `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Rundgang, Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen |
+| `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start, Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen |
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten neben der Vorschau, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
 | `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), Themen schreiben und übernehmen, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy |
 | `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), leise Meldung und kurzer Titel am Handy |
-| `test/handy.js` | Bei 390 und 320 px: keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
+| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
 mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).
@@ -560,7 +580,7 @@ Die Tests öffnen die Seite über http: `h.starteBrowser()` startet einen kleine
 verlor Chromium in CI gelegentlich, was die Seite direkt vor dem Neuladen gespeichert hatte
 (Bundesland, geladene Sicherung, untergeschobener Tag); lokal trat das nie auf. Bei `file://`
 bleiben nur Tests, die genau das prüfen, mit `h.DATEI_SEITE` bzw. `h.EINZELDATEI`: die
-Einzeldatei (`test/lokal.js`), das Neuladen bei leerem Speicher (Rundgang in `test/lauf.js`) und die
+Einzeldatei (`test/lokal.js`), das Neuladen bei leerem Speicher (Einrichtung in `test/lauf.js`) und die
 Suche nach dem Sprachmodell (`test/ki.js`). Solche Seiten öffnet `h.oeffnen()` zweimal:
 `ohneRundgang()` schreibt schon beim Dokumentstart in den Speicher. Das ist genau der frühe Zugriff,
 der den Speicher abkoppeln kann, und `speicherNeuLaden()` sieht dann keinen leeren Speicher. Ohne
