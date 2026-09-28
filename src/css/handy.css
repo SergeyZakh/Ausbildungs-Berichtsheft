@@ -34,22 +34,40 @@
   .wsanteil { gap: 5px; }
   .wochensumme .ring { width: 18px; height: 18px; --dicke: 3px; }
 
-  /* Reihe 3: sieben Tage in einer Zeile, der Wochenreiter darunter. */
+  /* Reihe 3: sieben Tage in einer Zeile, der Wochenreiter breit darunter. Neben der Marke eines
+     Tages steht kein Text, Art und Stunden nennt der Tageskopf darunter: Mit Stunden in den
+     Reitern lagen Reiter und Tageskopf zusammen rund 230 px über dem Schreibfeld, mit offener
+     Tastatur blieb davon kaum etwas zum Schreiben. Die breite Woche war dabei nie das Problem. */
   /* Oben Abstand zur Kopfleiste: Ohne ihn saßen die Reiter auf deren Trennlinie, und ihr oberer
      Rand samt Rundung wurde abgeschnitten. */
-  .reiter { overflow: visible; flex-wrap: wrap; gap: 5px; padding: 12px 12px 12px; }
-  .reiter button { flex: 1 1 0; min-width: 0; padding: 7px 2px; border-radius: 10px; overflow: hidden; }
+  .reiter { overflow: visible; flex-wrap: wrap; gap: 5px; padding: 12px 12px 10px; }
+  .reiter button { flex: 1 1 0; min-width: 0; padding: 7px 1px 6px; gap: 4px; border-radius: 10px; overflow: hidden; }
   .reiter button:last-child {
     flex: 1 1 100%; flex-direction: row; align-items: center; justify-content: center;
     gap: 10px; padding: 8px 12px;
   }
   .reiter .rdatum { display: none; }
   .reiter .rtag { font-size: 11.5px; letter-spacing: .04em; }
-  .reiter .rlage {
-    font-size: 10.5px; gap: 3px; max-width: 100%;
-    overflow: hidden; text-overflow: ellipsis;
+  .reiter .rlage { font-size: 10.5px; gap: 3px; max-width: 100%; min-height: 16px; overflow: hidden; }
+  .reiter .rtext { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .reiter button:not(:last-child) .rlage:not(.ohnemarke) .rtext { display: none; }
+
+  /* Tageskopf in einer Zeile: Datum, Art, Stunden. Die Beschriftungen stehen nur noch für
+     Vorleser da, Auswahl und Stundenzahl sprechen für sich. Reicht die Breite nicht, rutschen
+     Art und Stunden unter das Datum. */
+  .artkopf { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 6px 12px; }
+  .artkopf > .sektionskopf {
+    flex: 1 1 auto; min-height: 0; padding: 0; letter-spacing: .05em;
+    background: none; border: 0;
   }
-  .reiter button:not(:last-child) .rlage { flex-direction: column; }
+  .artkopf > .sektionskopf .wochentag { display: none; }
+  .artkopf > .sektionsleib { flex: 1 1 auto; justify-content: space-between; padding: 0; gap: 12px; flex-wrap: nowrap; }
+  .artkopf .feldpaar { flex: none; }
+  /* Sonst so breit wie die längste Art („Betriebsversammlung“), und die Zeile bräche um. */
+  .artkopf select { width: 10em; max-width: 100%; }
+  .artkopf .feldetikett {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
 
   .tagpanel { padding: 0 12px 14px; gap: 10px; overflow: visible; }
   /* Das Feld wächst mit dem Text (textfeldWachsen() in ansicht-tag.js), statt ihn abzuschneiden. */

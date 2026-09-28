@@ -60,7 +60,7 @@ Protokoll, sind hier aber noch nicht durchgetestet.
 | --- | --- |
 | Tagestext, Art des Tages, Stunden, „übernommen“ | Browser **und** Server |
 | Abteilung und Unterweisungen je Woche | Browser und Server |
-| Stammdaten (Name, Beruf, Betrieb, Vertragszeitraum …) | Browser und Server |
+| Stammdaten (Name, Beruf, Betrieb, Vertragszeitraum, Schultage …) | Browser und Server |
 | Importierte Buchungen: Kunden, Tickets, Uhrzeiten, Kollegennamen | **nur im Browser** |
 | Einstellungen des Sprachmodells, Namensliste für die Bereinigung | nur im Browser |
 | Wer wen betreut | Server |

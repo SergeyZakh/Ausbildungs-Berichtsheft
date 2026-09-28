@@ -10,7 +10,7 @@
 var BEISPIEL_STAMM = {
   name: "Muster, Max", beruf: "Fachinformatiker für Systemintegration",
   betrieb: "Beispiel IT GmbH", abteilung: "IT", ausbilder: "Erika Beispiel",
-  schule: "Berufskolleg Musterstadt", beginn: "2025-08-01", ende: "2028-07-31"
+  schule: "Berufskolleg Musterstadt", schultage: "Do", beginn: "2025-08-01", ende: "2028-07-31"
 };
 
 function beispielLaden() {

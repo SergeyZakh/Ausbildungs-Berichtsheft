@@ -38,7 +38,7 @@ function zeichneReiter() {
 /** Reiter eines Tages: Farbe und Marke zeigen, was der Tag noch braucht. */
 function tagReiter(montag, i) {
   var datum = plus(montag, i), t = tage[iso(datum)];
-  var art = t && t.art ? t.art : "";
+  var art = tagArt(iso(datum));
   var schule = istSchultag(art);
   var frei = !!art && !schule;
   var fehlt = !frei && !!(t && (t.stunden || schule)) && !((t && t.text ? t.text : "").trim());
@@ -64,12 +64,13 @@ function tagReiter(montag, i) {
   else if (stand === "fertig" && !frei) marke = '<span class="haken" title="gegengelesen">✓</span>';
   else if (fehlt) marke = '<span class="punkt" title="noch kein Text"></span>';
 
+  // Am Handy bleibt neben einer Marke kein Platz für den Text (handy.css); ohne Marke steht er da.
   b.innerHTML =
     '<span class="rtag"><span class="rkurz">' + KURZ[datum.getDay()].toUpperCase() +
     '</span><span class="rdatum">' + dm(datum) + "</span></span>" +
-    '<span class="rlage">' + marke +
+    '<span class="rlage' + (marke ? "" : " ohnemarke") + '">' + marke + '<span class="rtext">' +
     (frei ? sicher(art) : t && t.stunden ? stundenText(t.stunden) + "\u2009h" : schule ? "Schule" : "—") +
-    "</span>";
+    "</span></span>";
   b.addEventListener("click", function () {
     aktiverTag = i; zeichneReiter(); zeichneTag(); merken();
   });
@@ -102,7 +103,7 @@ function wochenReiter() {
     : ringHtml(anteil.fertig, anteil.von, anteil.fertig + " von " + anteil.von + " Tagen gegengelesen");
   w.innerHTML =
     '<span class="rtag"><span class="rkurz">WOCHE</span></span>' +
-    '<span class="rlage">' + marke + (wocheVoll ? "ausgefüllt" : "offen") + "</span>";
+    '<span class="rlage">' + marke + '<span class="rtext">' + (wocheVoll ? "ausgefüllt" : "offen") + "</span></span>";
   w.addEventListener("click", function () { aktiverTag = 7; zeichneReiter(); zeichneTag(); });
   return w;
 }

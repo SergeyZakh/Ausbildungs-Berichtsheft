@@ -8,6 +8,24 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ## Unveröffentlicht
 
+### Neu
+
+- **Feste Schultage und Blockunterricht** unter *Deine Daten → Schule*, dort steht jetzt auch der
+  Name der Berufsschule. Leere Tage an diesen Tagen stehen schon auf „Berufsschule“, mit dem Feld
+  für die Unterrichtsthemen. Feiertage, Tage außerhalb der Vertragslaufzeit und Tage mit Buchungen
+  oder Text ändert der Plan nicht. Das Beispiel hat donnerstags Schule.
+
+### Geändert
+
+- **Am Handy** stehen die Tagesreiter kompakt in einer Zeile, die Woche breit darunter; Datum, Art
+  und Stunden des Tages stehen ebenfalls in einer Zeile. Das Schreibfeld beginnt deutlich weiter
+  oben und bleibt mit offener Tastatur sichtbar.
+
+### Behoben
+
+- **„Arbeitstag“ von Hand** an einem Feiertag wurde beim nächsten Import derselben Datei wieder
+  zum Feiertag. Eine am Tag gewählte Art bleibt jetzt, auch „Arbeitstag“.
+
 ## [0.1.1] – 2026-09-26
 
 ### Geändert

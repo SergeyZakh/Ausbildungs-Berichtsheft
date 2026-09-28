@@ -61,6 +61,78 @@ function ersterEingetragenerTag() {
   return frueh;
 }
 
+/* ---------- Schulplan ----------
+   Feste Schultage und Blockunterricht aus „Deine Daten → Schule“. Der Plan füllt nur
+   Tage ohne eigenen Inhalt vor: Ein Tag mit Buchungen kann in den Schulferien liegen, dann
+   wurde an ihm gearbeitet, und davon weiß der Plan nichts. Gespeichert wird die Art erst, wenn
+   am Tag geschrieben oder gewählt wird. Bis dahin ist ein leerer Schultag dieselbe Lücke wie
+   ein leerer Arbeitstag, im Heft wie auf dem Server (server/stand.js kennt keinen Plan). */
+
+var WERKTAGE_KURZ = ["Mo", "Di", "Mi", "Do", "Fr"];
+
+/** "Di, Mi" -> [1, 2], Montag ist 0. Was kein Werktag ist, fällt weg. */
+function schultageLesen(text) {
+  var liste = [];
+  String(text || "").split(/[\s,;]+/).forEach(function (w) {
+    var i = WERKTAGE_KURZ.indexOf(w.charAt(0).toUpperCase() + w.charAt(1).toLowerCase());
+    if (i !== -1 && liste.indexOf(i) === -1) liste.push(i);
+  });
+  return liste.sort();
+}
+
+/**
+ * Blockunterricht als Zeiträume, getrennt durch Semikolon, Komma oder Zeilenumbruch:
+ * "02.03.2026–20.03.2026; 04.05.–22.05.2026". Fehlt beim ersten Datum das Jahr, gilt das des
+ * zweiten (bei einem Block über Neujahr das davor). Ein einzelnes Datum ist ein Block von einem
+ * Tag. Was sich nicht lesen lässt, steht in `unklar`, damit der Dialog es zeigen kann.
+ */
+function schulbloeckeLesen(text) {
+  var bloecke = [], unklar = [];
+  String(text || "").split(/[;,\n]+/).forEach(function (teil) {
+    if (!teil.trim()) return;
+    var muster = /(\d{4})-(\d{1,2})-(\d{1,2})|(\d{1,2})\.(\d{1,2})\.(\d{4}|\d{2})?/g, m, daten = [];
+    while ((m = muster.exec(teil))) {
+      daten.push(m[1] ? { j: +m[1], mo: +m[2], t: +m[3] } : { j: m[6] ? jahr4(m[6]) : null, mo: +m[5], t: +m[4] });
+    }
+    var von = daten[0], bis = daten[daten.length - 1];
+    if (!von || daten.length > 2 || bis.j == null) { unklar.push(teil.trim()); return; }
+    if (von.j == null) von.j = (von.mo * 100 + von.t > bis.mo * 100 + bis.t) ? bis.j - 1 : bis.j;
+    var a = datumPruefen(von.j, von.mo, von.t), b = datumPruefen(bis.j, bis.mo, bis.t);
+    if (!a || !b || a > b) { unklar.push(teil.trim()); return; }
+    bloecke.push({ von: a, bis: b });
+  });
+  return { bloecke: bloecke, unklar: unklar };
+}
+
+/** Ist das laut Plan ein Schultag? Feiertage und Tage außerhalb der Ausbildung nie. */
+function schultagLautPlan(datumIso) {
+  var tag = tagIndex(vonIso(datumIso));
+  if (tag > 4) return false;
+  if (feiertagAn(datumIso, $("f-land").value)) return false;
+  var beginn = $("f-beginn").value, ende = $("f-ende").value;
+  if ((beginn && datumIso < beginn) || (ende && datumIso > ende)) return false;
+  if (schultageLesen($("f-schultage").value).indexOf(tag) !== -1) return true;
+  return schulbloeckeLesen($("f-schulbloecke").value).bloecke.some(function (b) {
+    return b.von <= datumIso && datumIso <= b.bis;
+  });
+}
+
+/** Hat der Tag etwas Eigenes: Text, Buchungen, Stunden oder eine gewählte Art? */
+function tagHatInhalt(t) {
+  return !!(t && (t.art || t.artVonHand || (t.text || "").trim() || (t.posten && t.posten.length) || t.stunden));
+}
+
+/**
+ * Die Art, die für einen Tag gilt: die eingetragene, an einem leeren Tag laut Schulplan
+ * "Berufsschule". Für die Ansicht und für das, was am Tag neu eingetragen wird; Stand, Lücken
+ * und Export lesen weiter die gespeicherte Art.
+ */
+function tagArt(datumIso) {
+  var t = tage[datumIso];
+  if (tagHatInhalt(t)) return t.art || "";
+  return schultagLautPlan(datumIso) ? "Berufsschule" : "";
+}
+
 /**
  * Stand der ganzen Woche:
  *
@@ -181,6 +253,7 @@ function stammdaten() {
     name: $("f-name").value, beruf: $("f-beruf").value, betrieb: $("f-betrieb").value,
     abteilung: $("f-abteilung").value, land: $("f-land").value,
     ausbilder: $("f-ausbilder").value, schule: $("f-schule").value,
+    schultage: $("f-schultage").value, schulbloecke: $("f-schulbloecke").value,
     beginn: $("f-beginn").value, ende: $("f-ende").value,
     jahr: ausbildungsjahr({ beginn: $("f-beginn").value }, berichtsdatum()),
     geburtsort: $("f-geburtsort").value, geburtsdatum: $("f-geburtsdatum").value,
@@ -284,6 +357,8 @@ function tagSichern(t, mitPosten) {
   if (t.vorKi != null) d.vorKi = t.vorKi;
   if (t.kiText != null) d.kiText = t.kiText;
   if (t.geprueft) d.geprueft = true;
+  // Auch „Arbeitstag“ von Hand zählt: Sonst stünde ein leerer Tag gleich wieder auf dem Schulplan.
+  if (t.artVonHand) d.artVonHand = true;
   if (mitPosten && t.posten && t.posten.length) d.posten = t.posten;
   return d;
 }

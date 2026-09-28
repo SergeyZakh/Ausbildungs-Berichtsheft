@@ -55,7 +55,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | Datei | Inhalt |
 | --- | --- |
 | `grundlagen.js` | Zustand (`tage`, `wochen`, `aktiveWoche` …), Konstanten, Datums- und Texthelfer, Feiertage je Bundesland (dieselben Regeln in `server/feiertage.js`) |
-| `zustand.js` | Stand je Tag/Woche, Stammdaten, Speichern, Zeitstempel für den Abgleich, Fußleistenmeldung `sage()` (bei offenem Dialog auch im Dialog) |
+| `zustand.js` | Stand je Tag/Woche, Schulplan (`tagArt()`), Stammdaten, Speichern, Zeitstempel für den Abgleich, Fußleistenmeldung `sage()` (bei offenem Dialog auch im Dialog) |
 | `sicherung.js` | Sicherung als JSON speichern und laden, Rückfrage `frage()` |
 | `bedienung.js` | Menüs und Tastatur |
 | `start.js` | Testzugänge (`window.__…`), Wiederherstellen des letzten Stands, Start des Rundgangs (am Handy nicht, `amHandy`) |
@@ -111,7 +111,11 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 Reihenfolge wie in der Liste `CSS` in `build.js`: `basis.css` (Farben, Schrift, Grundgerüst),
 `leiste.css` (Kopfleiste, Wochenbalken, Reiter), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
 Eingaben, Meldungen), `dialoge.css` (Monatsraster, „Deine Daten“, Zuordnung, Rundgang),
-`handy.css` (alle `@media`-Regeln für Handy und Tablet), `ausbilder.css` (Konto und Ausbilderansicht),
+`handy.css` (alle `@media`-Regeln für Handy und Tablet; dort stehen die Tagesreiter in einer Zeile
+mit der Woche breit darunter, und der Tageskopf `.artkopf` mit Datum, Art und Stunden in einer Zeile, damit das Schreibfeld auch mit
+offener Tastatur Platz hat; die Regeln greifen auch beim Drucken, denn A4 ist schmaler als 820 px,
+also dort keine Klassen aus dem Blatt wie `.tagkopf` oder `.kasten` verwenden),
+`ausbilder.css` (Konto und Ausbilderansicht),
 `blatt.css` (der Drucksatz des Vordrucks).
 
 ## Datenmodell
@@ -120,10 +124,11 @@ Eingaben, Meldungen), `dialoge.css` (Monatsraster, „Deine Daten“, Zuordnung,
 
 ```text
 stamm   Stammdaten und Einstellungen; Schlüssel = Feld-ID ohne "f-"
-        (kiAdresse ↔ f-ki-adresse)
+        (kiAdresse ↔ f-ki-adresse); schultage "Di, Mi", schulbloecke als Text
 tage    "JJJJ-MM-TT" → {
           text        was im Feld steht
           art         "", Berufsschule, Urlaub, Krank, Feiertag, Betriebsversammlung
+          artVonHand  true = Art am Tag gewählt, auch "" (Arbeitstag); der Schulplan gilt dann nicht
           stunden     aus dem Import, nur Anzeige
           von, bis, pausen, pauseMinuten
           posten      die Buchungen (fallen bei vollem Speicher weg)
@@ -195,6 +200,24 @@ vergleicht beide Seiten Fall für Fall.
   Feld im Vordruck.
 - Ein Werktag im Ausbildungszeitraum ohne Text ist eine Lücke, ob ganz ohne Eintrag oder mit
   geleertem Text. Ein gesetzlicher Feiertag ohne Text fehlt nicht, Tage in der Zukunft auch nicht.
+
+### Schulplan (`tagArt()`, `schultagLautPlan()`)
+
+Unter „Deine Daten → Schule“ stehen feste Schultage (Mo–Fr) und Blockunterricht als Zeiträume
+(`schulbloeckeLesen()`: `02.03.–20.03.2026; 04.05.2026–22.05.2026`, auch ISO-Daten und ein
+einzelner Tag). `tagArt()` liefert für einen Tag die gespeicherte Art oder, wenn der Tag nichts
+Eigenes hat (keine Art, kein Text, keine Buchungen, keine Stunden, nicht `artVonHand`), laut Plan
+„Berufsschule“. Feiertage und Tage außerhalb der Vertragslaufzeit sind nie Schultage.
+
+- Nur leere Tage: Ein Tag mit Buchungen kann in den Schulferien liegen. Den ändert der Plan nicht,
+  auch nicht beim Import.
+- Gespeichert wird die Art erst, wenn am Tag geschrieben oder gewählt wird. Tagesansicht und
+  Reiter lesen `tagArt()`; Stand, Lücken, Export und Server lesen die gespeicherte Art. Ein leerer
+  Schultag ist so dieselbe Lücke wie ein leerer Arbeitstag, und `server/stand.js` braucht keinen Plan.
+- Wer an einem Tag „Arbeitstag“ wählt, setzt `artVonHand`. Ohne die Marke stünde der leere Tag
+  gleich wieder auf dem Plan, und ein neuer Import setzte einen Feiertag zurück.
+- Die Schalter im Dialog spiegeln das versteckte Feld `f-schultage`; nur das wird gespeichert und
+  mit dem Konto abgeglichen.
 
 ### Spalten erkennen (`csvAnalysieren()`)
 
@@ -421,6 +444,7 @@ npm test
 | `test/ki.js` | Anbindung gegen einen nachgebauten Ollama: Prompt, Warnungen, Fehler, Wochenlauf, Abbruch; Anfragen nur an das eigene Ollama |
 | `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Rundgang, Löschen; Feiertage und Wochenstand gleich wie auf dem Server |
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
+| `test/schulplan.js` | Feste Schultage und Blockunterricht: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen), Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/handy.js` | Bei 390 und 320 px: keine Sperre, nichts ragt über den Rand, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
