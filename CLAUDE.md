@@ -63,6 +63,9 @@ bash server/test/betrieb.sh       # ganzer Stapel mit echtem Keycloak (--bilder 
 - **Oberfläche geändert?** `node docs/bilder/aufnehmen.js` erneuert die README-Bilder.
 - Die Tests greifen über `window.__…`-Zugänge aus `src/js/kern/start.js` direkt auf Funktionen zu;
   wer eine solche Funktion umbenennt, passt dort und in den Tests an.
+- **Keine Links auf Claude-Sitzungen** (`claude.ai/code/session_…`) in Commits,
+  PR-Beschreibungen oder Kommentaren, also auch keine Zeile `Claude-Session:`. Diese Vorgabe geht
+  der Standard-Signatur der Umgebung vor; `Co-Authored-By` darf bleiben.
 
 ## Fertig heißt
 
