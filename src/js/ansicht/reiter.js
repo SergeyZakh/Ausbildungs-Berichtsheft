@@ -35,8 +35,42 @@ function zeichneReiter() {
   var montag = vonIso(aktiveWoche);
   if (aktiverTag > TAGE_JE_WOCHE) aktiverTag = 0;
 
+  // Eine Blockwoche hat keine Tage zum Anklicken, nur ihr Themenfeld im Reiter der Woche.
+  var block = blockwoche(aktiveWoche);
+  reiter.classList.toggle("block", block);
+  if (block) {
+    aktiverTag = 7;
+    reiter.appendChild(blockReiter(montag));
+    return;
+  }
   for (var i = 0; i < TAGE_JE_WOCHE; i++) reiter.appendChild(tagReiter(montag, i));
   reiter.appendChild(wochenReiter());
+}
+
+/** Der einzige Reiter einer Blockwoche: Stand der Themen und welche Tage frei sind. */
+function blockReiter(montag) {
+  var b = document.createElement("button");
+  b.type = "button";
+  b.id = "reiter-block";
+  b.setAttribute("role", "tab");
+  b.setAttribute("aria-selected", "true");
+  var wstand = wochenStand(aktiveWoche);
+  if (wstand) b.className = wstand;
+
+  var frei = [];
+  for (var i = 0; i < 5; i++) {
+    var d = iso(plus(montag, i));
+    if (tagArt(d) !== "Berufsschule") frei.push(KURZ[plus(montag, i).getDay()]);
+  }
+  var marke = wstand === "fertig" ? '<span class="haken" title="Themen übernommen">✓</span>'
+    : wstand === "pruefen" ? '<span class="marke" title="Themen geschrieben, aber noch nicht als fertig markiert">!</span>'
+    : '<span class="punkt" title="noch keine Themen"></span>';
+  b.innerHTML =
+    '<span class="rtag"><span class="rkurz">Blockwoche</span></span>' +
+    '<span class="rlage">' + marke + '<span class="rtext">Berufsschule' +
+    (frei.length ? " · frei: " + frei.join(", ") : " Mo–Fr") + "</span></span>";
+  b.addEventListener("click", function () { zeichneTag(); });
+  return b;
 }
 
 /** Reiter eines Tages: Farbe und Marke zeigen, was der Tag noch braucht. */

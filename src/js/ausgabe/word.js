@@ -229,6 +229,9 @@ function wochenTexte(montag) {
   var wd = wochendaten[iso(montag)] || {};
   var eigene = zeilen(wd.unterweisungen).map(ohneSchlusspunkt).join("\n");
   if (eigene) unterweisung.unshift({ kopf: "", text: eigene });
+  // Die Themen einer Blockwoche stehen ohne Wochentag vorn, wie der Vordruck sein Feld meint.
+  var themen = zeilen(wd.schule).map(ohneSchlusspunkt).join("\n");
+  if (themen) schule.unshift({ kopf: "", text: themen });
 
   return { betrieb: betrieb, unterweisung: unterweisung, schule: schule, summe: summe };
 }
@@ -306,8 +309,8 @@ var TAEGLICH_SPALTE = "Ausgeführte Arbeiten, Unterweisungen, Berufsschulunterri
 
 /**
  * Die Zeilen einer Woche für die tägliche Notierung, gemeinsam für Word und Druck:
- * Montag bis Freitag immer, Samstag und Sonntag nur mit Eintrag, zuletzt die Unterweisungen der
- * Woche. Ein Eintrag ist { kopf: { tag, datum, art, woche }, text }.
+ * Montag bis Freitag immer, Samstag und Sonntag nur mit Eintrag, zuletzt die Themen einer
+ * Blockwoche und die Unterweisungen der Woche. Ein Eintrag ist { kopf: { tag, datum, art, woche }, text }.
  * Die Art steht über dem Text, außer bei einem gewöhnlichen Arbeitstag.
  */
 function tagesZeilen(montag) {
@@ -315,7 +318,8 @@ function tagesZeilen(montag) {
   for (var i = 0; i < TAGE_JE_WOCHE; i++) {
     var datum = plus(montag, i), t = tage[iso(datum)];
     var text = t ? zeilen(t.text).map(ohneSchlusspunkt).join("\n") : "";
-    var art = (t && t.art) || "";
+    // Ein Tag unter den Themen der Woche ist Berufsschule, auch ohne eigenen Eintrag.
+    var art = (t && t.art) || (tagImWochenfeld(iso(datum)) ? "Berufsschule" : "");
     if (i > 4 && !text && !art) continue;
     out.push({
       kopf: { tag: WOCHENTAGE[datum.getDay()], datum: dm(datum), art: art },
@@ -323,6 +327,9 @@ function tagesZeilen(montag) {
     });
   }
   var wd = wochendaten[iso(montag)] || {};
+  // Wer nach einer Blockwoche auf die tägliche Notierung umstellt, verliert die Themen nicht.
+  var themen = zeilen(wd.schule).map(ohneSchlusspunkt).join("\n");
+  if (themen) out.push({ kopf: { tag: "Berufsschule", datum: "", art: "", woche: true }, text: themen });
   var eigene = zeilen(wd.unterweisungen).map(ohneSchlusspunkt).join("\n");
   if (eigene) out.push({ kopf: { tag: "Unterweisungen", datum: "", art: "", woche: true }, text: eigene });
   return out;

@@ -159,6 +159,12 @@ async function warteAuf(pruefung, was, versuche = 50) {
       (await wocheImKonto('2026-08-31')).unterweisungen === 'Erste Hilfe', JSON.stringify(await wocheImKonto('2026-08-31')));
     pruefe('… und keine unveränderten Stammdaten',
       (await api(AZUBI, 'abgleich', {})).daten.stamm.geaendert === stammVorher);
+    // Blockwoche: Die Themen der Woche gehen ins Konto wie Abteilung und Unterweisungen.
+    await ruhig(azubi);
+    await azubi.p.evaluate(() => window.__wocheSetzen('2026-09-14', { schule: 'LF5: Subnetting und VLANs', schuleGeprueft: true }));
+    await warteAuf(async () => (await wocheImKonto('2026-09-14')).schule === 'LF5: Subnetting und VLANs', 'Themen der Blockwoche im Konto');
+    pruefe('Themen einer Blockwoche liegen samt „übernommen“ im Konto',
+      (await wocheImKonto('2026-09-14')).schuleGeprueft === true, JSON.stringify(await wocheImKonto('2026-09-14')));
     pruefe('Keine JavaScript-Fehler auf beiden Geräten',
       azubi.fehler.length === 0 && zweitesGeraet.fehler.length === 0, azubi.fehler.concat(zweitesGeraet.fehler).join(' | '));
 
@@ -297,6 +303,17 @@ async function warteAuf(pruefung, was, versuche = 50) {
       abteilungBlock.includes('IT-Betrieb') && !abteilungBlock.includes('nicht angegeben'), abteilungBlock);
     pruefe('Daneben der Stand je Tag: übernommen bzw. kein Eintrag',
       woche.includes('übernommen') && woche.includes('kein Eintrag'), woche.slice(0, 300));
+
+    // Die Blockwoche danach: keine Tageseinträge, nur die Themen der Woche.
+    await ausbilder.p.click('#a-vor');
+    await warteAuf(async () => (await ausbilder.p.locator('#a-inhalt').innerText()).includes('Blockwoche'), 'Blockwoche beim Ausbilder');
+    const blockwoche = await ausbilder.p.locator('#a-inhalt').innerText();
+    pruefe('Ausbilder sieht die Blockwoche: Tage übernommen, Themen im Blatt',
+      blockwoche.includes('Blockwoche, übernommen') && blockwoche.includes('LF5: Subnetting und VLANs') &&
+      !blockwoche.includes('kein Eintrag'), blockwoche.slice(0, 400));
+    await ausbilder.p.click('#a-zurueck');
+    await warteAuf(async () => (await ausbilder.p.locator('#a-wochenlabel').innerText()).includes('7.–13. Sep'), 'Zurück zur Woche ab 7.9.');
+    await ausbilder.p.waitForSelector('.vorschaubuehne .bogen');
 
     // Das Monatsraster am Wochenknopf: eine Zeile je Woche mit den Tagen dieses Azubis.
     await ausbilder.p.click('#a-wochenlabel');

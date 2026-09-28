@@ -308,7 +308,9 @@ In der Kopfleiste steht, wo die Einträge liegen: **im Konto gesichert** oder **
 - Je Azubi, wie viele Wochen zum Gegenlesen offen oder unvollständig sind und
   wann zuletzt etwas geschrieben wurde. Es gelten dieselben Regeln wie im Heft des Azubis:
   Urlaub, Krank und Feiertag sind frei; Berufsschule und Betriebsversammlung brauchen Text wie
-  ein Arbeitstag; ein Werktag ohne Text fehlt, auch wenn sein Text geleert wurde.
+  ein Arbeitstag; ein Werktag ohne Text fehlt, auch wenn sein Text geleert wurde. Hat eine Woche
+  Themen für die Berufsschule (Blockwoche), zählt jeder Werktag ohne eigenen Text, der nicht frei
+  ist, mit deren Stand; links steht dann „Blockwoche, übernommen“.
 
 - In der Mitte das Wochenblatt aus demselben Drucksatz wie Word und PDF, links der Stand je Tag, rechts
   die Angaben der Woche und eine Karte „Wochenblatt“ mit Umfang und Herunterladen.
@@ -331,7 +333,7 @@ mitkamen. Ältere Sicherungen der Datenbank enthalten sie weiterhin.
 | `betreuung` | Ausbilder, Azubi | wer wen sieht |
 | `stammdaten` | Person | Felder des Vordrucks als JSON |
 | `tage` | Person, Datum | Text, Art, Stunden, geprüft, `geaendert` (Gerät), `eingegangen` (Server) |
-| `wochen` | Person, Montag | Abteilung, Unterweisungen, `geaendert`, `eingegangen` |
+| `wochen` | Person, Montag | Abteilung, Unterweisungen, Themen einer Blockwoche (`schule`, `schule_geprueft`), `geaendert`, `eingegangen` |
 
 ## Schnittstelle
 
@@ -422,7 +424,7 @@ docker exec ollama ollama pull qwen3.5:4b
 | Datei | Prüft |
 | --- | --- |
 | `server/test/anmeldung.js` | Token, Signatur, nonce, Rollen, Cookie gegen einen nachgebauten Anbieter |
-| `server/test/server.js` | Schnittstelle, Abgleich, Rechte, Wochenstände (auch Feiertage je Bundesland und Berufsschule), Konto-IDs mit `@` und `+`, Aufräumen beim Start gegen Postgres |
+| `server/test/server.js` | Schnittstelle, Abgleich, Rechte, Wochenstände (auch Feiertage je Bundesland, Berufsschule und Blockwochen; ein älterer Browser ohne `schule` leert die Themen nicht), Konto-IDs mit `@` und `+`, Aufräumen beim Start gegen Postgres |
 | `test/konto.js` | Browser mit nachgestellter Anmeldung: Abgleich, zweites Gerät (auch Wochenangaben und Neuladen), Ausbilder-Ansicht |
 | `test/betrieb.js` | Stapel aus `docker-compose.server.yml` mit Keycloak, Anmeldung über die echte Seite |
 

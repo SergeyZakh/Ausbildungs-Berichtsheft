@@ -922,22 +922,32 @@ const NAME = 'Mustermann, Max';
       ['Feiertag ohne Eintrag (NRW)', 'NW', FERTIG, null],
       ['Feiertag geleert (NRW)', 'NW', FERTIG, LEER],
       ['Fronleichnam ohne Eintrag in Berlin', 'BE', FERTIG, null],
+      // Blockwoche: Die Themen der Woche decken jeden Werktag ohne eigenen Text, der nicht frei ist.
+      ['Blockwoche übernommen, Tag ohne Eintrag', 'NW', null, null, { schule: 'LF5: Subnetting', schuleGeprueft: true }],
+      ['Blockwoche nicht übernommen', '', null, { ...LEER, art: 'Berufsschule' }, { schule: 'LF5: Subnetting', schuleGeprueft: false }],
+      ['Blockwoche mit krankem Tag', '', { ...LEER, art: 'Krank' }, null, { schule: 'LF5: Subnetting', schuleGeprueft: true }],
+      ['Blockwoche, geleerter Werktag', '', LEER, FERTIG, { schule: 'LF5: Subnetting', schuleGeprueft: true }],
+      ['Themen nur aus Leerzeichen', '', null, FERTIG, { schule: '  ', schuleGeprueft: true }],
     ];
     const IM_HEFT = { fertig: 'fertig', pruefen: 'offen', '': 'fehlt' };
     const abweichend = [];
-    for (const [name, land, mittwoch, donnerstag] of faelle) {
+    for (const [name, land, mittwoch, donnerstag, themen] of faelle) {
       const eintraege = { [WOCHE[0]]: FERTIG, [WOCHE[1]]: FERTIG, [WOCHE[4]]: FERTIG };
       if (mittwoch) eintraege[WOCHE[2]] = mittwoch;
       if (donnerstag) eintraege[WOCHE[3]] = donnerstag;
-      const heft = await seite.evaluate(([liste, bundesland, montag]) => {
+      const heft = await seite.evaluate(([liste, bundesland, montag, woche]) => {
         document.getElementById('f-land').value = bundesland;
         const tage = window.__tage();
         Object.keys(tage).forEach((k) => { delete tage[k]; });
         Object.entries(liste).forEach(([datum, t]) => { tage[datum] = { ...t, pausen: [], posten: [] }; });
+        const wochendaten = window.__wochendaten();
+        if (woche) wochendaten[montag] = { abteilung: '', unterweisungen: '', ...woche };
+        else delete wochendaten[montag];
         return window.__wochenStand(montag);
-      }, [eintraege, land, WOCHE[0]]);
+      }, [eintraege, land, WOCHE[0], themen || null]);
       const server = wochenUebersicht(WOCHE[0], WOCHE[4],
-        Object.entries(eintraege).map(([datum, t]) => ({ datum, ...t })), land)[0].stand;
+        Object.entries(eintraege).map(([datum, t]) => ({ datum, ...t })), land,
+        themen ? [{ montag: WOCHE[0], ...themen }] : [])[0].stand;
       if (IM_HEFT[heft] !== server) abweichend.push(`${name}: Heft ${heft || '(leer)'}, Ausbilder ${server}`);
     }
     pruefe('Heft und Ausbilder sehen jede Woche gleich (' + faelle.length + ' Fälle)',

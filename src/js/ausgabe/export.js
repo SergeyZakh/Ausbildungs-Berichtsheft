@@ -67,6 +67,8 @@ function exportBefunde(montage) {
       var n = zeilenBedarf(t.text);
       if (n > stichpunkteJeTag()) eng.push(wann + " — " + n + " statt " + stichpunkteJeTag() + " Zeilen");
     }
+    var block = wochenSchule(iso(montag));
+    if (block && !block.schuleGeprueft) offen.push("Blockwoche " + kurzSpanne(montag) + " — Themen nicht übernommen");
   });
   // Ohne Ausbildungsbeginn und ohne Lehrjahr stünde im Kopf nur "2 /".
   var s = stammdaten();

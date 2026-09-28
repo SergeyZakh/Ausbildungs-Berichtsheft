@@ -106,7 +106,8 @@ async function standLesen(personId, von, bis, seit) {
     [personId, von, bis, grenze]
   );
   const wochen = await pool.query(
-    `SELECT to_char(montag, 'YYYY-MM-DD') AS montag, abteilung, unterweisungen, geaendert
+    `SELECT to_char(montag, 'YYYY-MM-DD') AS montag, abteilung, unterweisungen,
+            schule, schule_geprueft AS "schuleGeprueft", geaendert
        FROM wochen WHERE person_id = $1 AND montag BETWEEN $2 AND $3 AND eingegangen > $4 ORDER BY montag`,
     [personId, von, bis, grenze]
   );
@@ -145,14 +146,20 @@ async function standSchreiben(personId, daten) {
     }
     for (const woche of wochen) {
       pruefeDatum(woche.montag, 'montag');
+      // Ein Browser von vor den Blockwochen schickt kein „schule“ mit. Er soll die Themen, die ein
+      // anderes Gerät geschrieben hat, dann nicht leeren: null heißt „unverändert lassen“.
+      const mitSchule = woche.schule !== undefined;
       await verbindung.query(
-        `INSERT INTO wochen (person_id, montag, abteilung, unterweisungen, geaendert)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO wochen (person_id, montag, abteilung, unterweisungen, schule, schule_geprueft, geaendert)
+         VALUES ($1, $2, $3, $4, COALESCE($5::text, ''), COALESCE($6::boolean, false), $7)
          ON CONFLICT (person_id, montag) DO UPDATE
            SET abteilung = EXCLUDED.abteilung, unterweisungen = EXCLUDED.unterweisungen,
+               schule = COALESCE($5::text, wochen.schule), schule_geprueft = COALESCE($6::boolean, wochen.schule_geprueft),
                geaendert = EXCLUDED.geaendert, eingegangen = now()
          WHERE wochen.geaendert < EXCLUDED.geaendert`,
-        [personId, woche.montag, String(woche.abteilung || ''), String(woche.unterweisungen || ''), zeitstempel(woche.geaendert)]
+        [personId, woche.montag, String(woche.abteilung || ''), String(woche.unterweisungen || ''),
+          mitSchule ? String(woche.schule || '') : null, mitSchule ? Boolean(woche.schuleGeprueft) : null,
+          zeitstempel(woche.geaendert)]
       );
     }
     if (daten.stamm && typeof daten.stamm.daten === 'object' && daten.stamm.daten) {
@@ -284,8 +291,9 @@ async function beantworten(person, methode, pfad, suche, koerper) {
         continue;
       }
       const [von, bis] = zeiten;
-      const { tage, stamm } = await standLesen(azubi.id, von, bis, null);
-      const wochen = wochenUebersicht(von, bis, tage, stamm?.daten?.land);
+      const stand = await standLesen(azubi.id, von, bis, null);
+      const { tage } = stand;
+      const wochen = wochenUebersicht(von, bis, tage, stand.stamm?.daten?.land, stand.wochen);
       // Wann zuletzt etwas eingetragen wurde: zeigt, wer seit Wochen nichts mehr schreibt.
       const beschrieben = tage.filter((t) => String(t.text || '').trim() || t.art);
       ergebnis.push({
@@ -317,7 +325,7 @@ async function beantworten(person, methode, pfad, suche, koerper) {
     const heute = new Date().toISOString().slice(0, 10);
     const lesenBis = !suche.get('bis') && bis === heute ? plusTage(montag(heute), 6) : bis;
     const stand = await standLesen(azubiId, von, lesenBis, null);
-    return { ...stand, von, bis, wochenstand: wochenUebersicht(von, bis, stand.tage, stand.stamm?.daten?.land) };
+    return { ...stand, von, bis, wochenstand: wochenUebersicht(von, bis, stand.tage, stand.stamm?.daten?.land, stand.wochen) };
   }
 
   throw new Fehler(404, 'Unbekannter Weg');
