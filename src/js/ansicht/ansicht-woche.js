@@ -65,7 +65,7 @@ function zeichneWochenliste() {
   if (!wochen.length) {
     var leer = document.createElement("p");
     leer.className = "leerzeile";
-    leer.textContent = "Noch kein Export geladen.";
+    leer.textContent = "Noch keine Woche mit Einträgen.";
     liste.appendChild(leer);
   }
 }

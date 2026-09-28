@@ -170,6 +170,18 @@
   .wochenliste .wtag b { width: 21px; height: 21px; font-size: 10.5px; }
   .onb-karte { width: calc(100vw - 24px); }
 
+  /* Die Einrichtung füllt am Handy den Bildschirm: Sie ist das Erste, was man sieht. */
+  #dlg-einrichtung {
+    width: 100%; max-width: none; height: 100dvh; max-height: 100dvh; min-height: 0;
+    margin: 0; border: 0; border-radius: 0;
+  }
+  .er-kopf { padding: 14px 16px 0; }
+  .er-leib { padding: 18px 16px 8px; }
+  .er-fuss { padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); }
+  .er-schritt h2 { font-size: 21px; }
+  .er-karten { grid-template-columns: 1fr; }
+  .er-wahl .knopf { flex: 1 1 100%; }
+
   /* Die Reiter im Datendialog brechen um, statt seitlich zu scrollen. */
   #dlg-stamm { width: calc(100% - 20px); height: auto; max-height: calc(100vh - 20px); }
   #dlg-stamm .dkopf { flex: none; }
@@ -180,7 +192,7 @@
 
 /* Dieselbe Bedingung wie amHandy in start.js: Der Rundgang zeigt auf Stellen im breiten Fenster. */
 @media (pointer: coarse) and (max-width: 820px) {
-  #btn-hilfe { display: none; }
+  #btn-hilfe, #trenner-hilfe { display: none; }
 }
 
 /* Ganz schmal (320 px) passen neben vier Knöpfe nur Ring und Anteil; die Stunden stehen im Tageskopf.

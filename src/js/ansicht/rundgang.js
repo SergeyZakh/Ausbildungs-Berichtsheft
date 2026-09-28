@@ -14,9 +14,9 @@ var RUNDGANG = [
     text: "Du lädst den Export deiner Zeiterfassung, schreibst die Tage fertig und bekommst " +
           "die Wochenblätter im IHK-Vordruck. Alles bleibt in diesem Browser." },
   { ziel: [".leerbild", "#btn-mehr"],
-    titel: "Export laden",
-    text: "Zieh die CSV aus Clockify, Harvest, Jira, Kimai, Toggl oder Excel einfach ins Fenster. " +
-          "Aus jeder Buchung wird eine Zeile, die du dann überarbeitest. Ohne Export schreibst du die Tage selbst." },
+    titel: "Zeiterfassung laden",
+    text: "Zieh die CSV aus Clockify, Harvest, Jira, Kimai, Toggl oder Excel einfach ins Fenster, oder " +
+          "wähle sie im Menü ⋯. Aus jeder Buchung wird eine Zeile, die du dann überarbeitest." },
   { ziel: [".wochenbalken"],
     titel: "Woche wählen",
     text: "Mit den Pfeilen blätterst du durch jede Kalenderwoche, ein Klick auf " +

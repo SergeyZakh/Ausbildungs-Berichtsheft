@@ -15,17 +15,44 @@ const ziel = (name) => path.join(__dirname, name);
 
 (async () => {
   const browser = await h.starteBrowser();
+
+  // Die Einrichtung beim ersten Start, im zweiten Schritt mit ausgedachten Angaben.
+  const erst = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+  await h.oeffnen(erst);
+  await erst.waitForSelector('#dlg-einrichtung[open]');
+  await erst.click('#er-weiter');
+  await erst.fill('#w-name', 'Muster, Max');
+  await erst.fill('#w-beruf', 'Fachinformatiker/in – Systemintegration');
+  await erst.fill('#w-betrieb', 'Beispiel IT GmbH');
+  await erst.evaluate(() => document.activeElement && document.activeElement.blur());
+  await h.markieren(erst, [
+    ['#er-punkte', 1, 'danach'],                                    // wie weit es noch ist
+    ['.er-schritt[data-schritt="du"] .felder', 2, 'rechts'],        // die Angaben dieses Schritts
+    ['#er-weiter', 3, 'davor'],                                     // weiter
+  ]);
+  await erst.screenshot({ path: ziel('einrichtung.png') });
+  await erst.close();
+
+  // Das Startbild nach der Einrichtung: Die Angaben stehen schon da.
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
   await h.ohneRundgang(page);
   await h.oeffnen(page);
+  await page.evaluate((s) => localStorage.setItem(s, JSON.stringify({ stamm: {
+    name: 'Muster, Max', beruf: 'Fachinformatiker/in', betrieb: 'Beispiel IT GmbH',
+    beginn: '2025-08-01', ende: '2028-07-31' } })), h.SPEICHER);
+  await page.reload();
   await page.waitForTimeout(500);
   await h.markieren(page, [
-    ['.leerbild .knopf.voll', 1, 'darunter'],          // Export laden
-    ['#btn-beispiel', 2, 'darunter'],                  // Beispiel ansehen
-    ['.leerbild .knopf:last-of-type', 3, 'darunter'],  // Ohne Export starten
-    ['#btn-mehr', 4, 'darunter'],          // Weitere Aktionen: Sicherung, Deine Daten
+    ['.leerbild .knopf.voll', 1, 'davor'],          // Zeiterfassung laden
+    ['.leerbild .knopf:not(.voll)', 2, 'danach'],    // Selbst schreiben
+    ['#btn-beispiel', 3, 'darunter'],                  // Beispiel ansehen
+    ['#btn-mehr', 4, 'darunter'],          // Menü: Deine Daten, Übersicht, Sicherung, Rundgang
   ]);
   await page.screenshot({ path: ziel('start.png') });
+  // Für die weiteren Bilder wie bisher ohne gespeicherten Stand.
+  await page.evaluate((s) => localStorage.removeItem(s), h.SPEICHER);
+  await page.reload();
+  await page.waitForTimeout(500);
 
   await h.markieren(page, []);
   await page.click('#btn-beispiel');

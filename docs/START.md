@@ -29,36 +29,41 @@ Programmierung oder Servern zu beschäftigen. Die technische Dokumentation steht
 <br>
 
 **Ausprobieren ohne Download?** Die [Demo](https://SergeyZakh.github.io/Ausbildungs-Berichtsheft/) öffnen und
-**Beispiel ansehen** klicken.
+in der Einrichtung **erst das Beispiel ansehen** klicken.
 
 ### Schritt für Schritt
 
-![Startbild: so sieht das Werkzeug nach dem Öffnen aus](bilder/start.png)
+![Einrichtung beim ersten Öffnen: Name, Beruf und Betrieb](bilder/einrichtung.png)
 
-Im Startbild: **1** Export laden (Schritt 3), **2** Beispiel ansehen – zwei ausgedachte Wochen
-zum Ausprobieren, jederzeit wieder löschbar, **3** ohne Export starten und die Tage selbst
-schreiben, **4** das Menü **⋯** mit „Deine Daten“, Sicherung speichern und laden, Rundgang und
-der Konfiguration für die lokale KI.
+Beim ersten Öffnen kommt die **Einrichtung**: **1** wie weit es noch ist, **2** die Angaben dieses
+Schritts, **3** weiter zum nächsten. Mit **Später** geht es ohne Angaben weiter.
+
+![Startbild nach der Einrichtung](bilder/start.png)
+
+Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohne Zeiterfassung,
+**3** Beispiel ansehen – zwei ausgedachte Wochen zum Ausprobieren, jederzeit wieder löschbar,
+**4** das Menü **⋯** mit „Deine Daten“, der Übersicht, Sicherung speichern und laden und dem Rundgang.
 
 1. **Datei herunterladen.** Auf der [Releases-Seite](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/latest)
    unter „Assets“ auf `Berichtsheft.html` klicken. Die Datei an einem festen Ort speichern,
    zum Beispiel in *Dokumente*. Doppelklick öffnet sie im Browser. Eine Internetverbindung
    wird nicht benötigt.
 
-2. **Zeiten exportieren.** In deiner Zeiterfassung die Zeiten der gewünschten Wochen als CSV
+2. **Einrichten.** Beim ersten Öffnen fragt die Einrichtung in wenigen Schritten, was auf jedem
+   Wochenblatt steht: Name, Ausbildungsberuf, Betrieb, Vertragslaufzeit, das Bundesland für die
+   Feiertage, deine Berufsschule mit festen Schultagen und Blockunterricht (im Kalender: ersten Tag
+   antippen, dann den letzten) und den Vordruck, wöchentlich oder täglich. Leere Tage an Schultagen
+   stehen dann schon auf „Berufsschule“. Ändern lässt sich alles unter **⋯ → Deine Daten**,
+   Schulferien stehen dort unter **Schule**.
+
+3. **Zeiten exportieren.** In deiner Zeiterfassung die Zeiten der gewünschten Wochen als CSV
    exportieren. Wo das Menü liegt, steht im README unter
    [Unterstützte Exporte](../README.md#unterstützte-exporte). Ohne Zeiterfassung überspringst du
-   diesen Schritt und klickst **Ohne Export starten**.
+   diesen Schritt und klickst **Selbst schreiben**.
 
-3. **Export laden.** Auf **Export laden** klicken und die CSV-Datei wählen, oder die Datei einfach
-   ins Browserfenster ziehen. Erkennt das Werkzeug die Spalten nicht sicher, fragt es nach. Jede
-   Spalte einmal zuordnen, beim nächsten Mal weiß es Bescheid.
-
-4. **Deine Daten eintragen.** Oben rechts auf **⋯ → Deine Daten**: Name, Ausbildungsberuf,
-   Betrieb, Vertragslaufzeit und das Bundesland für die automatische Erfassung der Feiertage.
-   Unter **Schule** wählst du deine festen Schultage; Blockunterricht und Schulferien wählst du
-   dort im Kalender (ersten Tag antippen, dann den letzten). Leere Tage an diesen Tagen stehen dann schon auf „Berufsschule“, in den Ferien nicht.
-   Verlangt deine IHK die tägliche Notierung, stellst du unter **Verarbeitung → Vordruck** um.
+4. **Zeiterfassung laden.** Auf **Zeiterfassung laden (CSV)** klicken und die Datei wählen, oder
+   sie einfach ins Browserfenster ziehen. Erkennt das Werkzeug die Spalten nicht sicher, fragt es
+   nach. Jede Spalte einmal zuordnen, beim nächsten Mal weiß es Bescheid.
 
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere
    ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig; was die Zeichen in den
@@ -66,8 +71,9 @@ der Konfiguration für die lokale KI.
    Abteilung und Unterweisungen ein. Was über alle Wochen noch fehlt, zeigt **⋯ → Übersicht aller
    Wochen**.
 
-6. **Exportieren.** Auf **Exportieren** und dann **Wochenblatt als Word** oder
-   **Wochenblatt als PDF drucken**. Für alle Wochen auf einmal → **Gesamtheft als Word**.
+6. **Exportieren.** Auf **Exportieren**, dann unter **Diese Woche** „Als Word-Datei“ oder „Als PDF
+   drucken“. Für alle Wochen auf einmal dasselbe unter **Ganzes Heft mit Deckblatt**; was nur das
+   Deckblatt braucht (Geburtsdatum, Anschrift …), steht unter **⋯ → Deine Daten → Deckblatt**.
 
 7. **Sichern.** Deine Einträge liegen nur in diesem Browser. Werden die Browserdaten gelöscht,
    ist das Heft weg. Deshalb regelmäßig **⋯ → Sicherung speichern** und die Datei aufheben; nach
@@ -107,7 +113,7 @@ Webseite den Zugriff erlaubt, und davon raten wir ab. Mit KI öffnest du das Ber
    npm start          # http://localhost:8080, beenden mit Strg + C
    ```
 
-4. **Im Berichtsheft nachsehen:** **⋯ → Deine Daten → Sprachmodell** öffnen. Adresse und Modell
+4. **Im Berichtsheft nachsehen:** **⋯ → Deine Daten → KI** öffnen. Adresse und Modell
    trägt das Werkzeug selbst ein, sobald es Ollama findet. Bleiben die Felder leer, als Adresse
    `http://localhost:11434` eintippen. **Verbindung prüfen** muss grün werden.
 
@@ -162,7 +168,7 @@ eine Lizenz. Die genauen Grenzen stehen auf der Docker-Seite.
    `http://<Name-oder-IP-dieses-Rechners>:8080`. Die IP zeigt PowerShell mit `ipconfig`
    (Zeile „IPv4-Adresse“). Beim ersten Zugriff fragt die Windows-Firewall eventuell nach;
    „Private Netzwerke“ erlauben.
-8. **KI prüfen.** Jeder Nutzer einmal **⋯ → Deine Daten → Sprachmodell** öffnen: Adresse (`/ki`)
+8. **KI prüfen.** Jeder Nutzer einmal **⋯ → Deine Daten → KI** öffnen: Adresse (`/ki`)
    und Modell stehen dann schon da. Sonst `/ki` eintragen und **Verbindung prüfen** klicken.
 
 Danach geht es weiter wie in Weg 1 ab Schritt 2.

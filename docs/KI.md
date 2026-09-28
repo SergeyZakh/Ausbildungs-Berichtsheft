@@ -89,7 +89,7 @@ oder den Container (Teil B) nehmen.
 
 ### A4. Im Werkzeug eintragen
 
-**⋯ → Deine Daten → Sprachmodell**. Ist das Adressfeld leer, sucht das Werkzeug beim Öffnen
+**⋯ → Deine Daten → KI**. Ist das Adressfeld leer, sucht das Werkzeug beim Öffnen
 selbst: erst `/ki`, dann `http://localhost:11434`. Antwortet eines davon, stehen Adresse und die
 installierten Modelle sofort da. Von Hand geht es weiterhin:
 
@@ -108,7 +108,7 @@ den festen Regeln dazu und ersetzen sie nicht.
 
 ### A5. Ausprobieren
 
-Export laden, einen vollen Tag wählen, **Mit KI kürzen**. Der erste Aufruf dauert
+Zeiterfassung laden, einen vollen Tag wählen, **Mit KI kürzen**. Der erste Aufruf dauert
 länger, weil das Modell geladen wird. Dann gegenlesen: Das Modell fasst zusammen,
 Nebenthemen können dabei wegfallen. Steht dort etwas, das so nicht gemacht wurde,
 von Hand korrigieren; diesen Fall fängt keine Prüfung zuverlässig.

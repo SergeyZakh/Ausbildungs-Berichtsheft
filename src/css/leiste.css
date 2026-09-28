@@ -49,6 +49,11 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
 .menue button:hover:not(:disabled) { background: var(--hauch); }
 .menue button:disabled { color: var(--blass); cursor: not-allowed; }
 .menuetrenner { height: 1px; margin: 4px 8px; background: var(--linie); }
+/* Überschrift einer Gruppe im Menü: sagt, wofür die Knöpfe darunter sind. */
+.menuetitel {
+  margin: 0; padding: 7px 11px 3px; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--schiefer);
+}
 
 /* ---------- Wochenbalken: Blättern, Wochenknopf, Summe ---------- */
 .wochenbalken { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }

@@ -200,9 +200,10 @@ zwei Beispielzeilen – dann baue ich dein Format ein.
 
 ## So wird gearbeitet 
 
-1. Zeiten als CSV exportieren und ins Fenster ziehen. Ohne Export? **Ohne Export starten**.
-2. Unter **⋯ → Deine Daten** Name, Beruf, Betrieb und Vertragslaufzeit eintragen, unter **Schule**
-   deine festen Schultage oder den Blockunterricht.
+1. Beim ersten Öffnen die **Einrichtung** durchgehen: Name, Beruf, Betrieb, Vertragslaufzeit,
+   Bundesland, Berufsschule und Vordruck. Ändern lässt sich alles unter **⋯ → Deine Daten**.
+2. Zeiten als CSV exportieren und ins Fenster ziehen oder **Zeiterfassung laden (CSV)** klicken.
+   Ohne Zeiterfassung: **Selbst schreiben**.
 3. Tag für Tag den Entwurf überarbeiten und auf **Fertig** drücken. Im Reiter **Woche** stehen **Abteilung und Unterweisungen**.
 4. **Exportieren** → Wochenblatt oder Gesamtheft, als Word oder PDF.
 
@@ -269,7 +270,7 @@ docker compose -f docker-compose.lokal.yml up -d --build   # http://localhost:80
 ```
 
 Beim ersten Start lädt der Dienst `ollama-modelle` das Modell `qwen3.5:4b` (rund 3,4 GB).
-Unter **⋯ → Deine Daten → Sprachmodell** stehen Adresse (`/ki`) und Modell dann schon da – das
+Unter **⋯ → Deine Daten → KI** stehen Adresse (`/ki`) und Modell dann schon da – das
 Werkzeug sucht sie selbst, solange das Feld leer ist.
 
 **Ohne Sprachmodell?** Nur `docker compose -f docker-compose.lokal.yml up -d --build berichtsheft`
@@ -331,7 +332,7 @@ Einrichten, Abgleich, Rechte und Sicherung → [docs/SERVER.md](docs/SERVER.md)
   bietet die Meldung den frühesten offenen Tag an.
 - **Eine Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den
   Text des Tages.
-- **Feiertage** werden bundesweit erkannt. Mit deinem Bundesland unter *Deine Daten → Verarbeitung*
+- **Feiertage** werden bundesweit erkannt. Mit deinem Bundesland unter *Deine Daten → Ausbildung*
   kommen die Feiertage des Landes dazu. Was nur in einzelnen Gemeinden gilt, etwa Mariä Himmelfahrt
   in Teilen Bayerns, trägst du als Art des Tages ein. Ein Feiertag ohne Eintrag zählt nicht als Lücke.
 - **Der Vordruck** folgt dem verbreiteten IHK-Muster „Ausbildungsnachweis – wöchentliche
