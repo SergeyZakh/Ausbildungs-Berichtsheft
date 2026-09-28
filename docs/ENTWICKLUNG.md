@@ -90,7 +90,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang, Vordruck (`vordruckSchalter()`), KI und Herunterladen |
 | `stammdaten.js` | Dialog „Deine Daten“, Verbindungsprüfung, Löschen und Verwerfen |
 | `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
-| `farbe.js` | Knopf hell/dunkel in der Kopfleiste |
+| `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
 | `rundgang.js` | Rundgänge beim ersten Start, für Azubis und für Ausbilder |
 | `hinweise.js` | Hinweis über den Reitern: Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
 | `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Kästchen pro Woche und die Tage je Art (`uebersichtDaten()`) |
@@ -189,7 +189,10 @@ die Rolle kennt.
 Gerät abweicht; sonst fehlt der Eintrag, und die Seite folgt `prefers-color-scheme`. Ein kleines
 Skript im Kopf von `index.html` setzt daraus `data-farbe` am `html`-Element, bevor etwas gezeichnet
 wird. `basis.css` führt die dunklen Farben deshalb zweimal (für das Gerät und für `data-farbe`);
-`test/hinweise.js` prüft, dass beide gleich sind.
+`test/hinweise.js` prüft, dass beide gleich sind. Beim Umschalten sind die Übergänge einzelner
+Elemente aus (Klasse `farbwechsel`): Sonst blendeten Knöpfe über 0,15 s über, während Text und Kanten
+sprangen. Darüber zieht eine View Transition die neue Farbe als Kreis vom Knopf auf; ohne diese
+Schnittstelle oder mit „Bewegung reduzieren“ wechselt die Seite in einem Schritt.
 
 ### Stand eines Tages (`tagStand()`)
 
@@ -221,8 +224,10 @@ Unter „Deine Daten → Schule“ stehen feste Schultage (Mo–Fr), Blockunterr
 Zeiträume (`schulbloeckeLesen()`: `02.03.–20.03.2026; 04.05.2026–22.05.2026`, auch ISO-Daten und ein
 einzelner Tag). In den Ferien entfallen die festen Schultage; ein Block gilt auch dort.
 Getippt werden Blöcke und Ferien nicht mehr: `zeitraum.js` zeigt sie als Marken mit ×, und „Im
-Kalender wählen“ öffnet ein Monatsraster (am Rechner zwei Monate, am Handy einer). Erster Tag, letzter
-Tag, in beliebiger Richtung; Überlappendes wird ein Zeitraum (`zeitraeumeOrdnen()`). Gespeichert wird
+Kalender wählen“ öffnet ein Monatsraster (am Rechner zwei Monate, am Handy einer). Oben stehen die
+zwei Schritte (erster Tag, letzter Tag, dazu die Werktage ohne Feiertage), ein Zeitraum ist ein helles
+Band mit dunklen Kreisen an Anfang und Ende. Erster Tag, letzter Tag, in beliebiger Richtung;
+Überlappendes wird ein Zeitraum (`zeitraeumeOrdnen()`). Gespeichert wird
 weiter der Text in `f-schulbloecke` und `f-schulferien`, den ältere Stände und das Konto kennen; was
 darin unlesbar ist, steht als rote Marke da, bis man es entfernt. `tagArt()` liefert für einen Tag die gespeicherte Art oder, wenn der Tag nichts
 Eigenes hat (keine Art, kein Text, keine Buchungen, keine Stunden, nicht `artVonHand`), laut Plan

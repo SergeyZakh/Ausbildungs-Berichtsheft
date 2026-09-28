@@ -328,6 +328,14 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       const z = getComputedStyle(document.body).backgroundColor.match(/\d+/g).map(Number);
       return (z[0] + z[1] + z[2]) / 3;
     });
+    /** Den Knopf drücken und warten, bis die Kreisblende (View Transition) durch ist. */
+    const umschalten = async (page) => {
+      const vorher = await page.getAttribute('#btn-farbe', 'aria-pressed');
+      await page.click('#btn-farbe');
+      await page.waitForFunction((v) => document.getElementById('btn-farbe').getAttribute('aria-pressed') !== v, vorher);
+      await page.waitForFunction(() => !document.documentElement.getAnimations({ subtree: true }).length &&
+        !document.documentElement.classList.contains('farbwechsel'));
+    };
 
     const ctx = await browser.newContext({ viewport: { width: 1300, height: 850 }, colorScheme: 'light' });
     const page = await ctx.newPage();
@@ -339,7 +347,7 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     pruefe('Gerät hell: Seite hell, Knopf zeigt den Mond',
       (await grundHell(page)) > 200 && (await page.locator('#btn-farbe .mond').isVisible()) &&
         (await page.getAttribute('#btn-farbe', 'aria-pressed')) === 'false');
-    await page.click('#btn-farbe');
+    await umschalten(page);
     pruefe('Ein Klick: dunkel, gemerkt, Knopf zeigt die Sonne',
       (await grundHell(page)) < 40 && (await page.locator('#btn-farbe .sonne').isVisible()) &&
         (await page.getAttribute('#btn-farbe', 'aria-pressed')) === 'true' &&
@@ -349,7 +357,7 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.waitForTimeout(600);
     pruefe('Nach dem Neuladen bleibt es dunkel', (await grundHell(page)) < 40 &&
       (await page.evaluate(() => document.documentElement.getAttribute('data-farbe'))) === 'dunkel');
-    await page.click('#btn-farbe');
+    await umschalten(page);
     pruefe('Zurück auf hell wie das Gerät: nichts mehr gemerkt',
       (await grundHell(page)) > 200 && (await page.evaluate(() =>
         localStorage.getItem('berichtsheft-farbe') === null && !document.documentElement.hasAttribute('data-farbe'))));
@@ -366,10 +374,25 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     const abweichend = Object.keys(vomGeraet).filter((n) => vomGeraet[n] !== vonHand[n]);
     pruefe('Dunkel per Knopf und dunkel vom Gerät haben dieselben Farben',
       Object.keys(vomGeraet).length > 20 && abweichend.length === 0, abweichend.join(', '));
-    await seite.click('#btn-farbe');
+    await umschalten(seite);
     pruefe('Gerät dunkel: ein Klick macht hell und merkt es',
       (await grundHell(seite)) > 200 && (await seite.evaluate(() => localStorage.getItem('berichtsheft-farbe'))) === 'hell');
     await dunkel.close();
+
+    // Mit „Bewegung reduzieren“ keine Blende: Die Farbe wechselt im selben Klick, ohne Animation.
+    const ruhig = await browser.newContext({ viewport: { width: 1300, height: 850 }, reducedMotion: 'reduce' });
+    const still = await ruhig.newPage();
+    await h.ohneRundgang(still);
+    await h.oeffnen(still);
+    await still.waitForTimeout(600);
+    const sofort = await still.evaluate(() => {
+      document.getElementById('btn-farbe').click();
+      return { farbe: document.documentElement.getAttribute('data-farbe'),
+        animationen: document.documentElement.getAnimations({ subtree: true }).length };
+    });
+    pruefe('Bewegung reduziert: Wechsel sofort, ohne Blende', sofort.farbe === 'dunkel' && sofort.animationen === 0,
+      JSON.stringify(sofort));
+    await ruhig.close();
   }
 
   /* ---------- Am Handy: kurze Überschrift, Meldung wird leise ---------- */

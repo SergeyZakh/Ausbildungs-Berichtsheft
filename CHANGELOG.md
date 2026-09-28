@@ -36,6 +36,11 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 - **Dependabot** schlägt keine neue Hauptversion von Postgres mehr vor: postgres:18 startet nicht auf
   den Daten von 17. Wie der Wechsel von Hand geht, steht in docs/SERVER.md unter „Update“.
+- **Hell/dunkel wechselt weich:** Die neue Farbe breitet sich als Kreis vom Knopf aus, statt dass
+  die Seite stückweise umspringt. Mit „Bewegung reduzieren“ wechselt sie ohne Animation.
+- **Kalender für Blockunterricht und Ferien** übersichtlicher: oben die Schritte „Erster Tag“ und
+  „Letzter Tag“ mit den Werktagen, Zeiträume als helles Band mit dunklen Enden, Legende, Punkt an
+  Feiertagen, × zum Neubeginnen, „Fertig“ unten; die Marken nennen ihre Werktage.
 - **Kopfleiste am Handy:** Die Wochensumme füllt die Zeile bis zu den Knöpfen und sagt „0/5 fertig“;
   bei 320 px bleibt die Leiste zweizeilig.
 - **Ohne Woche** stehen nur Name, Menü und die Startkarte in der Mitte da; die Startkarte bietet

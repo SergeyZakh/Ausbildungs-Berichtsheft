@@ -21,6 +21,11 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
 .farbknopf { width: 34px; height: 34px; color: var(--text); }
 .farbknopf svg { width: 16px; height: 16px; }
 .farbknopf .sonne { display: none; }
+/* Beim Wechsel keine Übergänge einzelner Elemente (farbeOhneUebergaenge() in farbe.js), und die
+   Kreisblende statt der eingebauten Überblendung: Beide Bilder liegen fest übereinander, nur das
+   neue wird vom Knopf aus aufgezogen. */
+.farbwechsel *, .farbwechsel *::before, .farbwechsel *::after { transition: none !important; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 :root[data-farbe="dunkel"] .farbknopf .mond { display: none; }
 :root[data-farbe="dunkel"] .farbknopf .sonne { display: block; }
 @media (prefers-color-scheme: dark) {
