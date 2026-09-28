@@ -34,6 +34,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ### Geändert
 
+- **Dependabot** schlägt keine neue Hauptversion von Postgres mehr vor: postgres:18 startet nicht auf
+  den Daten von 17. Wie der Wechsel von Hand geht, steht in docs/SERVER.md unter „Update“.
 - **Kopfleiste am Handy:** Die Wochensumme füllt die Zeile bis zu den Knöpfen und sagt „0/5 fertig“;
   bei 320 px bleibt die Leiste zweizeilig.
 - **Ohne Woche** stehen nur Name, Menü und die Startkarte in der Mitte da; die Startkarte bietet

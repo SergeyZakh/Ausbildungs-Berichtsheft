@@ -385,6 +385,12 @@ hin**, etwa über die Sicherung des Rechners oder ein nächtliches `rsync` des V
 
 3. Neu laden genügt im Browser; die Einträge liegen im Konto und im Browser.
 
+Die Datenbank bleibt auf Postgres 17. Eine neue Hauptversion liest die Daten der alten nicht und
+startet auf dem bestehenden Volume nicht. Der Wechsel geht nur über eine Sicherung: sichern, Stapel
+anhalten, Volume der Datenbank entfernen, Image-Version in `docker-compose.server.yml` erhöhen,
+starten und die Sicherung einspielen. Dependabot schlägt ihn deshalb nicht vor
+(`.github/dependabot.yml`).
+
 ## Sicherheit
 
 | | |
