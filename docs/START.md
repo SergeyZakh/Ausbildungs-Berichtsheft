@@ -56,8 +56,8 @@ der Konfiguration für die lokale KI.
 
 4. **Deine Daten eintragen.** Oben rechts auf **⋯ → Deine Daten**: Name, Ausbildungsberuf,
    Betrieb, Vertragslaufzeit und das Bundesland für die automatische Erfassung der Feiertage.
-   Unter **Schule** wählst du deine festen Schultage oder trägst Blockunterricht und Schulferien
-   ein. Leere Tage an diesen Tagen stehen dann schon auf „Berufsschule“, in den Ferien nicht.
+   Unter **Schule** wählst du deine festen Schultage; Blockunterricht und Schulferien wählst du
+   dort im Kalender (ersten Tag antippen, dann den letzten). Leere Tage an diesen Tagen stehen dann schon auf „Berufsschule“, in den Ferien nicht.
    Verlangt deine IHK die tägliche Notierung, stellst du unter **Verarbeitung → Vordruck** um.
 
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere

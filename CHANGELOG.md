@@ -15,6 +15,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   für die Unterrichtsthemen. Feiertage, Tage außerhalb der Vertragslaufzeit und Tage mit Buchungen
   oder Text ändert der Plan nicht. Das Beispiel hat donnerstags Schule.
 - **Schulferien** im Schulplan: Darin entfallen die festen Schultage, Blockunterricht gilt weiter.
+  Blöcke und Ferien wählst du im Kalender (ersten Tag antippen, dann den letzten); sie stehen als
+  Marken mit × da, Überlappendes wird zusammengelegt.
 - **Tägliche Notierung** als zweiter Vordruck der IHK: eine Zeile je Tag, ohne Stunden wie das
   wöchentliche Blatt. Umschalten neben der Wochenvorschau oder unter *Deine Daten →
   Verarbeitung*; gilt für Vorschau, Druck und Word, auch beim Ausbilder.
@@ -27,16 +29,20 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Tipp fürs iPhone:** Safari löscht Seitendaten nach sieben Tagen ohne Besuch, vom
   Home-Bildschirm aus nicht. Die Seite lässt sich dort als App ablegen, mit eigenem Symbol.
 - **Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den Text.
-- **Dunkler Modus**, wenn das Gerät ihn eingestellt hat. Die Blattvorschau bleibt weiß.
+- **Dunkler Modus**, wenn das Gerät ihn eingestellt hat oder per Knopf (Mond/Sonne) in der
+  Kopfleiste. Die Blattvorschau bleibt weiß.
 
 ### Geändert
 
+- **Dependabot** schlägt keine neue Hauptversion von Postgres mehr vor: postgres:18 startet nicht auf
+  den Daten von 17. Wie der Wechsel von Hand geht, steht in docs/SERVER.md unter „Update“.
+- **Kopfleiste am Handy:** Die Wochensumme füllt die Zeile bis zu den Knöpfen und sagt „0/5 fertig“;
+  bei 320 px bleibt die Leiste zweizeilig.
 - **Ohne Woche** stehen nur Name, Menü und die Startkarte in der Mitte da; die Startkarte bietet
   auch „Sicherung laden“ an.
 - **Der Kalender erklärt die Marken** der Reiter (E, KI, !, ✓, leerer Kreis).
 - **Am Handy** wird die Meldung unten nach acht Sekunden leise (eine Zeile, ohne Farbe), und die
   Überschrift der Unterweisungen ist kurz.
-
 - **Am Handy** stehen die Tagesreiter kompakt in einer Zeile, die Woche breit darunter; Datum, Art
   und Stunden des Tages stehen ebenfalls in einer Zeile. Das Schreibfeld beginnt deutlich weiter
   oben und bleibt mit offener Tastatur sichtbar.

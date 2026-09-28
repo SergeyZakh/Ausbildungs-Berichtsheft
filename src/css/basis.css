@@ -66,11 +66,13 @@
   --buehne:    #ECEBE6;   /* hinter der Blattvorschau */
 }
 
-/* Dunkler Modus, wenn das Gerät ihn wünscht. Das Blatt bleibt weiß (.bogen, #druck in blatt.css):
-   Es zeigt, was gedruckt wird. Grün und Rot sind heller, damit sie auf Dunkel lesbar bleiben,
-   und tragen weiter weiße Schrift. */
+/* Dunkler Modus: wenn das Gerät ihn wünscht oder der Knopf in der Kopfleiste ihn gewählt hat
+   (data-farbe am html-Element, farbe.js). Das Blatt bleibt weiß (.bogen, #druck in blatt.css): Es
+   zeigt, was gedruckt wird. Grün und Rot sind heller, damit sie auf Dunkel lesbar bleiben, und
+   tragen weiter weiße Schrift. Die Werte stehen zweimal, einmal je Weg; wer einen ändert, ändert
+   beide. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-farbe="hell"]) {
     --text:      #ECEBE7;
     --linie:     #34343B;
     --linie-fest:#4B4B53;
@@ -100,8 +102,41 @@
     --posten-grund: #18181C;
     --buehne:    #26262C;
   }
-  dialog::backdrop { background: rgba(0, 0, 0, .5); }
+  :root:not([data-farbe="hell"]) dialog::backdrop { background: rgba(0, 0, 0, .5); }
 }
+:root[data-farbe="dunkel"] {
+  --text:      #ECEBE7;
+  --linie:     #34343B;
+  --linie-fest:#4B4B53;
+  --grund:     #111114;
+  --flaeche:   #1B1B1F;
+  --band:      #24242A;
+  --schiefer:  #A3A29B;
+  --gut:       #2E9A4E;
+  --gut-hell:  #15291C;
+  --acht:      #D8463C;
+  --acht-hell: #33191A;
+  --glas:      rgba(30, 30, 35, .72);
+  --glas-kante:rgba(255, 255, 255, .08);
+  --schatten:  0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+  --schatten-hoch: 0 2px 6px rgba(0, 0, 0, .35), 0 18px 48px rgba(0, 0, 0, .5);
+  --gut-kante: #2C5A3A;  --gut-hover: #1B3524;
+  --acht-kante:#6A2C28;  --acht-hover:#442020; --acht-tief: #B8342B;
+  --gefahr-kante: #6A2C28; --gefahr-linie: #4A2422;
+  --blass:     #5F5E59;
+  --linie-leise: #2A2A30;
+  --gewaehlt-grau: #55555C;
+  --voll-hover: #D2D1CC;
+  --hauch:     rgba(255, 255, 255, .07);
+  --fokus-ring: rgba(255, 255, 255, .12);
+  --menue:     rgba(30, 30, 35, .97);
+  --popover:   rgba(30, 30, 35, .9);
+  --posten-grund: #18181C;
+  --buehne:    #26262C;
+  color-scheme: dark;
+}
+:root[data-farbe="dunkel"] dialog::backdrop { background: rgba(0, 0, 0, .5); }
+:root[data-farbe="hell"] { color-scheme: light; }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }

@@ -32,8 +32,10 @@ const { pruefe, abschluss } = h.protokoll("Einzeldatei: offline und ohne Zugriff
     !/\(0,\s*eval\)/.test(quelle) && !/\beval\s*\(\s*["'`]/.test(quelle));
   pruefe('Lizenzkopf steht in der Datei (die Schrift verlangt ihn)',
     /\/\*!\s[\s\S]{0,600}SIL Open Font License/.test(quelle) && /MIT-Lizenz/.test(quelle));
+  // Drei Skripte: die Farbe (hell/dunkel) im Kopf, die Bibliothek, das Werkzeug. Ein viertes
+  // </script hieße, dass eines davon die Zeichenfolge im Inhalt trägt und früher endet.
   pruefe('Keine Zeichenfolge, die den HTML-Parser aushebelt',
-    !quelle.includes('<!--') && (quelle.match(/<\/script/gi) || []).length === 2,
+    !quelle.includes('<!--') && (quelle.match(/<\/script/gi) || []).length === 3,
     (quelle.match(/<\/script/gi) || []).length + '× </script');
 
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });

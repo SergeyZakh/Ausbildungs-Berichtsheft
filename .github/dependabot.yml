@@ -54,6 +54,12 @@ updates:
     ignore:
       - dependency-name: "berichtsheft"
       - dependency-name: "berichtsheft-server"
+      # Eine neue Hauptversion von Postgres liest die Daten der alten nicht: postgres:18 startet auf
+      # einem Volume von 17 nicht. Der Sprung braucht Sicherung und Wiederherstellung (docs/SERVER.md,
+      # Update) und gehört von Hand gemacht. Dependabot schlug ihn in einer Gruppe mit einem kleinen
+      # Ollama-Update vor.
+      - dependency-name: "postgres"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /

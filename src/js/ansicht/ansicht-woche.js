@@ -29,8 +29,8 @@ function zeichneWochenwahl() {
   $("wochensumme").innerHTML = (anteil.von
     ? '<span class="wsanteil' + (anteil.fertig === anteil.von ? " fertig" : "") + '">' +
       ringHtml(anteil.fertig, anteil.von, anteil.fertig + " von " + anteil.von + " Tagen gegengelesen") +
-      anteil.fertig + "/" + anteil.von + "</span>"
-    : "") + "<span>" + stundenText(l.summe) + "\u2009h</span>";
+      "<span>" + anteil.fertig + "/" + anteil.von + '<span class="wswort">\u00a0fertig</span></span></span>'
+    : "") + '<span class="wsstunden">' + stundenText(l.summe) + "\u2009h</span>";
 
   // Ein offenes Raster zeigt Änderungen sofort.
   if (wochenwahlOffen()) zeichneWochenliste();

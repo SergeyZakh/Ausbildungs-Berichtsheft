@@ -2,6 +2,7 @@
 /**
  * Schulplan: Feste Schultage und Blockunterricht aus „Deine Daten → Schule“ füllen leere Tage
  * mit „Berufsschule“ vor. In den Schulferien entfallen die festen Schultage, Blöcke gelten weiter.
+ * Blöcke und Ferien werden im Kalender gewählt (erster Tag, letzter Tag) und stehen als Marken da.
  *
  * Der Plan wirkt nur auf Tage ohne eigenen Inhalt. Ein Tag mit Buchungen kann in den
  * Schulferien liegen und bleibt deshalb, wie der Import ihn liefert. Gespeichert wird die Art
@@ -20,6 +21,25 @@ const gespeichert = (page, datum) => page.evaluate(([schluessel, d]) => {
 }, [h.SPEICHER, datum]);
 
 const artAm = (page, datum) => page.evaluate((d) => window.__tagArt(d), datum);
+
+/** Im Kalender für Zeiträume zum Monat blättern, in dem `datum` liegt, und den Tag antippen. */
+async function kalenderTag(page, datum) {
+  const monat = datum.slice(0, 7);
+  for (let i = 0; i < 60; i++) {
+    const tage = await page.$$eval('#zr-raster .zr-tag', (t) => t.map((x) => x.getAttribute('data-datum')));
+    if (tage.some((d) => d.startsWith(monat))) break;
+    await page.click(tage[0] < monat ? '#zr-vor' : '#zr-zurueck');
+  }
+  await page.click('#zr-raster [data-datum="' + datum + '"]');
+}
+
+/** Einen Zeitraum im Kalender wählen: erster Tag, letzter Tag. */
+async function zeitraumWaehlen(page, von, bis) {
+  await kalenderTag(page, von);
+  await kalenderTag(page, bis);
+}
+
+const marken = (page, liste) => page.$$eval('#' + liste + ' .zchip', (m) => m.map((x) => x.firstChild.textContent));
 
 /** Einen Schultag im Dialog an- oder abwählen; der Schalter selbst ist unsichtbar. */
 async function schultagSchalten(page, kurz) {
@@ -45,19 +65,49 @@ async function schultagSchalten(page, kurz) {
   await h.stammReiter(page, '#f-schulbloecke');
   await schultagSchalten(page, 'Mi');
   await schultagSchalten(page, 'Do');
-  await page.fill('#f-schulbloecke', '11.05.–17.05.2026; 30.02.2026');
+  // Getippt wurde der Blockunterricht bis 0.1.1; so ein Stand kann Unlesbares enthalten.
+  await page.evaluate(() => {
+    const feld = document.getElementById('f-schulbloecke');
+    feld.value = '11.05.–17.05.2026; 30.02.2026';
+    feld.dispatchEvent(new Event('input', { bubbles: true }));
+  });
   const unklar = await page.locator('#schulbloecke-stand').textContent();
-  pruefe('Blockunterricht: Unlesbares wird genannt',
-    unklar.includes('Nicht erkannt: 30.02.2026') &&
-      (await page.locator('#schulbloecke-stand.fehlt').count()) === 1, unklar);
-  await page.fill('#f-schulbloecke', '11.05.–17.05.2026');
-  const erkannt = await page.locator('#schulbloecke-stand').textContent();
-  pruefe('Blockunterricht: Das Jahr des ersten Datums kommt vom zweiten',
-    erkannt === '1 Block: 11.05.2026–17.05.2026', erkannt);
-  await page.fill('#f-schulferien', '12.10.–23.10.2026; 11.05.–15.05.2026');
-  const ferien = await page.locator('#schulferien-stand').textContent();
-  pruefe('Schulferien: Zeiträume werden erkannt und genannt',
-    ferien === '2 Zeiträume: 12.10.2026–23.10.2026, 11.05.2026–15.05.2026', ferien);
+  pruefe('Blockunterricht aus altem Stand: Unlesbares steht rot als Marke',
+    (await marken(page, 'schulbloecke-liste')).join('|') === '11.05.–17.05.2026|30.02.2026' &&
+      (await page.locator('#schulbloecke-liste .zchip.unklar').count()) === 1 &&
+      unklar.includes('Nicht lesbar'), unklar);
+  await page.click('#schulbloecke-liste .zchip.unklar button');
+  pruefe('Blockunterricht: × entfernt das Unlesbare, der Block bleibt',
+    (await page.inputValue('#f-schulbloecke')) === '11.05.2026–17.05.2026' &&
+      (await page.locator('#schulbloecke-stand').isHidden()), await page.inputValue('#f-schulbloecke'));
+
+  // Schulferien im Kalender: erster Tag, letzter Tag, in beliebiger Reihenfolge der Zeiträume.
+  await page.click('#schulferien-liste .zwahl');
+  await page.waitForTimeout(200);
+  pruefe('„Im Kalender wählen“ öffnet den Kalender', await page.locator('#dlg-zeitraum').isVisible());
+  pruefe('Der Kalender zeigt am Rechner zwei Monate', (await page.locator('#zr-raster .zr-monat:visible').count()) === 2);
+  await zeitraumWaehlen(page, '2026-10-12', '2026-10-23');
+  await zeitraumWaehlen(page, '2026-05-15', '2026-05-11');
+  pruefe('Kalender: zwei Zeiträume, sortiert, auch rückwärts gewählt',
+    (await page.inputValue('#f-schulferien')) === '11.05.2026–15.05.2026; 12.10.2026–23.10.2026',
+    await page.inputValue('#f-schulferien'));
+  const band = await page.$$eval('#zr-raster .zr-tag.drin', (t) => t.map((x) => x.getAttribute('data-datum')));
+  pruefe('Kalender: Die Tage eines Zeitraums stehen als Band',
+    band.includes('2026-05-11') && band.includes('2026-05-13') && band.includes('2026-05-15') && !band.includes('2026-05-16'),
+    band.slice(0, 6).join(','));
+  pruefe('Kalender: Blockunterricht erscheint schraffiert, zur Orientierung',
+    (await page.locator('#zr-raster [data-datum="2026-05-16"].anders').count()) === 1);
+  await zeitraumWaehlen(page, '2026-10-20', '2026-10-30');
+  pruefe('Kalender: Überlappendes wird ein Zeitraum',
+    (await page.inputValue('#f-schulferien')) === '11.05.2026–15.05.2026; 12.10.2026–30.10.2026',
+    await page.inputValue('#f-schulferien'));
+  await page.click('#zr-liste .zchip:has-text("12.10.–30.10.2026") button');
+  await zeitraumWaehlen(page, '2026-10-12', '2026-10-23');
+  await page.click('#zr-fertig');
+  await page.waitForTimeout(200);
+  pruefe('Nach „Fertig“ stehen die Zeiträume als Marken im Reiter',
+    (await marken(page, 'schulferien-liste')).join('|') === '11.05.–15.05.2026|12.10.–23.10.2026',
+    (await marken(page, 'schulferien-liste')).join('|'));
   pruefe('Reiter „Schule“ passt ohne Scrollen in den Dialog', await page.evaluate(() => {
     const koerper = document.querySelector('#dlg-stamm .dkoerper');
     const leiste = document.querySelector('#dlg-stamm .blattleiste');
@@ -68,8 +118,8 @@ async function schultagSchalten(page, kurz) {
 
   const stamm = await page.evaluate((s) => JSON.parse(localStorage.getItem(s)).stamm, h.SPEICHER);
   pruefe('Schultage, Blöcke und Ferien landen in den Stammdaten',
-    stamm.schultage === 'Mi, Do' && stamm.schulbloecke === '11.05.–17.05.2026' &&
-      stamm.schulferien === '12.10.–23.10.2026; 11.05.–15.05.2026', JSON.stringify(stamm));
+    stamm.schultage === 'Mi, Do' && stamm.schulbloecke === '11.05.2026–17.05.2026' &&
+      stamm.schulferien === '11.05.2026–15.05.2026; 12.10.2026–23.10.2026', JSON.stringify(stamm));
 
   /* ---------- Welche Tage der Plan trifft ---------- */
   pruefe('Leerer Donnerstag ist Berufsschule', (await artAm(page, '2026-09-03')) === 'Berufsschule');
@@ -188,6 +238,35 @@ async function schultagSchalten(page, kurz) {
   pruefe('Beispiel: der Plan legt keine Tage an',
     (await bsp.evaluate(() => Object.keys(window.__tage()).length)) === 7);
   pruefe('Beispiel ohne JavaScript-Fehler', bspFehler.length === 0, bspFehler.join(' | '));
+
+  /* ---------- Kalender am Handy ---------- */
+  for (const breite of [390, 320]) {
+    const ctx = await browser.newContext({ viewport: { width: breite, height: 780 }, isMobile: true, hasTouch: true });
+    const handy = await ctx.newPage();
+    const handyFehler = h.fehlerSammeln(handy);
+    await h.ohneRundgang(handy);
+    await h.oeffnen(handy);
+    await handy.waitForTimeout(600);
+    await h.stammdatenOeffnen(handy);
+    await h.stammReiter(handy, '#f-schulbloecke');
+    await handy.click('#schulbloecke-liste .zwahl');
+    await handy.waitForTimeout(200);
+    const lage = await handy.evaluate(() => {
+      const d = document.getElementById('dlg-zeitraum').getBoundingClientRect();
+      const tag = document.querySelector('#zr-raster .zr-tag').getBoundingClientRect();
+      return { links: d.left, rechts: d.right, breite: innerWidth, tagHoehe: tag.height,
+        monate: [...document.querySelectorAll('#zr-raster .zr-monat')].filter((m) => m.offsetParent).length };
+    });
+    pruefe('Kalender am Handy: ein Monat, im Bildschirm, Tage groß genug zum Tippen (' + breite + ' px)',
+      lage.monate === 1 && lage.links >= 0 && lage.rechts <= lage.breite && lage.tagHoehe >= 38, JSON.stringify(lage));
+    const tage = await handy.$$eval('#zr-raster .zr-tag', (t) => t.map((x) => x.getAttribute('data-datum')));
+    await handy.click('#zr-raster [data-datum="' + tage[2] + '"]');
+    await handy.click('#zr-raster [data-datum="' + tage[4] + '"]');
+    pruefe('Kalender am Handy: Antippen trägt den Zeitraum ein (' + breite + ' px)',
+      (await handy.locator('#zr-liste .zchip').count()) === 1);
+    pruefe('Kalender am Handy ohne JavaScript-Fehler (' + breite + ' px)', handyFehler.length === 0, handyFehler.join(' | '));
+    await ctx.close();
+  }
 
   await browser.close();
   abschluss();
