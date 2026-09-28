@@ -107,7 +107,8 @@ const server = http.createServer((req, res) => {
     if (u.protocol !== 'file:' && u.protocol !== 'data:' && u.protocol !== 'blob:' &&
         !['127.0.0.1', 'localhost'].includes(u.hostname)) fremdeAnfragen.push(r.url());
   });
-  await h.oeffnen(page);
+  // Als Datei: Geprüft wird unten auch, welche Adressen das Werkzeug dann nach Ollama absucht.
+  await h.oeffnen(page, h.DATEI_SEITE);
   await page.waitForTimeout(600);
 
   const text = () => page.locator('.tagpanel textarea').inputValue();

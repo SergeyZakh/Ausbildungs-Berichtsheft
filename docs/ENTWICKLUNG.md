@@ -452,12 +452,21 @@ mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).
 
 Die Tests laufen gegen `dist/` und nutzen die Zugänge `window.__saeubern`,
 `window.__csvAnalysieren` usw. aus `start.js`. Gemeinsame Helfer stehen in
-`test/hilfen.js`. Seiten mit `file://` öffnen die Tests mit `h.oeffnen()` zweimal: `ohneRundgang()`
-schreibt schon beim Dokumentstart in den Speicher. Das ist genau der frühe Zugriff, der den
-Speicher abkoppeln kann, und `speicherNeuLaden()` sieht dann keinen leeren Speicher. Ohne das
-zweite Öffnen verlor ein Test in rund 13 % der Läufe beim nächsten Neuladen seine Daten (so wackelte
-`test/sicherung.js`). Testdaten sind ausgedacht; echte Namen, Kunden oder
-Firmendaten gehören weder in `test/` noch in `src/beispiel.csv`.
+`test/hilfen.js`.
+
+Die Tests öffnen die Seite über http: `h.starteBrowser()` startet einen kleinen Webserver für
+`dist/` auf einem freien Port, `h.oeffnen()` nimmt dessen Adresse (`h.SEITE`). Über `file://`
+verlor Chromium in CI gelegentlich, was die Seite direkt vor dem Neuladen gespeichert hatte
+(Bundesland, geladene Sicherung, untergeschobener Tag); lokal trat das nie auf. Bei `file://`
+bleiben nur Tests, die genau das prüfen, mit `h.DATEI_SEITE` bzw. `h.EINZELDATEI`: die
+Einzeldatei (`test/lokal.js`), das Neuladen bei leerem Speicher (Rundgang in `test/lauf.js`) und die
+Suche nach dem Sprachmodell (`test/ki.js`). Solche Seiten öffnet `h.oeffnen()` zweimal:
+`ohneRundgang()` schreibt schon beim Dokumentstart in den Speicher. Das ist genau der frühe Zugriff,
+der den Speicher abkoppeln kann, und `speicherNeuLaden()` sieht dann keinen leeren Speicher. Ohne
+das zweite Öffnen verlor ein Test in rund 13 % der Läufe beim nächsten Neuladen seine Daten.
+
+Testdaten sind ausgedacht; echte Namen, Kunden oder Firmendaten gehören weder in `test/` noch in
+`src/beispiel.csv`.
 
 ## Bilder im README
 
