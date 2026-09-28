@@ -86,7 +86,21 @@ async function schultagSchalten(page, kurz) {
   await page.waitForTimeout(200);
   pruefe('„Im Kalender wählen“ öffnet den Kalender', await page.locator('#dlg-zeitraum').isVisible());
   pruefe('Der Kalender zeigt am Rechner zwei Monate', (await page.locator('#zr-raster .zr-monat:visible').count()) === 2);
+  // Die Schritte oben: Nach dem ersten Tipp steht er dort, und der letzte Tag ist dran.
+  await kalenderTag(page, '2026-10-05');
+  pruefe('Kalender: Der erste Tag steht oben, der letzte ist dran',
+    (await page.locator('#zr-von').textContent()) === 'Mo, 05.10.2026' &&
+      (await page.locator('#zr-schritt-bis.aktiv').count()) === 1 &&
+      (await page.locator('#zr-raster [data-datum="2026-10-05"].start').count()) === 1);
+  await page.hover('#zr-raster [data-datum="2026-10-09"]');
+  pruefe('Kalender: Mit der Maus zeigt der letzte Tag schon die Werktage',
+    (await page.locator('#zr-tage').textContent()) === '5 Werktage' &&
+      (await page.locator('#zr-raster .zr-tag.vorschau').count()) === 5);
+  await page.click('#zr-neu');
+  pruefe('Kalender: × verwirft den angefangenen Zeitraum',
+    (await page.locator('#zr-von').textContent()) === '–' && (await page.inputValue('#f-schulferien')) === '');
   await zeitraumWaehlen(page, '2026-10-12', '2026-10-23');
+  pruefe('Kalender: Die Marke nennt die Werktage', (await page.locator('#zr-liste .zchip .zzusatz').first().textContent()) === '10 Werktage');
   await zeitraumWaehlen(page, '2026-05-15', '2026-05-11');
   pruefe('Kalender: zwei Zeiträume, sortiert, auch rückwärts gewählt',
     (await page.inputValue('#f-schulferien')) === '11.05.2026–15.05.2026; 12.10.2026–23.10.2026',

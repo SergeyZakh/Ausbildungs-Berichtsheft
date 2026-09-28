@@ -221,34 +221,96 @@
 .zchip button:hover { color: var(--text); background: var(--hauch); }
 .knopf.zwahl { border-radius: 999px; padding: 5px 13px; }
 
-#dlg-zeitraum { width: min(660px, calc(100% - 32px)); max-width: none; }
-.zr-leiste { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.zr-hilfe { flex: 1 1 auto; margin: 0; text-align: center; font-size: 12.5px; color: var(--schiefer); }
-.zr-raster { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-.zr-monatsname { margin-bottom: 6px; text-align: center; font-size: 13px; font-weight: 600; }
-.zr-tage { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 3px; }
+#dlg-zeitraum { width: min(680px, calc(100% - 32px)); max-width: none; }
+#dlg-zeitraum .dkopf h2 { margin: 0; }
+.zr-unter { margin: 2px 0 0; font-size: 12.5px; color: var(--schiefer); }
+
+/* Die zwei Schritte: umrandet ist, was als Nächstes kommt. */
+.zr-schritte { display: flex; align-items: stretch; gap: 8px; margin-bottom: 16px; }
+.zr-schritt {
+  position: relative; flex: 1 1 0; min-width: 0; padding: 7px 12px; border-radius: var(--rund-klein);
+  background: var(--band); border: 1.5px solid transparent;
+  transition: border-color .15s, background-color .15s;
+}
+.zr-schritt span { display: block; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--schiefer); }
+.zr-schritt b { display: block; font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.zr-schritt small { display: block; min-height: 16px; font-size: 11.5px; color: var(--schiefer); }
+#zr-schritt-von b { padding-right: 26px; }
+.zr-schritt.aktiv { background: var(--flaeche); border-color: var(--text); }
+.zr-pfeil { align-self: center; color: var(--schiefer); }
+.zr-neu {
+  position: absolute; top: 50%; right: 6px; width: 26px; height: 26px; margin-top: -13px; padding: 0;
+  border: 0; border-radius: 50%; font-size: 16px; line-height: 1; color: var(--schiefer); background: transparent;
+}
+.zr-neu:hover { color: var(--text); background: var(--hauch); }
+
+/* Blättern an den Monatsnamen: links vor dem ersten, rechts nach dem letzten gezeigten Monat. */
+.zr-kalender { position: relative; }
+.zr-blaettern { position: absolute; top: -5px; z-index: 1; width: 30px; height: 30px; }
+#zr-zurueck { left: 0; }
+#zr-vor { right: 0; }
+.zr-raster { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.zr-monatsname { height: 20px; margin-bottom: 8px; text-align: center; font-size: 13.5px; font-weight: 600; }
+.zr-tage { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; }
 .zr-wt {
-  padding: 2px 0 5px; text-align: center; font-size: 10px; letter-spacing: .06em;
+  padding: 2px 0 6px; text-align: center; font-size: 10px; letter-spacing: .06em;
   text-transform: uppercase; color: var(--schiefer);
 }
-/* Ein Zeitraum ist ein durchgehendes Band, rund an seinen Enden. Farbe ist die Schrift: Grün und
-   Rot bedeuten im Werkzeug „fertig“ und „sieh hin“, nicht „Schule“. */
+
+/* Ein Tag: die Zahl im Kreis, dahinter das Band des Zeitraums. Anfang und Ende sind dunkle Kreise,
+   dazwischen ein helles Band. Farbe ist nur die Schrift: Grün und Rot heißen im Werkzeug „fertig“
+   und „sieh hin“, nicht „Schule“. */
 .zr-tag {
-  height: 34px; padding: 0; font: inherit; font-size: 13px; font-variant-numeric: tabular-nums;
-  color: var(--text); background: transparent; border: 0; border-radius: 0;
+  --zr-band: color-mix(in srgb, var(--text) 11%, transparent);
+  position: relative; height: 36px; padding: 0; font: inherit; font-size: 13px;
+  font-variant-numeric: tabular-nums; color: var(--text); background: transparent; border: 0; border-radius: 0;
 }
-.zr-tag:hover { background: var(--hauch); border-radius: 999px; }
+.zr-tag > span {
+  position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 50%; transition: background-color .12s, color .12s;
+}
+.zr-tag:hover > span { background: var(--hauch); }
 .zr-tag.we, .zr-tag.ft { color: var(--schiefer); }
-.zr-tag.heute { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-/* Der andere Zeitraum (Ferien beim Blockunterricht und umgekehrt) nur schraffiert, zur Orientierung. */
+/* Feiertag: kleiner Punkt unter der Zahl. */
+.zr-tag.ft > span::after {
+  content: ""; position: absolute; bottom: 3px; left: 50%; width: 4px; height: 4px; margin-left: -2px;
+  border-radius: 50%; background: currentColor;
+}
+.zr-tag.heute > span { box-shadow: inset 0 0 0 1.5px var(--linie-fest); font-weight: 700; }
+/* Der Zeitraum der anderen Art nur schraffiert, zur Orientierung. */
 .zr-tag.anders { background: repeating-linear-gradient(135deg, var(--band) 0 4px, transparent 4px 8px); }
-.zr-tag.vorschau { background: color-mix(in srgb, var(--text) 16%, transparent); border-radius: 0; }
-.zr-tag.drin { color: var(--flaeche); background: var(--text); border-radius: 0; }
-.zr-tag.anfang { border-radius: 999px 0 0 999px; }
-.zr-tag.ende { border-radius: 0 999px 999px 0; }
-.zr-tag.anfang.ende { border-radius: 999px; }
-.zr-tag.start { box-shadow: inset 0 0 0 2px var(--text); border-radius: 999px; }
-.zr-liste { margin-top: 16px; min-height: 30px; }
+
+/* Band: eingetragen (drin), gerade gewählt (vorschau), beim Überfahren einer Marke (markiert). */
+.zr-tag.drin, .zr-tag.vorschau { background: var(--zr-band); }
+.zr-tag.markiert { background: color-mix(in srgb, var(--text) 20%, transparent); }
+.zr-tag.zeilenanfang { border-radius: 999px 0 0 999px; }
+.zr-tag.zeilenende { border-radius: 0 999px 999px 0; }
+.zr-tag.zeilenanfang.zeilenende { border-radius: 999px; }
+/* Anfang und Ende: das Band beginnt in der Mitte des Tages, die Zahl steht im dunklen Kreis. */
+.zr-tag.anfang, .zr-tag.vanfang { background: linear-gradient(90deg, transparent 50%, var(--zr-band) 50%); }
+.zr-tag.ende, .zr-tag.vende { background: linear-gradient(90deg, var(--zr-band) 50%, transparent 50%); }
+.zr-tag.anfang.ende, .zr-tag.vanfang.vende { background: transparent; }
+.zr-tag.anfang > span, .zr-tag.ende > span,
+.zr-tag.start > span, .zr-tag.vende > span, .zr-tag.vanfang > span { background: var(--text); color: var(--flaeche); }
+.zr-tag.start > span { box-shadow: 0 0 0 3px var(--zr-band); }
+
+.zr-legende {
+  display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 14px 0 0; padding-top: 12px;
+  border-top: 1px solid var(--linie); font-size: 11.5px; color: var(--schiefer);
+}
+.zr-legende span { display: inline-flex; align-items: center; gap: 6px; }
+.zr-legende i { display: inline-block; width: 18px; height: 12px; border-radius: 999px; }
+.zr-legende .zl-band { background: color-mix(in srgb, var(--text) 11%, transparent); box-shadow: inset 12px 0 0 -6px var(--text); }
+.zr-legende .zl-anders { background: repeating-linear-gradient(135deg, var(--linie-fest) 0 3px, transparent 3px 6px); }
+.zr-legende .zl-feiertag { width: 5px; height: 5px; background: var(--schiefer); }
+.zr-legende .zl-heute { width: 14px; height: 14px; box-shadow: inset 0 0 0 1.5px var(--linie-fest); }
+.zr-eingetragen { margin-top: 14px; }
+.zr-liste-titel { display: block; margin-bottom: 6px; font-size: 12px; color: var(--schiefer); }
+.zr-liste { min-height: 30px; }
+.zr-liste .zchip { cursor: pointer; }
+.zchip .zzusatz { margin-left: 6px; font-size: 11.5px; color: var(--schiefer); }
+#dlg-zeitraum .dfuss { padding-top: 14px; border-top: 1px solid var(--linie); }
+.zr-hilfe { flex: 1 1 auto; margin: 0; font-size: 12.5px; color: var(--schiefer); }
 
 /* Gefahrenbereich */
 .gefahrkasten { border: 1.5px solid var(--gefahr-kante); border-radius: 12px; color: var(--acht); overflow: hidden; }

@@ -405,17 +405,34 @@
 <!-- Blockunterricht oder Schulferien im Kalender wählen (zeitraum.js), über „Deine Daten“ -->
 <dialog id="dlg-zeitraum" aria-labelledby="zr-titel">
   <div class="dkopf">
-    <h2 id="zr-titel">Blockunterricht wählen</h2>
-    <button type="button" class="knopf voll" id="zr-fertig">Fertig</button>
+    <div>
+      <h2 id="zr-titel">Blockunterricht</h2>
+      <p class="zr-unter">Ersten und letzten Tag antippen</p>
+    </div>
   </div>
   <div class="dkoerper">
-    <div class="zr-leiste">
-      <button type="button" class="rundknopf" id="zr-zurueck" aria-label="Voriger Monat">‹</button>
-      <p class="zr-hilfe" id="zr-hilfe" aria-live="polite"></p>
-      <button type="button" class="rundknopf" id="zr-vor" aria-label="Nächster Monat">›</button>
+    <!-- Wo man steht: erster Tag, letzter Tag. Der aktive Schritt ist umrandet. -->
+    <div class="zr-schritte">
+      <div class="zr-schritt" id="zr-schritt-von"><span>Erster Tag</span><b id="zr-von">–</b>
+        <button type="button" class="zr-neu" id="zr-neu" aria-label="Neu beginnen" title="Neu beginnen">×</button></div>
+      <span class="zr-pfeil" aria-hidden="true">→</span>
+      <div class="zr-schritt" id="zr-schritt-bis"><span>Letzter Tag</span><b id="zr-bis">–</b>
+        <small id="zr-tage"></small></div>
     </div>
-    <div class="zr-raster" id="zr-raster"></div>
-    <div class="zeitraeume zr-liste" id="zr-liste"></div>
+    <div class="zr-kalender">
+      <button type="button" class="rundknopf zr-blaettern" id="zr-zurueck" aria-label="Voriger Monat">‹</button>
+      <button type="button" class="rundknopf zr-blaettern" id="zr-vor" aria-label="Nächster Monat">›</button>
+      <div class="zr-raster" id="zr-raster"></div>
+    </div>
+    <p class="zr-legende" id="zr-legende"></p>
+    <div class="zr-eingetragen">
+      <span class="zr-liste-titel" id="zr-liste-titel">Eingetragen</span>
+      <div class="zeitraeume zr-liste" id="zr-liste"></div>
+    </div>
+  </div>
+  <div class="dfuss">
+    <p class="zr-hilfe" id="zr-hilfe" role="status"></p>
+    <button type="button" class="knopf voll" id="zr-fertig">Fertig</button>
   </div>
 </dialog>
 
