@@ -56,19 +56,24 @@ der Konfiguration für die lokale KI.
 
 4. **Deine Daten eintragen.** Oben rechts auf **⋯ → Deine Daten**: Name, Ausbildungsberuf,
    Betrieb, Vertragslaufzeit und das Bundesland für die automatische Erfassung der Feiertage.
-   Unter **Schule** wählst du deine festen Schultage oder trägst Blockunterricht ein. Leere Tage
-   an diesen Tagen stehen dann schon auf „Berufsschule“.
+   Unter **Schule** wählst du deine festen Schultage oder trägst Blockunterricht und Schulferien
+   ein. Leere Tage an diesen Tagen stehen dann schon auf „Berufsschule“, in den Ferien nicht.
+   Verlangt deine IHK die tägliche Notierung, stellst du unter **Verarbeitung → Vordruck** um.
 
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere
-   ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig. Im Reiter **Woche**
-   trägst du Abteilung und Unterweisungen ein.
+   ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig; was die Zeichen in den
+   Reitern heißen, erklärt der Kalender unter dem Wochenknopf. Im Reiter **Woche** trägst du
+   Abteilung und Unterweisungen ein. Was über alle Wochen noch fehlt, zeigt **⋯ → Übersicht aller
+   Wochen**.
 
 6. **Exportieren.** Auf **Exportieren** und dann **Wochenblatt als Word** oder
    **Wochenblatt als PDF drucken**. Für alle Wochen auf einmal → **Gesamtheft als Word**.
 
 7. **Sichern.** Deine Einträge liegen nur in diesem Browser. Werden die Browserdaten gelöscht,
-   ist das Heft weg. Deshalb regelmäßig **⋯ → Sicherung speichern** und die Datei aufheben.
-   Auf einem anderen Rechner holst du sie mit **⋯ → Sicherung laden** zurück.
+   ist das Heft weg. Deshalb regelmäßig **⋯ → Sicherung speichern** und die Datei aufheben; nach
+   zwei Wochen ohne Sicherung erinnert dich das Werkzeug. Auf einem anderen Rechner holst du sie mit
+   **⋯ → Sicherung laden** zurück. Am iPhone leg das Berichtsheft auf den Home-Bildschirm, sonst
+   löscht Safari es nach sieben Tagen ohne Besuch.
 
 ### KI dazu (optional)
 

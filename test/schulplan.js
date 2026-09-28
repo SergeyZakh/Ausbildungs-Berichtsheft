@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Schulplan: Feste Schultage und Blockunterricht aus „Deine Daten → Schule“ füllen leere Tage
- * mit „Berufsschule“ vor.
+ * mit „Berufsschule“ vor. In den Schulferien entfallen die festen Schultage, Blöcke gelten weiter.
  *
  * Der Plan wirkt nur auf Tage ohne eigenen Inhalt. Ein Tag mit Buchungen kann in den
  * Schulferien liegen und bleibt deshalb, wie der Import ihn liefert. Gespeichert wird die Art
@@ -12,7 +12,7 @@
  */
 const h = require('./hilfen');
 
-const { pruefe, abschluss } = h.protokoll('Schulplan: feste Schultage und Blockunterricht');
+const { pruefe, abschluss } = h.protokoll('Schulplan: feste Schultage, Blockunterricht und Ferien');
 
 /** Ein Tag, wie er gerade im Browserspeicher steht. */
 const gespeichert = (page, datum) => page.evaluate(([schluessel, d]) => {
@@ -54,6 +54,10 @@ async function schultagSchalten(page, kurz) {
   const erkannt = await page.locator('#schulbloecke-stand').textContent();
   pruefe('Blockunterricht: Das Jahr des ersten Datums kommt vom zweiten',
     erkannt === '1 Block: 11.05.2026–17.05.2026', erkannt);
+  await page.fill('#f-schulferien', '12.10.–23.10.2026; 11.05.–15.05.2026');
+  const ferien = await page.locator('#schulferien-stand').textContent();
+  pruefe('Schulferien: Zeiträume werden erkannt und genannt',
+    ferien === '2 Zeiträume: 12.10.2026–23.10.2026, 11.05.2026–15.05.2026', ferien);
   pruefe('Reiter „Schule“ passt ohne Scrollen in den Dialog', await page.evaluate(() => {
     const koerper = document.querySelector('#dlg-stamm .dkoerper');
     const leiste = document.querySelector('#dlg-stamm .blattleiste');
@@ -63,8 +67,9 @@ async function schultagSchalten(page, kurz) {
   await page.waitForTimeout(400);
 
   const stamm = await page.evaluate((s) => JSON.parse(localStorage.getItem(s)).stamm, h.SPEICHER);
-  pruefe('Schultage und Blöcke landen in den Stammdaten',
-    stamm.schultage === 'Mi, Do' && stamm.schulbloecke === '11.05.–17.05.2026', JSON.stringify(stamm));
+  pruefe('Schultage, Blöcke und Ferien landen in den Stammdaten',
+    stamm.schultage === 'Mi, Do' && stamm.schulbloecke === '11.05.–17.05.2026' &&
+      stamm.schulferien === '12.10.–23.10.2026; 11.05.–15.05.2026', JSON.stringify(stamm));
 
   /* ---------- Welche Tage der Plan trifft ---------- */
   pruefe('Leerer Donnerstag ist Berufsschule', (await artAm(page, '2026-09-03')) === 'Berufsschule');
@@ -79,6 +84,10 @@ async function schultagSchalten(page, kurz) {
     (await artAm(page, '2026-05-14')) === '');
   pruefe('Blockunterricht: Wochenende im Block zählt nicht', (await artAm(page, '2026-05-16')) === '');
   pruefe('Blockunterricht: der Tag nach dem Block zählt nicht', (await artAm(page, '2026-05-18')) === '');
+  pruefe('Schulferien: kein fester Schultag darin (Mi und Do)',
+    (await artAm(page, '2026-10-14')) === '' && (await artAm(page, '2026-10-22')) === '');
+  pruefe('Schulferien: danach gilt der Plan wieder', (await artAm(page, '2026-10-29')) === 'Berufsschule');
+  pruefe('Schulferien: Blockunterricht darin bleibt Schule', (await artAm(page, '2026-05-12')) === 'Berufsschule');
   pruefe('Ein leerer Schultag bleibt eine Lücke wie ein leerer Arbeitstag',
     await page.evaluate(() => window.__fehlenderWerktag('2026-09-03')));
   const bloecke = await page.evaluate(() => [

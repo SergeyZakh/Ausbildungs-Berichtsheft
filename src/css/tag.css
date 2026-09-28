@@ -27,6 +27,17 @@
 .leerbild h2 { margin: 0 0 8px; font-size: 17px; }
 .leerbild p { margin: 0 0 18px; color: var(--schiefer); }
 .leerbild .knopf + .knopf { margin-left: 8px; }
+.leerbild .leerfuss { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--linie); font-size: 12.5px; }
+/* Ohne Woche steht die Startkarte allein in der Mitte des Fensters. */
+body.ohnewoche #tagbereich { align-items: center; justify-content: center; padding-bottom: 6vh; }
+body.ohnewoche .leerbild { margin: 8px 20px; }
+.textknopf {
+  padding: 0; font: inherit; color: var(--text); background: none; border: 0;
+  text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--linie-fest);
+}
+.textknopf:hover { text-decoration-color: currentColor; }
+/* Kurzer Titel nur am Handy (handy.css). */
+.sektionskopf .kurz { display: none; }
 
 /* ---------- Sektion: Beschriftungsband über einem umrandeten Feld ----------
    Dieselbe Gliederung wie der amtliche Vordruck, als Karte. */
@@ -56,13 +67,13 @@
 
 /* Rot heißt "da muss noch jemand drüber" (roher Entwurf oder ungelesene
    Modellausgabe), grün heißt gegengelesen. */
-.sektion.pruefen { border-color: #EDC6C1; }
+.sektion.pruefen { border-color: var(--acht-kante); }
 .sektion.pruefen > .sektionskopf {
-  background: var(--acht-hell); border-bottom-color: #EDC6C1; color: var(--acht);
+  background: var(--acht-hell); border-bottom-color: var(--acht-kante); color: var(--acht);
 }
-.sektion.fertig { border-color: #BFDDC8; }
+.sektion.fertig { border-color: var(--gut-kante); }
 .sektion.fertig > .sektionskopf {
-  background: var(--gut-hell); border-bottom-color: #BFDDC8; color: var(--gut);
+  background: var(--gut-hell); border-bottom-color: var(--gut-kante); color: var(--gut);
 }
 
 /* Drei Gewichte im Band: Fahne = Marke, Knopf = Möglichkeit,
@@ -83,7 +94,7 @@
 .sektionsknopf:disabled { opacity: .45; cursor: default; }
 .sektionsknopf.uebernehmen { background: var(--acht); color: #fff; border-color: var(--acht); }
 .sektionsknopf.uebernehmen::before { content: "\2713"; font-size: 11px; }
-.sektionsknopf.uebernehmen:hover { background: #8F1C13; border-color: #8F1C13; }
+.sektionsknopf.uebernehmen:hover { background: var(--acht-tief); border-color: var(--acht-tief); }
 .sektionsknopf.bearbeiten { border-color: var(--gut); color: var(--gut); background: var(--flaeche); }
 .sektionsknopf.bearbeiten:hover { background: var(--gut); color: #fff; }
 .sektionsknopf .stift { font-size: 12px; line-height: 1; }
@@ -163,6 +174,19 @@
 .seitenspalte .kislot { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; }
 .seitenspalte .kislot > * { width: 100%; justify-content: center; }
 .exportknoepfe { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* Zwei Möglichkeiten als Segmentschalter, wie die Reiter im Datendialog. */
+.umschalter {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 3px;
+  background: var(--band); border: 1px solid var(--linie); border-radius: 11px;
+}
+.umschalter button {
+  padding: 6px 8px; font: inherit; font-size: 12.5px; color: var(--schiefer);
+  background: transparent; border: 0; border-radius: 8px;
+}
+.umschalter button:hover { color: var(--text); }
+.umschalter button[aria-checked="true"] {
+  background: var(--flaeche); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+}
 .exportknoepfe .knopf { width: 100%; justify-content: center; }
 @media (max-width: 1180px) {
   .tagflaeche.dreispaltig { flex-wrap: wrap; }
@@ -180,7 +204,7 @@
 .vorschaubuehne {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 16px;
   display: flex; flex-direction: column; align-items: center; gap: 16px;
-  background: #ECEBE6;
+  background: var(--buehne);
 }
 /* Ein A4-Bogen in echter Größe, verkleinert per transform; der Rahmen
    bekommt die verkleinerte Höhe, damit nichts Leeres darunter bleibt. */
@@ -236,7 +260,7 @@
   min-width: 200px; flex: 1 1 320px; max-width: 420px;
 }
 .abteilungsfeld:hover { border-color: var(--linie-fest); }
-.abteilungsfeld:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px rgba(22, 22, 26, .08); }
+.abteilungsfeld:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px var(--fokus-ring); }
 
 /* Zeilenstand unter dem Text: passt der Text in den Vordruck? */
 .textfuss {
@@ -251,7 +275,7 @@
 .textfuss.passt .textstand { color: var(--gut); }
 .textfuss.eng   .textstand { color: var(--acht); }
 .textfuss.leer  .textstand { color: var(--schiefer); }
-.textfuss.leer .textstand::before { background: transparent; border: 1.5px solid #9A9A9A; }
+.textfuss.leer .textstand::before { background: transparent; border: 1.5px solid var(--blass); }
 
 /* KI unten links im Feld: schwarze Pille mit ✦ im weißen Kreis. Während
    des Laufs steht an derselben Stelle eine gleich gebaute Statuspille. */
@@ -260,19 +284,19 @@
 .kistatus {
   display: inline-flex; align-items: center; gap: 8px; height: 30px;
   border-radius: 999px; font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none;
-  background: var(--text); color: #fff; border: 1px solid var(--text);
+  background: var(--text); color: var(--flaeche); border: 1px solid var(--text);
 }
 .sektionsknopf.kiknopf { padding: 0 16px 0 3px; }
 .sektionsknopf.kiknopf::before {
   content: "\2726"; flex: none; display: inline-flex; align-items: center; justify-content: center;
   width: 22px; height: 22px; border-radius: 50%; font-size: 11px;
-  background: #fff; color: var(--text);
+  background: var(--flaeche); color: var(--text);
 }
-.sektionsknopf.kiknopf:hover:not(:disabled) { background: #33333A; border-color: #33333A; }
+.sektionsknopf.kiknopf:hover:not(:disabled) { background: var(--voll-hover); border-color: var(--voll-hover); }
 .sektionsknopf.kiknopf:disabled { opacity: .35; }
 /* "Original zurück": helle Pille, Pfeil im dunklen Kreis. */
 .sektionsknopf.kiknopf.zurueck { background: var(--flaeche); color: var(--text); border-color: var(--linie); }
-.sektionsknopf.kiknopf.zurueck::before { content: "\21BA"; font-size: 13px; background: var(--text); color: #fff; }
+.sektionsknopf.kiknopf.zurueck::before { content: "\21BA"; font-size: 13px; background: var(--text); color: var(--flaeche); }
 .sektionsknopf.kiknopf.zurueck:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
 .sektionsknopf.kiknopf.zurueck.sicher,
 .sektionsknopf.kiknopf.zurueck.sicher:hover:not(:disabled) { background: var(--acht); border-color: var(--acht); color: #fff; }
@@ -281,17 +305,17 @@
 .kistatus { padding: 0 3px 0 6px; white-space: nowrap; }
 .kistatus .fpunkt {
   flex: none; width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, .25); border-top-color: #fff;
+  border: 2px solid color-mix(in srgb, var(--flaeche) 25%, transparent); border-top-color: var(--flaeche);
   animation: dreh .9s linear infinite;
 }
 .kistatus b { font-weight: 500; }
-.kistatus .ksek { font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, .6); }
+.kistatus .ksek { font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--flaeche) 60%, transparent); }
 .kistatus .ksek:empty { display: none; }
 .kiabbruch {
-  font: inherit; font-size: 11.5px; color: #fff; cursor: pointer;
-  background: rgba(255, 255, 255, .14); border: none; border-radius: 999px; padding: 3px 11px;
+  font: inherit; font-size: 11.5px; color: var(--flaeche); cursor: pointer;
+  background: color-mix(in srgb, var(--flaeche) 14%, transparent); border: none; border-radius: 999px; padding: 3px 11px;
 }
-.kiabbruch:hover:not(:disabled) { background: rgba(255, 255, 255, .24); }
+.kiabbruch:hover:not(:disabled) { background: color-mix(in srgb, var(--flaeche) 24%, transparent); }
 .kiabbruch:disabled { opacity: .5; cursor: default; }
 
 /* Buchungen aus Kimai neben dem Text. */
@@ -302,12 +326,12 @@
 .sektion.posten .sektionsleib { padding: 0; display: block; overflow: hidden; }
 .postenliste {
   flex: none; height: 100%; overflow-y: auto;
-  background: #FBFBF9; padding: 8px 14px 10px;
+  background: var(--posten-grund); padding: 8px 14px 10px;
 }
 .postenliste p {
   margin: 0; padding: 5px 0; font-size: 12.5px; color: var(--schiefer);
   display: flex; gap: 12px; align-items: baseline;
-  border-bottom: 1px solid #EFEEEA;
+  border-bottom: 1px solid var(--linie-leise);
 }
 .postenliste p:last-child { border-bottom: none; }
 .postenliste .pzeit { flex: 0 0 92px; font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--text); }
@@ -319,7 +343,42 @@
   -webkit-line-clamp: 2; overflow: hidden;
 }
 .postenliste p.offen .ptext { display: block; -webkit-line-clamp: unset; color: var(--text); }
-.postenliste .pleer { color: #9A9A9A; font-style: italic; border-bottom: none; }
+.postenliste .pleer { color: var(--blass); font-style: italic; border-bottom: none; }
+/* Plus am Ende der Buchung: als Zeile in den Text (postenSektion). */
+.postenliste p:has(.pdazu) { position: relative; padding-right: 38px; }
+.pdazu {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 26px; height: 26px; padding: 0; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font: inherit; font-size: 15px; line-height: 1; color: var(--text);
+  background: var(--flaeche); border: 1px solid var(--linie);
+  transition: background-color .15s, border-color .15s;
+}
+.pdazu:hover { background: var(--band); border-color: var(--linie-fest); }
+.pdazu.drin { font-size: 12px; color: var(--gut); background: var(--gut-hell); border-color: var(--gut-kante); }
+
+/* ---------- Hinweis über den Reitern (hinweise.js) ----------
+   Eine Karte wie der Fortschritt darunter. Rot nur im Titel: Der Hinweis soll auffallen, aber
+   nicht aussehen wie ein Tag, der gegengelesen werden muss. */
+.hinweise { flex: none; margin: 0 20px 12px; }
+.hinweis {
+  position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px;
+  padding: 10px 44px 10px 16px;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund);
+  box-shadow: var(--schatten); animation: auftauchen .2s ease-out;
+}
+.hinweistext { flex: 1 1 320px; margin: 0; font-size: 13px; line-height: 1.45; color: var(--schiefer); }
+.hinweistext b { color: var(--text); font-weight: 600; margin-right: 2px; }
+.hinweis.warn .hinweistext b { color: var(--acht); }
+.hinweisknoepfe { flex: none; display: flex; gap: 8px; flex-wrap: wrap; }
+.hinweisknoepfe .knopf { border-radius: 999px; }
+.hinweiszu {
+  position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px; line-height: 1; color: var(--schiefer);
+  background: transparent; border: 0; border-radius: 50%;
+}
+.hinweiszu:hover { background: var(--band); color: var(--text); }
 
 /* ---------- Fortschritt eines Modelllaufs ----------
    Kein Balken: Wie weit ein Sprachmodell ist, weiß niemand. Angezeigt
@@ -360,8 +419,8 @@
   padding: 5px 20px 6px; border-top: 1px solid var(--linie); background: var(--flaeche);
   min-height: 28px; transition: background-color .15s, border-color .15s;
 }
-.fussleiste.gut  { background: var(--gut-hell); border-top-color: #BFDDC8; }
-.fussleiste.warn { background: var(--acht-hell); border-top-color: #EDC6C1; }
+.fussleiste.gut  { background: var(--gut-hell); border-top-color: var(--gut-kante); }
+.fussleiste.warn { background: var(--acht-hell); border-top-color: var(--acht-kante); }
 .notiz { flex: 1 1 auto; margin: 0; font-size: 11.5px; color: var(--schiefer); }
 .notiz.gut  { color: var(--gut); font-weight: 500; }
 .notiz.warn { color: var(--acht); font-weight: 500; }
@@ -370,7 +429,7 @@
   margin-left: 10px; padding: 1px 8px; font: inherit; font-weight: 500; color: inherit;
   background: transparent; border: 1px solid currentColor; border-radius: 999px; cursor: pointer; opacity: .85;
 }
-.notizknopf:hover { opacity: 1; background: rgba(255, 255, 255, .6); }
+.notizknopf:hover { opacity: 1; background: color-mix(in srgb, var(--flaeche) 60%, transparent); }
 /* Wer das Werkzeug gebaut hat, für wen und unter welcher Lizenz. Leise gesetzt:
    Sie steht immer da und soll nie mit einer Meldung um Aufmerksamkeit ringen. */
 .signatur {

@@ -14,8 +14,28 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Name der Berufsschule. Leere Tage an diesen Tagen stehen schon auf „Berufsschule“, mit dem Feld
   für die Unterrichtsthemen. Feiertage, Tage außerhalb der Vertragslaufzeit und Tage mit Buchungen
   oder Text ändert der Plan nicht. Das Beispiel hat donnerstags Schule.
+- **Schulferien** im Schulplan: Darin entfallen die festen Schultage, Blockunterricht gilt weiter.
+- **Tägliche Notierung** als zweiter Vordruck der IHK: eine Zeile je Tag mit Stunden aus dem
+  Import und der Summe der Woche. Umschalten neben der Wochenvorschau oder unter *Deine Daten →
+  Verarbeitung*; gilt für Vorschau, Druck und Word, auch beim Ausbilder.
+- **Übersicht aller Wochen** (Menü ⋯): je Ausbildungsjahr ein Kästchen pro Woche, grün fertig, rot
+  ungelesen oder mit Lücke, dazu die Tage in der Berufsschule, im Urlaub, krank und an Feiertagen.
+- **Was fehlt noch?** Beim Öffnen nennt ein Hinweis die Lücken und ungelesenen Tage der letzten
+  Woche und der Wochen davor, mit Sprung zum ersten offenen Tag.
+- **Erinnerung an die Sicherung**, wenn die letzte älter als 14 Tage ist und sich seitdem etwas
+  geändert hat. Ohne Konto liegt das Heft nur im Browser.
+- **Tipp fürs iPhone:** Safari löscht Seitendaten nach sieben Tagen ohne Besuch, vom
+  Home-Bildschirm aus nicht. Die Seite lässt sich dort als App ablegen, mit eigenem Symbol.
+- **Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den Text.
+- **Dunkler Modus**, wenn das Gerät ihn eingestellt hat. Die Blattvorschau bleibt weiß.
 
 ### Geändert
+
+- **Ohne Woche** stehen nur Name, Menü und die Startkarte in der Mitte da; die Startkarte bietet
+  auch „Sicherung laden“ an.
+- **Der Kalender erklärt die Marken** der Reiter (E, KI, !, ✓, leerer Kreis).
+- **Am Handy** wird die Meldung unten nach acht Sekunden leise (eine Zeile, ohne Farbe), und die
+  Überschrift der Unterweisungen ist kurz.
 
 - **Am Handy** stehen die Tagesreiter kompakt in einer Zeile, die Woche breit darunter; Datum, Art
   und Stunden des Tages stehen ebenfalls in einer Zeile. Das Schreibfeld beginnt deutlich weiter

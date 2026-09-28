@@ -51,7 +51,8 @@ Protokoll, sind hier aber noch nicht durchgetestet.
 
 1. **Zurück zur Auswahl.**
 2. **Woche wechseln** – oder über das Monatsraster springen.
-3. **Das Wochenblatt**, wie der Azubi es sieht. Ändern kann der Ausbilder nichts.
+3. **Das Wochenblatt**, wie der Azubi es sieht, auch im Vordruck mit täglicher Notierung, wenn der
+   Azubi ihn gewählt hat. Ändern kann der Ausbilder nichts.
 4. **Herunterladen** – Wochenblatt oder Gesamtheft als Word und PDF.
 
 ## Was wo liegt
@@ -60,9 +61,10 @@ Protokoll, sind hier aber noch nicht durchgetestet.
 | --- | --- |
 | Tagestext, Art des Tages, Stunden, „übernommen“ | Browser **und** Server |
 | Abteilung und Unterweisungen je Woche | Browser und Server |
-| Stammdaten (Name, Beruf, Betrieb, Vertragszeitraum, Schultage …) | Browser und Server |
+| Stammdaten (Name, Beruf, Betrieb, Vertragszeitraum, Schultage, Schulferien, Vordruck …) | Browser und Server |
 | Importierte Buchungen: Kunden, Tickets, Uhrzeiten, Kollegennamen | **nur im Browser** |
 | Einstellungen des Sprachmodells, Namensliste für die Bereinigung | nur im Browser |
+| Letzte Sicherung, weggeklickte Hinweise | nur im Browser |
 | Wer wen betreut | Server |
 | Name und Rolle aus dem Anmeldedienst | Server |
 

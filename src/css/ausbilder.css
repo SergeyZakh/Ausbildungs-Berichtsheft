@@ -111,9 +111,9 @@ body.alsausbilder .leiste { display: none; }
   transition: background-color .15s, border-color .15s;
 }
 .aauswahlknopf:hover { background: var(--band); border-color: var(--linie-fest); }
-.aauswahlknopf.pruefen { border-color: #EDC6C1; background: var(--acht-hell); }
-.aauswahlknopf.pruefen:hover { background: #F8D7D3; }
-.aauswahlknopf.fertig { border-color: #BFDDC8; background: var(--gut-hell); }
+.aauswahlknopf.pruefen { border-color: var(--acht-kante); background: var(--acht-hell); }
+.aauswahlknopf.pruefen:hover { background: var(--acht-hover); }
+.aauswahlknopf.fertig { border-color: var(--gut-kante); background: var(--gut-hell); }
 .aauswahlknopf .aname { font-weight: 600; font-size: 14.5px; min-width: 12em; }
 .aauswahlknopf .alage { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
 .aauswahlknopf.pruefen .alage { color: var(--acht); }

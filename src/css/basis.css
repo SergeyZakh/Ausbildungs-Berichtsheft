@@ -47,8 +47,60 @@
   --rund:      14px;      /* Karten und Dialoge */
   --rund-klein: 9px;      /* Knöpfe und Felder */
   --schatten:  0 1px 2px rgba(22, 22, 26, .04), 0 6px 20px rgba(22, 22, 26, .05);
-  --schatten-hoch: 0 2px 6px rgba(22, 22, 26, .06), 0 18px 48px rgba(22, 22, 26, .16);
+  --schatten-hoch: 0 2px 6px var(--hauch), 0 18px 48px rgba(22, 22, 26, .16);
   --sans: "Instrument Sans", system-ui, -apple-system, sans-serif;
+  /* Abstufungen derselben Farben, damit der dunkle Modus sie an einer Stelle tauschen kann. */
+  --gut-kante: #BFDDC8;  --gut-hover: #D6EBDC;
+  --acht-kante:#EDC6C1;  --acht-hover:#F8D7D3; --acht-tief: #8F1C13;
+  --gefahr-kante: #E3A9A2; --gefahr-linie: #F1CFCA;
+  --auf-farbe: #FFFFFF;   /* Schrift auf Grün und Rot */
+  --blass:     #B0AEA8;   /* Ausgegrautes: leere Tage, gesperrte Knöpfe */
+  --linie-leise: #EFEEEA;
+  --gewaehlt-grau: #7A7973;
+  --voll-hover: #33333A;
+  --hauch:     rgba(22, 22, 26, .06);
+  --fokus-ring: rgba(22, 22, 26, .08);
+  --menue:     rgba(255, 255, 255, .96);
+  --popover:   rgba(255, 255, 255, .84);
+  --posten-grund: #FBFBF9;
+  --buehne:    #ECEBE6;   /* hinter der Blattvorschau */
+}
+
+/* Dunkler Modus, wenn das Gerät ihn wünscht. Das Blatt bleibt weiß (.bogen, #druck in blatt.css):
+   Es zeigt, was gedruckt wird. Grün und Rot sind heller, damit sie auf Dunkel lesbar bleiben,
+   und tragen weiter weiße Schrift. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text:      #ECEBE7;
+    --linie:     #34343B;
+    --linie-fest:#4B4B53;
+    --grund:     #111114;
+    --flaeche:   #1B1B1F;
+    --band:      #24242A;
+    --schiefer:  #A3A29B;
+    --gut:       #2E9A4E;
+    --gut-hell:  #15291C;
+    --acht:      #D8463C;
+    --acht-hell: #33191A;
+    --glas:      rgba(30, 30, 35, .72);
+    --glas-kante:rgba(255, 255, 255, .08);
+    --schatten:  0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+    --schatten-hoch: 0 2px 6px rgba(0, 0, 0, .35), 0 18px 48px rgba(0, 0, 0, .5);
+    --gut-kante: #2C5A3A;  --gut-hover: #1B3524;
+    --acht-kante:#6A2C28;  --acht-hover:#442020; --acht-tief: #B8342B;
+    --gefahr-kante: #6A2C28; --gefahr-linie: #4A2422;
+    --blass:     #5F5E59;
+    --linie-leise: #2A2A30;
+    --gewaehlt-grau: #55555C;
+    --voll-hover: #D2D1CC;
+    --hauch:     rgba(255, 255, 255, .07);
+    --fokus-ring: rgba(255, 255, 255, .12);
+    --menue:     rgba(30, 30, 35, .97);
+    --popover:   rgba(30, 30, 35, .9);
+    --posten-grund: #18181C;
+    --buehne:    #26262C;
+  }
+  dialog::backdrop { background: rgba(0, 0, 0, .5); }
 }
 
 * { box-sizing: border-box; }
@@ -80,7 +132,7 @@ button { font: inherit; cursor: pointer; }
 }
 .knopf:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
 .knopf.voll { background: var(--text); border-color: var(--text); color: var(--flaeche); }
-.knopf.voll:hover:not(:disabled) { background: #33333A; border-color: #33333A; }
+.knopf.voll:hover:not(:disabled) { background: var(--voll-hover); border-color: var(--voll-hover); }
 .knopf:disabled { opacity: .4; cursor: not-allowed; }
 
 /* Symbolknöpfe (⋯, ‹, ›) sind Kreise, Textknöpfe nicht. */
@@ -92,7 +144,7 @@ button { font: inherit; cursor: pointer; }
   transition: background-color .15s, border-color .15s;
 }
 .rundknopf:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
-.rundknopf:disabled { color: #B8B6B0; cursor: not-allowed; }
+.rundknopf:disabled { color: var(--blass); cursor: not-allowed; }
 
 /* ---------- Dialoge ---------- */
 dialog {
@@ -127,7 +179,7 @@ dialog::backdrop {
 }
 .felder input:hover, .felder textarea:hover { border-color: var(--linie-fest); }
 .felder input:focus, .felder textarea:focus {
-  outline: none; border-color: var(--text); box-shadow: 0 0 0 3px rgba(22, 22, 26, .08);
+  outline: none; border-color: var(--text); box-shadow: 0 0 0 3px var(--fokus-ring);
 }
 .felder textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
 .felder small { display: block; margin-top: 4px; font-size: 11.5px; color: var(--schiefer); }

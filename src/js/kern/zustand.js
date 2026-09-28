@@ -62,7 +62,7 @@ function ersterEingetragenerTag() {
 }
 
 /* ---------- Schulplan ----------
-   Feste Schultage und Blockunterricht aus „Deine Daten → Schule“. Der Plan füllt nur
+   Feste Schultage, Blockunterricht und Schulferien aus „Deine Daten → Schule“. Der Plan füllt nur
    Tage ohne eigenen Inhalt vor: Ein Tag mit Buchungen kann in den Schulferien liegen, dann
    wurde an ihm gearbeitet, und davon weiß der Plan nichts. Gespeichert wird die Art erst, wenn
    am Tag geschrieben oder gewählt wird. Bis dahin ist ein leerer Schultag dieselbe Lücke wie
@@ -104,17 +104,27 @@ function schulbloeckeLesen(text) {
   return { bloecke: bloecke, unklar: unklar };
 }
 
-/** Ist das laut Plan ein Schultag? Feiertage und Tage außerhalb der Ausbildung nie. */
+/** Liegt das Datum in einem der Zeiträume aus diesem Feld (Blockunterricht, Schulferien)? */
+function inZeitraeumen(feldId, datumIso) {
+  return schulbloeckeLesen($(feldId).value).bloecke.some(function (b) {
+    return b.von <= datumIso && datumIso <= b.bis;
+  });
+}
+
+/**
+ * Ist das laut Plan ein Schultag? Feiertage und Tage außerhalb der Ausbildung nie. Ein Block
+ * gilt auch in den Ferien, die festen Schultage dort nicht: Blockunterricht in den Ferien hat es
+ * nie gegeben, ein vergessenes Ferienende dagegen schon.
+ */
 function schultagLautPlan(datumIso) {
   var tag = tagIndex(vonIso(datumIso));
   if (tag > 4) return false;
   if (feiertagAn(datumIso, $("f-land").value)) return false;
   var beginn = $("f-beginn").value, ende = $("f-ende").value;
   if ((beginn && datumIso < beginn) || (ende && datumIso > ende)) return false;
-  if (schultageLesen($("f-schultage").value).indexOf(tag) !== -1) return true;
-  return schulbloeckeLesen($("f-schulbloecke").value).bloecke.some(function (b) {
-    return b.von <= datumIso && datumIso <= b.bis;
-  });
+  if (inZeitraeumen("f-schulbloecke", datumIso)) return true;
+  if (inZeitraeumen("f-schulferien", datumIso)) return false;
+  return schultageLesen($("f-schultage").value).indexOf(tag) !== -1;
 }
 
 /** Hat der Tag etwas Eigenes: Text, Buchungen, Stunden oder eine gewählte Art? */
@@ -189,6 +199,34 @@ function wochenAnteil(montagIso) {
   return { fertig: fertig, von: von };
 }
 
+/**
+ * Was eine Woche noch braucht, Tag für Tag nach denselben Regeln wie `wochenStand()`:
+ *   ohneText   Tage, die Text bräuchten und keinen haben
+ *   ungelesen  Tage mit Text, der noch nicht als fertig markiert ist
+ *   fertig     gegengelesene Tage
+ *   erster     Index des ersten Tags, der etwas braucht, sonst -1
+ * Für den Hinweis beim Öffnen und die Übersicht (hinweise.js, uebersicht.js).
+ */
+function wochenBilanz(montagIso) {
+  var montag = vonIso(montagIso), b = { ohneText: 0, ungelesen: 0, fertig: 0, erster: -1 };
+  var merke = function (i) { if (b.erster === -1) b.erster = i; };
+  for (var i = 0; i < TAGE_JE_WOCHE; i++) {
+    var datum = iso(plus(montag, i));
+    var t = tage[datum];
+    if (!t) {
+      if (fehlenderWerktag(datum)) { b.ohneText++; merke(i); }
+      continue;
+    }
+    var schule = istSchultag(t.art);
+    if (t.art && !schule) continue;
+    var stand = tagStand(t);
+    if (stand === "fertig") b.fertig++;
+    else if (stand !== "leer") { b.ungelesen++; merke(i); }
+    else if (t.stunden || schule || fehlenderWerktag(datum)) { b.ohneText++; merke(i); }
+  }
+  return b;
+}
+
 /** Ein Fortschrittsring als HTML. */
 function ringHtml(fertig, von, titel) {
   var anteil = von ? Math.round(fertig / von * 100) : 0;
@@ -254,6 +292,7 @@ function stammdaten() {
     abteilung: $("f-abteilung").value, land: $("f-land").value,
     ausbilder: $("f-ausbilder").value, schule: $("f-schule").value,
     schultage: $("f-schultage").value, schulbloecke: $("f-schulbloecke").value,
+    schulferien: $("f-schulferien").value, vordruck: $("f-vordruck").value,
     beginn: $("f-beginn").value, ende: $("f-ende").value,
     jahr: ausbildungsjahr({ beginn: $("f-beginn").value }, berichtsdatum()),
     geburtsort: $("f-geburtsort").value, geburtsdatum: $("f-geburtsdatum").value,
@@ -276,7 +315,12 @@ function stammdaten() {
      tage    je Tag Text, Art, Zeiten, Buchungen und Herkunft des Texts
      wochen  Abteilung und Unterweisungen je Woche
      kunden  Kundennamen aus dem letzten Import
-     stand   zuletzt offene Woche und Reiter */
+     stand   zuletzt offene Woche und Reiter
+     hinweise  letzte Sicherung und weggeklickte Hinweise (hinweise.js), nur für diesen Browser */
+
+/* { gesichert, homeBildschirm, sicherungSpaeter } – nie im Konto: Ob in diesem Browser gesichert
+   wurde, sagt nichts über ein anderes Gerät. */
+var browserHinweise = {};
 
 /* ---------- Zeitstempel für den Abgleich mit dem Server ----------
    Ohne Konto stören sie nicht, mit Konto entscheiden sie, welcher Stand gewinnt.
@@ -378,7 +422,8 @@ function merkenJetzt() {
       wochen: wochendaten,
       kunden: kunden,
       stand: { woche: aktiveWoche, tag: aktiverTag },
-      geaendert: { stamm: stammGeaendert, jeWoche: wochenGeaendert }
+      geaendert: { stamm: stammGeaendert, jeWoche: wochenGeaendert },
+      hinweise: browserHinweise
     }));
   };
   try {
@@ -430,6 +475,10 @@ function geladen() {
 
 /* ---------- Meldungen in der Fußleiste ---------- */
 
+/* Am Handy wird die Meldung nach NOTIZ_STILL_MS leise: eine Zeile, ohne Farbe (handy.css). Sie
+   bleibt lesbar und lässt sich antippen, nimmt dem Schreibfeld aber keinen Platz mehr. */
+var NOTIZ_STILL_MS = 8000, notizUhr = null;
+
 /** art: "" (neutral), "gut" oder "warn" */
 function sage(text, art) {
   var m = $("notiz");
@@ -438,6 +487,12 @@ function sage(text, art) {
   m.className = "notiz" + (art ? " " + art : "");
   var leiste = m.closest ? m.closest(".fussleiste") : null;
   if (leiste) leiste.className = "fussleiste" + (art ? " " + art : "");
+  clearTimeout(notizUhr);
+  notizUhr = setTimeout(function () {
+    if (m.classList.contains("ganz")) return;
+    m.classList.add("still");
+    if (leiste) leiste.classList.add("still");
+  }, NOTIZ_STILL_MS);
   // Ein modaler Dialog liegt über der Fußleiste; die Meldung erscheint dann zusätzlich in ihm.
   var dlg = offenerDialog();
   if (dlg && text) dialogNotiz(dlg, text, art);

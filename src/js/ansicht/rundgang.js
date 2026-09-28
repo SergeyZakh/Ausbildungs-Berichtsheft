@@ -24,7 +24,8 @@ var RUNDGANG = [
   { ziel: ["#reiter"],
     titel: "Ein Reiter je Tag",
     text: "Der achte Reiter gehört der ganzen Woche. Grün heißt fertig, rot heißt: " +
-          "da musst du noch drüber." },
+          "da musst du noch drüber – E ist der Entwurf aus dem Import, KI die Fassung des " +
+          "Sprachmodells, ! dein eigener Text. Die Zeichen erklärt auch der Kalender." },
   { ziel: ["#tagbereich .tagpanel"],
     titel: "Schreiben",
     text: "Links schreibst du, rechts stehen deine Buchungen zum " +

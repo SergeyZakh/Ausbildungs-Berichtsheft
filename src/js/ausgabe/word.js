@@ -9,8 +9,10 @@
  *   Seite 2   Ausbildungsgang: Abteilung von/bis
  *   ab 3      je Woche ein Blatt mit drei Feldern und drei Unterschriften
  *
- * Zeiten und Stunden stehen bewusst nicht im Dokument: Der Nachweis
- * fragt nach Tätigkeiten. Maße in Twips (1 cm = 567).
+ * Zeiten und Stunden stehen bewusst nicht im wöchentlichen Blatt: Der Nachweis
+ * fragt nach Tätigkeiten. Der zweite Vordruck, die tägliche Notierung
+ * (Deine Daten → Ausbildung → Vordruck), hat eine Spalte dafür; dort stehen die
+ * Stunden aus dem Import. Maße in Twips (1 cm = 567).
  * ========================================================== */
 
 var D = window.docx;
@@ -30,11 +32,11 @@ var SEITE = {
    nicht weiter geschrumpft. */
 var MASSE = [
   { text: 19, zeile: 250, vorPos: 50, vorTag: 220, tag: 16,
-    gross: 5000, klein: 1900, rand: 150, vorFeld: 260 },
+    gross: 5000, klein: 1900, rand: 150, vorFeld: 260, tageszeile: 1350 },
   { text: 18, zeile: 235, vorPos: 40, vorTag: 190, tag: 15,
-    gross: 3800, klein: 1600, rand: 130, vorFeld: 210 },
+    gross: 3800, klein: 1600, rand: 130, vorFeld: 210, tageszeile: 950 },
   { text: 17, zeile: 220, vorPos: 30, vorTag: 150, tag: 14,
-    gross: 2400, klein: 1200, rand: 110, vorFeld: 170 }
+    gross: 2400, klein: 1200, rand: 110, vorFeld: 170, tageszeile: 560 }
 ];
 
 /* ---------- Grundbausteine ---------- */
@@ -269,6 +271,7 @@ function eintraege(liste, m) {
 }
 
 function wochenSeite(nummer, montag, s) {
+  if (taeglich(s)) return taeglicheSeite(nummer, montag, s);
   var texte = wochenTexte(montag);
   var wd = wochendaten[iso(montag)] || {};
   var abteilung = wd.abteilung || s.abteilung || "";
@@ -288,6 +291,126 @@ function wochenSeite(nummer, montag, s) {
 
   teile.push(absatz("", { nach: m.vorFeld }));
   teile.push(unterschriften());
+  return { kinder: teile, kopf: fortsetzungsKopf(s, montag) };
+}
+
+/* ---------- Tägliche Notierung ---------- */
+
+function taeglich(s) { return !!s && s.vordruck === "taeglich"; }
+
+/** Untertitel des Deckblatts, je nach Vordruck. */
+function notierungTitel(s) {
+  return "(Ausbildungsnachweis – " + (taeglich(s) ? "tägliche" : "wöchentliche") + " Notierung –)";
+}
+
+var TAEGLICH_SPALTE = "Ausgeführte Arbeiten, Unterweisungen, Berufsschulunterricht";
+
+/**
+ * Die Zeilen einer Woche für die tägliche Notierung, gemeinsam für Word und Druck:
+ * Montag bis Freitag immer, Samstag und Sonntag nur mit Eintrag, zuletzt die Unterweisungen der
+ * Woche. Ein Eintrag ist { kopf: { tag, datum, art, stunden, woche }, text }.
+ * Die Art steht über dem Text, außer bei einem gewöhnlichen Arbeitstag.
+ */
+function tagesZeilen(montag) {
+  var out = [];
+  for (var i = 0; i < TAGE_JE_WOCHE; i++) {
+    var datum = plus(montag, i), t = tage[iso(datum)];
+    var text = t ? zeilen(t.text).map(ohneSchlusspunkt).join("\n") : "";
+    var art = (t && t.art) || "";
+    if (i > 4 && !text && !art) continue;
+    out.push({
+      kopf: { tag: WOCHENTAGE[datum.getDay()], datum: dm(datum), art: art, stunden: (t && t.stunden) || null },
+      text: text
+    });
+  }
+  var wd = wochendaten[iso(montag)] || {};
+  var eigene = zeilen(wd.unterweisungen).map(ohneSchlusspunkt).join("\n");
+  if (eigene) out.push({ kopf: { tag: "Unterweisungen", datum: "", art: "", stunden: null, woche: true }, text: eigene });
+  return out;
+}
+
+/** Stundensumme der Zeilen; mehrteilige Tage (Blattumbruch) zählen einmal. */
+function tagesSumme(reihen) {
+  var gesehen = [], summe = 0;
+  reihen.forEach(function (e) {
+    if (gesehen.indexOf(e.kopf) !== -1) return;
+    gesehen.push(e.kopf);
+    if (e.kopf.stunden) summe += e.kopf.stunden;
+  });
+  return summe;
+}
+
+var SP_TAEGLICH = [1600, BREITE - 1600 - 1150, 1150];
+
+function taeglicheSeite(nummer, montag, s) {
+  var reihen = tagesZeilen(montag);
+  var m = MASSE[dichte({ betrieb: reihen, unterweisung: [], schule: [] })];
+  var wd = wochendaten[iso(montag)] || {};
+  var summe = tagesSumme(reihen);
+  var rundum = { top: rahmen(KRAFT, 2), bottom: rahmen(KRAFT, 2), left: rahmen(KRAFT, 2), right: rahmen(KRAFT, 2) };
+
+  function zelle(kinder, i, o) {
+    o = o || {};
+    return new D.TableCell({
+      width: { size: SP_TAEGLICH[i], type: D.WidthType.DXA },
+      verticalAlign: o.vertikal || D.VerticalAlign.TOP,
+      margins: { top: m.rand, bottom: m.rand, left: 140, right: 140 },
+      borders: rundum,
+      children: kinder.length ? kinder : [absatz("")]
+    });
+  }
+  function kopfText(t, rechts) {
+    return absatz(t, {
+      groesse: 14, sperrung: 10, grossbuchstaben: true, farbe: AKZENT, zeile: 220,
+      ausrichtung: rechts ? D.AlignmentType.RIGHT : D.AlignmentType.LEFT
+    });
+  }
+  var stdAbsatz = function (h, fett) {
+    return absatz(h ? stundenText(h) : "", { groesse: m.text, fett: !!fett, ausrichtung: D.AlignmentType.RIGHT });
+  };
+
+  var zeilenListe = [new D.TableRow({
+    tableHeader: true,
+    children: [zelle([kopfText("Tag")], 0), zelle([kopfText(TAEGLICH_SPALTE)], 1), zelle([kopfText("Stunden", true)], 2)]
+  })];
+  reihen.forEach(function (e) {
+    var inhalt = [];
+    if (e.kopf.art) inhalt.push(absatz(e.kopf.art, { groesse: m.tag, farbe: GRAU, nach: 40 }));
+    zeilen(e.text).forEach(function (z, j) { inhalt.push(stichpunkt(z, m, j ? m.vorPos : 0)); });
+    zeilenListe.push(new D.TableRow({
+      height: { value: e.kopf.woche ? 400 : m.tageszeile, rule: D.HeightRule.ATLEAST },
+      children: [
+        zelle([absatz(e.kopf.tag, { groesse: m.tag, fett: true, farbe: AKZENT })]
+          .concat(e.kopf.datum ? [absatz(e.kopf.datum, { groesse: m.tag, farbe: GRAU, vor: 20 })] : []), 0),
+        zelle(inhalt, 1),
+        zelle([stdAbsatz(e.kopf.stunden)], 2)
+      ]
+    }));
+  });
+  if (summe) {
+    zeilenListe.push(new D.TableRow({
+      cantSplit: true,
+      children: [zelle([], 0), zelle([absatz("Gesamtstunden", { groesse: m.text, ausrichtung: D.AlignmentType.RIGHT })], 1),
+        zelle([stdAbsatz(summe, true)], 2)]
+    }));
+  }
+
+  var teile = [
+    absatz("Ausbildungsnachweis", {
+      groesse: 24, sperrung: 20, grossbuchstaben: true, farbe: AKZENT,
+      ausrichtung: D.AlignmentType.CENTER, vor: 120, nach: 420
+    }),
+    kopfLeiste(s, wd.abteilung || s.abteilung || "", nummer, montag),
+    absatz("", { nach: m.vorFeld }),
+    new D.Table({
+      width: { size: BREITE, type: D.WidthType.DXA },
+      columnWidths: SP_TAEGLICH,
+      layout: D.TableLayoutType.FIXED,
+      rows: zeilenListe
+    }),
+    absatz("", { nach: m.vorFeld }),
+    unterschriften()
+  ];
   return { kinder: teile, kopf: fortsetzungsKopf(s, montag) };
 }
 
@@ -354,7 +477,7 @@ function deckblatt(s) {
     absatz("Berichtsheft", {
       groesse: 40, fett: true, farbe: AKZENT, ausrichtung: D.AlignmentType.CENTER, nach: 140
     }),
-    absatz("(Ausbildungsnachweis – wöchentliche Notierung –)", {
+    absatz(notierungTitel(s), {
       groesse: 20, farbe: GRAU, ausrichtung: D.AlignmentType.CENTER, nach: 900
     }),
     tabelle([3800, BREITE - 3800], deckblattAngaben(s).map(function (a) { return stammZeile(a[0], a[1]); })),

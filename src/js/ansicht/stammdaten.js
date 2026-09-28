@@ -147,7 +147,8 @@ dlg.addEventListener("close", function () {
   $(id).addEventListener("change", function () { entwuerfeNeu(); zeichnen(); merken(); });
 });
 
-["f-name", "f-beruf", "f-betrieb", "f-abteilung", "f-ausbilder", "f-schule", "f-schulbloecke", "f-beginn", "f-ende",
+["f-name", "f-beruf", "f-betrieb", "f-abteilung", "f-ausbilder", "f-schule", "f-schulbloecke", "f-schulferien",
+ "f-vordruck", "f-beginn", "f-ende",
  "f-geburtsort", "f-geburtsdatum", "f-anschrift", "f-zweig", "f-land", "f-vertragAm", "f-vertreterName", "f-vertreterAnschrift",
  "f-ausblenden", "f-namen", "f-projektraus", "f-ki-adresse", "f-ki-modell", "f-ki-anweisungen", "f-ki-stichpunkte"]
   .forEach(function (id) {
@@ -183,21 +184,28 @@ schultagSchalter.forEach(function (k) {
   });
 });
 
-/** Unter dem Feld steht, was gelesen wurde – oder was nicht. */
-function bloeckeStandZeigen() {
-  var feld = $("schulbloecke-stand");
-  var gelesen = schulbloeckeLesen($("f-schulbloecke").value);
+/** Unter einem Feld mit Zeiträumen steht, was gelesen wurde – oder was nicht. */
+function zeitraeumeStandZeigen(feldId, standId, eins, viele, leer) {
+  var feld = $(standId);
+  var gelesen = schulbloeckeLesen($(feldId).value);
   feld.className = gelesen.unklar.length ? "fehlt" : "";
   if (gelesen.unklar.length) {
     feld.textContent = "Nicht erkannt: " + gelesen.unklar.join(" · ") + ". Bitte als TT.MM.JJJJ–TT.MM.JJJJ.";
   } else if (gelesen.bloecke.length) {
-    feld.textContent = mehrzahl(gelesen.bloecke.length, " Block", " Blöcke") + ": " +
+    feld.textContent = mehrzahl(gelesen.bloecke.length, eins, viele) + ": " +
       gelesen.bloecke.map(function (b) { return dmy(vonIso(b.von)) + "–" + dmy(vonIso(b.bis)); }).join(", ");
   } else {
-    feld.textContent = "Zeiträume, getrennt durch Semikolon. Jeder Werktag darin gilt als Schultag.";
+    feld.textContent = leer;
   }
 }
+function bloeckeStandZeigen() {
+  zeitraeumeStandZeigen("f-schulbloecke", "schulbloecke-stand", " Block", " Blöcke",
+    "Zeiträume, getrennt durch Semikolon. Jeder Werktag darin gilt als Schultag.");
+  zeitraeumeStandZeigen("f-schulferien", "schulferien-stand", " Zeitraum", " Zeiträume",
+    "Darin entfallen die festen Schultage. Blockunterricht gilt weiter.");
+}
 $("f-schulbloecke").addEventListener("input", bloeckeStandZeigen);
+$("f-schulferien").addEventListener("input", bloeckeStandZeigen);
 
 /** Zeichenzähler unter den eigenen Anweisungen. */
 function anweisungenZaehlen() {
@@ -390,7 +398,7 @@ function importDatenVerwerfen() {
 /** Den gesamten Stand löschen, auch die Stammdatenfelder – sonst schriebe
  *  das Schließen des Dialogs sie gleich wieder in den Speicher. */
 function allesLoeschen() {
-  tage = {}; wochendaten = {}; kunden.length = 0;
+  tage = {}; wochendaten = {}; kunden.length = 0; browserHinweise = {};
   aktiveWoche = null; aktiverTag = 0; monatAnker = null;
 
   Object.keys(stammdaten()).forEach(function (k) {

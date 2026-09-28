@@ -3,10 +3,14 @@
  * ========================================================== */
 
 function zeichnen() {
+  // Ohne Woche gibt es nichts zu blättern und nichts zu exportieren: Kopfleiste und Startkarte
+  // werden ruhiger (tag.css, leiste.css).
+  document.body.classList.toggle("ohnewoche", !aktiveWoche);
   zeichneWochenwahl();
   zeichneReiter();
   zeichneTag();
   lehrjahrZeigen();
+  hinweiseZeigen();
   $("btn-heft").disabled = !wochen.length;
   $("btn-wochenblatt").disabled = !aktiveWoche;
 }
