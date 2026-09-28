@@ -4,11 +4,19 @@
 const { chromium } = require('playwright');
 const JSZip = require('jszip');
 const fs = require('fs');
+const http = require('http');
 const path = require('path');
 const { pathToFileURL } = require('url');
 
 const DIST = path.join(__dirname, '..', 'dist');
-const SEITE = pathToFileURL(path.join(DIST, 'index.html')).href;
+/* Die Seite als Datei. Nur für Tests, die genau das prüfen: die Einzeldatei (lokal.js), das
+   Neuladen bei leerem Speicher (lauf.js) und die Suche nach dem Sprachmodell (ki.js). */
+const DATEI_SEITE = pathToFileURL(path.join(DIST, 'index.html')).href;
+/* Alle anderen öffnen die Seite über http (dienerStarten()). Über file:// verlor Chromium in CI
+   gelegentlich, was eine Seite direkt vor dem Neuladen gespeichert hatte: Bundesland, geladene
+   Sicherung, untergeschobener Tag. Lokal trat das nie auf, auf dem Bau-Server in drei von elf
+   Läufen, zuletzt zweimal hintereinander. Über http kennt die Doku das Problem nicht. */
+let SEITE = null;
 const EINZELDATEI = path.join(DIST, 'Berichtsheft.html');
 const SPEICHER = 'berichtsheft-v1';
 const RUNDGANG = 'berichtsheft-onboarding';
@@ -62,8 +70,42 @@ function pruefeBuild() {
   }
 }
 
+const TYPEN = {
+  '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8',
+  '.woff2': 'font/woff2', '.png': 'image/png', '.svg': 'image/svg+xml',
+};
+
+/**
+ * dist/ über http auf einem freien Port dieses Rechners, solange der Testprozess läuft. Wie ein
+ * Webserver ohne Berichtsheft-Server: /api/ich beantwortet er mit 404, das Werkzeug arbeitet
+ * dann ohne Konto (kontoStarten() in konto.js).
+ */
+function dienerStarten() {
+  const diener = http.createServer((anfrage, antwort) => {
+    let weg = '';
+    try { weg = decodeURIComponent((anfrage.url || '/').split('?')[0]); } catch (e) { /* wird 404 */ }
+    const datei = path.normalize(path.join(DIST, weg === '/' ? 'index.html' : weg));
+    if (!datei.startsWith(DIST + path.sep) || !fs.existsSync(datei) || fs.statSync(datei).isDirectory()) {
+      antwort.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return antwort.end('Nicht gefunden');
+    }
+    antwort.writeHead(200, {
+      'Content-Type': TYPEN[path.extname(datei).toLowerCase()] || 'application/octet-stream',
+      'Cache-Control': 'no-store',
+    });
+    fs.createReadStream(datei).pipe(antwort);
+  });
+  // Hält den Testprozess nicht am Leben, wenn die Tests fertig sind.
+  diener.unref();
+  return new Promise((fertig) => diener.listen(0, '127.0.0.1', () => {
+    fertig('http://127.0.0.1:' + diener.address().port + '/index.html');
+  }));
+}
+
 async function starteBrowser() {
   pruefeBuild();
+  if (!SEITE) SEITE = await dienerStarten();
   return chromium.launch();
 }
 
@@ -72,9 +114,10 @@ async function starteBrowser() {
  * file:// gelegentlich an einen Speicher, der mit dem Tab verschwindet (speicherNeuLaden() in
  * src/js/kern/grundlagen.js). Das trifft Seiten, die gleich beim Laden auf den Speicher zugreifen,
  * und genau das tut ohneRundgang(). Ohne das zweite Öffnen verlor ein Test in rund 13 % der Läufe
- * nach dem nächsten Neuladen seine Daten. Das zweite Dokument im Tab ist nie betroffen.
+ * nach dem nächsten Neuladen seine Daten. Ohne vorher gestarteten Browser (und damit ohne
+ * Webserver) bleibt es bei der Datei.
  */
-async function oeffnen(page, adresse = SEITE) {
+async function oeffnen(page, adresse = SEITE || DATEI_SEITE) {
   await page.goto(adresse);
   if (adresse.startsWith('file:')) await page.goto(adresse);
 }
@@ -280,7 +323,9 @@ function sichtbarerText(xml) {
 }
 
 module.exports = {
-  SEITE, EINZELDATEI, SPEICHER, RUNDGANG, testdatei,
+  // Erst nach starteBrowser() gesetzt, deshalb als Getter.
+  get SEITE() { return SEITE; },
+  DATEI_SEITE, EINZELDATEI, SPEICHER, RUNDGANG, testdatei,
   protokoll, starteBrowser, oeffnen, ohneRundgang, fehlerSammeln, markieren,
   stammReiter, stammFuellen, stammdatenOeffnen, exportTrotzdem,
   downloadsSammeln, warteAufDatei, docxLesen, sichtbarerText,

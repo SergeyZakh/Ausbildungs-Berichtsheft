@@ -550,7 +550,8 @@ const NAME = 'Mustermann, Max';
   {
     const kontext = await browser.newContext({ viewport: { width: 1200, height: 800 } });
     const seite = await kontext.newPage();
-    await seite.goto(h.SEITE);
+    // Als Datei: Nur dort lädt die Seite bei ganz leerem Speicher einmal neu.
+    await seite.goto(h.DATEI_SEITE);
     await seite.waitForTimeout(1100);
     const gemerkt = () => seite.evaluate((s) => localStorage.getItem(s), h.RUNDGANG);
     const ladeart = () => seite.evaluate(() => performance.getEntriesByType('navigation')[0].type);
@@ -586,7 +587,7 @@ const NAME = 'Mustermann, Max';
     // Mit Einträgen im Speicher gibt es nichts zu prüfen: Die Seite öffnet ohne Neuladen. Im selben
     // Tab, denn das zweite Dokument eines Tabs ist nie abgekoppelt; ein neuer Tab wäre es selten
     // doch und lüde dann zu Recht neu.
-    await seite.goto(h.SEITE);
+    await seite.goto(h.DATEI_SEITE);
     await seite.waitForTimeout(600);
     pruefe('Mit vorhandenem Speicher öffnet die Seite ohne Neuladen', (await ladeart()) === 'navigate', await ladeart());
     await kontext.close();
