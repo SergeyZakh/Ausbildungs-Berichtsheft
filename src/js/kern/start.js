@@ -19,6 +19,9 @@ window.__montagVon = function (datumIso) { return iso(montagVon(vonIso(datumIso)
 window.__fehlenderWerktag = function (datumIso) { return fehlenderWerktag(datumIso); };
 window.__tagArt = function (datumIso) { return tagArt(datumIso); };
 window.__schulbloeckeLesen = schulbloeckeLesen;
+window.__wochenBilanz = function (montagIso) { return wochenBilanz(montagIso); };
+window.__offeneWochen = function () { return offeneWochen(); };
+window.__hinweise = function () { return browserHinweise; };
 window.__kalenderwoche = function (montagIso) { return kalenderwoche(vonIso(montagIso)); };
 window.__blattHoehe = function (html) { return blattHoehe(html); };
 window.__satzHoehe = function () { return satzHoehe(); };
@@ -92,6 +95,7 @@ if (alt && alt.tage) {
   });
 }
 if (alt && alt.wochen) wochendaten = alt.wochen;
+if (alt && alt.hinweise && typeof alt.hinweise === "object") browserHinweise = alt.hinweise;
 // Die Stempel für den Abgleich. Ohne sie galten Stammdaten und Wochen nach jedem Neuladen als
 // eben geändert und überschrieben beim ersten Speichern, was ein anderes Gerät ins Konto schrieb.
 stempelLaden(alt && alt.geaendert);
@@ -106,6 +110,7 @@ if (wochen.length) {
   sage("Letzter Stand wiederhergestellt — " + Object.keys(tage).length +
     " Tage, " + wochen.length + (wochen.length === 1 ? " Woche." : " Wochen."));
 }
+hinweiseBeimOeffnen();
 
 /* Am Handy (Touch und schmal) startet der Rundgang nicht: Er zeigt auf Stellen, die es nur im
    breiten Fenster nebeneinander gibt. Das Werkzeug selbst geht, die Ansicht steht in handy.css. */
@@ -119,5 +124,7 @@ if ($("gruppe-zu")) $("gruppe-zu").addEventListener("click", function () { $("dl
 // Der Rundgang erst, wenn gezeichnet und klar ist, wer angemeldet ist: Er zeigt auf Stellen im
 // Fenster, und Ausbilder bekommen einen eigenen. Geht es gleich zum Anmeldedienst, keiner.
 kontoStarten().then(function () {
+  // Erst jetzt ist klar, ob ein Konto die Daten hält; dann braucht es keine Sicherung.
+  hinweiseZeigen();
   if (!amHandy && !KONTO.weiterleitung && !NEU_LADEN && !onbGesehen()) setTimeout(onbStarten, 300);
 });

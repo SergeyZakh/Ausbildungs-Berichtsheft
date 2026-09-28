@@ -139,7 +139,12 @@ flowchart TD
   wenn du ihn übernimmst. Rot heißt offen, grün fertig.
 
 - **Ausgabe** als Word – Wochenblatt oder Gesamtheft mit Deckblatt – und als PDF über den
-  Druckdialog, mit Live-Vorschau des Blatts.
+  Druckdialog, mit Live-Vorschau des Blatts. Wahlweise im Vordruck mit wöchentlicher oder mit
+  täglicher Notierung (eine Zeile je Tag).
+
+- **Übersicht und Erinnerungen.** Eine Übersicht zeigt jede Woche der Ausbildung und zählt
+  Schul-, Urlaubs- und Krankheitstage je Ausbildungsjahr. Beim Öffnen sagt ein Hinweis, was in
+  den letzten Wochen noch fehlt; ohne Konto erinnert das Werkzeug an die Sicherung.
 
 - **Optional mit eigenem Sprachmodell.** [Ollama](https://ollama.com) fasst den Tag in so vielen
   Zeilen zusammen, wie dein Ausbilder verlangt – auf deinem Rechner oder im Docker-Stapel des
@@ -158,7 +163,8 @@ flowchart TD
 2. **Ausbildungsabteilung** – gilt für die gesamte Woche; ohne Eintrag zählt die aus deinen Stammdaten.
 3. **Unterweisungen und Lehrgespräche** – eigenes Feld im Vordruck.
 4. **Vorschau des Wochenblatts**
-5. **Umfang, KI und Herunterladen** 
+5. **Umfang, Vordruck, KI und Herunterladen** – wöchentliche oder tägliche Notierung, umschalten
+   mit einem Klick.
 6. **Exportieren** – Wochenblatt oder Gesamtheft, als Word oder PDF.
 
 ## Unterstützte Exporte
@@ -303,18 +309,24 @@ Einrichten, Abgleich, Rechte und Sicherung → [docs/SERVER.md](docs/SERVER.md)
 - **Am Handy** läuft das Werkzeug auch. Tage, Woche und Blattvorschau stehen dann untereinander.
   Zum Gegenlesen vieler Wochen ist ein Rechner bequemer, und „PDF drucken“ hängt vom Druckdialog
   des Handys ab.
+- **Am iPhone** löscht Safari die Daten einer Seite, die du sieben Tage nicht öffnest. Leg das
+  Berichtsheft über *Teilen → Zum Home-Bildschirm* ab; dort beginnt es leer, deinen Stand bringst
+  du mit **⋯ → Sicherung speichern** und *Sicherung laden* mit.
+- **Dunkel** wird die Oberfläche, wenn dein Gerät es so eingestellt hat. Das Blatt bleibt weiß.
 - **Als Datei per Doppelklick** kann Chrome oder Edge in seltenen Fällen einen Tab öffnen, der den
   gespeicherten Stand nicht sieht. Das Werkzeug prüft das beim Start und lädt dann einmal neu. Mit
   `npm start` oder Docker tritt es gar nicht auf. Sichern unter **⋯ → Sicherung speichern** schadet nie.
 - **Im Dokument stehen keine Uhrzeiten.**
-- **Schultage** aus *Deine Daten → Schule* setzen nur leere Tage auf „Berufsschule“. Tage mit
-  Buchungen bleiben, wie der Import sie liefert, denn sie können in den Schulferien liegen. Am Tag
+- **Schultage** aus *Deine Daten → Schule* setzen nur leere Tage auf „Berufsschule“, in den dort
+  eingetragenen Schulferien nicht. Tage mit Buchungen bleiben, wie der Import sie liefert. Am Tag
   selbst lässt sich die Art jederzeit umstellen.
+- **Eine Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den
+  Text des Tages.
 - **Feiertage** werden bundesweit erkannt. Mit deinem Bundesland unter *Deine Daten → Verarbeitung*
   kommen die Feiertage des Landes dazu. Was nur in einzelnen Gemeinden gilt, etwa Mariä Himmelfahrt
   in Teilen Bayerns, trägst du als Art des Tages ein. Ein Feiertag ohne Eintrag zählt nicht als Lücke.
 - **Der Vordruck** folgt dem verbreiteten IHK-Muster „Ausbildungsnachweis – wöchentliche
-  Notierung“. Frag bei deiner IHK nach, ob sie eine eigene Form verlangt.
+  Notierung“, wahlweise der täglichen Notierung. Frag bei deiner IHK nach, welchen sie verlangt.
 
 ## Mitmachen
 

@@ -7,10 +7,15 @@
  * ========================================================== */
 
 function sicherungSpeichern() {
+  if (!Object.keys(tage).length && !geladen()) { sage("Es gibt noch nichts zu sichern.", "warn"); return; }
+  // Der Zeitpunkt steht schon in der Datei: Wer sie später lädt, weiß, wann zuletzt gesichert wurde.
+  browserHinweise.gesichert = new Date().toISOString();
+  delete browserHinweise.sicherungSpaeter;
   speichernVerwerfen();
   merkenJetzt();
   var stand = geladen();
   if (!stand) { sage("Es gibt noch nichts zu sichern.", "warn"); return; }
+  hinweiseZeigen();
   var name = "Berichtsheft-Sicherung-" + iso(new Date()) + ".json";
   dateiAnbieten(new Blob([JSON.stringify(stand, null, 2)], { type: "application/json" }), name);
 }

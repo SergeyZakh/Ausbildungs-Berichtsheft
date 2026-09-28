@@ -84,7 +84,8 @@ function druckAbschnitt(titel, liste, klasse) {
  * Ein Blatt einer Woche. `fortsetzung` markiert Folgeblätter, `letzte`
  * hängt Unterweisungen, Berufsschule und Unterschriften an.
  */
-function druckBlattSeite(nummer, montag, s, texte, fortsetzung, letzte) {
+/** Kopfleiste eines Blatts: Nummer, Ausbildungsjahr, Woche, Abteilung, Name. */
+function druckKopfleiste(nummer, montag, s) {
   var wd = wochendaten[iso(montag)] || {};
   var abteilung = wd.abteilung || s.abteilung || "";
   var jahr = ausbildungsjahr(s, montag) || s.jahr || "";
@@ -92,31 +93,37 @@ function druckBlattSeite(nummer, montag, s, texte, fortsetzung, letzte) {
   function kopfFeld(etikett, wert) {
     return "<td><span>" + sicher(etikett) + "</span>" + sicher(wert || "") + "</td>";
   }
+  return '<table class="kopfleiste"><tr>' +
+    // Zwei eigene Felder wie im Vordruck: "3 / 1" unter einem Etikett las niemand richtig.
+    kopfFeld("Nr.", nummer) +
+    kopfFeld("Ausbildungsjahr", jahr ? jahr + "." : "") +
+    kopfFeld("Ausbildungswoche", dmy(montag) + " – " + dmy(plus(montag, 6))) +
+    kopfFeld("Ausbildungsabteilung", abteilung) +
+    kopfFeld("Name", s.name) +
+  "</tr></table>";
+}
 
+var DRUCK_UNTERSCHRIFTEN = '<div class="unterschriften">' +
+  "<div>Auszubildender / Datum</div>" +
+  "<div>Ausbilder / Datum</div>" +
+  "<div>Gesetzlicher Vertreter / Datum</div>" +
+"</div>";
+
+function druckBlattSeite(nummer, montag, s, texte, fortsetzung, letzte) {
   return '<article class="blatt dicht-' + dichte(texte) + (fortsetzung ? " fortsetzung" : "") + '">' +
     "<h1>Ausbildungsnachweis" + (fortsetzung ? " – Fortsetzung" : "") + "</h1>" +
-    '<table class="kopfleiste"><tr>' +
-      // Zwei eigene Felder wie im Vordruck: "3 / 1" unter einem Etikett las niemand richtig.
-      kopfFeld("Nr.", nummer) +
-      kopfFeld("Ausbildungsjahr", jahr ? jahr + "." : "") +
-      kopfFeld("Ausbildungswoche", dmy(montag) + " – " + dmy(plus(montag, 6))) +
-      kopfFeld("Ausbildungsabteilung", abteilung) +
-      kopfFeld("Name", s.name) +
-    "</tr></table>" +
+    druckKopfleiste(nummer, montag, s) +
     druckAbschnitt("Betriebliche Tätigkeit", texte.betrieb, "gross") +
     (letzte ?
       druckAbschnitt("Unterweisungen, Lehrgespräche, betrieblicher Unterricht, sonstige Schulungsveranstaltungen",
                      texte.unterweisung, "klein") +
       druckAbschnitt("Berufsschule (Unterrichtsthemen)", texte.schule, "klein") +
-      '<div class="unterschriften">' +
-        "<div>Auszubildender / Datum</div>" +
-        "<div>Ausbilder / Datum</div>" +
-        "<div>Gesetzlicher Vertreter / Datum</div>" +
-      "</div>" : "") +
+      DRUCK_UNTERSCHRIFTEN : "") +
     "</article>";
 }
 
 function druckBlattEinseitig(nummer, montag, s) {
+  if (taeglich(s)) return druckTaeglichSeite(nummer, montag, s, tagesZeilen(montag), false, true);
   return druckBlattSeite(nummer, montag, s, wochenTexte(montag), false, true);
 }
 
@@ -185,21 +192,31 @@ function druckBlatt(nummer, montag, s) {
   var einseitig = druckBlattEinseitig(nummer, montag, s);
   if (passtAufEineSeite(einseitig)) return einseitig;
 
-  var texte = wochenTexte(montag);
-  var rest = druckEinheiten(texte.betrieb);
-  var seiten = [], wache = 0;
+  if (taeglich(s)) {
+    var reihen = tagesZeilen(montag);
+    return druckAufteilen(druckTagesEinheiten(reihen), function (teil, fortsetzung, letzte) {
+      return druckTaeglichSeite(nummer, montag, s, druckBuendeln(teil), fortsetzung, letzte, reihen);
+    });
+  }
 
-  var bauen = function (teil, fortsetzung, letzte) {
+  var texte = wochenTexte(montag);
+  return druckAufteilen(druckEinheiten(texte.betrieb), function (teil, fortsetzung, letzte) {
     return druckBlattSeite(nummer, montag, s, {
       betrieb: druckBuendeln(teil),
       unterweisung: letzte ? texte.unterweisung : [],
       schule: letzte ? texte.schule : []
     }, fortsetzung, letzte);
-  };
+  });
+}
 
-  /* Vor jedem Blatt: Passt der ganze Rest samt Schlussfeldern? Dann ist es
-     das letzte. Sonst so viel wie möglich ohne Schlussfelder – aber nie
-     alles, sonst stünden die Schlussfelder allein auf einem leeren Blatt. */
+/**
+ * Einheiten auf Blätter verteilen. `bauen(teil, fortsetzung, letzte)` liefert das HTML eines Blatts.
+ * Vor jedem Blatt: Passt der ganze Rest samt Schlussfeldern? Dann ist es das letzte. Sonst so viel
+ * wie möglich ohne Schlussfelder – aber nie alles, sonst stünden die Schlussfelder allein auf einem
+ * leeren Blatt.
+ */
+function druckAufteilen(rest, bauen) {
+  var seiten = [], wache = 0;
   while (rest.length && wache++ < 200) {
     var fortsetzung = seiten.length > 0;
 
@@ -213,9 +230,53 @@ function druckBlatt(nummer, montag, s) {
   }
   if (!seiten.length) seiten = [[]];
 
-  return seiten.map(function (betrieb, i) {
-    return bauen(betrieb, i > 0, i === seiten.length - 1);
+  return seiten.map(function (teil, i) {
+    return bauen(teil, i > 0, i === seiten.length - 1);
   }).join("");
+}
+
+/* ---------- Tägliche Notierung ----------
+   Der zweite Vordruck der IHK: eine Zeile je Tag. Stunden stehen nicht darin, die IHK fragt nach
+   Tätigkeiten. Montag bis Freitag stehen immer da, wie im Vordruck; Samstag und Sonntag nur mit
+   Eintrag. */
+
+/** Wie druckEinheiten, aber auch ein Tag ohne Text bleibt als leere Zeile stehen. */
+function druckTagesEinheiten(reihen) {
+  var out = [];
+  reihen.forEach(function (e) {
+    var teile = [];
+    zeilen(e.text).forEach(function (z) {
+      druckWortzeilen(z, 85).forEach(function (t) { teile.push(t); });
+    });
+    if (!teile.length) teile.push("");
+    teile.forEach(function (z, i) { out.push({ kopf: e.kopf, text: z, erste: i === 0 }); });
+  });
+  return out;
+}
+
+/** Ein Blatt der täglichen Notierung. `alle` sind die Zeilen der ganzen Woche, für die Dichte:
+ *  Alle Blätter einer Woche stehen in derselben Stufe. */
+function druckTaeglichSeite(nummer, montag, s, reihen, fortsetzung, letzte, alle) {
+  var zeile = function (e) {
+    var k = e.kopf;
+    var art = k.art ? '<p class="tart">' + sicher(k.art) + "</p>" : "";
+    var text = zeilen(e.text).map(function (z) {
+      var roh = String(z).replace(/^\s*[-*•·]\s*/, "").trim();
+      return roh ? '<p class="sp"><span class="pkt">•</span>' + sicher(roh) + "</p>" : "";
+    }).join("");
+    return '<tr' + (k.woche ? ' class="wochenzeile"' : "") + ">" +
+      '<td class="ttag"><b>' + sicher(k.tag) + "</b>" + (k.datum ? "<span>" + k.datum + "</span>" : "") + "</td>" +
+      '<td class="ttext">' + art + text + "</td></tr>";
+  };
+  return '<article class="blatt taeglich dicht-' + dichte({ betrieb: alle || reihen, unterweisung: [], schule: [] }) +
+      (fortsetzung ? " fortsetzung" : "") + '">' +
+    "<h1>Ausbildungsnachweis" + (fortsetzung ? " – Fortsetzung" : "") + "</h1>" +
+    druckKopfleiste(nummer, montag, s) +
+    '<table class="tagestabelle"><thead><tr>' +
+      "<th>Tag</th><th>" + TAEGLICH_SPALTE + "</th>" +
+    "</tr></thead><tbody>" + reihen.map(zeile).join("") + "</tbody></table>" +
+    (letzte ? DRUCK_UNTERSCHRIFTEN : "") +
+    "</article>";
 }
 
 /** Wie druckBlatt, aber ohne Ausnahmen: Scheitert die Aufteilung, kommt
@@ -236,7 +297,7 @@ function druckVorseiten(s) {
   }
   var deck = '<article class="blatt deck">' +
     '<h1 class="gross">Berichtsheft</h1>' +
-    '<p class="untertitel">(Ausbildungsnachweis – wöchentliche Notierung –)</p>' +
+    '<p class="untertitel">' + sicher(notierungTitel(s)) + "</p>" +
     '<table class="stammliste">' +
       deckblattAngaben(s).map(function (a) { return zeile(a[0], a[1]); }).join("") +
     "</table>" +

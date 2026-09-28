@@ -8,6 +8,10 @@
   padding: 12px 20px;
 }
 .leiste .schub { flex: none; display: flex; align-items: center; gap: 8px; }
+/* Ohne Woche: statt leerem Wochenknopf und gesperrtem Export nur der Name und das Menü. */
+body.ohnewoche .wochenbalken, body.ohnewoche #btn-export { display: none; }
+body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: 15px; font-weight: 600; letter-spacing: .01em; }
+body.ohnewoche .leiste .schub { margin-left: auto; }
 .leiste .schub .knopf { text-align: center; padding: 7px 14px 7px 16px; border-radius: 999px; }
 /* Pfeil am Exportknopf: Er öffnet ein Menü. */
 #btn-export { display: inline-flex; align-items: center; gap: 8px; }
@@ -27,9 +31,9 @@
   text-align: left; background: transparent; color: var(--text); border: none;
   border-radius: 8px; padding: 8px 11px; font-size: 12.5px; white-space: nowrap;
 }
-.menue button:hover:not(:disabled) { background: rgba(22, 22, 26, .06); }
-.menue button:disabled { color: #9A9A9A; cursor: not-allowed; }
-.menuetrenner { height: 1px; margin: 4px 8px; background: rgba(22, 22, 26, .1); }
+.menue button:hover:not(:disabled) { background: var(--hauch); }
+.menue button:disabled { color: var(--blass); cursor: not-allowed; }
+.menuetrenner { height: 1px; margin: 4px 8px; background: var(--linie); }
 
 /* ---------- Wochenbalken: Blättern, Wochenknopf, Summe ---------- */
 .wochenbalken { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }
@@ -47,8 +51,8 @@
 }
 .wochenknopf:hover { background: var(--band); border-color: var(--linie-fest); }
 /* Derselbe Stand wie im Monatsraster: rot = Ungelesenes, grün = durch. */
-.wochenknopf.pruefen { color: var(--acht); font-weight: 500; border-color: #EDC6C1; }
-.wochenknopf.fertig  { color: var(--gut); font-weight: 500; border-color: #BFDDC8; }
+.wochenknopf.pruefen { color: var(--acht); font-weight: 500; border-color: var(--acht-kante); }
+.wochenknopf.fertig  { color: var(--gut); font-weight: 500; border-color: var(--gut-kante); }
 .wochenknopf.pruefen:hover { background: var(--acht-hell); }
 .wochenknopf.fertig:hover  { background: var(--gut-hell); }
 .wochensumme {
@@ -94,7 +98,7 @@
 .reiter button[aria-selected="true"] .rlage { color: var(--flaeche); }
 /* Gewählt, aber ohne Stand (kein Text, frei): grau statt schwarz. */
 .reiter button[aria-selected="true"]:not(.fertig):not(.pruefen) {
-  background: #7A7973; border-color: #7A7973; box-shadow: 0 6px 16px rgba(22, 22, 26, .12);
+  background: var(--gewaehlt-grau); border-color: var(--gewaehlt-grau); box-shadow: 0 6px 16px rgba(22, 22, 26, .12);
 }
 .reiter .rtag {
   display: flex; gap: 5px; justify-content: center;
@@ -124,7 +128,7 @@
 .reiter button.fertig .haken { background: var(--gut); }
 /* Im gewählten Reiter kehrt sich die Marke um: weißer Kreis, farbige Schrift. */
 .reiter button[aria-selected="true"] .marke,
-.reiter button[aria-selected="true"] .haken { background: #fff; color: var(--text); }
+.reiter button[aria-selected="true"] .haken { background: var(--flaeche); color: var(--text); }
 .reiter button.pruefen[aria-selected="true"] .marke { color: var(--acht); }
 .reiter button.fertig[aria-selected="true"] .haken { color: var(--gut); }
 .reiter .ring { width: 14px; height: 14px; --dicke: 2.5px; }
@@ -136,13 +140,13 @@
 @keyframes dreh { to { transform: rotate(360deg); } }
 
 /* Der Reiter färbt mit dem Stand des Tages: grün durch, rot ungelesen. */
-.reiter button.fertig { background: var(--gut-hell); color: var(--gut); border-color: #BFDDC8; }
+.reiter button.fertig { background: var(--gut-hell); color: var(--gut); border-color: var(--gut-kante); }
 .reiter button.fertig .rlage { color: var(--gut); }
-.reiter button.fertig:hover { background: #D6EBDC; }
+.reiter button.fertig:hover { background: var(--gut-hover); }
 .reiter button.fertig[aria-selected="true"] { background: var(--gut); border-color: var(--gut); color: #fff; box-shadow: 0 6px 16px rgba(26, 127, 55, .25); }
 .reiter button.fertig[aria-selected="true"] .rlage { color: #fff; }
-.reiter button.pruefen { background: var(--acht-hell); color: var(--acht); border-color: #EDC6C1; }
+.reiter button.pruefen { background: var(--acht-hell); color: var(--acht); border-color: var(--acht-kante); }
 .reiter button.pruefen .rlage { color: var(--acht); }
-.reiter button.pruefen:hover { background: #F8D7D3; }
+.reiter button.pruefen:hover { background: var(--acht-hover); }
 .reiter button.pruefen[aria-selected="true"] { background: var(--acht); border-color: var(--acht); color: #fff; box-shadow: 0 6px 16px rgba(180, 35, 24, .25); }
 .reiter button.pruefen[aria-selected="true"] .rlage { color: #fff; }

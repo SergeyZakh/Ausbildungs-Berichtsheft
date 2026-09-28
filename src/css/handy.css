@@ -24,7 +24,7 @@
   .wochenbalken { order: 3; flex: 1 1 100%; }
   .leiste .schub .knopf { min-width: 0; padding: 6px 12px; font-size: 12px; }
   /* Fast deckend: Über den roten Tagesreitern war das Glas sonst kaum lesbar. */
-  .menue { min-width: 210px; background: rgba(255, 255, 255, .96); }
+  .menue { min-width: 210px; background: var(--menue); }
   .menue button { padding: 11px 12px; font-size: 14px; }
 
   .wochenschalter { gap: 6px; }
@@ -106,7 +106,18 @@
   .postenliste { padding: 7px 12px 9px; max-height: 55vh; }
   .postenliste p { flex-direction: column; gap: 0; padding: 6px 0; }
   .postenliste .pzeit { flex: none; font-size: 11.5px; }
+  .postenliste p:has(.pdazu) { padding-right: 46px; }
+  .pdazu { width: 34px; height: 34px; font-size: 17px; }
   .leerbild { margin: 4px 12px; padding: 28px 22px; }
+
+  /* Der Hinweis scrollt mit weg; die Reiter darunter halten mit ihrem oberen Rand Abstand. */
+  .hinweise { margin: 12px 12px 0; }
+  .hinweis { padding: 10px 40px 12px 14px; gap: 10px; }
+  .hinweistext { flex: 1 1 100%; font-size: 13.5px; }
+  .hinweisknoepfe .knopf { padding: 8px 14px; font-size: 13px; }
+  .hinweiszu { width: 34px; height: 34px; top: 4px; right: 4px; }
+  .uraster { grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); }
+  .ukw { height: 30px; font-size: 11px; }
 
   .fortschritt { margin: 0 12px 10px; gap: 8px; padding-left: 12px; }
   .fortschritt .ftext { font-size: 11px; }
@@ -119,7 +130,14 @@
     font-size: 12px; line-height: 1.35;
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
   }
-  .fussleiste #notiz.ganz { display: block; -webkit-line-clamp: unset; }
+  /* Nach ein paar Sekunden eine Zeile ohne Farbe (sage() in zustand.js); Tippen zeigt sie ganz. */
+  .fussleiste #notiz.still { -webkit-line-clamp: 1; color: var(--schiefer); font-weight: 400; }
+  .fussleiste.still { background: var(--flaeche); border-top-color: var(--linie); }
+  .fussleiste #notiz.ganz { display: block; -webkit-line-clamp: unset; opacity: 1; }
+  .sektionskopf .lang:has(+ .kurz) { display: none; }
+  .sektionskopf .kurz { display: inline; }
+  body.ohnewoche .leerbild { margin: 12px; }
+  body.ohnewoche .leiste { flex-wrap: nowrap; }
 
   .felder { grid-template-columns: 1fr; }
   /* Safari am iPhone zoomt beim Tippen in jedes Feld unter 16 px hinein; danach ließ sich die

@@ -6,14 +6,18 @@
 
 /* ---------- Bausteine ---------- */
 
-/** Abgegrenzter Bereich mit Beschriftungsband, wie im Vordruck. */
-function sektion(titel, klasse) {
+/** Abgegrenzter Bereich mit Beschriftungsband, wie im Vordruck. `kurz` steht am Handy statt
+ *  eines langen Titels: In Großbuchstaben lief „Unterweisungen, Lehrgespräche …“ dort über vier Zeilen. */
+function sektion(titel, klasse, kurz) {
   var wurzel = document.createElement("section");
   wurzel.className = "sektion" + (klasse ? " " + klasse : "");
   var kopf = document.createElement("h3");
   kopf.className = "sektionskopf";
   var beschriftung = document.createElement("span");
-  beschriftung.textContent = titel;
+  if (kurz) {
+    beschriftung.innerHTML = '<span class="lang">' + sicher(titel) + '</span><span class="kurz">' + sicher(kurz) + "</span>";
+    beschriftung.title = titel;
+  } else beschriftung.textContent = titel;
   kopf.appendChild(beschriftung);
   var leib = document.createElement("div");
   leib.className = "sektionsleib";
@@ -87,8 +91,9 @@ function zeichneTag() {
   } else {
     var flaeche = document.createElement("div");
     flaeche.className = "tagflaeche";
-    flaeche.appendChild(textSektion(key, t, art, istSchule));
-    if (t && t.posten && t.posten.length) flaeche.appendChild(postenSektion(t.posten));
+    var textKarte = textSektion(key, t, art, istSchule);
+    flaeche.appendChild(textKarte);
+    if (t && t.posten && t.posten.length) flaeche.appendChild(postenSektion(t.posten, textKarte.querySelector("textarea")));
     panel.appendChild(flaeche);
   }
 
@@ -120,7 +125,7 @@ function zeichneLeerbild(bereich) {
     "<p>Exportiere deine Zeiten als CSV – aus Clockify, Harvest, Jira/Tempo, Kimai, Toggl " +
     "oder einer Excel-Liste – und lade sie hier. Ziehen geht auch, " +
     "irgendwo ins Fenster. Daraus entstehen die Wochenblätter für deinen " +
-    "Ausbildungsnachweis. Ohne Export wählst du eine Woche und schreibst die Tage selbst.</p>";
+    "Ausbildungsnachweis. Ohne Export beginnst du mit dieser Woche und schreibst die Tage selbst.</p>";
   var lb = document.createElement("button");
   lb.type = "button"; lb.className = "knopf voll"; lb.textContent = "Export laden";
   lb.addEventListener("click", function () { $("datei").click(); });
@@ -137,6 +142,16 @@ function zeichneLeerbild(bereich) {
     wocheZeigen(iso(montagVon(heute)), Math.min(tagIndex(heute), 4));
   });
   leer.appendChild(ohne);
+  // Wer vom Home-Bildschirm aus neu anfängt oder das Gerät wechselt, bringt sein Heft als Sicherung mit.
+  var weiter = document.createElement("p");
+  weiter.className = "leerfuss";
+  weiter.appendChild(document.createTextNode("Schon ein Heft angefangen? "));
+  var laden = document.createElement("button");
+  laden.type = "button"; laden.className = "textknopf"; laden.id = "btn-leer-sicherung";
+  laden.textContent = "Sicherung laden";
+  laden.addEventListener("click", function () { $("sicherungsdatei").click(); });
+  weiter.appendChild(laden);
+  leer.appendChild(weiter);
   bereich.appendChild(leer);
 }
 
@@ -343,8 +358,13 @@ function kiKnopf(key, t) {
  * Die importierten Buchungen neben dem Text, zum Gegenhalten beim Schreiben.
  * Projekt und Tätigkeit erscheinen nur, wenn sie etwas aussagen (gleiche
  * Regeln wie im Entwurf); die Beschreibung steht im Original.
+ *
+ * Das Plus hängt eine Buchung als Zeile an den Text, bereinigt wie im Entwurf (postenZeile):
+ * Wer den Entwurf gelöscht hat und neu schreibt, holt sich so einzelne Zeilen zurück, ohne
+ * Kundennamen und Ticketnummern abzutippen. Steht die Zeile schon im Text, zeigt der Knopf
+ * einen Haken.
  */
-function postenSektion(posten) {
+function postenSektion(posten, ta) {
   var s = sektion("Buchungen", "posten");
   var zahl = document.createElement("span");
   zahl.className = "postenzahl";
@@ -376,8 +396,44 @@ function postenSektion(posten) {
       z.title = "Klicken für den ganzen Text";
       z.addEventListener("click", function () { z.classList.toggle("offen"); });
     }
+    var zeile = postenZeile(pst);
+    if (ta && zeile) {
+      var dazu = document.createElement("button");
+      dazu.type = "button";
+      dazu.className = "pdazu";
+      dazu.setAttribute("data-zeile", zeile);
+      dazu.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (imText(ta.value, zeile)) { sage("Steht schon im Text: " + zeile); return; }
+        var t = tage[ta.id.slice("feld-".length)], warFertig = !!(t && t.geprueft);
+        ta.value = ta.value.replace(/\s+$/, "") + (ta.value.trim() ? "\n" : "") + zeile;
+        ta.dispatchEvent(new Event("input", { bubbles: true }));
+        sage("In den Text übernommen: " + zeile + (warFertig ? " — der Tag ist wieder offen." : ""),
+          warFertig ? "warn" : "gut");
+      });
+      z.appendChild(dazu);
+    }
     liste.appendChild(z);
   });
   s.leib.appendChild(liste);
+
+  function postenAbgleichen() {
+    if (!ta) return;
+    Array.prototype.forEach.call(liste.querySelectorAll(".pdazu"), function (k) {
+      var drin = imText(ta.value, k.getAttribute("data-zeile"));
+      k.classList.toggle("drin", drin);
+      k.textContent = drin ? "✓" : "+";
+      k.title = drin ? "Steht schon im Text" : "Als Zeile in den Text übernehmen";
+      k.setAttribute("aria-label", k.title + ": " + k.getAttribute("data-zeile"));
+    });
+  }
+  if (ta) ta.addEventListener("input", postenAbgleichen);
+  postenAbgleichen();
   return s.wurzel;
+}
+
+/** Steht diese Zeile schon im Text? Groß- und Kleinschreibung und Satzzeichen zählen nicht. */
+function imText(text, zeile) {
+  var k = schluessel(zeile);
+  return !!k && zeilen(text).some(function (z) { return schluessel(z) === k; });
 }

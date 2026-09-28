@@ -5,11 +5,11 @@
 /* ---------- Wochenwahl: Monatsraster ---------- */
 .wpopover {
   position: absolute; z-index: 50; width: 420px; max-width: calc(100vw - 16px);
-  background: rgba(255, 255, 255, .84); border: 1px solid var(--glas-kante); border-radius: 16px;
+  background: var(--popover); border: 1px solid var(--glas-kante); border-radius: 16px;
   -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
   box-shadow: var(--schatten-hoch);
 }
-.wpopover .dkopf { border-bottom-color: rgba(22, 22, 26, .08); padding: 12px 12px 12px 18px; }
+.wpopover .dkopf { border-bottom-color: var(--linie); padding: 12px 12px 12px 18px; }
 .wpopover .dkoerper { padding: 14px 16px 16px; }
 .monatszeile {
   display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
@@ -25,7 +25,7 @@
 .wochenliste button {
   display: grid; grid-template-columns: 34px repeat(7, 1fr) 52px;
   width: 100%; align-items: center; text-align: left;
-  background: var(--flaeche); border: none; border-bottom: 1px solid #EFEEEA;
+  background: var(--flaeche); border: none; border-bottom: 1px solid var(--linie-leise);
   padding: 0; color: var(--text);
 }
 .wochenliste .wkopf {
@@ -35,10 +35,10 @@
 .wochenliste .wkopf span { padding: 5px 0; text-align: center; }
 .wochenliste button:last-child { border-bottom: none; }
 .wochenliste button:hover:not(:disabled) { background: var(--band); }
-.wochenliste button:disabled { color: #A8A8A8; cursor: not-allowed; }
+.wochenliste button:disabled { color: var(--blass); cursor: not-allowed; }
 /* Leere Woche: blass, mit "+" statt Stunden; ein Klick legt sie an. */
-.wochenliste button.neu, .wochenliste button.neu .wkw { color: #B0AEA8; }
-.wochenliste button.neu .wstd { color: #B0AEA8; font-size: 14px; }
+.wochenliste button.neu, .wochenliste button.neu .wkw { color: var(--blass); }
+.wochenliste button.neu .wstd { color: var(--blass); font-size: 14px; }
 .wochenliste button.neu:hover, .wochenliste button.neu:hover .wkw, .wochenliste button.neu:hover .wstd { color: var(--text); }
 .wochenliste .wkw { font-size: 10px; color: var(--schiefer); text-align: center; font-variant-numeric: tabular-nums; }
 .wochenliste .wstd {
@@ -60,8 +60,8 @@
 .wochenliste .wtag.voll b   { background: var(--acht); color: #fff; }
 .wochenliste .wtag.fertig b { background: var(--gut); color: #fff; }
 .wochenliste .wtag.offen b  { border: 1.5px solid var(--text); }
-.wochenliste .wtag.frei b   { color: #A8A8A8; text-decoration: line-through; }
-.wochenliste .wtag.nichts b { color: #C8C8C8; }
+.wochenliste .wtag.frei b   { color: var(--blass); text-decoration: line-through; }
+.wochenliste .wtag.nichts b { color: var(--blass); }
 
 .wochenliste button.pruefen,
 .wochenliste button.pruefen .wkw,
@@ -80,6 +80,21 @@
 .wochenliste button.pruefen[aria-current="true"] { background: var(--acht-hell); box-shadow: inset 3px 0 0 0 var(--acht); }
 .wochenliste button.fertig[aria-current="true"]  { background: var(--gut-hell); box-shadow: inset 3px 0 0 0 var(--gut); }
 
+/* Legende unter dem Raster: dieselben Marken wie in den Reitern. */
+.legende {
+  display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 10px;
+  font-size: 11.5px; color: var(--schiefer);
+}
+.legende span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legende .lm {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px;
+  font-size: 8.5px; font-weight: 700; line-height: 1; color: var(--auf-farbe);
+}
+.legende .lm.rot { background: var(--acht); }
+.legende .lm.gruen { background: var(--gut); font-size: 9.5px; }
+.legende .lr { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid currentColor; }
+.legende s { color: var(--blass); font-size: 11px; }
 .sprungzeile { display: flex; gap: 8px; margin-top: 10px; }
 .sprungzeile .knopf { flex: 1 1 0; font-size: 12px; padding: 7px 8px; }
 .suchzeile { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
@@ -153,7 +168,7 @@
   flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .kombiliste button em { flex: none; font-style: normal; color: var(--gut); visibility: hidden; }
-.kombiliste button:hover { background: rgba(22, 22, 26, .06); }
+.kombiliste button:hover { background: var(--hauch); }
 .kombiliste button[aria-selected="true"] { font-weight: 600; }
 .kombiliste button[aria-selected="true"] em { visibility: visible; }
 
@@ -171,11 +186,13 @@
 
 /* Feste Schultage: fünf Pillen statt fünf Häkchen. Das Häkchen bleibt im Dokument, damit
    Tastatur und Vorleser es finden, sichtbar ist nur die Pille dahinter. */
-.tagwahl { margin: 0; padding: 0; border: 0; min-width: 0; }
+/* Fünf Schalter passen neben den Namen der Schule, in die halbe Breite des Dialogs. Als Flex-Zeile:
+   Zwischen inline-block-Schaltern stand der Leerraum aus dem HTML, und „Fr“ brach um. */
+.tagwahl { margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; }
 .tagwahl legend { padding: 0; margin-bottom: 6px; font-size: 12px; color: var(--schiefer); }
-.felder .tagwahl label { display: inline-block; position: relative; margin: 0 6px 0 0; }
+.felder .tagwahl label { display: block; position: relative; margin: 0; }
 .felder .tagwahl label span {
-  display: inline-block; min-width: 46px; margin: 0; padding: 6px 12px; text-align: center;
+  display: inline-block; min-width: 42px; margin: 0; padding: 6px 8px; text-align: center;
   font-size: 13px; color: var(--text); cursor: pointer;
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: 999px;
   transition: background-color .15s, border-color .15s, color .15s;
@@ -184,15 +201,15 @@
 .felder .tagwahl input {
   position: absolute; left: 0; top: 0; width: 1px; height: 1px; margin: 0; padding: 0; opacity: 0;
 }
-.felder .tagwahl input:checked + span { background: var(--text); border-color: var(--text); color: #fff; }
+.felder .tagwahl input:checked + span { background: var(--text); border-color: var(--text); color: var(--flaeche); }
 .felder .tagwahl input:focus-visible + span { outline: 2px solid var(--text); outline-offset: 2px; }
 .felder small.fehlt { color: var(--acht); }
 
 /* Gefahrenbereich */
-.gefahrkasten { border: 1.5px solid #E3A9A2; border-radius: 12px; color: var(--acht); overflow: hidden; }
+.gefahrkasten { border: 1.5px solid var(--gefahr-kante); border-radius: 12px; color: var(--acht); overflow: hidden; }
 .gefahrzeile {
   display: flex; align-items: flex-start; gap: 14px;
-  padding: 12px 14px; border-bottom: 1px solid #F1CFCA;
+  padding: 12px 14px; border-bottom: 1px solid var(--gefahr-linie);
 }
 .gefahrzeile:last-child { border-bottom: none; }
 .gefahrzeile > div { flex: 1 1 auto; min-width: 0; }
@@ -202,14 +219,14 @@
 .gefahrknopf:hover:not(:disabled) { background: var(--acht); border-color: var(--acht); color: #fff; }
 .gefahrhinweis {
   margin: 0; padding: 10px 14px; font-size: 12.5px; line-height: 1.5; color: var(--text);
-  border-top: 1px solid #E3A9A2; background: var(--band);
+  border-top: 1px solid var(--gefahr-kante); background: var(--band);
 }
-.gefahrfrage { padding: 12px 14px; border-top: 1px solid #E3A9A2; background: var(--acht-hell); }
+.gefahrfrage { padding: 12px 14px; border-top: 1px solid var(--gefahr-kante); background: var(--acht-hell); }
 .gefahrfrage p { margin: 0 0 10px; font-size: 12.5px; line-height: 1.5; }
 .gefahrfrage label span { display: block; font-size: 12px; margin-bottom: 4px; }
 .gefahrfrage input {
   width: 100%; font: inherit; font-size: 13.5px; letter-spacing: .08em;
-  color: var(--acht); background: #fff; border: 1px solid var(--acht); border-radius: var(--rund-klein);
+  color: var(--acht); background: var(--flaeche); border: 1px solid var(--acht); border-radius: var(--rund-klein);
   padding: 6px 10px;
 }
 .gefahrfrage input::placeholder { color: #D99; }
@@ -218,7 +235,7 @@
 .gefahrfuss .knopf:hover:not(:disabled) { background: var(--acht-hell); border-color: var(--acht); }
 #gefahr-ja { background: var(--acht); border-color: var(--acht); color: #fff; }
 #gefahr-ja:hover:not(:disabled) { filter: brightness(1.12); background: var(--acht); }
-#gefahr-ja:disabled { background: #fff; color: var(--acht); border-color: #C9A5A1; }
+#gefahr-ja:disabled { background: var(--flaeche); color: var(--acht); border-color: var(--gefahr-kante); }
 
 /* ---------- Spalten zuordnen ---------- */
 #dlg-zuordnung { max-width: 680px; }
@@ -300,6 +317,44 @@
   font-size: 12.5px; line-height: 1.4; color: var(--text);
   background: var(--flaeche); border: 1px solid var(--linie-fest); box-shadow: var(--schatten-hoch);
 }
-.dlgnotiz.gut  { color: var(--gut); background: var(--gut-hell); border-color: #BFDDC8; }
-.dlgnotiz.warn { color: var(--acht); background: var(--acht-hell); border-color: #EDC6C1; }
+.dlgnotiz.gut  { color: var(--gut); background: var(--gut-hell); border-color: var(--gut-kante); }
+.dlgnotiz.warn { color: var(--acht); background: var(--acht-hell); border-color: var(--acht-kante); }
 .dlgnotiz[hidden] { display: none; }
+
+/* ---------- Übersicht aller Wochen (uebersicht.js) ---------- */
+#dlg-uebersicht { width: min(680px, calc(100% - 32px)); max-width: none; }
+#dlg-uebersicht .dkoerper { max-height: calc(100vh - 140px); overflow-y: auto; }
+.ueb-kopf { display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.ueb-kopf p { flex: 1 1 260px; margin: 0; font-size: 13px; color: var(--text); }
+.ueb-kopf p.gut { color: var(--gut); font-weight: 500; }
+.ueb-kopf .knopf { border-radius: 999px; }
+.ujahr { padding: 14px 0 16px; border-top: 1px solid var(--linie); }
+.ujahr h3 { margin: 0 0 2px; font-size: 13px; font-weight: 600; }
+.ujahr h3 span { margin-left: 6px; font-weight: 400; color: var(--schiefer); font-size: 12px; }
+.ustand { margin: 0 0 10px; font-size: 12px; color: var(--schiefer); }
+.uraster { display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 4px; }
+/* Ein Kästchen je Woche, darin die Kalenderwoche. */
+.ukw {
+  display: flex; align-items: center; justify-content: center; height: 26px; padding: 0;
+  font: inherit; font-size: 10.5px; font-variant-numeric: tabular-nums;
+  border: 1.5px solid transparent; border-radius: 7px; cursor: pointer;
+}
+.ukw.fertig  { background: var(--gut); color: var(--auf-farbe); }
+.ukw.pruefen { background: var(--acht); color: var(--auf-farbe); }
+.ukw.luecke  { background: var(--flaeche); color: var(--acht); border-color: var(--acht); }
+.ukw.frei    { background: var(--band); color: var(--schiefer); border-color: var(--linie); }
+.ukw.kommt   { background: transparent; color: var(--blass); border: 1.5px dashed var(--linie); }
+.ukw:hover { filter: brightness(.94); }
+.ukw[aria-current="true"] { box-shadow: 0 0 0 2px var(--flaeche), 0 0 0 4px var(--text); }
+.utage { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; font-size: 12px; }
+.utage span { padding: 3px 10px; border: 1px solid var(--linie); border-radius: 999px; color: var(--schiefer); }
+.utage b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.utage .leise, .ulegende .leise { border: 0; padding: 3px 0; color: var(--schiefer); }
+.ulegende {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0; padding-top: 12px;
+  border-top: 1px solid var(--linie); font-size: 11.5px; color: var(--schiefer);
+}
+.ulegende span { display: inline-flex; align-items: center; gap: 6px; }
+.ulegende .ukw { display: inline-block; width: 16px; height: 12px; border-radius: 4px; cursor: default; }
+.ulegende .ukw:hover { filter: none; }
+.ulegende .leise { flex: 1 1 100%; }

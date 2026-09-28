@@ -47,6 +47,8 @@ const JS = [
   'kern/bedienung.js',
   'ansicht/stammdaten.js',
   'ansicht/rundgang.js',
+  'ansicht/hinweise.js',
+  'ansicht/uebersicht.js',
   'konto/konto.js',
   'konto/ausbilder.js',
   'kern/start.js',

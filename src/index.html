@@ -3,10 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
 <title>Berichtsheft – Ausbildungsnachweis aus deiner Zeiterfassung</title>
 <!-- Favicon im Dokument, damit die Einzeldatei auch offline ihr Symbol zeigt. -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2316161A'/%3E%3Cpath d='M18 12h20l9 9v31H18z' fill='%23FFFFFF'/%3E%3Cpath d='M38 12v9h9z' fill='%23BDBAB2'/%3E%3Cpath d='M24 30h16M24 37h16M24 44h10' stroke='%2316161A' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<!-- Vom Home-Bildschirm des iPhones aus öffnet das Heft als eigene App: Dort löscht Safari den
+     Speicher nicht nach sieben Tagen ohne Besuch (hinweise.js). Das Symbol ist das Favicon als PNG. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Berichtsheft">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
 <!-- build:docx -->
 <!-- build:css -->
 </head>
@@ -37,6 +43,7 @@
     <div class="menuehalter">
       <button type="button" class="rundknopf" id="btn-mehr" aria-label="Weitere Aktionen" aria-haspopup="true" aria-expanded="false">⋯</button>
       <div class="menue" id="menue-mehr" hidden role="menu">
+        <button type="button" role="menuitem" id="btn-uebersicht">Übersicht aller Wochen</button>
         <button type="button" role="menuitem" id="btn-laden">Zeiten importieren (CSV)</button>
         <button type="button" role="menuitem" id="btn-sicherung">Sicherung speichern</button>
         <button type="button" role="menuitem" id="btn-sicherung-laden">Sicherung laden</button>
@@ -50,6 +57,8 @@
 <!-- Am Rechner ohne Wirkung (display: contents). Am Handy scrollt nur dieser Rahmen zwischen
      Kopf- und Fußleiste, damit nichts unter den Leisten durchläuft (handy.css). -->
 <div class="mitte" id="mitte">
+<!-- Hinweise beim Öffnen: Home-Bildschirm, Sicherung, was noch fehlt (hinweise.js) -->
+<div class="hinweise" id="hinweise" hidden></div>
 <div class="fortschritt" id="fortschritt" hidden>
   <span class="ftext" id="ftext"></span>
   <span class="fuhr" id="fuhr"></span>
@@ -87,6 +96,15 @@
       <button type="button" class="rundknopf" id="monat-vor" aria-label="Nächster Monat">›</button>
     </div>
     <div class="wochenliste" id="wochenliste"></div>
+    <!-- Am Handy gibt es kein Überfahren mit der Maus: Was Kreise und Marken heißen, steht hier. -->
+    <div class="legende">
+      <span><b class="lm rot">E</b>Entwurf</span>
+      <span><b class="lm rot">KI</b>von der KI</span>
+      <span><b class="lm rot">!</b>eigener Text, nicht fertig</span>
+      <span><b class="lm gruen">✓</b>fertig</span>
+      <span><i class="lr"></i>Text fehlt</span>
+      <span><s>12</s>frei</span>
+    </div>
     <div class="sprungzeile">
       <button type="button" class="knopf" id="sprung-offen">Erste offene Woche</button>
       <button type="button" class="knopf" id="sprung-heute">Heute</button>
@@ -146,9 +164,9 @@
          f-schultage, das wie jedes Stammdatenfeld gespeichert und abgeglichen wird. -->
     <div class="dlg-blatt" data-blatt="schule" hidden>
       <div class="felder">
-        <label class="weit"><span>Name der Berufsschule</span>
+        <label><span>Name der Berufsschule</span>
           <input id="f-schule" type="text" placeholder="Berufskolleg Musterstadt"></label>
-        <fieldset class="weit tagwahl" id="schultage-wahl">
+        <fieldset class="tagwahl" id="schultage-wahl">
           <legend>Feste Schultage</legend>
           <label><input type="checkbox" value="Mo"><span>Mo</span></label>
           <label><input type="checkbox" value="Di"><span>Di</span></label>
@@ -161,14 +179,23 @@
           <input id="f-schulbloecke" type="text" autocomplete="off"
             placeholder="02.03.2026–20.03.2026; 04.05.2026–22.05.2026">
           <small id="schulbloecke-stand"></small></label>
-        <small class="weit">Leere Tage an diesen Schultagen stehen schon auf „Berufsschule“. Feiertage
-          und Tage mit Buchungen oder Text bleiben, wie sie sind, etwa in den Schulferien. Am Tag
+        <label class="weit"><span>Schulferien</span>
+          <input id="f-schulferien" type="text" autocomplete="off"
+            placeholder="30.03.2026–10.04.2026; 20.07.2026–01.09.2026">
+          <small id="schulferien-stand"></small></label>
+        <small class="weit">Leere Tage an diesen Schultagen stehen schon auf „Berufsschule“, außer in
+          den Schulferien. Feiertage und Tage mit Buchungen oder Text bleiben, wie sie sind. Am Tag
           selbst lässt sich die Art jederzeit umstellen.</small>
       </div>
     </div>
 
     <div class="dlg-blatt" data-blatt="verarbeitung" hidden>
       <div class="felder">
+        <label class="weit"><span>Vordruck</span><select id="f-vordruck">
+          <option value="">Wöchentliche Notierung: die Tätigkeiten der Woche in einem Feld</option>
+          <option value="taeglich">Tägliche Notierung: eine Zeile je Tag</option>
+        </select>
+        </label>
         <label class="weit"><span>Nicht ins Heft übernehmen</span>
           <input id="f-ausblenden" type="text" placeholder="Allgemein, Daily, Orga"></label>
         <label class="weit"><span>Projektnamen nicht voranstellen</span>
@@ -351,6 +378,15 @@
     <button type="button" class="knopf" id="pruef-nein">Zurück</button>
     <button type="button" class="knopf voll" id="pruef-ja">Trotzdem exportieren</button>
   </div>
+</dialog>
+
+<!-- Alle Wochen der Ausbildung und die Tage je Art (uebersicht.js) -->
+<dialog id="dlg-uebersicht" aria-labelledby="ueb-titel">
+  <div class="dkopf">
+    <h2 id="ueb-titel">Übersicht</h2>
+    <button type="button" class="knopf" id="ueb-zu">Schließen</button>
+  </div>
+  <div class="dkoerper" id="ueb-inhalt"></div>
 </dialog>
 
 <dialog id="dlg-gruppe">
