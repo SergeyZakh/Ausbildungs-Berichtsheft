@@ -236,8 +236,9 @@ function druckAufteilen(rest, bauen) {
 }
 
 /* ---------- Tägliche Notierung ----------
-   Der zweite Vordruck der IHK: eine Zeile je Tag, daneben die Stunden, darunter die Summe.
-   Montag bis Freitag stehen immer da, wie im Vordruck; Samstag und Sonntag nur mit Eintrag. */
+   Der zweite Vordruck der IHK: eine Zeile je Tag. Stunden stehen nicht darin, die IHK fragt nach
+   Tätigkeiten. Montag bis Freitag stehen immer da, wie im Vordruck; Samstag und Sonntag nur mit
+   Eintrag. */
 
 /** Wie druckEinheiten, aber auch ein Tag ohne Text bleibt als leere Zeile stehen. */
 function druckTagesEinheiten(reihen) {
@@ -253,9 +254,9 @@ function druckTagesEinheiten(reihen) {
   return out;
 }
 
-/** Ein Blatt der täglichen Notierung. `alle` sind die Zeilen der ganzen Woche, für die Summe. */
+/** Ein Blatt der täglichen Notierung. `alle` sind die Zeilen der ganzen Woche, für die Dichte:
+ *  Alle Blätter einer Woche stehen in derselben Stufe. */
 function druckTaeglichSeite(nummer, montag, s, reihen, fortsetzung, letzte, alle) {
-  var summe = tagesSumme(alle || reihen);
   var zeile = function (e) {
     var k = e.kopf;
     var art = k.art ? '<p class="tart">' + sicher(k.art) + "</p>" : "";
@@ -265,18 +266,15 @@ function druckTaeglichSeite(nummer, montag, s, reihen, fortsetzung, letzte, alle
     }).join("");
     return '<tr' + (k.woche ? ' class="wochenzeile"' : "") + ">" +
       '<td class="ttag"><b>' + sicher(k.tag) + "</b>" + (k.datum ? "<span>" + k.datum + "</span>" : "") + "</td>" +
-      '<td class="ttext">' + art + text + "</td>" +
-      '<td class="tstd">' + (k.stunden ? stundenText(k.stunden) : "") + "</td></tr>";
+      '<td class="ttext">' + art + text + "</td></tr>";
   };
   return '<article class="blatt taeglich dicht-' + dichte({ betrieb: alle || reihen, unterweisung: [], schule: [] }) +
       (fortsetzung ? " fortsetzung" : "") + '">' +
     "<h1>Ausbildungsnachweis" + (fortsetzung ? " – Fortsetzung" : "") + "</h1>" +
     druckKopfleiste(nummer, montag, s) +
     '<table class="tagestabelle"><thead><tr>' +
-      "<th>Tag</th><th>" + TAEGLICH_SPALTE + "</th><th>Stunden</th>" +
-    "</tr></thead><tbody>" + reihen.map(zeile).join("") +
-    (letzte && summe ? '<tr class="summe"><td></td><td>Gesamtstunden</td><td class="tstd">' + stundenText(summe) + "</td></tr>" : "") +
-    "</tbody></table>" +
+      "<th>Tag</th><th>" + TAEGLICH_SPALTE + "</th>" +
+    "</tr></thead><tbody>" + reihen.map(zeile).join("") + "</tbody></table>" +
     (letzte ? DRUCK_UNTERSCHRIFTEN : "") +
     "</article>";
 }

@@ -140,7 +140,7 @@ flowchart TD
 
 - **Ausgabe** als Word – Wochenblatt oder Gesamtheft mit Deckblatt – und als PDF über den
   Druckdialog, mit Live-Vorschau des Blatts. Wahlweise im Vordruck mit wöchentlicher oder mit
-  täglicher Notierung (eine Zeile je Tag, mit Stunden).
+  täglicher Notierung (eine Zeile je Tag).
 
 - **Übersicht und Erinnerungen.** Eine Übersicht zeigt jede Woche der Ausbildung und zählt
   Schul-, Urlaubs- und Krankheitstage je Ausbildungsjahr. Beim Öffnen sagt ein Hinweis, was in

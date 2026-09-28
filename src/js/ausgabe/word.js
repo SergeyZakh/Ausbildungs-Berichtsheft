@@ -9,10 +9,9 @@
  *   Seite 2   Ausbildungsgang: Abteilung von/bis
  *   ab 3      je Woche ein Blatt mit drei Feldern und drei Unterschriften
  *
- * Zeiten und Stunden stehen bewusst nicht im wöchentlichen Blatt: Der Nachweis
- * fragt nach Tätigkeiten. Der zweite Vordruck, die tägliche Notierung
- * (Deine Daten → Ausbildung → Vordruck), hat eine Spalte dafür; dort stehen die
- * Stunden aus dem Import. Maße in Twips (1 cm = 567).
+ * Zeiten und Stunden stehen bewusst nicht im Dokument, auch nicht in der
+ * täglichen Notierung (Deine Daten → Verarbeitung → Vordruck): Der Nachweis
+ * fragt nach Tätigkeiten, die IHK nicht nach Stunden. Maße in Twips (1 cm = 567).
  * ========================================================== */
 
 var D = window.docx;
@@ -308,7 +307,7 @@ var TAEGLICH_SPALTE = "Ausgeführte Arbeiten, Unterweisungen, Berufsschulunterri
 /**
  * Die Zeilen einer Woche für die tägliche Notierung, gemeinsam für Word und Druck:
  * Montag bis Freitag immer, Samstag und Sonntag nur mit Eintrag, zuletzt die Unterweisungen der
- * Woche. Ein Eintrag ist { kopf: { tag, datum, art, stunden, woche }, text }.
+ * Woche. Ein Eintrag ist { kopf: { tag, datum, art, woche }, text }.
  * Die Art steht über dem Text, außer bei einem gewöhnlichen Arbeitstag.
  */
 function tagesZeilen(montag) {
@@ -319,34 +318,22 @@ function tagesZeilen(montag) {
     var art = (t && t.art) || "";
     if (i > 4 && !text && !art) continue;
     out.push({
-      kopf: { tag: WOCHENTAGE[datum.getDay()], datum: dm(datum), art: art, stunden: (t && t.stunden) || null },
+      kopf: { tag: WOCHENTAGE[datum.getDay()], datum: dm(datum), art: art },
       text: text
     });
   }
   var wd = wochendaten[iso(montag)] || {};
   var eigene = zeilen(wd.unterweisungen).map(ohneSchlusspunkt).join("\n");
-  if (eigene) out.push({ kopf: { tag: "Unterweisungen", datum: "", art: "", stunden: null, woche: true }, text: eigene });
+  if (eigene) out.push({ kopf: { tag: "Unterweisungen", datum: "", art: "", woche: true }, text: eigene });
   return out;
 }
 
-/** Stundensumme der Zeilen; mehrteilige Tage (Blattumbruch) zählen einmal. */
-function tagesSumme(reihen) {
-  var gesehen = [], summe = 0;
-  reihen.forEach(function (e) {
-    if (gesehen.indexOf(e.kopf) !== -1) return;
-    gesehen.push(e.kopf);
-    if (e.kopf.stunden) summe += e.kopf.stunden;
-  });
-  return summe;
-}
-
-var SP_TAEGLICH = [1600, BREITE - 1600 - 1150, 1150];
+var SP_TAEGLICH = [1600, BREITE - 1600];
 
 function taeglicheSeite(nummer, montag, s) {
   var reihen = tagesZeilen(montag);
   var m = MASSE[dichte({ betrieb: reihen, unterweisung: [], schule: [] })];
   var wd = wochendaten[iso(montag)] || {};
-  var summe = tagesSumme(reihen);
   var rundum = { top: rahmen(KRAFT, 2), bottom: rahmen(KRAFT, 2), left: rahmen(KRAFT, 2), right: rahmen(KRAFT, 2) };
 
   function zelle(kinder, i, o) {
@@ -359,19 +346,13 @@ function taeglicheSeite(nummer, montag, s) {
       children: kinder.length ? kinder : [absatz("")]
     });
   }
-  function kopfText(t, rechts) {
-    return absatz(t, {
-      groesse: 14, sperrung: 10, grossbuchstaben: true, farbe: AKZENT, zeile: 220,
-      ausrichtung: rechts ? D.AlignmentType.RIGHT : D.AlignmentType.LEFT
-    });
+  function kopfText(t) {
+    return absatz(t, { groesse: 14, sperrung: 10, grossbuchstaben: true, farbe: AKZENT, zeile: 220 });
   }
-  var stdAbsatz = function (h, fett) {
-    return absatz(h ? stundenText(h) : "", { groesse: m.text, fett: !!fett, ausrichtung: D.AlignmentType.RIGHT });
-  };
 
   var zeilenListe = [new D.TableRow({
     tableHeader: true,
-    children: [zelle([kopfText("Tag")], 0), zelle([kopfText(TAEGLICH_SPALTE)], 1), zelle([kopfText("Stunden", true)], 2)]
+    children: [zelle([kopfText("Tag")], 0), zelle([kopfText(TAEGLICH_SPALTE)], 1)]
   })];
   reihen.forEach(function (e) {
     var inhalt = [];
@@ -382,18 +363,10 @@ function taeglicheSeite(nummer, montag, s) {
       children: [
         zelle([absatz(e.kopf.tag, { groesse: m.tag, fett: true, farbe: AKZENT })]
           .concat(e.kopf.datum ? [absatz(e.kopf.datum, { groesse: m.tag, farbe: GRAU, vor: 20 })] : []), 0),
-        zelle(inhalt, 1),
-        zelle([stdAbsatz(e.kopf.stunden)], 2)
+        zelle(inhalt, 1)
       ]
     }));
   });
-  if (summe) {
-    zeilenListe.push(new D.TableRow({
-      cantSplit: true,
-      children: [zelle([], 0), zelle([absatz("Gesamtstunden", { groesse: m.text, ausrichtung: D.AlignmentType.RIGHT })], 1),
-        zelle([stdAbsatz(summe, true)], 2)]
-    }));
-  }
 
   var teile = [
     absatz("Ausbildungsnachweis", {

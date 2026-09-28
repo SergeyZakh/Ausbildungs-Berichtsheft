@@ -456,9 +456,9 @@ dieselbe Aufteilung auf mehrere Blätter.
 
 **Tägliche Notierung:** der zweite Vordruck der IHK, gewählt mit `stamm.vordruck = "taeglich"`
 („Deine Daten → Verarbeitung“ oder der Schalter neben der Vorschau). `tagesZeilen()` in `word.js`
-liefert je Tag eine Zeile mit Datum, Art und Stunden, Montag bis Freitag immer, das Wochenende nur mit
-Eintrag, zuletzt die Unterweisungen der Woche. Darunter die Gesamtstunden (`tagesSumme()`). Hier stehen
-die Stunden aus dem Import, weil der Vordruck eine Spalte dafür hat; im wöchentlichen Blatt nicht.
+liefert je Tag eine Zeile mit Datum und Art, Montag bis Freitag immer, das Wochenende nur mit
+Eintrag, zuletzt die Unterweisungen der Woche. Stunden stehen auch hier nicht im Blatt: Die IHK fragt
+nach Tätigkeiten, nicht nach Stunden.
 `wochenSeite()` und `druckBlatt()` wählen den Vordruck selbst, auch beim Ausbilder, der die
 Stammdaten des Azubis mitbringt. Im Druck teilt `druckAufteilen()` eine volle Woche zeilenweise auf
 wie beim wöchentlichen Blatt; in Word wiederholt sich die Kopfzeile der Tabelle auf jeder Seite.
@@ -485,7 +485,7 @@ npm test
 | `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Rundgang, Löschen; Feiertage und Wochenstand gleich wie auf dem Server |
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
-| `test/vordruck.js` | Tägliche Notierung: Umschalten neben der Vorschau, Zeilen je Tag mit Stunden und Summe, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
+| `test/vordruck.js` | Tägliche Notierung: Umschalten neben der Vorschau, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
 | `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus, leise Meldung und kurzer Titel am Handy |
 | `test/handy.js` | Bei 390 und 320 px: keine Sperre, nichts ragt über den Rand, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 

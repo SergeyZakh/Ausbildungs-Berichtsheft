@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * Tägliche Notierung: der zweite Vordruck der IHK, eine Zeile je Tag mit Stunden.
+ * Tägliche Notierung: der zweite Vordruck der IHK, eine Zeile je Tag. Stunden stehen nicht darin,
+ * wie im wöchentlichen Blatt: Die IHK fragt nach Tätigkeiten.
  *
  * Gewählt unter „Deine Daten → Verarbeitung“ oder gleich neben der Wochenvorschau. Er gilt für
  * Vorschau, Druck und Word, auch beim Ausbilder, weil er in den Stammdaten steht. Geprüft wird
- * am Beispiel (Montag bis Freitag mit Stunden, donnerstags Berufsschule).
+ * am Beispiel (Montag bis Freitag mit gebuchten Stunden, donnerstags Berufsschule).
  *
  *   node test/vordruck.js
  */
@@ -45,10 +46,12 @@ const { pruefe, abschluss } = h.protokoll('Tägliche Notierung als zweiter Vordr
   pruefe('Montag bis Freitag je eine Zeile, das leere Wochenende fehlt',
     ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'].every((t, i) => zeilen[i] && zeilen[i].startsWith(t)) &&
       !zeilen.some((z) => /Samstag|Sonntag/.test(z)), zeilen.map((z) => z.slice(0, 12)).join(' | '));
-  pruefe('Jede Zeile trägt Datum und Stunden',
-    zeilen[0].includes('07.09.') && zeilen[0].includes('7,75') && zeilen[4].includes('6,25'), zeilen[0].slice(0, 40));
+  pruefe('Jede Zeile trägt ihr Datum', zeilen[0].includes('07.09.') && zeilen[4].includes('11.09.'), zeilen[0].slice(0, 40));
+  pruefe('Keine Stunden im Blatt, weder je Tag noch als Summe',
+    !/Stunden|7,75|6,25|37,50/.test(blatt), (blatt.match(/.{0,30}(Stunden|7,75|37,50).{0,30}/) || [''])[0]);
+  pruefe('Zwei Spalten: Tag und Tätigkeiten', await page.evaluate(() =>
+    document.querySelectorAll('.vorschaubuehne .tagestabelle thead th').length === 2));
   pruefe('Der Schultag nennt seine Art', /Donnerstag10\.09\.Berufsschule/.test(zeilen[3]), zeilen[3].slice(0, 40));
-  pruefe('Unten die Gesamtstunden der Woche', zeilen.some((z) => z.includes('Gesamtstunden') && z.includes('37,50')));
   pruefe('Unterschriften stehen darunter', blatt.includes('Ausbilder / Datum'));
   pruefe('Die Wahl steht in den Stammdaten',
     (await page.evaluate((s) => { window.__merkenJetzt(); return JSON.parse(localStorage.getItem(s)).stamm.vordruck; }, h.SPEICHER)) === 'taeglich');
@@ -58,8 +61,8 @@ const { pruefe, abschluss } = h.protokoll('Tägliche Notierung als zweiter Vordr
   await page.waitForTimeout(800);
   const mitUnterweisung = await page.evaluate(() =>
     [...document.querySelectorAll('.vorschaubuehne .tagestabelle tbody tr')].map((z) => z.textContent));
-  pruefe('Unterweisungen stehen als eigene Zeile vor der Summe',
-    /^Unterweisungen.*Brandschutz/.test(mitUnterweisung[mitUnterweisung.length - 2] || ''),
+  pruefe('Unterweisungen stehen als letzte Zeile',
+    /^Unterweisungen.*Brandschutz/.test(mitUnterweisung[mitUnterweisung.length - 1] || ''),
     mitUnterweisung.slice(-2).join(' | '));
 
   /* ---------- Word ---------- */
@@ -68,11 +71,11 @@ const { pruefe, abschluss } = h.protokoll('Tägliche Notierung als zweiter Vordr
   await h.exportTrotzdem(page);
   const woche = await h.warteAufDatei(dateien, 'Wochenblatt');
   const text = woche ? h.sichtbarerText((await h.docxLesen(woche.daten)).dokument) : '';
-  pruefe('Word: Tabelle mit Tag, Tätigkeiten und Stunden',
-    text.includes('Ausgeführte Arbeiten, Unterweisungen, Berufsschulunterricht') && text.includes('Stunden'), text.slice(0, 120));
-  pruefe('Word: Tage mit Datum und Stunden, dazu die Summe',
-    text.includes('Montag') && text.includes('07.09.') && text.includes('7,75') &&
-      text.includes('Gesamtstunden') && text.includes('37,50'), text.slice(0, 200));
+  pruefe('Word: Tabelle mit Tag und Tätigkeiten',
+    text.includes('Ausgeführte Arbeiten, Unterweisungen, Berufsschulunterricht') && text.includes('Montag') &&
+      text.includes('07.09.'), text.slice(0, 120));
+  pruefe('Word: keine Stunden, weder je Tag noch als Summe', !/Stunden|7,75|37,50/.test(text),
+    (text.match(/.{0,30}(Stunden|7,75|37,50).{0,30}/) || [''])[0]);
   pruefe('Word: kein Feld „Betriebliche Tätigkeit“', !text.includes('Betriebliche Tätigkeit'));
 
   const vorHeft = dateien.length;
@@ -103,13 +106,11 @@ const { pruefe, abschluss } = h.protokoll('Tägliche Notierung als zweiter Vordr
     [...document.querySelectorAll('.vorschaubuehne .bogen .blatt')].map((b) => ({
       fortsetzung: b.classList.contains('fortsetzung'),
       unterschrift: !!b.querySelector('.unterschriften'),
-      summe: !!b.querySelector('tr.summe'),
     })));
   pruefe('Volle Woche: mehrere Blätter, das zweite als Fortsetzung',
     blaetter.length >= 2 && !blaetter[0].fortsetzung && blaetter[1].fortsetzung, JSON.stringify(blaetter));
-  pruefe('Volle Woche: Summe und Unterschriften nur auf dem letzten Blatt',
-    blaetter.slice(0, -1).every((b) => !b.unterschrift && !b.summe) &&
-      blaetter[blaetter.length - 1].unterschrift && blaetter[blaetter.length - 1].summe, JSON.stringify(blaetter));
+  pruefe('Volle Woche: Unterschriften nur auf dem letzten Blatt',
+    blaetter.slice(0, -1).every((b) => !b.unterschrift) && blaetter[blaetter.length - 1].unterschrift, JSON.stringify(blaetter));
   pruefe('Volle Woche: jedes Blatt passt auf A4', await page.evaluate(() =>
     [...document.querySelectorAll('.vorschaubuehne .bogen')].every((b) => {
       const html = b.innerHTML;

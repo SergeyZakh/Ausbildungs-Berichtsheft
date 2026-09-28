@@ -90,7 +90,7 @@
 .blatt.dicht-2 h1 { margin: 1mm 0 6mm; }
 .blatt.dicht-2 .unterschriften { margin-top: 8mm; }
 
-/* Tägliche Notierung: eine Tabelle mit Tag, Tätigkeiten und Stunden (druckTaeglichSeite). */
+/* Tägliche Notierung: eine Tabelle mit Tag und Tätigkeiten (druckTaeglichSeite). */
 .blatt .tagestabelle { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 6mm; }
 .blatt .tagestabelle th, .blatt .tagestabelle td { border: .5pt solid #000; padding: 2.5mm 3mm; vertical-align: top; }
 .blatt .tagestabelle th {
@@ -98,11 +98,9 @@
   text-align: left; vertical-align: bottom; padding-top: 1.8mm; padding-bottom: 1.8mm;
 }
 .blatt .tagestabelle th:first-child, .blatt .tagestabelle td.ttag { width: 25mm; }
-.blatt .tagestabelle th:last-child, .blatt .tagestabelle td.tstd { width: 18mm; text-align: right; }
 .blatt .tagestabelle td { font-size: 10pt; line-height: 1.45; height: 24mm; }
 .blatt .tagestabelle td.ttag b { display: block; font-size: 9pt; }
 .blatt .tagestabelle td.ttag span { display: block; font-size: 8.5pt; color: #555; margin-top: .5mm; }
-.blatt .tagestabelle td.tstd { font-variant-numeric: tabular-nums; }
 .blatt .tagestabelle p { margin: 0 0 .6mm; }
 .blatt .tagestabelle p:last-child { margin-bottom: 0; }
 .blatt .tagestabelle p.sp { margin-left: 3.5mm; padding-left: 3.5mm; text-indent: -3.5mm; }
@@ -110,9 +108,6 @@
 .blatt .tagestabelle .tart { font-size: 8.5pt; color: #555; margin-bottom: .8mm; }
 /* .taeglich, damit die Höhen der Dichtestufen hier nicht greifen. */
 .blatt.taeglich .tagestabelle tr.wochenzeile td { height: auto; }
-.blatt.taeglich .tagestabelle tr.summe td { height: auto; border-left: 0; border-bottom: 0; padding-top: 2mm; text-align: right; }
-.blatt .tagestabelle tr.summe td:first-child { border: 0; }
-.blatt .tagestabelle tr.summe td.tstd { border: .5pt solid #000; font-weight: bold; }
 .blatt.taeglich.dicht-1 .tagestabelle td { font-size: 8.5pt; line-height: 1.35; height: 17mm; padding: 2mm 3mm; }
 .blatt.taeglich.dicht-2 .tagestabelle td { font-size: 8.5pt; line-height: 1.32; height: 10mm; padding: 1.6mm 3mm; }
 .blatt.taeglich.dicht-2 .tagestabelle { margin-top: 4mm; }

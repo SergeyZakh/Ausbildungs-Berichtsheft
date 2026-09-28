@@ -15,8 +15,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   für die Unterrichtsthemen. Feiertage, Tage außerhalb der Vertragslaufzeit und Tage mit Buchungen
   oder Text ändert der Plan nicht. Das Beispiel hat donnerstags Schule.
 - **Schulferien** im Schulplan: Darin entfallen die festen Schultage, Blockunterricht gilt weiter.
-- **Tägliche Notierung** als zweiter Vordruck der IHK: eine Zeile je Tag mit Stunden aus dem
-  Import und der Summe der Woche. Umschalten neben der Wochenvorschau oder unter *Deine Daten →
+- **Tägliche Notierung** als zweiter Vordruck der IHK: eine Zeile je Tag, ohne Stunden wie das
+  wöchentliche Blatt. Umschalten neben der Wochenvorschau oder unter *Deine Daten →
   Verarbeitung*; gilt für Vorschau, Druck und Word, auch beim Ausbilder.
 - **Übersicht aller Wochen** (Menü ⋯): je Ausbildungsjahr ein Kästchen pro Woche, grün fertig, rot
   ungelesen oder mit Lücke, dazu die Tage in der Berufsschule, im Urlaub, krank und an Feiertagen.
