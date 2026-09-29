@@ -156,6 +156,9 @@
   input, select, textarea { font-size: 16px !important; }
   /* Datumsfelder hält Safari sonst auf ihrer eigenen Breite, breiter als der Dialog. */
   input[type="date"] { -webkit-appearance: none; appearance: none; min-width: 0; max-width: 100%; display: block; }
+  /* Ohne Wert hat Safari im Feld keine Zeile und das Feld schrumpft auf einen dünnen Streifen.
+     Eine Zeilenhöhe macht es so hoch wie die Textfelder daneben; links wie deren Text. */
+  input[type="date"]::-webkit-date-and-time-value { min-height: 1.5em; text-align: left; }
   dialog { width: calc(100% - 20px); overflow-x: hidden; }
   /* Kopf und Fuß stehen, dazwischen scrollt der Inhalt. Vorher saßen die Knöpfe direkt auf der
      Kante des scrollenden Bereichs und wirkten übereinandergelegt. */

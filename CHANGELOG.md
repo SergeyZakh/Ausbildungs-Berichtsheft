@@ -74,6 +74,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ### Behoben
 
+- **Leeres Datumsfeld am iPhone** war nur ein dünner Streifen, etwa „Beginn laut Vertrag“ in der
+  Einrichtung. Es ist jetzt so hoch wie die Felder daneben, das Datum steht links.
 - **„Arbeitstag“ von Hand** an einem Feiertag wurde beim nächsten Import derselben Datei wieder
   zum Feiertag. Eine am Tag gewählte Art bleibt jetzt, auch „Arbeitstag“.
 
