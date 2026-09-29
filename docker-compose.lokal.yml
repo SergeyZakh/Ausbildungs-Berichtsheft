@@ -47,7 +47,7 @@ services:
         max-file: "3"
 
   ollama:
-    image: ollama/ollama:0.34.2
+    image: ollama/ollama:0.34.4
     restart: unless-stopped
     # Kein Port nach außen; erreichbar nur über /ki des Berichtshefts.
     expose:
@@ -83,7 +83,7 @@ services:
 
   ollama-modelle:
     # Lädt das Sprachmodell beim Start in das Volume und beendet sich dann (von ollama.com).
-    image: ollama/ollama:0.34.2
+    image: ollama/ollama:0.34.4
     restart: "no"
     depends_on:
       ollama:
