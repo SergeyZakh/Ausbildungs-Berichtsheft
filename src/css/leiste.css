@@ -21,6 +21,11 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
 .farbknopf { width: 34px; height: 34px; color: var(--text); }
 .farbknopf svg { width: 16px; height: 16px; }
 .farbknopf .sonne { display: none; }
+/* Beim Wechsel keine Übergänge einzelner Elemente (farbeOhneUebergaenge() in farbe.js), und die
+   Kreisblende statt der eingebauten Überblendung: Beide Bilder liegen fest übereinander, nur das
+   neue wird vom Knopf aus aufgezogen. */
+.farbwechsel *, .farbwechsel *::before, .farbwechsel *::after { transition: none !important; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 :root[data-farbe="dunkel"] .farbknopf .mond { display: none; }
 :root[data-farbe="dunkel"] .farbknopf .sonne { display: block; }
 @media (prefers-color-scheme: dark) {
@@ -44,6 +49,11 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
 .menue button:hover:not(:disabled) { background: var(--hauch); }
 .menue button:disabled { color: var(--blass); cursor: not-allowed; }
 .menuetrenner { height: 1px; margin: 4px 8px; background: var(--linie); }
+/* Überschrift einer Gruppe im Menü: sagt, wofür die Knöpfe darunter sind. */
+.menuetitel {
+  margin: 0; padding: 7px 11px 3px; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--schiefer);
+}
 
 /* ---------- Wochenbalken: Blättern, Wochenknopf, Summe ---------- */
 .wochenbalken { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }
@@ -148,6 +158,9 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
   border-radius: 50%; animation: dreh .8s linear infinite;
 }
 @keyframes dreh { to { transform: rotate(360deg); } }
+
+/* Eine Blockwoche hat nur einen Reiter: breit, Beschriftung und Stand in einer Zeile. */
+.reiter.block button { flex: 1 1 100%; flex-direction: row; justify-content: center; gap: 14px; }
 
 /* Der Reiter färbt mit dem Stand des Tages: grün durch, rot ungelesen. */
 .reiter button.fertig { background: var(--gut-hell); color: var(--gut); border-color: var(--gut-kante); }

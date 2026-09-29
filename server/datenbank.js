@@ -67,6 +67,10 @@ async function schemaAnlegen() {
     ALTER TABLE wochen     ADD COLUMN IF NOT EXISTS eingegangen timestamptz NOT NULL DEFAULT now();
     ALTER TABLE stammdaten ADD COLUMN IF NOT EXISTS eingegangen timestamptz NOT NULL DEFAULT now();
     CREATE INDEX IF NOT EXISTS tage_eingang ON tage (person_id, eingegangen);
+
+    -- Themen der Berufsschule für eine ganze Blockwoche statt je Tag, mit eigenem „übernommen“.
+    ALTER TABLE wochen ADD COLUMN IF NOT EXISTS schule text NOT NULL DEFAULT '';
+    ALTER TABLE wochen ADD COLUMN IF NOT EXISTS schule_geprueft boolean NOT NULL DEFAULT false;
   `);
 
   // Vor 0.1.0 schickte der Browser auch Einstellungen mit, die bei ihm bleiben sollen. Die API

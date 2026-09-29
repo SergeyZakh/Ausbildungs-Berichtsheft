@@ -123,7 +123,10 @@
   /* Ein Monat im Kalender für Zeiträume, mit Tagen groß genug für den Finger. */
   .zr-raster { grid-template-columns: 1fr; }
   .zr-raster .zr-monat + .zr-monat { display: none; }
-  .zr-tag { height: 40px; font-size: 15px; }
+  .zr-tag { height: 42px; font-size: 15px; }
+  .zr-tag > span { width: 38px; height: 38px; }
+  .zr-pfeil { display: none; }
+  .zr-neu { width: 34px; height: 34px; margin-top: -17px; right: 2px; }
   .ukw { height: 30px; font-size: 11px; }
 
   .fortschritt { margin: 0 12px 10px; gap: 8px; padding-left: 12px; }
@@ -167,6 +170,18 @@
   .wochenliste .wtag b { width: 21px; height: 21px; font-size: 10.5px; }
   .onb-karte { width: calc(100vw - 24px); }
 
+  /* Die Einrichtung füllt am Handy den Bildschirm: Sie ist das Erste, was man sieht. */
+  #dlg-einrichtung {
+    width: 100%; max-width: none; height: 100dvh; max-height: 100dvh; min-height: 0;
+    margin: 0; border: 0; border-radius: 0;
+  }
+  .er-kopf { padding: 14px 16px 0; }
+  .er-leib { padding: 18px 16px 8px; }
+  .er-fuss { padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); }
+  .er-schritt h2 { font-size: 21px; }
+  .er-karten { grid-template-columns: 1fr; }
+  .er-wahl .knopf { flex: 1 1 100%; }
+
   /* Die Reiter im Datendialog brechen um, statt seitlich zu scrollen. */
   #dlg-stamm { width: calc(100% - 20px); height: auto; max-height: calc(100vh - 20px); }
   #dlg-stamm .dkopf { flex: none; }
@@ -177,7 +192,7 @@
 
 /* Dieselbe Bedingung wie amHandy in start.js: Der Rundgang zeigt auf Stellen im breiten Fenster. */
 @media (pointer: coarse) and (max-width: 820px) {
-  #btn-hilfe { display: none; }
+  #btn-hilfe, #trenner-hilfe { display: none; }
 }
 
 /* Ganz schmal (320 px) passen neben vier Knöpfe nur Ring und Anteil; die Stunden stehen im Tageskopf.

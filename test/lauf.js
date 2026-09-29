@@ -546,7 +546,7 @@ const NAME = 'Mustermann, Max';
     await kontext.close();
   }
 
-  /* ---------- 19. Rundgang beim ersten Start ---------- */
+  /* ---------- 19. Einrichtung beim ersten Start ---------- */
   {
     const kontext = await browser.newContext({ viewport: { width: 1200, height: 800 } });
     const seite = await kontext.newPage();
@@ -555,34 +555,60 @@ const NAME = 'Mustermann, Max';
     await seite.waitForTimeout(1100);
     const gemerkt = () => seite.evaluate((s) => localStorage.getItem(s), h.RUNDGANG);
     const ladeart = () => seite.evaluate(() => performance.getEntriesByType('navigation')[0].type);
+    const schritt = () => seite.evaluate(() => [...document.querySelectorAll('.er-schritt')].find((x) => !x.hidden).dataset.schritt);
 
     // Ein ganz leerer Speicher bei file:// kann ein abgekoppelter sein (speicherNeuLaden() in
-    // grundlagen.js): Dann lädt die Seite genau einmal neu, und erst danach läuft der Rundgang.
+    // grundlagen.js): Dann lädt die Seite genau einmal neu, und erst danach kommt die Einrichtung.
     pruefe('Erster Start mit leerem Speicher: die Seite lädt einmal neu', (await ladeart()) === 'reload', await ladeart());
-    pruefe('Beim ersten Start läuft der Rundgang', await seite.locator('#onboarding').isVisible());
-    pruefe('Der Rundgang zählt seine Schritte',
-      /Schritt 1 von \d/.test(await seite.locator('#onb-zaehler').textContent()),
-      await seite.locator('#onb-zaehler').textContent());
-    pruefe('Vor dem ersten Schritt gibt es kein Zurück', await seite.locator('#onb-zurueck').isDisabled());
+    pruefe('Beim ersten Start kommt die Einrichtung, kein Rundgang',
+      await seite.locator('#dlg-einrichtung').isVisible() && !(await seite.locator('#onboarding').isVisible()));
+    pruefe('Sechs Schritte als Punkte, am Anfang ohne Zurück',
+      (await seite.locator('#er-punkte li').count()) === 6 &&
+      (await seite.evaluate(() => getComputedStyle(document.getElementById('er-zurueck')).visibility)) === 'hidden');
 
-    await seite.click('#onb-weiter');
-    await seite.waitForTimeout(350);
-    const loch = await seite.locator('#onb-loch').boundingBox();
-    pruefe('Ab Schritt zwei wird ein Element hervorgehoben', !!loch && loch.width > 20, JSON.stringify(loch));
-    pruefe('Während des Rundgangs steht noch keine 1 im Speicher', (await gemerkt()) !== '1');
-
-    for (let i = 0; i < 6; i++) {
-      if (!(await seite.locator('#onboarding').isVisible())) break;
-      await seite.click('#onb-weiter');
-      await seite.waitForTimeout(250);
-    }
-    pruefe('Am Ende schließt sich der Rundgang', !(await seite.locator('#onboarding').isVisible()));
-    pruefe('Gesehener Rundgang steht als 1 im Speicher', (await gemerkt()) === '1');
+    await seite.click('#er-weiter');
+    await seite.click('#er-weiter');
+    pruefe('Ohne Pflichtangaben geht es nicht weiter, das Fehlende steht da',
+      (await schritt()) === 'du' && (await seite.textContent('#er-fehlt')).includes('deinen Namen, den Ausbildungsberuf und den Betrieb'),
+      await seite.textContent('#er-fehlt'));
+    await seite.fill('#w-name', 'Muster, Max');
+    await seite.fill('#w-beruf', 'Fachinformatiker/in – Systemintegration');
+    await seite.fill('#w-betrieb', 'Beispiel IT GmbH');
+    await seite.click('#er-weiter');
+    await seite.fill('#w-beginn', '2025-09-01');
+    await seite.fill('#w-ende', '2025-08-01');
+    await seite.click('#er-weiter');
+    pruefe('Ein Ende vor dem Beginn wird bemerkt', (await seite.textContent('#er-fehlt')).includes('vor dem Beginn'));
+    await seite.fill('#w-ende', '2028-08-31');
+    await seite.selectOption('#w-land', 'NW');
+    pruefe('Aus dem Beginn steht das Ausbildungsjahr gleich da', /\d\. Ausbildungsjahr/.test(await seite.textContent('#er-jahr')),
+      await seite.textContent('#er-jahr'));
+    await seite.click('#er-weiter');
+    await seite.fill('#w-schule', 'Berufskolleg Musterstadt');
+    await seite.click('#w-schultage input[value="Do"] + span');
+    await seite.click('#er-weiter');
+    await seite.click('.er-karte[data-vordruck="taeglich"]');
+    await seite.click('#er-weiter');
+    pruefe('Letzter Schritt: Zeiterfassung laden oder selbst schreiben',
+      (await schritt()) === 'los' && await seite.locator('#er-laden').isVisible() && await seite.locator('#er-schreiben').isVisible());
+    pruefe('Während der Einrichtung steht noch keine 1 im Speicher', (await gemerkt()) !== '1');
+    await seite.click('#er-schreiben');
+    await seite.waitForTimeout(600);
+    const stamm = await seite.evaluate((s) => JSON.parse(localStorage.getItem(s)).stamm, h.SPEICHER);
+    pruefe('Die Angaben stehen in „Deine Daten“ und im Speicher',
+      stamm.name === 'Muster, Max' && stamm.beruf.startsWith('Fachinformatiker') && stamm.betrieb === 'Beispiel IT GmbH' &&
+      stamm.beginn === '2025-09-01' && stamm.ende === '2028-08-31' && stamm.land === 'NW' &&
+      stamm.schule === 'Berufskolleg Musterstadt' && stamm.schultage === 'Do' && stamm.vordruck === 'taeglich',
+      JSON.stringify(stamm));
+    pruefe('„Selbst schreiben“ öffnet die aktuelle Woche',
+      !(await seite.locator('#dlg-einrichtung').isVisible()) && (await seite.locator('.reiter button').count()) === 8);
+    pruefe('Gesehene Einrichtung steht als 1 im Speicher', (await gemerkt()) === '1');
 
     await seite.reload();
     await seite.waitForTimeout(900);
-    pruefe('Beim zweiten Start bleibt der Rundgang weg', !(await seite.locator('#onboarding').isVisible()));
-    pruefe('Über das Menü lässt er sich wieder holen', (await seite.locator('#btn-hilfe').count()) === 1);
+    pruefe('Beim zweiten Start bleibt die Einrichtung weg', !(await seite.locator('#dlg-einrichtung').isVisible()));
+    pruefe('Mit allen Angaben bietet die Startkarte keine Einrichtung an', (await seite.locator('#btn-leer-einrichtung').count()) === 0);
+    pruefe('Den Rundgang gibt es im Menü', (await seite.locator('#btn-hilfe').count()) === 1);
 
     // Mit Einträgen im Speicher gibt es nichts zu prüfen: Die Seite öffnet ohne Neuladen. Im selben
     // Tab, denn das zweite Dokument eines Tabs ist nie abgekoppelt; ein neuer Tab wäre es selten
@@ -922,22 +948,32 @@ const NAME = 'Mustermann, Max';
       ['Feiertag ohne Eintrag (NRW)', 'NW', FERTIG, null],
       ['Feiertag geleert (NRW)', 'NW', FERTIG, LEER],
       ['Fronleichnam ohne Eintrag in Berlin', 'BE', FERTIG, null],
+      // Blockwoche: Die Themen der Woche decken jeden Werktag ohne eigenen Text, der nicht frei ist.
+      ['Blockwoche übernommen, Tag ohne Eintrag', 'NW', null, null, { schule: 'LF5: Subnetting', schuleGeprueft: true }],
+      ['Blockwoche nicht übernommen', '', null, { ...LEER, art: 'Berufsschule' }, { schule: 'LF5: Subnetting', schuleGeprueft: false }],
+      ['Blockwoche mit krankem Tag', '', { ...LEER, art: 'Krank' }, null, { schule: 'LF5: Subnetting', schuleGeprueft: true }],
+      ['Blockwoche, geleerter Werktag', '', LEER, FERTIG, { schule: 'LF5: Subnetting', schuleGeprueft: true }],
+      ['Themen nur aus Leerzeichen', '', null, FERTIG, { schule: '  ', schuleGeprueft: true }],
     ];
     const IM_HEFT = { fertig: 'fertig', pruefen: 'offen', '': 'fehlt' };
     const abweichend = [];
-    for (const [name, land, mittwoch, donnerstag] of faelle) {
+    for (const [name, land, mittwoch, donnerstag, themen] of faelle) {
       const eintraege = { [WOCHE[0]]: FERTIG, [WOCHE[1]]: FERTIG, [WOCHE[4]]: FERTIG };
       if (mittwoch) eintraege[WOCHE[2]] = mittwoch;
       if (donnerstag) eintraege[WOCHE[3]] = donnerstag;
-      const heft = await seite.evaluate(([liste, bundesland, montag]) => {
+      const heft = await seite.evaluate(([liste, bundesland, montag, woche]) => {
         document.getElementById('f-land').value = bundesland;
         const tage = window.__tage();
         Object.keys(tage).forEach((k) => { delete tage[k]; });
         Object.entries(liste).forEach(([datum, t]) => { tage[datum] = { ...t, pausen: [], posten: [] }; });
+        const wochendaten = window.__wochendaten();
+        if (woche) wochendaten[montag] = { abteilung: '', unterweisungen: '', ...woche };
+        else delete wochendaten[montag];
         return window.__wochenStand(montag);
-      }, [eintraege, land, WOCHE[0]]);
+      }, [eintraege, land, WOCHE[0], themen || null]);
       const server = wochenUebersicht(WOCHE[0], WOCHE[4],
-        Object.entries(eintraege).map(([datum, t]) => ({ datum, ...t })), land)[0].stand;
+        Object.entries(eintraege).map(([datum, t]) => ({ datum, ...t })), land,
+        themen ? [{ montag: WOCHE[0], ...themen }] : [])[0].stand;
       if (IM_HEFT[heft] !== server) abweichend.push(`${name}: Heft ${heft || '(leer)'}, Ausbilder ${server}`);
     }
     pruefe('Heft und Ausbilder sehen jede Woche gleich (' + faelle.length + ' Fälle)',

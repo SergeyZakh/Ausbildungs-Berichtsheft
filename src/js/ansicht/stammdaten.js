@@ -7,7 +7,7 @@ var dlg = $("dlg-stamm");
 /* Pflichtangaben für den Vordruck. */
 var PFLICHT = [
   ["f-name", "Name"], ["f-beruf", "Ausbildungsberuf"],
-  ["f-betrieb", "Ausbildungsfirma"], ["f-beginn", "Vertragsbeginn"],
+  ["f-betrieb", "Ausbildungsbetrieb"], ["f-beginn", "Vertragsbeginn"],
   ["f-ende", "Vertragsende"]
 ];
 
@@ -112,7 +112,7 @@ function stammStandZeigen() {
   var feld = $("stamm-stand");
   if (!fehlt.length) {
     feld.className = "hinweis-stamm";
-    feld.textContent = "Alles da, was der Vordruck verlangt. Die Angaben bleiben in diesem Browser.";
+    feld.textContent = "Alles da, was der Vordruck verlangt. Gespeichert wird schon beim Tippen.";
     return;
   }
   feld.className = "hinweis-stamm fehlt";
@@ -127,7 +127,7 @@ Array.prototype.forEach.call(dlg.querySelectorAll(".blattleiste button"), functi
 $("btn-stamm").addEventListener("click", function () {
   menueSchliessen(); lehrjahrZeigen(); stammStandZeigen(); anweisungenZaehlen(); gefahrZeilenZeigen();
   schulplanZeigen();
-  blattZeigen("person"); dlg.showModal();
+  blattZeigen("ausbildung"); dlg.showModal();
 });
 $("dlg-zu").addEventListener("click", function () { dlg.close(); });
 $("dlg-fertig").addEventListener("click", function () { dlg.close(); });

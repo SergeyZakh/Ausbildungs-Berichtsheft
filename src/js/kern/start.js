@@ -20,6 +20,12 @@ window.__fehlenderWerktag = function (datumIso) { return fehlenderWerktag(datumI
 window.__tagArt = function (datumIso) { return tagArt(datumIso); };
 window.__schulbloeckeLesen = schulbloeckeLesen;
 window.__wochenBilanz = function (montagIso) { return wochenBilanz(montagIso); };
+window.__blockwoche = function (montagIso) { return blockwoche(montagIso); };
+window.__wochenAnteil = function (montagIso) { return wochenAnteil(montagIso); };
+window.__tagLage = function (datumIso) { return tagLage(datumIso); };
+window.__naechsterOffenerTag = function (datumIso) { return naechsterOffenerTag(datumIso); };
+window.__ersterOffenerTag = function () { return ersterOffenerTag(); };
+window.__wochenTexte = function (montagIso) { return wochenTexte(vonIso(montagIso)); };
 window.__offeneWochen = function () { return offeneWochen(); };
 window.__hinweise = function () { return browserHinweise; };
 window.__kalenderwoche = function (montagIso) { return kalenderwoche(vonIso(montagIso)); };
@@ -112,8 +118,8 @@ if (wochen.length) {
 }
 hinweiseBeimOeffnen();
 
-/* Am Handy (Touch und schmal) startet der Rundgang nicht: Er zeigt auf Stellen, die es nur im
-   breiten Fenster nebeneinander gibt. Das Werkzeug selbst geht, die Ansicht steht in handy.css. */
+/* Am Handy (Touch und schmal) startet der Rundgang der Ausbilder nicht: Er zeigt auf Stellen, die es
+   nur im breiten Fenster nebeneinander gibt. Die Einrichtung für Azubis kommt auch dort. */
 var amHandy = false;
 try { amHandy = window.matchMedia("(pointer: coarse) and (max-width: 820px)").matches; } catch (e) {}
 
@@ -121,10 +127,13 @@ try { amHandy = window.matchMedia("(pointer: coarse) and (max-width: 820px)").ma
 /* Konto: Liegt das Werkzeug auf einem Berichtsheft-Server, anmelden und abgleichen
    (src/js/konto/konto.js). Als Datei im Browser passiert hier nichts. */
 if ($("gruppe-zu")) $("gruppe-zu").addEventListener("click", function () { $("dlg-gruppe").close(); });
-// Der Rundgang erst, wenn gezeichnet und klar ist, wer angemeldet ist: Er zeigt auf Stellen im
-// Fenster, und Ausbilder bekommen einen eigenen. Geht es gleich zum Anmeldedienst, keiner.
+// Einrichtung und Rundgang erst, wenn klar ist, wer angemeldet ist und was das Konto mitbringt:
+// Azubis richten beim ersten Start ihr Heft ein, Ausbilder bekommen ihren Rundgang. Geht es gleich
+// zum Anmeldedienst, keins von beiden.
 kontoStarten().then(function () {
   // Erst jetzt ist klar, ob ein Konto die Daten hält; dann braucht es keine Sicherung.
   hinweiseZeigen();
-  if (!amHandy && !KONTO.weiterleitung && !NEU_LADEN && !onbGesehen()) setTimeout(onbStarten, 300);
+  if (KONTO.weiterleitung || NEU_LADEN) return;
+  if (einrichtungNoetig()) einrichtungStarten();
+  else if (onbAlsAusbilder() && !amHandy && !onbGesehen()) setTimeout(onbStarten, 300);
 });

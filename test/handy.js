@@ -83,6 +83,20 @@ async function durchgang(browser, breite) {
   await h.oeffnen(page);
   await page.waitForTimeout(600);
 
+  // Beim ersten Start kommt die Einrichtung, am Handy im Vollbild; „Weiter“ steht im Bild.
+  const einrichtung = await page.evaluate(() => {
+    const d = document.getElementById('dlg-einrichtung');
+    const r = d.getBoundingClientRect(), w = document.getElementById('er-weiter').getBoundingClientRect();
+    return { offen: d.open, breite: r.width, hoehe: r.height, weiterUnten: w.bottom, bild: innerHeight, bildBreite: innerWidth };
+  });
+  pruefe('Einrichtung beim ersten Start, im Vollbild' + bei,
+    einrichtung.offen && einrichtung.breite >= einrichtung.bildBreite - 1 && einrichtung.hoehe >= einrichtung.bild - 1 &&
+    einrichtung.weiterUnten <= einrichtung.bild, JSON.stringify(einrichtung));
+  await page.click('#er-weiter');
+  await nichtsRaus('Einrichtung');
+  await page.click('#er-spaeter');
+  await page.waitForTimeout(300);
+
   // Sichtbar reicht nicht: Unter der alten Sperrkarte war der Knopf sichtbar, aber verdeckt.
   pruefe('Keine Sperre, der Startknopf ist klickbar' + bei, await page.evaluate(() => {
     const k = document.getElementById('btn-beispiel');
@@ -90,6 +104,7 @@ async function durchgang(browser, breite) {
     return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === k;
   }));
   pruefe('Kein Rundgang am Handy' + bei, !(await page.locator('.onb-karte').isVisible().catch(() => false)));
+  pruefe('Nach „Später“ bietet die Startkarte die Einrichtung an' + bei, await page.locator('#btn-leer-einrichtung').isVisible());
   await nichtsRaus('Start');
 
   // Dialog „Spalten zuordnen“: Der Fuß beginnt unter dem scrollenden Bereich, nicht darin.

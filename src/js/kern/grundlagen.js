@@ -39,7 +39,7 @@ var NEU_LADEN = speicherNeuLaden();
 /* ---------- Zustand ----------
    tage         "2026-09-07" -> { text, art, stunden, posten, entwurf, ... }
    wochen       Montage aller Wochen mit Daten, neueste zuerst
-   wochendaten  Montag -> { abteilung, unterweisungen }
+   wochendaten  Montag -> { abteilung, unterweisungen, schule, schuleGeprueft }
    aktiverTag   0–6 = Montag–Sonntag, 7 = Wochenreiter */
 var tage = {}, wochen = [], aktiveWoche = null, aktiverTag = 0;
 var wochendaten = {};

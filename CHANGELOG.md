@@ -10,6 +10,10 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ### Neu
 
+- **Einrichtung beim ersten Start** statt des Rundgangs: in sechs kurzen Schritten Name, Beruf,
+  Betrieb, Vertragslaufzeit, Bundesland, Berufsschule und Vordruck, danach Zeiterfassung laden oder
+  selbst schreiben. Am Handy im Vollbild. Mit „Später“ geht es ohne Angaben weiter; die Startkarte
+  bietet die Einrichtung an, solange Pflichtangaben fehlen. Den Rundgang gibt es weiter im Menü.
 - **Feste Schultage und Blockunterricht** unter *Deine Daten → Schule*, dort steht jetzt auch der
   Name der Berufsschule. Leere Tage an diesen Tagen stehen schon auf „Berufsschule“, mit dem Feld
   für die Unterrichtsthemen. Feiertage, Tage außerhalb der Vertragslaufzeit und Tage mit Buchungen
@@ -19,7 +23,7 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Marken mit × da, Überlappendes wird zusammengelegt.
 - **Tägliche Notierung** als zweiter Vordruck der IHK: eine Zeile je Tag, ohne Stunden wie das
   wöchentliche Blatt. Umschalten neben der Wochenvorschau oder unter *Deine Daten →
-  Verarbeitung*; gilt für Vorschau, Druck und Word, auch beim Ausbilder.
+  Vordruck*; gilt für Vorschau, Druck und Word, auch beim Ausbilder.
 - **Übersicht aller Wochen** (Menü ⋯): je Ausbildungsjahr ein Kästchen pro Woche, grün fertig, rot
   ungelesen oder mit Lücke, dazu die Tage in der Berufsschule, im Urlaub, krank und an Feiertagen.
 - **Was fehlt noch?** Beim Öffnen nennt ein Hinweis die Lücken und ungelesenen Tage der letzten
@@ -31,11 +35,32 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den Text.
 - **Dunkler Modus**, wenn das Gerät ihn eingestellt hat oder per Knopf (Mond/Sonne) in der
   Kopfleiste. Die Blattvorschau bleibt weiß.
+- **Blockwoche:** Ist jeder Werktag einer Woche Berufsschule oder frei (ab zwei Schultagen), gibt es
+  statt der Tagesreiter ein Feld für die Themen der ganzen Woche und einmal „Fertig“. Der
+  wöchentliche Vordruck hat für die Berufsschule ohnehin ein Feld je Woche. Darunter stehen die
+  Tage mit ihrer Art, etwa für einen Krankheitstag. Beim Ausbilder zählt die Woche genauso; der
+  Server speichert die Themen in zwei neuen Spalten der Tabelle `wochen`.
+- **Nach „Fertig“ weiter** zum nächsten Tag, der noch Text oder „Fertig“ braucht, auch in die
+  nächste Woche; „Zurück“ hinter der Meldung führt wieder hin. Zurück an ältere Lücken springt es
+  nicht von selbst, die Meldung bietet den frühesten offenen Tag als Knopf an.
 
 ### Geändert
 
+- **Menüs und Knöpfe aufgeräumt:** Das Menü ⋯ ist nach Zweck gruppiert (Deine Daten und Übersicht,
+  Zeiterfassung laden, Sicherung, Rundgang). „Exportieren“ trennt „Diese Woche“ und „Ganzes Heft mit
+  Deckblatt“, je als Word oder PDF. Das Laden der CSV heißt überall „Zeiterfassung laden“, damit es
+  nicht mit „Exportieren“ verwechselt wird. Die Startkarte hat zwei Knöpfe, Beispiel und Sicherung
+  stehen als Links darunter.
+- **Deine Daten** in der Reihenfolge der Einrichtung: Ausbildung (mit Name und Bundesland), Schule,
+  Vordruck, Deckblatt (was nur das Deckblatt braucht), KI, Löschen. Statt „Schließen“ und „Speichern“
+  gibt es × und „Fertig“; gespeichert wird ohnehin beim Tippen.
 - **Dependabot** schlägt keine neue Hauptversion von Postgres mehr vor: postgres:18 startet nicht auf
   den Daten von 17. Wie der Wechsel von Hand geht, steht in docs/SERVER.md unter „Update“.
+- **Hell/dunkel wechselt weich:** Die neue Farbe breitet sich als Kreis vom Knopf aus, statt dass
+  die Seite stückweise umspringt. Mit „Bewegung reduzieren“ wechselt sie ohne Animation.
+- **Kalender für Blockunterricht und Ferien** übersichtlicher: oben die Schritte „Erster Tag“ und
+  „Letzter Tag“ mit den Werktagen, Zeiträume als helles Band mit dunklen Enden, Legende, Punkt an
+  Feiertagen, × zum Neubeginnen, „Fertig“ unten; die Marken nennen ihre Werktage.
 - **Kopfleiste am Handy:** Die Wochensumme füllt die Zeile bis zu den Knöpfen und sagt „0/5 fertig“;
   bei 320 px bleibt die Leiste zweizeilig.
 - **Ohne Woche** stehen nur Name, Menü und die Startkarte in der Mitte da; die Startkarte bietet
