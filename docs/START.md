@@ -126,8 +126,9 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
   ein. Ein Feiertag ohne Eintrag zählt nicht als Lücke.
 - **Der Vordruck** folgt dem verbreiteten IHK-Muster „Ausbildungsnachweis – wöchentliche
   Notierung“, wahlweise der täglichen Notierung. Frag bei deiner IHK nach, welchen sie verlangt.
-- **Tastatur:** `1`–`7` wählt den Tag, `8` den Reiter **Woche**, `Alt` + `←` / `→` blättert eine
-  Woche zurück oder vor, `Strg` + `S` speichert das Wochenblatt.
+- **Tastatur:** `1`–`7` wählt den Tag, `8` den Reiter **Woche** (die Ziffer steht klein in der Ecke
+  jedes Reiters), `Alt` + `←` / `→` blättert eine Woche zurück oder vor, `Strg` + `S` speichert das
+  Wochenblatt.
 
 ### KI dazu (optional)
 

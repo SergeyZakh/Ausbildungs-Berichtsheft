@@ -127,7 +127,8 @@
   .hinweis { padding: var(--luft-3) var(--luft-8) var(--luft-3) var(--luft-4); gap: var(--luft-3); }
   .hinweistext { flex: 1 1 100%; font-size: var(--schrift-text); }
   .hinweiszu { width: 34px; height: 34px; top: 4px; right: 4px; }
-  .uraster { grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); }
+  /* Das Jahr passt nicht in die Breite: feste Felder, das Raster scrollt seitlich, wie bei GitHub. */
+  .uraster { grid-template-columns: 20px repeat(var(--wochen), 12px); overflow-x: auto; padding-bottom: var(--luft-1); }
   /* Ein Monat im Kalender für Zeiträume, mit Tagen groß genug für den Finger. */
   .zr-raster { grid-template-columns: 1fr; }
   .zr-raster .zr-monat + .zr-monat { display: none; }
@@ -135,7 +136,6 @@
   .zr-tag > span { width: 38px; height: 38px; }
   .zr-pfeil { display: none; }
   .zr-neu { width: 34px; height: 34px; margin-top: -17px; right: 2px; }
-  .ukw { height: 30px; font-size: var(--schrift-fein); }
 
   .fortschritt { margin: 0 var(--luft-3) var(--luft-3); gap: var(--luft-2); padding-left: var(--luft-3); }
   .fortschritt .ftext { font-size: var(--schrift-fein); }

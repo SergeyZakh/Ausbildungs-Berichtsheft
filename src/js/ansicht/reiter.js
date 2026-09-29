@@ -86,6 +86,7 @@ function tagReiter(montag, i) {
   b.type = "button";
   b.setAttribute("role", "tab");
   b.setAttribute("aria-selected", String(i === aktiverTag));
+  tasteZeigen(b, String(i + 1));
 
   var stand = tagStand(t);
   var klassen = [];
@@ -124,12 +125,22 @@ function tagReiter(montag, i) {
   return b;
 }
 
+/**
+ * Die Taste, die den Reiter wählt (bedienung.js), steht am Rechner klein in seiner Ecke (leiste.css):
+ * Wer sie sieht, benutzt sie. Für Vorleser als aria-keyshortcuts.
+ */
+function tasteZeigen(knopf, taste) {
+  knopf.setAttribute("data-taste", taste);
+  knopf.setAttribute("aria-keyshortcuts", taste);
+}
+
 /** Der achte Reiter zeigt den Stand der ganzen Woche, nicht nur sein eigenes Feld. */
 function wochenReiter() {
   var w = document.createElement("button");
   w.type = "button";
   w.setAttribute("role", "tab");
   w.setAttribute("aria-selected", String(aktiverTag === 7));
+  tasteZeigen(w, "8");
   var wd = wocheDaten(aktiveWoche);
 
   var wstand = wochenStand(aktiveWoche);

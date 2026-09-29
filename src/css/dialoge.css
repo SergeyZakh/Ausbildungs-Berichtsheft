@@ -81,12 +81,21 @@
 .wochenliste button.pruefen[aria-current="true"] { background: var(--acht-hell); box-shadow: inset 3px 0 0 0 var(--acht); }
 .wochenliste button.fertig[aria-current="true"]  { background: var(--gut-hell); box-shadow: inset 3px 0 0 0 var(--gut); }
 
-/* Legende unter dem Raster: dieselben Marken wie in den Reitern. */
+/* Legende unter dem Raster in zwei Spalten: links die Marken der Reiter, rechts die Kreise des
+   Rasters mit demselben Aussehen. Vorher standen beide in einer Reihe durcheinander. */
 .legende {
-  display: flex; flex-wrap: wrap; gap: var(--luft-1) var(--luft-3); margin-top: var(--luft-3);
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--luft-4); margin-top: var(--luft-3);
+  padding-top: var(--luft-3); border-top: 1px solid var(--linie);
   font-size: var(--schrift-klein); color: var(--schiefer);
 }
-.legende span { display: inline-flex; align-items: center; gap: var(--luft-1); white-space: nowrap; }
+.legende > div { display: flex; flex-direction: column; gap: var(--luft-2); min-width: 0; }
+.legende .ltitel {
+  margin: 0; font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung);
+  text-transform: uppercase; color: var(--schiefer);
+}
+.legende span { display: flex; align-items: center; gap: var(--luft-2); white-space: nowrap; }
+/* Muster und Marke in gleich breiter Spalte, damit die Wörter untereinander beginnen. */
+.legende span > :first-child { flex: none; width: 20px; }
 .legende .lm {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 16px; height: 16px; padding: 0 var(--luft-1); border-radius: var(--rund-voll);
@@ -94,9 +103,17 @@
 }
 .legende .lm.rot { background: var(--acht); }
 .legende .lm.gruen { background: var(--gut); font-size: var(--schrift-marke); }
-.legende .lr { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid currentColor; }
-.legende .lf { width: 12px; height: 12px; border-radius: 50%; background: var(--acht-hell); box-shadow: inset 0 0 0 1px var(--acht-kante); }
-.legende s { color: var(--blass); font-size: var(--schrift-fein); }
+.legende .lr { width: 10px !important; height: 10px; margin: 0 5px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid currentColor; }
+/* Ein Tag des Rasters im Kleinen (.wtag weiter oben). */
+.legende .lk {
+  display: inline-flex; align-items: center; justify-content: center; height: 20px; border-radius: 50%;
+  font-size: var(--schrift-marke); font-style: normal; font-variant-numeric: tabular-nums;
+}
+.legende .lk.voll   { background: var(--acht); color: #fff; }
+.legende .lk.fertig { background: var(--gut); color: #fff; }
+.legende .lk.offen  { box-sizing: border-box; border: 1.5px solid var(--text); color: var(--text); }
+.legende .lk.fehlt  { background: var(--acht-hell); color: var(--acht); }
+.legende .lk.frei   { color: var(--blass); text-decoration: line-through; }
 .sprungzeile { display: flex; gap: var(--luft-2); margin-top: var(--luft-3); }
 .sprungzeile .knopf { flex: 1 1 0; font-size: var(--schrift-klein); padding: var(--luft-2); }
 .suchzeile { display: flex; align-items: center; gap: var(--luft-3); margin-top: var(--luft-3); }
@@ -441,32 +458,71 @@
 .dlgnotiz.warn { color: var(--acht); background: var(--acht-hell); border-color: var(--acht-kante); }
 .dlgnotiz[hidden] { display: none; }
 
+/* ---------- Ausbildungsberuf (berufe.js) ----------
+   Die Liste steht im Fluss unter dem Feld statt darüber zu schweben: In der Einrichtung und in
+   „Deine Daten“ scrollt der Inhalt, und eine schwebende Liste würde dort am Rand abgeschnitten. */
+.berufliste {
+  max-height: 248px; overflow-y: auto; margin-top: calc(-1 * var(--luft-2)); padding: var(--luft-1);
+  display: flex; flex-direction: column; gap: 1px;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund);
+  box-shadow: var(--schatten-hoch);
+}
+.bgruppe {
+  margin: 0; padding: var(--luft-2) var(--luft-3) var(--luft-1); font-size: var(--schrift-fein); font-weight: 600;
+  letter-spacing: var(--sperrung); text-transform: uppercase; color: var(--schiefer);
+}
+.boption {
+  text-align: left; padding: var(--luft-2) var(--luft-3); border: none; border-radius: var(--rund-klein);
+  background: transparent; color: var(--text); font: inherit; font-size: var(--schrift-text);
+}
+.boption b { font-weight: 600; }
+.boption:hover, .boption.aktiv { background: var(--hauch); }
+.bleer { margin: 0; padding: var(--luft-2) var(--luft-3); font-size: var(--schrift-klein); color: var(--schiefer); }
+.fachknoepfe { display: flex; flex-wrap: wrap; gap: var(--luft-2); }
+.fachknopf {
+  padding: var(--luft-1) var(--luft-3); border: 1px solid var(--linie); border-radius: var(--rund-voll);
+  background: var(--flaeche); color: var(--text); font: inherit; font-size: var(--schrift-klein);
+  transition: background-color .15s, border-color .15s;
+}
+.fachknopf:hover { border-color: var(--linie-fest); }
+.fachknopf[aria-checked="true"] { background: var(--text); border-color: var(--text); color: var(--flaeche); }
+.fachwahl.fehlt .fachknopf { border-color: var(--acht); }
+/* In der Einrichtung so groß wie ihre Felder. */
+.er-felder .fachknopf { min-height: 40px; padding: 0 var(--luft-4); font-size: var(--schrift-text); }
+
 /* ---------- Übersicht aller Wochen (uebersicht.js) ---------- */
-#dlg-uebersicht { width: min(680px, calc(100% - 32px)); max-width: none; }
+/* Breit genug für ein Jahr mit 53 Wochen in einer Zeile, flach genug für drei Jahre ohne Scrollen. */
+#dlg-uebersicht { width: min(980px, calc(100% - 32px)); max-width: none; }
 #dlg-uebersicht .dkoerper { max-height: calc(100vh - 140px); overflow-y: auto; }
 .ueb-kopf { display: flex; align-items: center; gap: var(--luft-3) var(--luft-4); flex-wrap: wrap; margin-bottom: var(--luft-5); }
 .ueb-kopf p { flex: 1 1 260px; margin: 0; font-size: var(--schrift-text); color: var(--text); }
 .ueb-kopf p.gut { color: var(--gut); font-weight: 600; }
-.ujahr { padding: var(--luft-4) 0; border-top: 1px solid var(--linie); }
-.ujahr h3 { margin: 0 0 2px; font-size: var(--schrift-text); font-weight: 600; }
+.ujahr { padding: var(--luft-3) 0; border-top: 1px solid var(--linie); }
+.ukopf { display: flex; align-items: baseline; gap: var(--luft-1) var(--luft-4); flex-wrap: wrap; margin-bottom: var(--luft-2); }
+.ukopf h3 { margin-right: auto; }
+.ujahr h3 { margin: 0; font-size: var(--schrift-text); font-weight: 600; }
 .ujahr h3 span { margin-left: var(--luft-2); font-weight: 400; color: var(--schiefer); font-size: var(--schrift-klein); }
-.ustand { margin: 0 0 var(--luft-3); font-size: var(--schrift-klein); color: var(--schiefer); }
-.uraster { display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: var(--luft-1); }
-/* Ein Kästchen je Woche, darin die Kalenderwoche. */
-.ukw {
-  display: flex; align-items: center; justify-content: center; height: 26px; padding: 0;
-  font: inherit; font-size: var(--schrift-fein); font-variant-numeric: tabular-nums;
-  border: 1.5px solid transparent; border-radius: var(--rund-klein); cursor: pointer;
+.ustand { margin: 0; font-size: var(--schrift-klein); color: var(--schiefer); }
+/* Wie die Aktivität bei GitHub: Spalte 1 die Wochentage, danach eine Spalte je Woche, Zeile 1 die
+   Monate. Die Felder wachsen mit der Breite und bleiben quadratisch (jahresRaster()). */
+.uraster {
+  display: grid; grid-template-columns: 20px repeat(var(--wochen), minmax(0, 1fr));
+  grid-template-rows: auto; gap: 3px;
 }
-.ukw.fertig  { background: var(--gut); color: var(--auf-farbe); }
-.ukw.pruefen { background: var(--acht); color: var(--auf-farbe); }
-.ukw.luecke  { background: var(--flaeche); color: var(--acht); border-color: var(--acht); }
-.ukw.frei    { background: var(--band); color: var(--schiefer); border-color: var(--linie); }
-.ukw.kommt   { background: transparent; color: var(--blass); border: 1.5px dashed var(--linie); }
-.ukw:hover { filter: brightness(.94); }
-.ukw[aria-current="true"] { box-shadow: 0 0 0 2px var(--flaeche), 0 0 0 4px var(--text); }
-.utage { display: flex; flex-wrap: wrap; gap: var(--luft-2); margin: var(--luft-3) 0 0; font-size: var(--schrift-klein); }
-.utage span { padding: var(--luft-1) var(--luft-3); border: 1px solid var(--linie); border-radius: var(--rund-voll); color: var(--schiefer); }
+.umonat { grid-row: 1; white-space: nowrap; font-size: var(--schrift-fein); color: var(--schiefer); line-height: 1.4; }
+.uwt { grid-column: 1; font-size: var(--schrift-fein); color: var(--schiefer); line-height: 1; align-self: center; }
+.utag { aspect-ratio: 1; border-radius: 3px; background: var(--hauch); }
+.utag[data-datum] { cursor: pointer; }
+.utag[data-datum]:hover { outline: 1.5px solid var(--text); outline-offset: 1px; }
+.utag.fertig  { background: var(--gut); }
+.utag.pruefen { background: var(--acht); }
+.utag.luecke  { background: var(--acht-hell); box-shadow: inset 0 0 0 1px var(--acht-kante); }
+.utag.frei    { background: var(--band); box-shadow: inset 0 0 0 1px var(--linie); }
+.utag.kommt   { background: transparent; box-shadow: inset 0 0 0 1px var(--linie); }
+.utag.aussen  { background: transparent; }
+.utag.heute   { outline: 1.5px solid var(--text); outline-offset: 1px; }
+.utage { display: flex; flex-wrap: wrap; gap: var(--luft-1) var(--luft-3); margin: 0; font-size: var(--schrift-klein); color: var(--schiefer); }
+.utage:empty { display: none; }
 .utage b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
 .utage .leise, .ulegende .leise { border: 0; padding: var(--luft-1) 0; color: var(--schiefer); }
 .ulegende {
@@ -474,9 +530,8 @@
   border-top: 1px solid var(--linie); font-size: var(--schrift-klein); color: var(--schiefer);
 }
 .ulegende span { display: inline-flex; align-items: center; gap: var(--luft-2); }
-.ulegende .ukw { display: inline-block; width: 16px; height: 12px; border-radius: 4px; cursor: default; }
-.ulegende .ukw:hover { filter: none; }
-.ulegende .leise { flex: 1 1 100%; }
+.ulegende .utag { display: inline-block; width: 12px; }
+.ulegende .leise { margin-left: auto; }
 
 /* ---------- Einrichtung beim ersten Start (einrichtung.js) ----------
    Ein Gedanke je Schritt, große Überschrift, wenige Felder. Oben zeigen Punkte, wie weit es noch

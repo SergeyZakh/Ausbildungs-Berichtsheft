@@ -17,6 +17,7 @@ var ER_PFLICHT = {
 };
 
 var erIndex = 0;
+var erBeruf = berufsfeld($("w-beruf"), $("w-berufliste"), $("w-fach"));
 var erDlg = $("dlg-einrichtung");
 var erFelder = Array.prototype.slice.call(erDlg.querySelectorAll("[data-feld]"));
 var erSchultage = Array.prototype.slice.call($("w-schultage").querySelectorAll("input[type=checkbox]"));
@@ -46,6 +47,7 @@ function einrichtungStarten() {
   // Was schon in „Deine Daten“ steht, steht auch hier: nach „Später“ oder aus dem Konto.
   erFelder.forEach(function (el) { el.value = $(el.getAttribute("data-feld")).value; });
   nameZeigen($("w-vorname"), $("w-nachname"));
+  erBeruf.zeigen();
   erSchultageZeigen();
   erBloeckeZeigen();
   erVordruckZeigen();
@@ -96,6 +98,11 @@ $("er-weiter").addEventListener("click", function () {
     erFehlt("Bitte noch " + aufzaehlen(fehlt.map(function (f) { return f[1]; })) + " eintragen.");
     fehlt.forEach(function (f) { $(f[0]).classList.add("fehlt"); });
     $(fehlt[0][0]).focus();
+    return;
+  }
+  if (name === "du" && erBeruf.fachFehlt()) {
+    erFehlt("Bitte noch die Fachrichtung wählen.");
+    $("w-fach").classList.add("fehlt");
     return;
   }
   if (name === "ausbildung" && $("w-ende").value <= $("w-beginn").value) {

@@ -140,6 +140,18 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
   transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s, transform .15s;
 }
 .reiter button:hover { background: var(--band); border-color: var(--linie-fest); }
+/* Die Taste des Reiters als kleine Kappe in der Ecke (tasteZeigen()). Nur mit Maus und breitem
+   Fenster: Am Handy gibt es keine Zifferntasten, dort wäre sie nur Unruhe. */
+@media (min-width: 821px) and (hover: hover) {
+  .reiter button { position: relative; }
+  .reiter button[data-taste]::before {
+    content: attr(data-taste); position: absolute; top: var(--luft-2); left: var(--luft-2);
+    min-width: 16px; height: 16px; padding: 0 var(--luft-1); box-sizing: border-box;
+    border: 1px solid currentColor; border-radius: 4px; opacity: .45;
+    font-size: var(--schrift-marke); font-weight: 600; line-height: 14px; text-align: center;
+  }
+  .reiter button[aria-selected="true"]::before { opacity: .7; }
+}
 .reiter button[aria-selected="true"] {
   background: var(--text); color: var(--flaeche); border-color: var(--text);
   box-shadow: 0 6px 16px rgba(22, 22, 26, .18);

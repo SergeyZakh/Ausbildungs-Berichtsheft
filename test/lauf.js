@@ -159,7 +159,7 @@ const NAME = 'Mustermann, Max';
   await h.stammdatenOeffnen(page);
   await h.stammFuellen(page, '#f-vorname', 'Max');
   await h.stammFuellen(page, '#f-nachname', 'Mustermann');
-  await h.stammFuellen(page, '#f-beruf', 'Fachinformatiker für Systemintegration');
+  await h.stammFuellen(page, '#f-berufwahl', 'Fachinformatiker für Systemintegration');
   await h.stammFuellen(page, '#f-abteilung', 'Systemintegration');
   await h.stammFuellen(page, '#f-beginn', '2025-09-01');
   await h.stammFuellen(page, '#f-ende', '2028-08-31');
@@ -595,8 +595,34 @@ const NAME = 'Mustermann, Max';
       await seite.textContent('#er-fehlt'));
     await seite.fill('#w-vorname', 'Max');
     await seite.fill('#w-nachname', 'Muster');
-    await seite.fill('#w-beruf', 'Fachinformatiker/in – Systemintegration');
+    // Beruf: eigene Liste beim Tippen, der getippte Teil fett; danach die Fachrichtung antippen.
+    await seite.fill('#w-beruf', 'fachinf');
+    const liste = await seite.evaluate(() => [...document.querySelectorAll('#w-berufliste .boption')]
+      .map((o) => [o.textContent, o.querySelector('b') ? o.querySelector('b').textContent : '']));
+    pruefe('Beruf: Die Liste zeigt passende Berufe, der getippte Teil ist fett',
+      await seite.locator('#w-berufliste').isVisible() && liste.length === 1 &&
+        liste[0][0] === 'Fachinformatiker/in' && liste[0][1] === 'Fachinf', JSON.stringify(liste));
+    await seite.click('#w-berufliste .boption');
+    pruefe('Nach der Wahl: Liste zu, Fachrichtungen zum Antippen',
+      !(await seite.locator('#w-berufliste').isVisible()) && (await seite.locator('#w-fach .fachknopf').count()) === 4 &&
+        (await seite.inputValue('#w-beruf')) === 'Fachinformatiker/in');
     await seite.fill('#w-betrieb', 'Beispiel IT GmbH');
+    await seite.click('#er-weiter');
+    pruefe('Ohne Fachrichtung geht es nicht weiter',
+      (await schritt()) === 'du' && (await seite.textContent('#er-fehlt')).includes('Fachrichtung'), await seite.textContent('#er-fehlt'));
+    await seite.click('#w-fach .fachknopf:has-text("Systemintegration")');
+    pruefe('Beruf und Fachrichtung stehen zusammen in „Deine Daten“',
+      (await seite.inputValue('#f-beruf')) === 'Fachinformatiker/in – Systemintegration', await seite.inputValue('#f-beruf'));
+    await seite.fill('#w-beruf', 'Tierpfleger/in');
+    pruefe('Ein Beruf, den die Liste nicht kennt, wird so übernommen',
+      (await seite.inputValue('#f-beruf')) === 'Tierpfleger/in' && !(await seite.locator('#w-fach').isVisible()) &&
+        (await seite.locator('#w-berufliste .bleer').isVisible()));
+    await seite.fill('#w-beruf', 'Fachinformatiker/in – Systemintegration');
+    await seite.click('#w-betrieb');
+    pruefe('Ganz eingetippt: Beruf und Fachrichtung werden getrennt angezeigt',
+      (await seite.inputValue('#w-beruf')) === 'Fachinformatiker/in' &&
+        (await seite.getAttribute('#w-fach .fachknopf:has-text("Systemintegration")', 'aria-checked')) === 'true' &&
+        (await seite.inputValue('#f-beruf')) === 'Fachinformatiker/in – Systemintegration');
     await seite.click('#er-weiter');
     await seite.fill('#w-beginn', '2025-09-01');
     await seite.fill('#w-ende', '2025-08-01');

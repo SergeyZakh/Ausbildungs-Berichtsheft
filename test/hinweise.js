@@ -73,6 +73,9 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       text.includes('Letzte Woche') && text.includes('1 nicht gegengelesen') &&
         (!luecken || text.includes(luecken + (luecken === 1 ? ' Tag' : ' Tage') + ' ohne Text')), text);
     pruefe('Fertige Wochen und die laufende zählen nicht', !text.includes('ältere'), text);
+    const tasten = await page.evaluate(() => [...document.querySelectorAll('#reiter button')]
+      .map((k) => getComputedStyle(k, '::before').content.replace(/"/g, '')).join(''));
+    pruefe('Am Rechner steht an jedem Reiter seine Taste, 1–7 und 8 für die Woche', tasten === '12345678', tasten);
     const bilanz = await page.evaluate((m) => window.__wochenBilanz(m), letzte);
     pruefe('Wochenbilanz: Urlaub braucht keinen Text, erster offener Tag ist Dienstag',
       bilanz.ohneText === luecken && bilanz.ungelesen === 1 && bilanz.fertig === 1 && bilanz.erster === 1, JSON.stringify(bilanz));
@@ -88,18 +91,23 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.click('#btn-uebersicht');
     await page.waitForTimeout(300);
     pruefe('Übersicht öffnet sich aus dem Menü', await page.locator('#dlg-uebersicht').isVisible());
-    const kaestchen = await page.evaluate(() =>
-      [...document.querySelectorAll('#dlg-uebersicht .uraster .ukw')].map((k) => k.className.replace('ukw ', '')));
-    pruefe('Ein Kästchen je Woche, im richtigen Zustand',
-      kaestchen[0] === 'fertig' && kaestchen[1] === 'fertig' && kaestchen[2] === 'pruefen', kaestchen.slice(0, 5).join(','));
+    // Wie die Aktivität bei GitHub: je Woche eine Spalte Mo–Fr, die Felder Spalte für Spalte.
+    const felder = await page.evaluate(() =>
+      [...document.querySelectorAll('#dlg-uebersicht .uraster .utag')].map((k) => k.className.replace('utag ', '')));
+    pruefe('Ein Feld je Werktag, im richtigen Zustand: zwei fertige Wochen, dann fertig, ungelesen, Urlaub',
+      felder.slice(0, 10).every((k) => k === 'fertig') && felder[10] === 'fertig' && felder[11] === 'pruefen' &&
+        felder[12] === 'frei', felder.slice(0, 15).join(','));
+    pruefe('Monate stehen über den Spalten, Wochentage davor',
+      (await page.locator('#dlg-uebersicht .umonat').count()) >= 1 &&
+        (await page.locator('#dlg-uebersicht .uwt').allTextContents()).join() === 'Mo,Mi,Fr');
     const jahr = await page.locator('#dlg-uebersicht .ujahr h3').first().textContent();
     pruefe('Überschrift nennt das Ausbildungsjahr mit seinen echten Grenzen',
       jahr.startsWith('1. Ausbildungsjahr') && jahr.includes(beginn.split('-').reverse().join('.')), jahr);
     const tageZeile = await page.locator('#dlg-uebersicht .utage').first().textContent();
     pruefe('Urlaubstage werden gezählt', /1\s*Urlaub/.test(tageZeile), tageZeile);
-    await page.locator('#dlg-uebersicht .ukw').nth(2).click();
+    await page.locator('#dlg-uebersicht .uraster .utag').nth(11).click();
     await page.waitForTimeout(700);
-    pruefe('Ein Klick auf ein Kästchen öffnet die Woche und schließt die Übersicht',
+    pruefe('Ein Klick auf ein Feld öffnet den Tag und schließt die Übersicht',
       !(await page.locator('#dlg-uebersicht').isVisible()) &&
         (await page.evaluate((s) => JSON.parse(localStorage.getItem(s)).stand.woche, h.SPEICHER)) === letzte);
 
@@ -141,6 +149,23 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     pruefe('1. Jahr: 2 Urlaub, 1 Krank, gesetzliche Feiertage',
       /2\s*Urlaub/.test(daten[0].tage) && /1\s*Krank/.test(daten[0].tage) && /\d+\s*Feiertag/.test(daten[0].tage), daten[0].tage);
     pruefe('2. Jahr: der Krankheitstag im August 2026', /1\s*Krank/.test(daten[1].tage), daten[1].tage);
+    await ctx.close();
+  }
+  {
+    // Drei Ausbildungsjahre passen auf einen Laptop mit 1366 × 768 ohne Scrollen.
+    const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+    const page = await mitStand(ctx, {
+      stamm: { beginn: '2024-08-01', ende: '2027-07-31' }, tage: { '2025-03-03': tag('Etwas') }, wochen: {},
+      hinweise: { gesichert: vorTagen(0) },
+    });
+    await h.oeffnen(page);
+    await page.waitForTimeout(700);
+    const mass = await page.evaluate(() => {
+      document.getElementById('btn-uebersicht').click();
+      const k = document.querySelector('#dlg-uebersicht .dkoerper');
+      return { jahre: document.querySelectorAll('#dlg-uebersicht .ujahr').length, hoehe: k.scrollHeight, sichtbar: k.clientHeight };
+    });
+    pruefe('Übersicht: drei Jahre ohne Scrollen bei 1366 × 768', mass.jahre === 3 && mass.hoehe <= mass.sichtbar, JSON.stringify(mass));
     await ctx.close();
   }
   {

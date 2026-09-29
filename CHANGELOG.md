@@ -26,6 +26,17 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   wie ein Knopf. Die Pfeile sind jetzt Winkel statt der Zeichen ‹ ›, auch am Handy und im Kalender.
 - **Kalender zeigt, wo nichts steht:** Werktage der Ausbildung bis heute ganz ohne Eintrag sind
   blassrot, auch in Wochen ohne Daten; die Legende nennt sie „nichts eingetragen“.
+- **Übersicht wie die Aktivität bei GitHub:** je Ausbildungsjahr ein Raster aus Wochen und
+  Werktagen, jeder Tag ein Feld in den Farben des Kalenders, oben die Monate. Ein Klick öffnet den
+  Tag. Am Rechner passen drei Ausbildungsjahre ohne Scrollen hinein.
+- **Ausbildungsberuf** in der Einrichtung und unter *Deine Daten*: eine eigene Liste beim Tippen,
+  nach Bereichen und mit dem getippten Teil fett, rund 30 Berufe statt 13. Hat der Beruf
+  Fachrichtungen (Fachinformatiker/in, Groß- und Außenhandel, Mediengestaltung), stehen sie darunter
+  zum Antippen. Jeder andere Beruf lässt sich weiter frei eintragen.
+- **Tastenkürzel sichtbar:** Am Rechner steht in der Ecke jedes Reiters seine Taste (1–7, 8 für die
+  Woche); die Pfeile nennen beim Überfahren Alt + ← / →.
+- **Legende im Kalender** in zwei Spalten: links die Marken der Tage, rechts die Kreise des Kalenders
+  mit genau ihrem Aussehen.
 - **Ganzes Heft als Word** geht jetzt wie als PDF, auch bevor etwas geschrieben ist. Vorher war
   „Als Word-Datei“ dann gesperrt, „Als PDF drucken“ nicht.
 - **Buchungen ohne Haken:** Steht eine Buchung schon im Text, fällt ihr Plus weg, statt dass ein
