@@ -23,5 +23,5 @@ function beispielLaden() {
   var schule = tage["2026-09-10"];
   if (schule && !schule.art) { schule.art = "Berufsschule"; merkenJetzt(); }
   wocheZeigen("2026-09-07", 0);
-  sage("Beispiel geladen: zwei ausgedachte Wochen. Unter ⋯ → Deine Daten → Gefahr löschst du es wieder.", "gut");
+  sage("Beispiel geladen: zwei ausgedachte Wochen. Wieder weg: ⋯ → Deine Daten → Löschen.", "gut");
 }
