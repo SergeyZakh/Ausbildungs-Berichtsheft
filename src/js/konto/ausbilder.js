@@ -184,9 +184,9 @@ function zeichneHeft() {
       '<button type="button" class="knopf zurueck" id="a-zurueck-liste">‹ Azubis</button>' +
       '<h1 class="atitel">' + sicher(azubi.name) + "</h1>" +
       '<div class="wochenschalter">' +
-        '<button type="button" class="rundknopf" id="a-zurueck" aria-label="Vorige Woche">‹</button>' +
+        '<button type="button" class="rundknopf" id="a-zurueck" aria-label="Vorige Woche">' + PFEIL_LINKS + '</button>' +
         '<button type="button" class="wochenknopf" id="a-wochenlabel" aria-haspopup="dialog" aria-expanded="false"></button>' +
-        '<button type="button" class="rundknopf" id="a-vor" aria-label="Nächste Woche">›</button>' +
+        '<button type="button" class="rundknopf" id="a-vor" aria-label="Nächste Woche">' + PFEIL_RECHTS + '</button>' +
       "</div>" +
       '<div class="wochensumme" id="a-summe"></div>' +
       '<div class="menuehalter" id="a-exporthalter">' +
@@ -205,9 +205,9 @@ function zeichneHeft() {
         '<button type="button" class="rundknopf dlg-x" id="a-wochen-zu" aria-label="Schließen">×</button></div>' +
       '<div class="dkoerper">' +
         '<div class="monatszeile">' +
-          '<button type="button" class="rundknopf" id="a-monat-zurueck" aria-label="Voriger Monat">‹</button>' +
+          '<button type="button" class="rundknopf" id="a-monat-zurueck" aria-label="Voriger Monat">' + PFEIL_LINKS + '</button>' +
           '<span id="a-monatslabel"></span>' +
-          '<button type="button" class="rundknopf" id="a-monat-vor" aria-label="Nächster Monat">›</button>' +
+          '<button type="button" class="rundknopf" id="a-monat-vor" aria-label="Nächster Monat">' + PFEIL_RECHTS + '</button>' +
         "</div>" +
         '<div class="wochenliste" id="a-wochenliste"></div>' +
         '<div class="sprungzeile"><button type="button" class="knopf" id="a-sprung-heute">Diese Woche</button></div>' +

@@ -20,8 +20,14 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Eine Karte je Tag:** Das Datum ist ihr Titel, Art des Tages, Stunden und „Fertig“ stehen im
   Kopf, über dem Text klein das Feld des Vordrucks. Vorher standen Tageskopf und Text in zwei
   Karten übereinander. Überschriften der Karten in normaler Schreibung statt Versalien.
-- **Kopfleiste am Rechner in drei Teilen:** links der Name, in der Mitte die Woche mit ihrem Stand,
-  rechts Farbe, Export und Menü. Vorher klaffte zwischen der Woche und den Knöpfen eine Lücke.
+- **Die Woche als Titel:** Am Rechner steht oben links groß „7.–13. September 2026 ▾“ (ein Klick
+  öffnet den Kalender), davor die Pfeile als leise Kreise, dahinter der Stand in Grau; rechts
+  Farbe, Export und Menü. Vorher standen in der Mitte vier umrandete Formen, und die Summe sah aus
+  wie ein Knopf. Die Pfeile sind jetzt Winkel statt der Zeichen ‹ ›, auch am Handy und im Kalender.
+- **Kalender zeigt, wo nichts steht:** Werktage der Ausbildung bis heute ganz ohne Eintrag sind
+  blassrot, auch in Wochen ohne Daten; die Legende nennt sie „nichts eingetragen“.
+- **Ganzes Heft als Word** geht jetzt wie als PDF, auch bevor etwas geschrieben ist. Vorher war
+  „Als Word-Datei“ dann gesperrt, „Als PDF drucken“ nicht.
 - **Buchungen ohne Haken:** Steht eine Buchung schon im Text, fällt ihr Plus weg, statt dass ein
   grüner Haken an jeder Zeile steht. Fliegt die Zeile aus dem Text, ist das Plus wieder da.
 - **Vor- und Nachname** in zwei Feldern, in der Einrichtung und unter *Deine Daten*. Gespeichert

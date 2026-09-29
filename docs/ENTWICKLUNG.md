@@ -116,8 +116,8 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 
 Reihenfolge wie in der Liste `CSS` in `build.js`: `basis.css` (Farben als Variablen, der dunkle
 Modus tauscht sie unter `prefers-color-scheme: dark`; Schrift, Grundgerüst),
-`leiste.css` (Kopfleiste, am Rechner ein Raster aus Name, Woche mit Summe und Aktionen, damit
-die Woche genau mittig steht; Wochenbalken, Reiter), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
+`leiste.css` (Kopfleiste: am Rechner die Woche als Titel mit `langSpanne()`, am Handy und beim
+Ausbilder als Knopf mit `kurzSpanne()`; Wochenbalken, Reiter), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
 Eingaben, Meldungen), `dialoge.css` (Monatsraster, „Deine Daten“, Zuordnung, Rundgang),
 `handy.css` (alle `@media`-Regeln für Handy und Tablet; dort stehen die Tagesreiter in einer Zeile
 mit der Woche breit darunter, und im Kopf der Tageskarte `.tagkarte` steht das Datum allein, darunter Art, Stunden und „Fertig“ in einer Zeile, damit das Schreibfeld auch mit
@@ -244,6 +244,8 @@ vergleicht beide Seiten Fall für Fall.
   Feld im Vordruck.
 - Ein Werktag im Ausbildungszeitraum ohne Text ist eine Lücke, ob ganz ohne Eintrag oder mit
   geleertem Text. Ein gesetzlicher Feiertag ohne Text fehlt nicht, Tage in der Zukunft auch nicht.
+  Im Monatsraster sind solche Tage ganz ohne Eintrag blassrot (`fehlenderWerktag()`), auch in
+  Wochen ohne Daten.
 - Hat die Woche Themen für die Berufsschule (`wochen.schule`), steht jeder Werktag ohne eigenen
   Text, der nicht frei ist, unter ihnen und hat ihren Stand (`tagImWochenfeld()`). Das gilt für
   jeden solchen Tag, nicht nur für Schultage laut Plan: Der Server kennt den Plan nicht.
@@ -252,7 +254,7 @@ vergleicht beide Seiten Fall für Fall.
 
 Statt eines Rundgangs über eine leere Seite fragt das Werkzeug Azubis beim ersten Start in sechs Schritten,
 was im Kopf jedes Wochenblatts steht: Willkommen (mit „Beispiel ansehen“ und „Sicherung laden“),
-Name/Beruf/Betrieb, Beginn/Ende und Bundesland, Berufsschule (feste Schultage, Blockunterricht im
+Vor- und Nachname/Beruf/Betrieb, Beginn/Ende und Bundesland, Berufsschule (feste Schultage, Blockunterricht im
 Kalender), Vordruck, zuletzt „Zeiterfassung laden (CSV)“ oder „Selbst schreiben“. Pflicht sind die
 Angaben aus `PFLICHT` in `stammdaten.js`; „Weiter“ nennt, was fehlt, und ein Ende vor dem Beginn.
 
@@ -260,6 +262,10 @@ Angaben aus `PFLICHT` in `stammdaten.js`; „Weiter“ nennt, was fehlt, und ein
   Daten“. Jede Eingabe geht sofort dorthin und löst dort `input` aus; gespeichert und abgeglichen
   wird wie beim Tippen im Dialog. Schultage schreiben `f-schultage`, der Blockunterricht nutzt die
   Marken und den Kalender aus `zeitraum.js`.
+- Vor- und Nachname sind hier und in „Deine Daten“ zwei Felder; gespeichert wird nur `f-name` als
+  „Nachname, Vorname“ (`nameZusammen()`, `nameTeilen()` in `stammdaten.js`). Ein älterer Name ohne
+  Komma teilt sich am letzten Leerzeichen. Die Pflichtangabe gilt erst mit beiden Teilen
+  (`pflichtFehlt()`).
 - Sie kommt nur, wenn noch nichts eingetragen ist (`einrichtungNoetig()`: keine Tage, kein Name,
   kein Beginn), nicht für Ausbilder, und erst nach `kontoStarten()`: Mit Konto bringt der Abgleich
   vorher mit, was schon eingetragen ist. Am Handy steht sie im Vollbild.

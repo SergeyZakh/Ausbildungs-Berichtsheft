@@ -8,10 +8,11 @@ function startMontag(s) {
   return wochen.length ? vonIso(wochen[wochen.length - 1]) : montagVon(new Date());
 }
 
-/** Die Montage aller Wochen vom Start bis zur neuesten Woche. */
+/** Die Montage aller Wochen vom Start bis zur neuesten Woche. Ist noch nichts geschrieben, endet
+ *  das Heft mit der offenen Woche, wie beim Druck: Sonst gab es das Heft als PDF, als Word nicht. */
 function alleExportMontage(s) {
   var montag = new Date(startMontag(s));
-  var letzter = wochen.length ? vonIso(wochen[0]) : montag;
+  var letzter = wochen.length ? vonIso(wochen[0]) : aktiveWoche ? vonIso(aktiveWoche) : montag;
   var out = [], wache = 0;
   while (montag <= letzter && wache++ < 400) {
     out.push(new Date(montag));
@@ -193,7 +194,7 @@ async function wochenblattSpeichern() {
 }
 
 async function gesamtheftSpeichern() {
-  if (!wochen.length) return;
+  if (!aktiveWoche) return;
   if (!(await exportFreigabe(true))) return;
   sage("Gesamtheft wird erzeugt …");
   try {

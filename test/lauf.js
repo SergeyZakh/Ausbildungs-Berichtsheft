@@ -625,6 +625,8 @@ const NAME = 'Mustermann, Max';
       JSON.stringify(stamm));
     pruefe('„Selbst schreiben“ öffnet die aktuelle Woche',
       !(await seite.locator('#dlg-einrichtung').isVisible()) && (await seite.locator('.reiter button').count()) === 8);
+    pruefe('Ohne geschriebene Woche geht das ganze Heft als Word wie als PDF',
+      !(await seite.locator('#btn-heft').isDisabled()) && !(await seite.locator('#btn-pdf-heft').isDisabled()));
     pruefe('Gesehene Einrichtung steht als 1 im Speicher', (await gemerkt()) === '1');
 
     await seite.reload();

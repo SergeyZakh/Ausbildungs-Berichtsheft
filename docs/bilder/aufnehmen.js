@@ -72,7 +72,7 @@ const ziel = (name) => path.join(__dirname, name);
   await page.click('.reiter button >> nth=7');
   await page.waitForTimeout(900);
   await h.markieren(page, [
-    ['.wochenbalken', 1, 'davor'],             // Woche wählen, samt Pfeilen; davor ist frei
+    ['#wochenlabel', 1, 'rechts'],             // Woche wählen: der Titel öffnet den Kalender
     ['#feld-abteilung', 2, 'rechts'],          // gilt für die ganze Woche
     ['#feld-unterweisungen', 3],
     ['.sektion.vorschau', 4],                  // so wird das Blatt gedruckt

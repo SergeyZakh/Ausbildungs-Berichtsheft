@@ -33,6 +33,9 @@
 
   .wochenschalter { gap: var(--luft-2); }
   .wochenschalter .rundknopf { width: 34px; height: 34px; }
+  /* Im Quelltext stehen beide Pfeile vor der Woche (für den Titel am Rechner); hier ‹ Woche ›. */
+  .wochenschalter #wochenlabel { order: 1; }
+  .wochenschalter #woche-vor { order: 2; }
   .wochenknopf { flex: 1 1 auto; padding: 0 var(--luft-3); height: 34px; line-height: 32px; font-size: var(--schrift-klein); }
   .wochensumme { height: 34px; padding: 0 var(--luft-3) 0 var(--luft-2); gap: var(--luft-2); font-size: var(--schrift-klein); }
   .leiste .schub .farbknopf { width: 34px; height: 34px; }

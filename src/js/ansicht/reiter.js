@@ -11,7 +11,7 @@ function zeichnen() {
   zeichneTag();
   lehrjahrZeigen();
   hinweiseZeigen();
-  $("btn-heft").disabled = !wochen.length;
+  $("btn-heft").disabled = !aktiveWoche;
   $("btn-wochenblatt").disabled = !aktiveWoche;
 }
 
