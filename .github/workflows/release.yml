@@ -1,10 +1,17 @@
 # Ein Tag wie v0.1.0 erzeugt ein Release mit Berichtsheft.html zum Herunterladen.
 #   git tag v0.1.0 && git push origin v0.1.0
+# Ohne Tag von Hand: Actions → Release → „Run workflow“ auf main mit der Version aus package.json.
+# Dann legt das Release den Tag auf diesem Stand selbst an.
 name: Release
 
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version wie in package.json, ohne v (etwa 0.2.0)
+        required: true
 
 permissions:
   contents: write
@@ -18,6 +25,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Tag bestimmen
+        env:
+          VERSION: ${{ inputs.version }}
+        # Von Hand nur auf main und nur mit der Version aus package.json: Sonst hieße das Release
+        # anders als die Datei darin. Die Eingabe geht über env in die Shell, nie direkt.
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            [ "$GITHUB_REF" = refs/heads/main ] || { echo "::error::Nur von main aus"; exit 1; }
+            [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Version wie 0.2.0 angeben"; exit 1; }
+            [ "$(node -p 'require("./package.json").version')" = "$VERSION" ] || { echo "::error::package.json hat eine andere Version"; exit 1; }
+            echo "TAG=v$VERSION" >> "$GITHUB_ENV"
+          else
+            echo "TAG=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+          fi
       - run: npm ci --omit=dev
       - run: npm run build
       - name: Release anlegen
@@ -27,8 +48,9 @@ jobs:
         # nachsehen kann, ob er genau die Datei aus diesem Release hat.
         run: |
           SUMME=$(sha256sum dist/Berichtsheft.html | cut -d' ' -f1)
-          gh release create "$GITHUB_REF_NAME" dist/Berichtsheft.html \
-            --title "Berichtsheft $GITHUB_REF_NAME" \
+          gh release create "$TAG" dist/Berichtsheft.html \
+            --target "$GITHUB_SHA" \
+            --title "Berichtsheft $TAG" \
             --notes "Berichtsheft.html herunterladen und doppelklicken. Die Datei läuft ohne Installation und ohne Internet.
 
           SHA-256 der Datei \`$SUMME\`

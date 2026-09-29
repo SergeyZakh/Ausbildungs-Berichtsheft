@@ -608,7 +608,7 @@ node docs/bilder/aufnehmen.js
 | --- | --- |
 | Tests | `.github/workflows/tests.yml` bei jedem Push und Pull Request |
 | Demo | `.github/workflows/pages.yml` baut `dist/` bei jedem Push auf `main` nach GitHub Pages. Einmalig in den Repo-Einstellungen: *Pages → Source → GitHub Actions*. |
-| Download | `.github/workflows/release.yml`: Ein Tag `v*` legt ein Release mit `Berichtsheft.html` an. |
+| Download | `.github/workflows/release.yml`: Ein Tag `v*` legt ein Release mit `Berichtsheft.html` an. Ohne Tag von Hand startet man den Workflow unter *Actions → Release → Run workflow* auf `main` mit der Version aus `package.json`; dann legt er den Tag selbst an. |
 | Updates | `.github/dependabot.yml` schlägt monatlich neue npm-Pakete, Images und Actions vor, je Bereich in einem gesammelten Pull Request. Die selbst gebauten Images `berichtsheft` und `berichtsheft-server` sind ausgenommen. |
 
 Neue Fassung:
@@ -619,7 +619,8 @@ Neue Fassung:
    den Vergleichslink am Ende ergänzen.
 3. `npm run build && npm test`, dazu `bash server/test/testen.sh` und `bash server/test/betrieb.sh`
    (der Betriebstest mit Keycloak läuft nicht in der CI).
-4. Committen, dann `git tag vX.Y.Z && git push origin main vX.Y.Z`.
+4. Committen, dann `git tag vX.Y.Z && git push origin main vX.Y.Z`. Wer keine Tags pushen darf,
+   startet stattdessen den Workflow „Release“ mit der Version.
 
 Der Speicheraufbau (`berichtsheft-v1`) muss abwärtskompatibel bleiben: Ältere
 Stände und Sicherungen werden beim Laden gelesen, nicht verworfen. Wer das
