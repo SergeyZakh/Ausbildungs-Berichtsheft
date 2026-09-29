@@ -122,7 +122,7 @@ async function oeffnen(page, adresse = SEITE || DATEI_SEITE) {
   if (adresse.startsWith('file:')) await page.goto(adresse);
 }
 
-/** Der Rundgang beim ersten Start würde jeden Klick abfangen. */
+/** Einrichtung (Azubi) und Rundgang (Ausbilder) beim ersten Start würden jeden Klick abfangen. */
 async function ohneRundgang(page) {
   await page.addInitScript((schluessel) => {
     try { localStorage.setItem(schluessel, '1'); localStorage.setItem(schluessel + '-ausbilder', '1'); } catch (e) {}

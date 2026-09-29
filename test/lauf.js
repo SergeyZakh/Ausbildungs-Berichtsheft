@@ -608,7 +608,7 @@ const NAME = 'Mustermann, Max';
     await seite.waitForTimeout(900);
     pruefe('Beim zweiten Start bleibt die Einrichtung weg', !(await seite.locator('#dlg-einrichtung').isVisible()));
     pruefe('Mit allen Angaben bietet die Startkarte keine Einrichtung an', (await seite.locator('#btn-leer-einrichtung').count()) === 0);
-    pruefe('Den Rundgang gibt es im Menü', (await seite.locator('#btn-hilfe').count()) === 1);
+    pruefe('Kein Rundgang im Menü: Die Einrichtung ersetzt ihn', (await seite.locator('#btn-hilfe, #onboarding:not([hidden])').count()) === 0);
 
     // Mit Einträgen im Speicher gibt es nichts zu prüfen: Die Seite öffnet ohne Neuladen. Im selben
     // Tab, denn das zweite Dokument eines Tabs ist nie abgekoppelt; ein neuer Tab wäre es selten

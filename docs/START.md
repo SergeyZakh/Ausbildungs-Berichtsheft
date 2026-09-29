@@ -42,7 +42,7 @@ Schritts, **3** weiter zum nächsten. Mit **Später** geht es ohne Angaben weite
 
 Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohne Zeiterfassung,
 **3** Beispiel ansehen – zwei ausgedachte Wochen zum Ausprobieren, jederzeit wieder löschbar,
-**4** das Menü **⋯** mit „Deine Daten“, der Übersicht, Sicherung speichern und laden und dem Rundgang.
+**4** das Menü **⋯** mit „Deine Daten“, der Übersicht und Sicherung speichern und laden.
 
 1. **Datei herunterladen.** Auf der [Releases-Seite](https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/latest)
    unter „Assets“ auf `Berichtsheft.html` klicken. Die Datei an einem festen Ort speichern,
@@ -65,11 +65,25 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
    sie einfach ins Browserfenster ziehen. Erkennt das Werkzeug die Spalten nicht sicher, fragt es
    nach. Jede Spalte einmal zuordnen, beim nächsten Mal weiß es Bescheid.
 
+   ![Zuordnungsdialog mit Vorschau](bilder/zuordnung.png)
+
+   **1** Datum, die einzige Pflichtangabe. **2** Dauer, oder Beginn und Ende, je nachdem, was dein
+   Export mitbringt. **3** Beschreibung, der Text, aus dem der Entwurf entsteht. **4** Datum mit
+   Schrägstrich, nur wenn sich `09/07` als 9. Juli **und** als 7. September lesen lässt. **5** Die
+   ersten Zeilen zur Kontrolle: Stimmt das Datum, stimmt meist alles.
+
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere
    ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig; was die Zeichen in den
    Reitern heißen, erklärt der Kalender unter dem Wochenknopf. Im Reiter **Woche** trägst du
    Abteilung und Unterweisungen ein. Was über alle Wochen noch fehlt, zeigt **⋯ → Übersicht aller
    Wochen**.
+
+   ![Wochenansicht mit Vorschau des Wochenblatts](bilder/woche.png)
+
+   **1** Woche wählen, ein Klick öffnet den Kalender. **2** Ausbildungsabteilung, gilt für die ganze
+   Woche; ohne Eintrag zählt die aus „Deine Daten“. **3** Unterweisungen und Lehrgespräche, ein
+   eigenes Feld im Vordruck. **4** Vorschau des Wochenblatts. **5** Ob die Woche auf ein Blatt
+   passt, mit Sprachmodell auch „Ganze Woche mit KI kürzen“. **6** Exportieren.
 
 6. **Exportieren.** Auf **Exportieren**, dann unter **Diese Woche** „Als Word-Datei“ oder „Als PDF
    drucken“. Für alle Wochen auf einmal dasselbe unter **Ganzes Heft mit Deckblatt**; was nur das
@@ -80,6 +94,39 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
    zwei Wochen ohne Sicherung erinnert dich das Werkzeug. Auf einem anderen Rechner holst du sie mit
    **⋯ → Sicherung laden** zurück. Am iPhone leg das Berichtsheft auf den Home-Bildschirm, sonst
    löscht Safari es nach sieben Tagen ohne Besuch.
+
+### Gut zu wissen
+
+- **Am Handy** läuft das Werkzeug auch. Tage, Woche und Blattvorschau stehen dann untereinander.
+  Zum Gegenlesen vieler Wochen ist ein Rechner bequemer, und „PDF drucken“ hängt vom Druckdialog
+  des Handys ab.
+- **Am iPhone** löscht Safari die Daten einer Seite, die du sieben Tage nicht öffnest. Leg das
+  Berichtsheft über *Teilen → Zum Home-Bildschirm* ab; dort beginnt es leer, deinen Stand bringst
+  du mit **⋯ → Sicherung speichern** und *Sicherung laden* mit.
+- **Dunkel** wird die Oberfläche, wenn dein Gerät es so eingestellt hat, oder mit dem Mond oben in
+  der Leiste. Das Blatt bleibt weiß.
+- **Als Datei per Doppelklick** kann Chrome oder Edge in seltenen Fällen einen Tab öffnen, der den
+  gespeicherten Stand nicht sieht. Das Werkzeug prüft das beim Start und lädt dann einmal neu. Mit
+  `npm start` oder Docker tritt es gar nicht auf.
+- **Im Dokument stehen keine Uhrzeiten.**
+- **Schultage** aus *Deine Daten → Schule* setzen nur leere Tage auf „Berufsschule“, in den dort
+  eingetragenen Schulferien nicht. Tage mit Buchungen bleiben, wie der Import sie liefert. Am Tag
+  selbst lässt sich die Art jederzeit umstellen.
+- **Blockwoche:** Ist jeder Werktag einer Woche Berufsschule oder frei, schreibst du die Themen
+  einmal für die ganze Woche statt an fünf Tagen – so wie der Vordruck ein Feld je Woche hat. Wer
+  an einem Tag krank war, stellt es in der Liste darunter um. Beim täglichen Vordruck bleibt es bei
+  einem Text je Tag.
+- **Nach „Fertig“** geht es gleich zum nächsten Tag, der noch etwas braucht, auch in der nächsten
+  Woche. „Zurück“ hinter der Meldung führt wieder hin.
+- **Eine Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den
+  Text des Tages.
+- **Feiertage** werden bundesweit erkannt, mit deinem Bundesland auch die des Landes. Was nur in
+  einzelnen Gemeinden gilt, etwa Mariä Himmelfahrt in Teilen Bayerns, trägst du als Art des Tages
+  ein. Ein Feiertag ohne Eintrag zählt nicht als Lücke.
+- **Der Vordruck** folgt dem verbreiteten IHK-Muster „Ausbildungsnachweis – wöchentliche
+  Notierung“, wahlweise der täglichen Notierung. Frag bei deiner IHK nach, welchen sie verlangt.
+- **Tastatur:** `1`–`7` wählt den Tag, `8` den Reiter **Woche**, `Alt` + `←` / `→` blättert eine
+  Woche zurück oder vor, `Strg` + `S` speichert das Wochenblatt.
 
 ### KI dazu (optional)
 

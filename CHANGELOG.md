@@ -13,7 +13,7 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Einrichtung beim ersten Start** statt des Rundgangs: in sechs kurzen Schritten Name, Beruf,
   Betrieb, Vertragslaufzeit, Bundesland, Berufsschule und Vordruck, danach Zeiterfassung laden oder
   selbst schreiben. Am Handy im Vollbild. Mit „Später“ geht es ohne Angaben weiter; die Startkarte
-  bietet die Einrichtung an, solange Pflichtangaben fehlen. Den Rundgang gibt es weiter im Menü.
+  bietet die Einrichtung an, solange Pflichtangaben fehlen. Ausbilder behalten ihren Rundgang.
 - **Feste Schultage und Blockunterricht** unter *Deine Daten → Schule*, dort steht jetzt auch der
   Name der Berufsschule. Leere Tage an diesen Tagen stehen schon auf „Berufsschule“, mit dem Feld
   für die Unterrichtsthemen. Feiertage, Tage außerhalb der Vertragslaufzeit und Tage mit Buchungen
@@ -22,8 +22,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Blöcke und Ferien wählst du im Kalender (ersten Tag antippen, dann den letzten); sie stehen als
   Marken mit × da, Überlappendes wird zusammengelegt.
 - **Tägliche Notierung** als zweiter Vordruck der IHK: eine Zeile je Tag, ohne Stunden wie das
-  wöchentliche Blatt. Umschalten neben der Wochenvorschau oder unter *Deine Daten →
-  Vordruck*; gilt für Vorschau, Druck und Word, auch beim Ausbilder.
+  wöchentliche Blatt. Gewählt in der Einrichtung oder unter *Deine Daten → Vordruck*; gilt für
+  Vorschau, Druck und Word, auch beim Ausbilder.
 - **Übersicht aller Wochen** (Menü ⋯): je Ausbildungsjahr ein Kästchen pro Woche, grün fertig, rot
   ungelesen oder mit Lücke, dazu die Tage in der Berufsschule, im Urlaub, krank und an Feiertagen.
 - **Was fehlt noch?** Beim Öffnen nennt ein Hinweis die Lücken und ungelesenen Tage der letzten
@@ -47,7 +47,7 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 ### Geändert
 
 - **Menüs und Knöpfe aufgeräumt:** Das Menü ⋯ ist nach Zweck gruppiert (Deine Daten und Übersicht,
-  Zeiterfassung laden, Sicherung, Rundgang). „Exportieren“ trennt „Diese Woche“ und „Ganzes Heft mit
+  Zeiterfassung laden, Sicherung). „Exportieren“ trennt „Diese Woche“ und „Ganzes Heft mit
   Deckblatt“, je als Word oder PDF. Das Laden der CSV heißt überall „Zeiterfassung laden“, damit es
   nicht mit „Exportieren“ verwechselt wird. Die Startkarte hat zwei Knöpfe, Beispiel und Sicherung
   stehen als Links darunter.

@@ -281,14 +281,12 @@ function textSektion(key, t, art, istSchule) {
     sage("Zum Bearbeiten geöffnet — danach wieder auf „Fertig“.", "warn");
   });
 
-  // Die Fahne sagt, woraus der Text stammt.
+  // Nur ein Text vom Sprachmodell bekommt eine Fahne; dass ein Tag noch offen ist, sagen Farbe
+  // und „Fertig“ schon.
   var fahne = document.createElement("span");
   fahne.className = "sektionsfahne";
-  var FAHNEN = {
-    roh:   ["Entwurf", "Noch der unveränderte Vorschlag aus deinen Buchungen"],
-    ki:    ["KI", "Vom Sprachmodell formuliert — bitte gegenlesen"],
-    eigen: ["Eigener Text", "Selbst geschrieben, aber noch nicht als fertig markiert"]
-  };
+  fahne.textContent = "KI";
+  fahne.title = "Vom Sprachmodell formuliert — bitte gegenlesen";
 
   function pruefstandAnzeigen() {
     var stand = tagStand(tage[key]);
@@ -298,9 +296,7 @@ function textSektion(key, t, art, istSchule) {
     uebernehmen.hidden = !offen;
     bearbeiten.hidden = !fertig;
     ta.readOnly = fertig;
-    var m = FAHNEN[stand];
-    fahne.hidden = !m;
-    if (m) { fahne.textContent = m[0]; fahne.title = m[1]; }
+    fahne.hidden = stand !== "ki";
   }
   s.kopf.appendChild(fahne);
   s.kopf.appendChild(uebernehmen);

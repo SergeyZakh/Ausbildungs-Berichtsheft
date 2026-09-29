@@ -1,48 +1,17 @@
 /* ============================================================
- * Rundgang beim ersten Start
+ * Rundgang für Ausbilder beim ersten Start
  *
- * Ein Gedanke je Schritt. Jeder Schritt zeigt auf das erste seiner Ziele,
- * das sichtbar ist; ohne Ziel steht die Karte mittig.
+ * Azubis richten ihr Heft stattdessen ein (einrichtung.js). Ausbilder schreiben kein Heft: Sie
+ * wählen Azubis, lesen Wochenblätter und laden sie herunter.
+ *
+ * Ein Gedanke je Schritt. Jeder Schritt zeigt auf das erste seiner Ziele, das sichtbar ist; ohne
+ * Ziel steht die Karte mittig. Schritte, deren Ziel nur im Heft eines Azubis steht, fallen in der
+ * Auswahl von selbst weg.
  * ========================================================== */
 
-var ONBOARDING = "berichtsheft-onboarding";
-var ONBOARDING_AUSBILDER = "berichtsheft-onboarding-ausbilder";
+var RUNDGANG_GESEHEN = "berichtsheft-onboarding-ausbilder";
 
 var RUNDGANG = [
-  { ziel: null,
-    titel: "Aus deinen Zeiten wird dein Berichtsheft",
-    text: "Du lädst den Export deiner Zeiterfassung, schreibst die Tage fertig und bekommst " +
-          "die Wochenblätter im IHK-Vordruck. Alles bleibt in diesem Browser." },
-  { ziel: [".leerbild", "#btn-mehr"],
-    titel: "Zeiterfassung laden",
-    text: "Zieh die CSV aus Clockify, Harvest, Jira, Kimai, Toggl oder Excel einfach ins Fenster, oder " +
-          "wähle sie im Menü ⋯. Aus jeder Buchung wird eine Zeile, die du dann überarbeitest." },
-  { ziel: [".wochenbalken"],
-    titel: "Woche wählen",
-    text: "Mit den Pfeilen blätterst du durch jede Kalenderwoche, ein Klick auf " +
-          "die Mitte öffnet den Kalender." },
-  { ziel: ["#reiter"],
-    titel: "Ein Reiter je Tag",
-    text: "Der achte Reiter gehört der ganzen Woche. Grün heißt fertig, rot heißt: " +
-          "da musst du noch drüber – E ist der Entwurf aus dem Import, KI die Fassung des " +
-          "Sprachmodells, ! dein eigener Text. Die Zeichen erklärt auch der Kalender." },
-  { ziel: ["#tagbereich .tagpanel"],
-    titel: "Schreiben",
-    text: "Links schreibst du, rechts stehen deine Buchungen zum " +
-          "Nachschauen. Unten am Feld siehst du, ob der Text auf das Blatt passt." },
-  { ziel: [".sektion.wachsend > .sektionskopf", "#tagbereich .tagpanel"],
-    titel: "Erst prüfen, dann fertig",
-    text: "Solange der Kasten rot ist, hat den Text noch niemand freigegeben. " +
-          "Ein Klick auf „Fertig“ macht ihn grün — „Bearbeiten“ öffnet ihn wieder." },
-  { ziel: [".leiste .schub", "#btn-mehr"],
-    titel: "Fertig? Dann raus damit",
-    text: "Unter „Exportieren“ bekommst du das Wochenblatt dieser Woche und das " +
-          "Gesamtheft, jeweils als Word oder PDF." }
-];
-
-/* Ausbilder schreiben kein Heft: Sie wählen Azubis, lesen Wochenblätter und laden sie herunter.
-   Schritte, deren Ziel nur im Heft eines Azubis steht, fallen in der Auswahl von selbst weg. */
-var RUNDGANG_AUSBILDER = [
   { ziel: null,
     titel: "Die Berichtshefte deiner Azubis",
     text: "Hier siehst du, welche Wochen fertig sind, liest die Wochenblätter und lädst sie als " +
@@ -73,15 +42,13 @@ var RUNDGANG_AUSBILDER = [
 ];
 
 function onbAlsAusbilder() { return document.body.classList.contains("alsausbilder"); }
-function onbSchluessel() { return onbAlsAusbilder() ? ONBOARDING_AUSBILDER : ONBOARDING; }
 
 var onbIndex = 0;
-/* Die Schritte, deren Ziel gerade zu sehen ist. Ohne geladene Woche gibt
-   es keine Reiter und kein Textfeld; diese Schritte fallen dann weg. */
+/* Die Schritte, deren Ziel gerade zu sehen ist. */
 var onbSchritte = RUNDGANG;
 
 function onbGesehen() {
-  try { return localStorage.getItem(onbSchluessel()) === "1"; } catch (e) { return true; }
+  try { return localStorage.getItem(RUNDGANG_GESEHEN) === "1"; } catch (e) { return true; }
 }
 
 function onbZiel(schritt) {
@@ -142,15 +109,14 @@ function onbZeigen(i) {
 
 function onbStarten() {
   onbIndex = 0;
-  onbSchritte = (onbAlsAusbilder() ? RUNDGANG_AUSBILDER : RUNDGANG)
-    .filter(function (s) { return !s.ziel || onbZiel(s); });
+  onbSchritte = RUNDGANG.filter(function (s) { return !s.ziel || onbZiel(s); });
   $("onboarding").hidden = false;
   onbZeigen(0);
 }
 
 function onbBeenden() {
   $("onboarding").hidden = true;
-  try { localStorage.setItem(onbSchluessel(), "1"); } catch (e) { /* ohne Speicher */ }
+  try { localStorage.setItem(RUNDGANG_GESEHEN, "1"); } catch (e) { /* ohne Speicher */ }
 }
 
 $("onb-weiter").addEventListener("click", function () {
@@ -165,10 +131,6 @@ $("onb-ueberspringen").addEventListener("click", onbBeenden);
 window.addEventListener("resize", function () {
   if (!$("onboarding").hidden) onbZeigen(onbIndex);
 });
-$("btn-hilfe").addEventListener("click", function () { menueSchliessen(); onbStarten(); });
 document.addEventListener("keydown", function (e) {
   if (!$("onboarding").hidden && e.key === "Escape") { e.stopPropagation(); onbBeenden(); }
 }, true);
-window.addEventListener("resize", function () {
-  if (!$("onboarding").hidden) onbZeigen(onbIndex);
-});

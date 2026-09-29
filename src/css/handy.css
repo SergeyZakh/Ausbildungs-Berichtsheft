@@ -193,11 +193,6 @@
   .blattleiste button { flex: 1 1 auto; min-width: 30%; padding: 8px 8px; font-size: 12px; }
 }
 
-/* Dieselbe Bedingung wie amHandy in start.js: Der Rundgang zeigt auf Stellen im breiten Fenster. */
-@media (pointer: coarse) and (max-width: 820px) {
-  #btn-hilfe, #trenner-hilfe { display: none; }
-}
-
 /* Ganz schmal (320 px) passen neben vier Knöpfe nur Ring und Anteil; die Stunden stehen im Tageskopf.
    Sonst brach die Kopfleiste auf drei Zeilen um. */
 @media (max-width: 360px) {

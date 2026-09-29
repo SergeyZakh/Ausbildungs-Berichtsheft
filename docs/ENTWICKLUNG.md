@@ -87,12 +87,12 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `ansicht-woche.js` | Wochenbalken, Monatsraster, Navigation durch jede Kalenderwoche, nach „Fertig“ weiter zum nächsten offenen Tag (`weiterNachFertig()`) |
 | `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“; in einer Blockwoche nur der Reiter „Blockwoche“ |
 | `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: Text, Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche |
-| `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang, Vordruck (`vordruckSchalter()`), KI und Herunterladen |
+| `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang und KI; heruntergeladen wird über „Exportieren“ |
 | `schulwoche.js` | Themen einer Blockwoche (`schulwocheSektion()`) und die Tage der Blockwoche mit ihrer Art |
 | `stammdaten.js` | Dialog „Deine Daten“ (Reiter Ausbildung, Schule, Vordruck, Deckblatt, KI, Löschen), Verbindungsprüfung, Löschen und Verwerfen |
 | `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
 | `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
-| `rundgang.js` | Rundgang über das Menü; beim ersten Start nur für Ausbilder |
+| `rundgang.js` | Rundgang der Ausbilder beim ersten Start und über **?**; Azubis bekommen stattdessen die Einrichtung |
 | `einrichtung.js` | Einrichtung beim ersten Start: die Angaben fürs Wochenblatt in sechs Schritten, jede Eingabe geht sofort in das Feld von „Deine Daten“ (`data-feld`) |
 | `hinweise.js` | Hinweis über den Reitern: Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
 | `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Kästchen pro Woche und die Tage je Art (`uebersichtDaten()`) |
@@ -182,10 +182,10 @@ Datenbank beim letzten Abgleich und steuert, was herunterkommt; `gesendet` die B
 erfolgreichen Hochladen und steuert, was hochgeht. Mit nur einer Marke gingen Eingaben verloren, die
 während eines Abgleichs entstanden oder deren Rechneruhr nachging.
 
-`localStorage["berichtsheft-onboarding"] = "1"`: Einrichtung gesehen (früher: Rundgang gesehen, darum
-derselbe Schlüssel); `berichtsheft-onboarding-ausbilder` dasselbe für den Rundgang der Ausbilder
-(`RUNDGANG_AUSBILDER`). Beides startet erst, wenn `kontoStarten()`
-die Rolle kennt.
+`localStorage["berichtsheft-onboarding"] = "1"`: Einrichtung gesehen (`EINRICHTUNG_GESEHEN`; früher
+hieß so der Rundgang der Azubis, wer ihn kannte, bekommt die Einrichtung nicht);
+`berichtsheft-onboarding-ausbilder` dasselbe für den Rundgang der Ausbilder (`RUNDGANG_GESEHEN`).
+Beides startet erst, wenn `kontoStarten()` die Rolle kennt.
 
 `localStorage["berichtsheft-zuordnungen"]`: bestätigte Zuordnungen je Kopfzeile,
 `Signatur → { felder, reihenfolge }`.
@@ -228,7 +228,7 @@ vergleicht beide Seiten Fall für Fall.
 
 ### Einrichtung beim ersten Start (`einrichtung.js`)
 
-Statt eines Rundgangs über eine leere Seite fragt das Werkzeug beim ersten Start in sechs Schritten,
+Statt eines Rundgangs über eine leere Seite fragt das Werkzeug Azubis beim ersten Start in sechs Schritten,
 was im Kopf jedes Wochenblatts steht: Willkommen (mit „Beispiel ansehen“ und „Sicherung laden“),
 Name/Beruf/Betrieb, Beginn/Ende und Bundesland, Berufsschule (feste Schultage, Blockunterricht im
 Kalender), Vordruck, zuletzt „Zeiterfassung laden (CSV)“ oder „Selbst schreiben“. Pflicht sind die
@@ -532,7 +532,7 @@ verkleinert per `transform`. Dieselbe Quelle wie der Druck, also auch
 dieselbe Aufteilung auf mehrere Blätter.
 
 **Tägliche Notierung:** der zweite Vordruck der IHK, gewählt mit `stamm.vordruck = "taeglich"`
-(„Deine Daten → Vordruck“, die Einrichtung oder der Schalter neben der Vorschau). `tagesZeilen()` in `word.js`
+(„Deine Daten → Vordruck“ oder die Einrichtung). `tagesZeilen()` in `word.js`
 liefert je Tag eine Zeile mit Datum und Art, Montag bis Freitag immer, das Wochenende nur mit
 Eintrag, zuletzt die Themen einer Blockwoche (die Tage darunter stehen als „Berufsschule“) und die
 Unterweisungen der Woche. Stunden stehen auch hier nicht im Blatt: Die IHK fragt
@@ -563,7 +563,7 @@ npm test
 | `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start, Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen |
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
-| `test/vordruck.js` | Tägliche Notierung: Umschalten neben der Vorschau, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
+| `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
 | `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), Themen schreiben und übernehmen, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy |
 | `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), leise Meldung und kurzer Titel am Handy |
 | `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
@@ -589,10 +589,10 @@ das zweite Öffnen verlor ein Test in rund 13 % der Läufe beim nächsten Neulad
 Testdaten sind ausgedacht; echte Namen, Kunden oder Firmendaten gehören weder in `test/` noch in
 `src/beispiel.csv`.
 
-## Bilder im README
+## Bilder in README und Anleitung
 
-`docs/bilder/*.png` entstehen aus dem Beispielheft, damit sie nach
-Oberflächenänderungen gleich aussehen:
+`docs/bilder/*.png` (im README und in `docs/START.md`) entstehen aus dem Beispielheft, damit sie
+nach Oberflächenänderungen gleich aussehen:
 
 ```bash
 npm run build

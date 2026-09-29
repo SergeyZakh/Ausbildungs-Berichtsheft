@@ -201,7 +201,7 @@ async function durchgang(browser, breite) {
   pruefe('Druck am Handy mit Satzhöhe 251 mm' + bei, (await page.evaluate(() => window.__satzHoehe())) === 251);
 
   await page.click('#btn-mehr');
-  pruefe('Kein „Rundgang noch einmal“ im Menü' + bei, !(await page.locator('#btn-hilfe').isVisible()));
+  pruefe('Kein Rundgang im Menü' + bei, !(await page.locator('#btn-hilfe').count()));
   await nichtsRaus('Menü');
   await page.click('#btn-mehr');
 

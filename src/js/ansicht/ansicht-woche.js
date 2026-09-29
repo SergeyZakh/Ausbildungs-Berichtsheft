@@ -19,10 +19,9 @@ function zeichneWochenwahl() {
   }
   var l = lage(aktiveWoche);
   var wstand = wochenStand(aktiveWoche);
+  // Nur der Zeitraum: Den Stand zeigen die Farbe und daneben „3/5 fertig“.
   etikett.className = "wochenknopf" + (wstand ? " " + wstand : "");
-  var zusatz = wstand === "pruefen" ? "  ·  nicht gegengelesen"
-    : l.offen ? "  ·  " + l.offen + " offen" : "";
-  etikett.textContent = kurzSpanne(vonIso(aktiveWoche)) + zusatz;
+  etikett.textContent = kurzSpanne(vonIso(aktiveWoche));
   $("woche-zurueck").disabled = false;
   $("woche-vor").disabled = false;
   var anteil = wochenAnteil(aktiveWoche);
