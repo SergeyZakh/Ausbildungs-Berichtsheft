@@ -202,7 +202,7 @@ function zeichneHeft() {
     "</div>" +
     '<div class="wpopover" id="a-wochen" hidden role="dialog" aria-label="Woche wählen">' +
       '<div class="dkopf"><h2>Woche wählen</h2>' +
-        '<button type="button" class="knopf" id="a-wochen-zu">Schließen</button></div>' +
+        '<button type="button" class="rundknopf dlg-x" id="a-wochen-zu" aria-label="Schließen">×</button></div>' +
       '<div class="dkoerper">' +
         '<div class="monatszeile">' +
           '<button type="button" class="rundknopf" id="a-monat-zurueck" aria-label="Voriger Monat">‹</button>' +

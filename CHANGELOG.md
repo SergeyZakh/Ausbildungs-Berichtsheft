@@ -13,6 +13,10 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Einheitliche Maße:** Schrift in sechs Stufen statt rund zwanzig Größen, Abstände im
   4-px-Raster, drei Eckenradien. Alle Textknöpfe sind Pillen in Textgröße, Symbolknöpfe Kreise.
   Die Oberfläche wirkt dadurch ruhiger; am Handy ist der Text einen halben Punkt größer.
+- **Fenster einheitlich:** Jedes Fenster schließt mit × oben rechts (oder Escape), auch Wochenwahl,
+  Übersicht, Kalender, Zuordnung und Rückfragen; die Knöpfe stehen unten rechts. Alle Felder sind
+  gleich hoch, auch Datum und Auswahl. Die Einrichtung hat größere Felder und Knöpfe, Willkommen
+  und Abschluss stehen mittig, und beim Öffnen hat „Später“ keinen Fokusrahmen mehr.
 
 ## [0.2.0] – 2026-09-29
 

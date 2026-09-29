@@ -24,6 +24,12 @@ MENUES.forEach(function (m) {
   $(m[1]).addEventListener("click", function () { menueSchliessen(); });
 });
 
+/* Das × im Kopf eines Fensters schließt es wie Escape. Was ein Fenster dabei tun muss (Antwort
+   „nein“, Kalender übernehmen), hängt an seinem close-Ereignis. */
+document.querySelectorAll("dialog .dlg-x").forEach(function (x) {
+  x.addEventListener("click", function () { x.closest("dialog").close(); });
+});
+
 // Ein Klick daneben schließt, was offen ist.
 document.addEventListener("click", function () {
   menueSchliessen();

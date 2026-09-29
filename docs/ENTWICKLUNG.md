@@ -136,7 +136,11 @@ also dort keine Klassen aus dem Blatt wie `.tagkopf`, `.kasten` oder `.tagestabe
 | Schriftstärke | 400 und 600 |
 
 Was man klickt, ist rund (Textknöpfe als Pille, Symbolknöpfe als Kreis); was man ausfüllt oder
-liest, hat Ecken. Ein Wert neben den Stufen braucht einen Kommentar, warum. `blatt.css` rechnet in
+liest, hat Ecken. **Fenster** sind gleich gebaut: im Kopf der Titel links und ein × (`.dlg-x`)
+rechts, im Fuß die Knöpfe rechts mit der Hauptaktion ganz außen, ein Hinweis links davon. Das ×
+schließt jedes `<dialog>` wie Escape (`bedienung.js`); was dabei geschehen muss, hängt am
+`close`-Ereignis des Fensters. Ohne × bleibt nur „Bitte anmelden“. Felder in Fenstern sind 40 px
+hoch, in der Einrichtung 44 px. Ein Wert neben den Stufen braucht einen Kommentar, warum. `blatt.css` rechnet in
 pt und mm des Vordrucks und bleibt davon ausgenommen.
 
 ## Datenmodell
