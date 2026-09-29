@@ -75,7 +75,7 @@ const ziel = (name) => path.join(__dirname, name);
     ['#feld-abteilung', 2, 'rechts'],          // gilt für die ganze Woche
     ['#feld-unterweisungen', 3],
     ['.sektion.vorschau', 4],                  // so wird das Blatt gedruckt
-    ['.seitenspalte .seitenkarte', 5],         // Umfang, KI und Herunterladen
+    ['.seitenspalte .seitenkarte', 5],         // Umfang und KI
     ['#btn-export', 6, 'unten-links'],   // Wochenblatt oder Gesamtheft
   ]);
   await page.screenshot({ path: ziel('woche.png') });

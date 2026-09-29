@@ -293,18 +293,18 @@ $("btn-import-weg").addEventListener("click", function () {
     "jeder Text, der aus dem Entwurf oder vom Sprachmodell stammt – auch überarbeitet. " +
     (bleiben ? "Bei " + bleiben + (bleiben === 1 ? " Tag bleibt" : " Tagen bleibt") +
       " der komplett selbst geschriebene Text stehen. " : "") +
-    "Stammdaten und Wochenangaben bleiben.");
+    "Deine Daten und die Wochenangaben bleiben.");
 });
 
 $("btn-alles-weg").addEventListener("click", function () {
   gefahrFragen("alles", mitKontoAbgleich()
     ? "Der gesamte Stand wird aus diesem Browser gelöscht: " +
       Object.keys(tage).length + " Tage, " + wochen.length + " Wochen, " +
-      "alle Texte und deine Stammdaten. Dein Konto bleibt unberührt: Der Stand dort " +
+      "alle Texte und deine Daten. Dein Konto bleibt unberührt: Der Stand dort " +
       "wird gleich danach neu geladen, und wer dich betreut, sieht ihn weiter."
     : "Der gesamte Stand wird aus diesem Browser gelöscht: " +
       Object.keys(tage).length + " Tage, " + wochen.length + " Wochen, " +
-      "alle Texte und deine Stammdaten. Es gibt keine Sicherung.");
+      "alle Texte und deine Daten. Es gibt keine Sicherung.");
 });
 
 /** Angemeldet als Azubi: Der eigene Stand wird mit dem Konto abgeglichen. */

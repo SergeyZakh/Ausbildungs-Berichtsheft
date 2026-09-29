@@ -161,7 +161,7 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
   background: radial-gradient(circle at 0 100%, transparent calc(var(--rund) - .5px),
     var(--linie) calc(var(--rund) - .5px) calc(var(--rund) + .5px), var(--grund) calc(var(--rund) + 1px));
 }
-/* Rechte Spalte: eine Karte, darin Umfang, KI und Herunterladen als Blöcke mit gleichem Rand.
+/* Rechte Spalte: eine Karte, darin Umfang und KI als Blöcke mit gleichem Rand.
    Der Kartenkörper ist sonst eine Flex-Zeile und schob die Knöpfe auf Textbreite zusammen. */
 .seitenspalte .sektionsleib { display: block; padding: 0; }
 .seitenblock { padding: 12px 14px 14px; }
@@ -176,21 +176,6 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 .seitenspalte .textstand { margin-left: 0; font-size: 13px; }
 .seitenspalte .kislot { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; }
 .seitenspalte .kislot > * { width: 100%; justify-content: center; }
-.exportknoepfe { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-/* Zwei Möglichkeiten als Segmentschalter, wie die Reiter im Datendialog. */
-.umschalter {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 3px;
-  background: var(--band); border: 1px solid var(--linie); border-radius: 11px;
-}
-.umschalter button {
-  padding: 6px 8px; font: inherit; font-size: 12.5px; color: var(--schiefer);
-  background: transparent; border: 0; border-radius: 8px;
-}
-.umschalter button:hover { color: var(--text); }
-.umschalter button[aria-checked="true"] {
-  background: var(--flaeche); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
-}
-.exportknoepfe .knopf { width: 100%; justify-content: center; }
 @media (max-width: 1180px) {
   .tagflaeche.dreispaltig { flex-wrap: wrap; }
   .tagflaeche.dreispaltig > .seitenspalte { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; max-width: none; position: static; }

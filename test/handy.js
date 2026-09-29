@@ -167,9 +167,11 @@ async function durchgang(browser, breite) {
   await page.evaluate(() => document.getElementById('mitte').scrollTo(0, 99999));
   await page.waitForTimeout(200);
   await nichtsDarunter('Tag ganz unten');
-  // Die Meldung zum Beispiel ist lang; unten klebend darf sie höchstens zwei Zeilen belegen.
+  // Eine lange Meldung, wie nach einem Import; unten klebend darf sie höchstens zwei Zeilen belegen.
   const notiz = await page.evaluate(() => {
     const n = document.getElementById('notiz');
+    n.textContent = 'Import fertig: 23 Tage mit 118 Buchungen übernommen, 4 Tage mit eigenem Text ' +
+      'blieben unverändert. Neue Tage stehen als Entwurf da und brauchen noch „Fertig“.';
     return { hoehe: n.getBoundingClientRect().height, zeile: parseFloat(getComputedStyle(n).lineHeight) };
   });
   pruefe('Meldung unten höchstens zwei Zeilen' + bei, notiz.hoehe <= notiz.zeile * 2 + 2, JSON.stringify(notiz));
@@ -199,7 +201,7 @@ async function durchgang(browser, breite) {
   pruefe('Druck am Handy mit Satzhöhe 251 mm' + bei, (await page.evaluate(() => window.__satzHoehe())) === 251);
 
   await page.click('#btn-mehr');
-  pruefe('Kein „Rundgang noch einmal“ im Menü' + bei, !(await page.locator('#btn-hilfe').isVisible()));
+  pruefe('Kein Rundgang im Menü' + bei, !(await page.locator('#btn-hilfe').count()));
   await nichtsRaus('Menü');
   await page.click('#btn-mehr');
 
@@ -222,8 +224,8 @@ async function durchgang(browser, breite) {
     return b.getBoundingClientRect().bottom - r.getBoundingClientRect().bottom;
   });
   pruefe('Woche: unter dem Blatt keine leere Fläche' + bei, leer < 60, Math.round(leer) + ' px');
-  pruefe('Woche: Knöpfe zum Herunterladen sichtbar' + bei,
-    await page.locator('.seitenspalte .exportknoepfe .knopf').first().isVisible());
+  pruefe('Woche: der Umfang des Blatts steht neben der Vorschau' + bei,
+    await page.locator('.seitenspalte .textstand').first().isVisible());
   await nichtsRaus('Woche');
   await nichtsDarunter('Woche');
 

@@ -6,14 +6,14 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
-## Unveröffentlicht
+## [0.2.0] – 2026-09-29
 
 ### Neu
 
 - **Einrichtung beim ersten Start** statt des Rundgangs: in sechs kurzen Schritten Name, Beruf,
   Betrieb, Vertragslaufzeit, Bundesland, Berufsschule und Vordruck, danach Zeiterfassung laden oder
   selbst schreiben. Am Handy im Vollbild. Mit „Später“ geht es ohne Angaben weiter; die Startkarte
-  bietet die Einrichtung an, solange Pflichtangaben fehlen. Den Rundgang gibt es weiter im Menü.
+  bietet die Einrichtung an, solange Pflichtangaben fehlen. Ausbilder behalten ihren Rundgang.
 - **Feste Schultage und Blockunterricht** unter *Deine Daten → Schule*, dort steht jetzt auch der
   Name der Berufsschule. Leere Tage an diesen Tagen stehen schon auf „Berufsschule“, mit dem Feld
   für die Unterrichtsthemen. Feiertage, Tage außerhalb der Vertragslaufzeit und Tage mit Buchungen
@@ -22,8 +22,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Blöcke und Ferien wählst du im Kalender (ersten Tag antippen, dann den letzten); sie stehen als
   Marken mit × da, Überlappendes wird zusammengelegt.
 - **Tägliche Notierung** als zweiter Vordruck der IHK: eine Zeile je Tag, ohne Stunden wie das
-  wöchentliche Blatt. Umschalten neben der Wochenvorschau oder unter *Deine Daten →
-  Vordruck*; gilt für Vorschau, Druck und Word, auch beim Ausbilder.
+  wöchentliche Blatt. Gewählt in der Einrichtung oder unter *Deine Daten → Vordruck*; gilt für
+  Vorschau, Druck und Word, auch beim Ausbilder.
 - **Übersicht aller Wochen** (Menü ⋯): je Ausbildungsjahr ein Kästchen pro Woche, grün fertig, rot
   ungelesen oder mit Lücke, dazu die Tage in der Berufsschule, im Urlaub, krank und an Feiertagen.
 - **Was fehlt noch?** Beim Öffnen nennt ein Hinweis die Lücken und ungelesenen Tage der letzten
@@ -47,10 +47,14 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 ### Geändert
 
 - **Menüs und Knöpfe aufgeräumt:** Das Menü ⋯ ist nach Zweck gruppiert (Deine Daten und Übersicht,
-  Zeiterfassung laden, Sicherung, Rundgang). „Exportieren“ trennt „Diese Woche“ und „Ganzes Heft mit
+  Zeiterfassung laden, Sicherung). „Exportieren“ trennt „Diese Woche“ und „Ganzes Heft mit
   Deckblatt“, je als Word oder PDF. Das Laden der CSV heißt überall „Zeiterfassung laden“, damit es
   nicht mit „Exportieren“ verwechselt wird. Die Startkarte hat zwei Knöpfe, Beispiel und Sicherung
   stehen als Links darunter.
+- **Weniger doppelt:** Neben der Wochenvorschau stehen nur noch Umfang und KI, heruntergeladen wird
+  über „Exportieren“, auch beim Ausbilder. Über dem Tagestext steht nur noch die Fahne „KI“, der
+  Wochenknopf nennt nur den Zeitraum; den Stand zeigen Farbe und „3/5 fertig“.
+- **README** auf das Wesentliche gekürzt; Tipps, Tastatur und Bilder stehen in docs/START.md.
 - **Deine Daten** in der Reihenfolge der Einrichtung: Ausbildung (mit Name und Bundesland), Schule,
   Vordruck, Deckblatt (was nur das Deckblatt braucht), KI, Löschen. Statt „Schließen“ und „Speichern“
   gibt es × und „Fertig“; gespeichert wird ohnehin beim Tippen.
@@ -74,6 +78,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ### Behoben
 
+- **Leeres Datumsfeld am iPhone** war nur ein dünner Streifen, etwa „Beginn laut Vertrag“ in der
+  Einrichtung. Es ist jetzt so hoch wie die Felder daneben, das Datum steht links.
 - **„Arbeitstag“ von Hand** an einem Feiertag wurde beim nächsten Import derselben Datei wieder
   zum Feiertag. Eine am Tag gewählte Art bleibt jetzt, auch „Arbeitstag“.
 
@@ -138,5 +144,6 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
+[0.2.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/tag/v0.1.0

@@ -24,13 +24,20 @@ var erKarten = Array.prototype.slice.call(erDlg.querySelectorAll(".er-karte"));
 // Dieselben Bundesländer wie in „Deine Daten“, nur einmal gepflegt.
 $("w-land").innerHTML = $("f-land").innerHTML;
 
+/* Der Schlüssel stammt aus der Zeit, als Azubis beim ersten Start einen Rundgang bekamen. Wer ihn
+   gesehen hat, fing vor der Einrichtung an und braucht sie nicht. */
+var EINRICHTUNG_GESEHEN = "berichtsheft-onboarding";
+
+function einrichtungGesehen() {
+  try { return localStorage.getItem(EINRICHTUNG_GESEHEN) === "1"; } catch (e) { return true; }
+}
+
 /**
  * Braucht es die Einrichtung? Nur für Azubis und nur, solange nichts eingetragen ist: Wer schon
  * Tage oder Stammdaten hat, fing vor der Einrichtung an, auch auf einem anderen Gerät mit Konto.
- * Gesehen heißt dasselbe wie früher beim Rundgang (ONBOARDING), so kommt sie niemandem doppelt.
  */
 function einrichtungNoetig() {
-  if (document.body.classList.contains("alsausbilder") || onbGesehen()) return false;
+  if (document.body.classList.contains("alsausbilder") || einrichtungGesehen()) return false;
   return !Object.keys(tage).length && !$("f-name").value.trim() && !$("f-beginn").value;
 }
 
@@ -152,14 +159,14 @@ erKarten.forEach(function (k) {
  * bietet die Einrichtung an, solange Pflichtangaben fehlen.
  */
 function einrichtungBeenden(danach) {
-  try { localStorage.setItem(ONBOARDING, "1"); } catch (e) { /* ohne Speicher */ }
+  try { localStorage.setItem(EINRICHTUNG_GESEHEN, "1"); } catch (e) { /* ohne Speicher */ }
   if (erDlg.open) erDlg.close();
   merkenJetzt();
   zeichnen();
   if (danach) danach();
 }
 erDlg.addEventListener("close", function () {
-  try { localStorage.setItem(ONBOARDING, "1"); } catch (e) { /* ohne Speicher */ }
+  try { localStorage.setItem(EINRICHTUNG_GESEHEN, "1"); } catch (e) { /* ohne Speicher */ }
 });
 
 $("er-spaeter").addEventListener("click", function () {

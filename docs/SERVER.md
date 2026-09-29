@@ -53,7 +53,7 @@ Protokoll, sind hier aber noch nicht durchgetestet.
 2. **Woche wechseln** – oder über das Monatsraster springen.
 3. **Das Wochenblatt**, wie der Azubi es sieht, auch im Vordruck mit täglicher Notierung, wenn der
    Azubi ihn gewählt hat. Ändern kann der Ausbilder nichts.
-4. **Herunterladen** – Wochenblatt oder Gesamtheft als Word und PDF.
+4. **Exportieren** – Wochenblatt oder Gesamtheft als Word und PDF.
 
 ## Was wo liegt
 
@@ -313,7 +313,8 @@ In der Kopfleiste steht, wo die Einträge liegen: **im Konto gesichert** oder **
   ist, mit deren Stand; links steht dann „Blockwoche, übernommen“.
 
 - In der Mitte das Wochenblatt aus demselben Drucksatz wie Word und PDF, links der Stand je Tag, rechts
-  die Angaben der Woche und eine Karte „Wochenblatt“ mit Umfang und Herunterladen.
+  die Angaben der Woche und eine Karte „Wochenblatt“ mit dem Umfang. Word und PDF gibt es über
+  „Exportieren“ oben.
 
 - Eigener Rundgang beim ersten Anmelden, danach über **?** oben rechts. Person und **Abmelden** stehen in
   derselben Leiste.
