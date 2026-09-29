@@ -150,7 +150,10 @@
   <div class="dkoerper">
     <div class="dlg-blatt" data-blatt="ausbildung">
       <div class="felder">
-        <label class="weit"><span>Name, Vorname <i>*</i></span><input id="f-name" type="text" placeholder="Mustermann, Max"></label>
+        <!-- Gespeichert wird f-name als „Nachname, Vorname“ wie im Vordruck (nameZusammen()). -->
+        <label><span>Vorname <i>*</i></span><input id="f-vorname" type="text" autocomplete="given-name" placeholder="Max"></label>
+        <label><span>Nachname <i>*</i></span><input id="f-nachname" type="text" autocomplete="family-name" placeholder="Mustermann"></label>
+        <input id="f-name" type="hidden">
         <label><span>Ausbildungsberuf <i>*</i></span><input id="f-beruf" type="text" list="er-berufe" placeholder="Fachinformatiker/in"></label>
         <label><span>Ausbildungsbetrieb <i>*</i></span><input id="f-betrieb" type="text" placeholder="Muster GmbH"></label>
         <label><span>Beginn laut Vertrag <i>*</i></span><input id="f-beginn" type="date"></label>
@@ -337,8 +340,10 @@
       <h2>Du und dein Betrieb</h2>
       <p class="er-text">So steht es oben auf jedem Wochenblatt.</p>
       <div class="felder er-felder">
-        <label class="weit"><span>Dein Name <i>*</i></span>
-          <input id="w-name" data-feld="f-name" type="text" autocomplete="name" placeholder="Mustermann, Max"></label>
+        <label><span>Vorname <i>*</i></span>
+          <input id="w-vorname" type="text" autocomplete="given-name" placeholder="Max"></label>
+        <label><span>Nachname <i>*</i></span>
+          <input id="w-nachname" type="text" autocomplete="family-name" placeholder="Mustermann"></label>
         <label class="weit"><span>Ausbildungsberuf <i>*</i></span>
           <input id="w-beruf" data-feld="f-beruf" type="text" list="er-berufe" placeholder="z. B. Fachinformatiker/in"></label>
         <label class="weit"><span>Ausbildungsbetrieb <i>*</i></span>

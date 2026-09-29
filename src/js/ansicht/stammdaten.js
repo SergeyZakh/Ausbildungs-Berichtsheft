@@ -6,10 +6,58 @@ var dlg = $("dlg-stamm");
 
 /* Pflichtangaben für den Vordruck. */
 var PFLICHT = [
-  ["f-name", "Name"], ["f-beruf", "Ausbildungsberuf"],
+  ["f-name", "Vor- und Nachname"], ["f-beruf", "Ausbildungsberuf"],
   ["f-betrieb", "Ausbildungsbetrieb"], ["f-beginn", "Vertragsbeginn"],
   ["f-ende", "Vertragsende"]
 ];
+
+/** Fehlt diese Pflichtangabe? Der Name zählt erst mit Vor- und Nachname. */
+function pflichtFehlt(id) {
+  if (id !== "f-name") return !$(id).value.trim();
+  var n = nameTeilen($("f-name").value);
+  return !n.vorname || !n.nachname;
+}
+
+/* ---------- Vor- und Nachname ----------
+   Eingegeben in zwei Feldern, gespeichert und abgeglichen wird nur f-name als „Nachname, Vorname“,
+   so wie der Vordruck ihn verlangt. Ältere Stände, Sicherungen und das Konto kennen nur dieses Feld. */
+
+/** "Mustermann, Max" -> Max / Mustermann. Ohne Komma (ältere Stände, „Max Mustermann“) ist das
+ *  letzte Wort der Nachname; wer anders heißt, korrigiert es in den beiden Feldern. */
+function nameTeilen(name) {
+  var n = String(name || "").trim();
+  var komma = n.indexOf(",");
+  if (komma !== -1) return { vorname: n.slice(komma + 1).trim(), nachname: n.slice(0, komma).trim() };
+  var leer = n.lastIndexOf(" ");
+  return leer === -1 ? { vorname: "", nachname: n }
+    : { vorname: n.slice(0, leer).trim(), nachname: n.slice(leer + 1) };
+}
+
+/** Max / Mustermann -> "Mustermann, Max". Nur ein Vorname bleibt ", Max", damit er beim
+ *  nächsten Öffnen nicht als Nachname dasteht. */
+function nameZusammen(vorname, nachname) {
+  vorname = String(vorname || "").trim(); nachname = String(nachname || "").trim();
+  return vorname ? nachname + ", " + vorname : nachname;
+}
+
+/** Die beiden Felder (Deine Daten oder Einrichtung) aus f-name füllen. */
+function nameZeigen(vorFeld, nachFeld) {
+  var n = nameTeilen($("f-name").value);
+  vorFeld.value = n.vorname;
+  nachFeld.value = n.nachname;
+}
+
+/** Aus den beiden Feldern f-name setzen; dessen Listener speichern und prüfen die Pflichtangaben. */
+function nameUebernehmen(vorFeld, nachFeld) {
+  var name = nameZusammen(vorFeld.value, nachFeld.value);
+  if ($("f-name").value === name) return;
+  $("f-name").value = name;
+  $("f-name").dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+[$("f-vorname"), $("f-nachname")].forEach(function (feld) {
+  feld.addEventListener("input", function () { nameUebernehmen($("f-vorname"), $("f-nachname")); });
+});
 
 /** Zwischen den Reitern des Dialogs umschalten. */
 function blattZeigen(ziel) {
@@ -108,7 +156,7 @@ $("f-ki-modell").addEventListener("keydown", function (e) {
 });
 
 function stammStandZeigen() {
-  var fehlt = PFLICHT.filter(function (f) { return !$(f[0]).value.trim(); });
+  var fehlt = PFLICHT.filter(function (f) { return pflichtFehlt(f[0]); });
   var feld = $("stamm-stand");
   if (!fehlt.length) {
     feld.className = "hinweis-stamm";
@@ -126,7 +174,7 @@ Array.prototype.forEach.call(dlg.querySelectorAll(".blattleiste button"), functi
 
 $("btn-stamm").addEventListener("click", function () {
   menueSchliessen(); lehrjahrZeigen(); stammStandZeigen(); anweisungenZaehlen(); gefahrZeilenZeigen();
-  schulplanZeigen();
+  schulplanZeigen(); nameZeigen($("f-vorname"), $("f-nachname"));
   blattZeigen("ausbildung"); dlg.showModal();
 });
 $("dlg-zu").addEventListener("click", function () { dlg.close(); });

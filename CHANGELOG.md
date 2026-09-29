@@ -22,6 +22,11 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Karten übereinander. Überschriften der Karten in normaler Schreibung statt Versalien.
 - **Kopfleiste am Rechner in drei Teilen:** links der Name, in der Mitte die Woche mit ihrem Stand,
   rechts Farbe, Export und Menü. Vorher klaffte zwischen der Woche und den Knöpfen eine Lücke.
+- **Buchungen ohne Haken:** Steht eine Buchung schon im Text, fällt ihr Plus weg, statt dass ein
+  grüner Haken an jeder Zeile steht. Fliegt die Zeile aus dem Text, ist das Plus wieder da.
+- **Vor- und Nachname** in zwei Feldern, in der Einrichtung und unter *Deine Daten*. Gespeichert
+  wird weiter „Nachname, Vorname“ wie im Vordruck; ein älterer Name ohne Komma wird beim Öffnen
+  am letzten Leerzeichen geteilt.
 - **Feinschliff:** Ein Fokusrahmen für alle Felder (Kante mit Ring, gut sichtbar auch im dunklen
   Modus), eine kurze Einblendung für Fenster und Menüs, mit „Bewegung reduzieren“ ohne.
 

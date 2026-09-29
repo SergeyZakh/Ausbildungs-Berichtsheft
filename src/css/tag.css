@@ -354,7 +354,6 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   transition: background-color .15s, border-color .15s;
 }
 .pdazu:hover { background: var(--band); border-color: var(--linie-fest); }
-.pdazu.drin { font-size: var(--schrift-klein); color: var(--gut); background: var(--gut-hell); border-color: var(--gut-kante); }
 
 /* ---------- Hinweis über den Reitern (hinweise.js) ----------
    Eine Karte wie der Fortschritt darunter. Rot nur im Titel: Der Hinweis soll auffallen, aber
