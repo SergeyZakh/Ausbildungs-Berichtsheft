@@ -14,7 +14,6 @@
   overflow: hidden; padding: 0 var(--luft-5) var(--luft-4);
   animation: auftauchen .18s ease-out;
 }
-@keyframes auftauchen { from { opacity: 0; transform: translateY(3px); } }
 /* Freier Tag: Karten im Grau. */
 .tagpanel.frei .sektion { background: var(--band); }
 .ruhig { color: var(--schiefer); font-size: var(--schrift-text); }
@@ -212,7 +211,7 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-klein);
   padding: var(--luft-1) var(--luft-2);
 }
-.tagpanel select:hover, .tagpanel select:focus { background: var(--band); border-color: var(--linie-fest); }
+.tagpanel select:hover { background: var(--band); border-color: var(--linie-fest); }
 
 /* Eine Karte je Tag: Datum als Titel, Art und Stunden daneben, darüber dem Text das Feld des
    Vordrucks. Vorher standen Tageskopf und Text in zwei Karten übereinander. */
@@ -261,7 +260,6 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   min-width: 200px; flex: 1 1 320px; max-width: 420px;
 }
 .abteilungsfeld:hover { border-color: var(--linie-fest); }
-.abteilungsfeld:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px var(--fokus-ring); }
 
 /* Zeilenstand unter dem Text: passt der Text in den Vordruck? */
 .textfuss {
@@ -344,7 +342,7 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   -webkit-line-clamp: 2; overflow: hidden;
 }
 .postenliste p.offen .ptext { display: block; -webkit-line-clamp: unset; color: var(--text); }
-.postenliste .pleer { color: var(--blass); font-style: italic; border-bottom: none; }
+.postenliste .pleer { color: var(--schiefer); border-bottom: none; }
 /* Plus am Ende der Buchung: als Zeile in den Text (postenSektion). */
 .postenliste p:has(.pdazu) { position: relative; padding-right: var(--luft-8); }
 .pdazu {

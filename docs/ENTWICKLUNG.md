@@ -140,7 +140,10 @@ liest, hat Ecken. **Fenster** sind gleich gebaut: im Kopf der Titel links und ei
 rechts, im Fuß die Knöpfe rechts mit der Hauptaktion ganz außen, ein Hinweis links davon. Das ×
 schließt jedes `<dialog>` wie Escape (`bedienung.js`); was dabei geschehen muss, hängt am
 `close`-Ereignis des Fensters. Ohne × bleibt nur „Bitte anmelden“. Felder in Fenstern sind 40 px
-hoch, in der Einrichtung 44 px. Ein Wert neben den Stufen braucht einen Kommentar, warum. `blatt.css` rechnet in
+hoch, in der Einrichtung 44 px. **Fokus:** Knöpfe und Marken zeigen eine Linie mit Abstand, Felder
+eine dunkle Kante mit weichem Ring (`--fokus-ring`); nur das Schreibfeld des Tages hat eine Kante
+oben. **Bewegung:** Fenster, Menüs und Popover erscheinen mit `auftauchen` (kurz von unten); unter
+`prefers-reduced-motion` ohne. Ein Wert neben den Stufen braucht einen Kommentar, warum. `blatt.css` rechnet in
 pt und mm des Vordrucks und bleibt davon ausgenommen.
 
 ## Datenmodell

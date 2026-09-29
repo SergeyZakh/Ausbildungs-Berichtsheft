@@ -74,7 +74,7 @@
   --gewaehlt-grau: #7A7973;
   --voll-hover: #33333A;
   --hauch:     rgba(22, 22, 26, .06);
-  --fokus-ring: rgba(22, 22, 26, .08);
+  --fokus-ring: rgba(22, 22, 26, .12);
   --menue:     rgba(255, 255, 255, .96);
   --popover:   rgba(255, 255, 255, .84);
   --posten-grund: #FBFBF9;
@@ -111,7 +111,7 @@
     --gewaehlt-grau: #55555C;
     --voll-hover: #D2D1CC;
     --hauch:     rgba(255, 255, 255, .07);
-    --fokus-ring: rgba(255, 255, 255, .12);
+    --fokus-ring: rgba(255, 255, 255, .16);
     --menue:     rgba(30, 30, 35, .97);
     --popover:   rgba(30, 30, 35, .9);
     --posten-grund: #18181C;
@@ -143,7 +143,7 @@
   --gewaehlt-grau: #55555C;
   --voll-hover: #D2D1CC;
   --hauch:     rgba(255, 255, 255, .07);
-  --fokus-ring: rgba(255, 255, 255, .12);
+  --fokus-ring: rgba(255, 255, 255, .16);
   --menue:     rgba(30, 30, 35, .97);
   --popover:   rgba(30, 30, 35, .9);
   --posten-grund: #18181C;
@@ -167,10 +167,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 button { font: inherit; cursor: pointer; }
+/* Ein Fokusrahmen für alles: Knöpfe und Marken eine Linie mit Abstand, Felder eine dunkle Kante mit
+   weichem Ring. Das Schreibfeld des Tages hat stattdessen eine Kante oben (tag.css). */
 :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+input:not([type=checkbox]):not([type=radio]):focus, textarea:focus, select:focus-visible {
+  outline: none; border-color: var(--text); box-shadow: 0 0 0 3px var(--fokus-ring);
+}
+
+/* Fenster und Menüs erscheinen kurz von unten; mit „Bewegung reduzieren“ sofort (Regel unten). */
+@keyframes auftauchen { from { opacity: 0; transform: translateY(3px); } }
+@keyframes einblenden { from { opacity: 0; } }
+dialog[open] { animation: auftauchen .16s ease-out; }
+dialog[open]::backdrop { animation: einblenden .16s ease-out; }
+.menue:not([hidden]), .wpopover:not([hidden]), .kombiliste:not([hidden]) { animation: auftauchen .12s ease-out; }
 
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; animation-duration: .01ms !important; }
+  *, ::backdrop { transition: none !important; animation-duration: .01ms !important; }
 }
 
 /* ---------- Knöpfe ----------
@@ -231,9 +243,6 @@ dialog::backdrop {
   padding: var(--luft-2) var(--luft-3); transition: border-color .15s, box-shadow .15s;
 }
 .felder input:hover, .felder textarea:hover { border-color: var(--linie-fest); }
-.felder input:focus, .felder textarea:focus {
-  outline: none; border-color: var(--text); box-shadow: 0 0 0 3px var(--fokus-ring);
-}
 .felder textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
 .felder small { display: block; margin-top: var(--luft-1); font-size: var(--schrift-klein); color: var(--schiefer); }
 /* Alle Felder gleich hoch; Datumsfelder und Auswahllisten brachten sonst ihre eigene Höhe mit. */

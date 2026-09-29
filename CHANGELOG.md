@@ -21,6 +21,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Kopf, über dem Text klein das Feld des Vordrucks. Vorher standen Tageskopf und Text in zwei
   Karten übereinander. Überschriften der Karten in normaler Schreibung statt Versalien, und die
   Wochenwahl steht kompakt links in der Kopfleiste.
+- **Feinschliff:** Ein Fokusrahmen für alle Felder (Kante mit Ring, gut sichtbar auch im dunklen
+  Modus), eine kurze Einblendung für Fenster und Menüs, mit „Bewegung reduzieren“ ohne.
 
 ## [0.2.0] – 2026-09-29
 
