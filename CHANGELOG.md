@@ -17,6 +17,10 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Übersicht, Kalender, Zuordnung und Rückfragen; die Knöpfe stehen unten rechts. Alle Felder sind
   gleich hoch, auch Datum und Auswahl. Die Einrichtung hat größere Felder und Knöpfe, Willkommen
   und Abschluss stehen mittig, und beim Öffnen hat „Später“ keinen Fokusrahmen mehr.
+- **Eine Karte je Tag:** Das Datum ist ihr Titel, Art des Tages, Stunden und „Fertig“ stehen im
+  Kopf, über dem Text klein das Feld des Vordrucks. Vorher standen Tageskopf und Text in zwei
+  Karten übereinander. Überschriften der Karten in normaler Schreibung statt Versalien, und die
+  Wochenwahl steht kompakt links in der Kopfleiste.
 
 ## [0.2.0] – 2026-09-29
 

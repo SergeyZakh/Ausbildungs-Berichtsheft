@@ -125,7 +125,7 @@ const NAME = 'Mustermann, Max';
   pruefe('Berufsschule hat weiterhin ein Textfeld',
     (await page.locator('.tagpanel textarea').count()) === 1);
   pruefe('Beschriftung wechselt auf Unterrichtsthemen',
-    (await page.locator('.sektion.wachsend .sektionskopf').textContent()).includes('Unterrichtsthemen'));
+    (await page.locator('.sektion.wachsend .vordruckfeld').textContent()).includes('Unterrichtsthemen'));
   pruefe('Bearbeitbare Bereiche sind abgesetzt',
     (await page.locator('.tagpanel .sektion').count()) >= 2,
     (await page.locator('.tagpanel .sektion').count()) + ' Sektionen');

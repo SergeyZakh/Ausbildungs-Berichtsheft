@@ -59,9 +59,9 @@ const ziel = (name) => path.join(__dirname, name);
   await page.waitForTimeout(800);
   await h.markieren(page, [
     ['.reiter button', 1, 'rechts'],                 // Montag bis Sonntag, Farbe zeigt den Stand
-    ['.tagpanel > .sektion', 2],                     // Art des Tages und Stunden
+    ['.tagkarte .tagfelder', 2, 'unten-links'],      // Art des Tages und Stunden
     ['.tagflaeche .sektion.wachsend textarea', 3],   // Text, der ins Heft kommt
-    ['.sektionsknopf.uebernehmen', 4, 'unten-rechts'],  // Entwurf oder fertig
+    ['.sektionsknopf.uebernehmen', 4, 'unten-rechts'],  // Fertig
     ['.sektion.posten', 5, 'rechts'],                // Buchungen aus dem Import
     ['#wochensumme', 6, 'davor'],                    // Stunden der Woche
   ]);

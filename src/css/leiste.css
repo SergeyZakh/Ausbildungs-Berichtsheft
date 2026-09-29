@@ -56,14 +56,16 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
 }
 
 /* ---------- Wochenbalken: Blättern, Wochenknopf, Summe ---------- */
-.wochenbalken { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }
+/* Die Wochenwahl kompakt links, Stand und Aktionen rechts: Ein Knopf über die ganze Breite mit
+   etwas Text in der Mitte wirkte leer. Am Handy füllt sie ihre eigene Zeile (handy.css). */
+.wochenbalken { flex: 0 1 auto; min-width: 0; display: flex; align-items: center; margin-right: auto; }
 .wochenschalter { display: flex; align-items: center; gap: var(--luft-2); flex: 1 1 auto; min-width: 0; }
 .wochenschalter .rundknopf { width: 36px; height: 36px; font-size: var(--schrift-titel); }
 /* block statt flex, sonst schneidet ein zu langes Etikett links und rechts ab
    statt mit Auslassungspunkten zu enden. */
 .wochenknopf {
   font: inherit; cursor: pointer; display: block; text-align: center; line-height: 34px;
-  flex: 1 1 auto; min-width: 0; height: 36px; padding: 0 var(--luft-4); font-size: var(--schrift-text);
+  flex: 0 1 auto; min-width: 176px; height: 36px; padding: 0 var(--luft-5); font-size: var(--schrift-text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   background: var(--flaeche); color: var(--text);
   border: 1px solid var(--linie); border-radius: var(--rund-voll);

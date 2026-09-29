@@ -81,7 +81,8 @@ function zeichneTag() {
 
   var panel = document.createElement("div");
   panel.className = "tagpanel" + (istFrei ? " frei" : "");
-  panel.appendChild(artSektion(datum, key, t, art, istFrei));
+  // Ein freier Tag hat nur seinen Kopf; sonst stehen Art und Stunden im Kopf der Textkarte.
+  if (istFrei) panel.appendChild(artSektion(datum, key, t, art, istFrei));
 
   if (istFrei) {
     var ruhig = document.createElement("p");
@@ -93,7 +94,7 @@ function zeichneTag() {
     if (tagImWochenfeld(key)) panel.appendChild(wochenfeldHinweis());
     var flaeche = document.createElement("div");
     flaeche.className = "tagflaeche";
-    var textKarte = textSektion(key, t, art, istSchule);
+    var textKarte = textSektion(key, t, art, istSchule, datum);
     flaeche.appendChild(textKarte);
     if (t && t.posten && t.posten.length) flaeche.appendChild(postenSektion(t.posten, textKarte.querySelector("textarea")));
     panel.appendChild(flaeche);
@@ -174,16 +175,27 @@ function zeichneLeerbild(bereich) {
   bereich.appendChild(leer);
 }
 
-/** Kopf des Tages: Art des Tages und Stunden. Die Stunden kommen aus dem Import
- *  und sind nur Anzeige; im Nachweis steht keine Stundenzahl. */
+/** Kopf eines freien Tages: nur Datum und Art. */
 function artSektion(datum, key, t, art, istFrei) {
   var s = sektion(dmy(datum), "artkopf");
-  // Am Handy steht der Wochentag schon im gewählten Reiter; dort fällt er hier weg (handy.css).
+  tagTitel(s, datum);
+  s.leib.appendChild(tagFelder(datum, key, t, art, istFrei));
+  return s.wurzel;
+}
+
+/** Der Wochentag vor dem Datum im Titel. Am Handy steht er schon im Reiter (handy.css). */
+function tagTitel(s, datum) {
   var wochentag = document.createElement("span");
   wochentag.className = "wochentag";
   wochentag.textContent = WOCHENTAGE[datum.getDay()] + ", ";
   s.kopf.firstChild.insertBefore(wochentag, s.kopf.firstChild.firstChild);
+}
 
+/** Art des Tages und Stunden. Die Stunden kommen aus dem Import und sind nur Anzeige; im
+ *  Nachweis steht keine Stundenzahl. Die Beschriftungen sind nur für Vorleser da. */
+function tagFelder(datum, key, t, art, istFrei) {
+  var felder = document.createElement("div");
+  felder.className = "tagfelder";
   var wahl = document.createElement("select");
   wahl.id = "feld-art";
   wahl.className = art ? "gesetzt" : "";
@@ -201,7 +213,7 @@ function artSektion(datum, key, t, art, istFrei) {
     tage[key].artVonHand = true;
     merken(); zeichnen();
   });
-  s.leib.appendChild(feldPaar("Art des Tages", wahl, "feld-art"));
+  felder.appendChild(feldPaar("Art des Tages", wahl, "feld-art"));
 
   if (!istFrei) {
     var wrap = document.createElement("span");
@@ -216,9 +228,9 @@ function artSektion(datum, key, t, art, istFrei) {
     einheit.className = "einheit";
     einheit.textContent = "h";
     wrap.appendChild(einheit);
-    s.leib.appendChild(feldPaar("Stunden", wrap));
+    felder.appendChild(feldPaar("Stunden", wrap));
   }
-  return s.wurzel;
+  return felder;
 }
 
 /**
@@ -229,11 +241,19 @@ function artSektion(datum, key, t, art, istFrei) {
  * ist er grün und schreibgeschützt; "Bearbeiten" öffnet ihn wieder. Jede
  * Änderung hebt die Freigabe auf.
  */
-function textSektion(key, t, art, istSchule) {
-  var s = sektion(
-    istSchule ? (art === "Berufsschule" ? "Berufsschule (Unterrichtsthemen)" : "Inhalte")
-              : "Betriebliche Tätigkeit",
-    "wachsend");
+function textSektion(key, t, art, istSchule, datum) {
+  // Eine Karte je Tag: im Kopf das Datum mit Art, Stunden und „Fertig“, darüber dem Text das Feld
+  // des Vordrucks, in das er kommt.
+  var s = sektion(dmy(datum), "wachsend tagkarte");
+  tagTitel(s, datum);
+  s.kopf.appendChild(tagFelder(datum, key, t, art, false));
+  var feldname = document.createElement("label");
+  feldname.className = "vordruckfeld";
+  feldname.htmlFor = "feld-" + key;
+  feldname.textContent = istSchule
+    ? (art === "Berufsschule" ? "Berufsschule (Unterrichtsthemen)" : "Inhalte")
+    : "Betriebliche Tätigkeit";
+  s.leib.appendChild(feldname);
 
   var ta = document.createElement("textarea");
   ta.id = "feld-" + key;
@@ -292,7 +312,7 @@ function textSektion(key, t, art, istSchule) {
     var stand = tagStand(tage[key]);
     var offen = stand !== "fertig" && stand !== "leer";
     var fertig = stand === "fertig";
-    s.wurzel.className = "sektion wachsend" + (offen ? " pruefen" : fertig ? " fertig" : "");
+    s.wurzel.className = "sektion wachsend tagkarte" + (offen ? " pruefen" : fertig ? " fertig" : "");
     uebernehmen.hidden = !offen;
     bearbeiten.hidden = !fertig;
     ta.readOnly = fertig;

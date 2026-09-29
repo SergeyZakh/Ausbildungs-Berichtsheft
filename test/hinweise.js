@@ -424,7 +424,7 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       return { text: k.innerText, hoehe: k.getBoundingClientRect().height };
     });
     pruefe('Am Handy: kurzer Titel „Unterweisungen und Schulungen“ in einer Zeile',
-      kopf.text.trim() === 'UNTERWEISUNGEN UND SCHULUNGEN' && kopf.hoehe < 50, JSON.stringify(kopf));
+      kopf.text.trim() === 'Unterweisungen und Schulungen' && kopf.hoehe < 50, JSON.stringify(kopf));
     await ctx.close();
   }
 
