@@ -174,7 +174,7 @@ async function schultagSchalten(page, kurz) {
   await page.waitForTimeout(300);
   pruefe('Art des Tages steht auf Berufsschule', (await page.inputValue('#feld-art')) === 'Berufsschule');
   pruefe('Das Feld fragt nach den Unterrichtsthemen',
-    (await page.locator('.sektion.wachsend .sektionskopf').textContent()).includes('Unterrichtsthemen'));
+    (await page.locator('.sektion.wachsend .vordruckfeld').textContent()).includes('Unterrichtsthemen'));
   pruefe('Solange der Tag leer ist, wird nichts gespeichert', (await gespeichert(page, '2026-09-10')) === null);
   await page.fill('.tagpanel textarea', 'Lernfeld 5: Subnetting');
   await page.waitForTimeout(600);

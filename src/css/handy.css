@@ -33,7 +33,7 @@
 
   .wochenschalter { gap: var(--luft-2); }
   .wochenschalter .rundknopf { width: 34px; height: 34px; }
-  .wochenknopf { padding: 0 var(--luft-3); height: 34px; line-height: 32px; font-size: var(--schrift-klein); }
+  .wochenknopf { flex: 1 1 auto; padding: 0 var(--luft-3); height: 34px; line-height: 32px; font-size: var(--schrift-klein); }
   .wochensumme { height: 34px; padding: 0 var(--luft-3) 0 var(--luft-2); gap: var(--luft-2); font-size: var(--schrift-klein); }
   .leiste .schub .farbknopf { width: 34px; height: 34px; }
   .wsanteil { gap: var(--luft-1); }
@@ -65,7 +65,11 @@
     flex: 1 1 auto; min-height: 0; padding: 0; letter-spacing: var(--sperrung);
     background: none; border: 0;
   }
-  .artkopf > .sektionskopf .wochentag { display: none; }
+  .artkopf > .sektionskopf .wochentag, .tagkarte > .sektionskopf .wochentag { display: none; }
+  .tagkarte .tagfelder select { width: 10em; max-width: 100%; }
+  /* Datum allein in der ersten Zeile, darunter Art und Stunden links, „Fertig“ rechts. */
+  .tagkarte > .sektionskopf > span:first-child { flex: 1 1 100%; }
+  .tagkarte .tagfelder { margin-left: 0; flex: 1 1 auto; }
   .artkopf > .sektionsleib { flex: 1 1 auto; justify-content: space-between; padding: 0; gap: var(--luft-3); flex-wrap: nowrap; }
   .artkopf .feldpaar { flex: none; }
   /* Sonst so breit wie die längste Art („Betriebsversammlung“), und die Zeile bräche um. */

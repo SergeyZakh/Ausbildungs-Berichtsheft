@@ -59,11 +59,11 @@ const ziel = (name) => path.join(__dirname, name);
   await page.waitForTimeout(800);
   await h.markieren(page, [
     ['.reiter button', 1, 'rechts'],                 // Montag bis Sonntag, Farbe zeigt den Stand
-    ['.tagpanel > .sektion', 2],                     // Art des Tages und Stunden
+    ['.tagkarte .tagfelder', 2, 'unten-links'],      // Art des Tages und Stunden
     ['.tagflaeche .sektion.wachsend textarea', 3],   // Text, der ins Heft kommt
-    ['.sektionsknopf.uebernehmen', 4, 'unten-rechts'],  // Entwurf oder fertig
+    ['.sektionsknopf.uebernehmen', 4, 'unten-rechts'],  // Fertig
     ['.sektion.posten', 5, 'rechts'],                // Buchungen aus dem Import
-    ['#wochensumme', 6, 'davor'],                    // Stunden der Woche
+    ['#wochensumme', 6, 'danach'],                   // Stunden der Woche
   ]);
   await page.screenshot({ path: ziel('tag.png') });
 
@@ -71,7 +71,7 @@ const ziel = (name) => path.join(__dirname, name);
   await page.click('.reiter button >> nth=7');
   await page.waitForTimeout(900);
   await h.markieren(page, [
-    ['#wochenlabel', 1, 'danach'],             // Woche wählen
+    ['.wochenbalken', 1, 'davor'],             // Woche wählen, samt Pfeilen; davor ist frei
     ['#feld-abteilung', 2, 'rechts'],          // gilt für die ganze Woche
     ['#feld-unterweisungen', 3],
     ['.sektion.vorschau', 4],                  // so wird das Blatt gedruckt

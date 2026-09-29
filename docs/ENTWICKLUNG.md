@@ -86,7 +86,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | --- | --- |
 | `ansicht-woche.js` | Wochenbalken, Monatsraster, Navigation durch jede Kalenderwoche, nach „Fertig“ weiter zum nächsten offenen Tag (`weiterNachFertig()`) |
 | `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“; in einer Blockwoche nur der Reiter „Blockwoche“ |
-| `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: Text, Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche |
+| `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: eine Karte je Tag (`textSektion()`, im Kopf Datum, Art und Stunden aus `tagFelder()`, über dem Text das Feld des Vordrucks), Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche; ein freier Tag hat nur seinen Kopf (`artSektion()`) |
 | `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang und KI; heruntergeladen wird über „Exportieren“ |
 | `schulwoche.js` | Themen einer Blockwoche (`schulwocheSektion()`) und die Tage der Blockwoche mit ihrer Art |
 | `stammdaten.js` | Dialog „Deine Daten“ (Reiter Ausbildung, Schule, Vordruck, Deckblatt, KI, Löschen), Verbindungsprüfung, Löschen und Verwerfen |
@@ -116,10 +116,11 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 
 Reihenfolge wie in der Liste `CSS` in `build.js`: `basis.css` (Farben als Variablen, der dunkle
 Modus tauscht sie unter `prefers-color-scheme: dark`; Schrift, Grundgerüst),
-`leiste.css` (Kopfleiste, Wochenbalken, Reiter), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
+`leiste.css` (Kopfleiste, am Rechner ein Raster aus Name, Woche mit Summe und Aktionen, damit
+die Woche genau mittig steht; Wochenbalken, Reiter), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
 Eingaben, Meldungen), `dialoge.css` (Monatsraster, „Deine Daten“, Zuordnung, Rundgang),
 `handy.css` (alle `@media`-Regeln für Handy und Tablet; dort stehen die Tagesreiter in einer Zeile
-mit der Woche breit darunter, und der Tageskopf `.artkopf` mit Datum, Art und Stunden in einer Zeile, damit das Schreibfeld auch mit
+mit der Woche breit darunter, und im Kopf der Tageskarte `.tagkarte` steht das Datum allein, darunter Art, Stunden und „Fertig“ in einer Zeile, damit das Schreibfeld auch mit
 offener Tastatur Platz hat; die Regeln greifen auch beim Drucken, denn A4 ist schmaler als 820 px,
 also dort keine Klassen aus dem Blatt wie `.tagkopf`, `.kasten` oder `.tagestabelle` verwenden),
 `ausbilder.css` (Konto und Ausbilderansicht),
@@ -140,7 +141,10 @@ liest, hat Ecken. **Fenster** sind gleich gebaut: im Kopf der Titel links und ei
 rechts, im Fuß die Knöpfe rechts mit der Hauptaktion ganz außen, ein Hinweis links davon. Das ×
 schließt jedes `<dialog>` wie Escape (`bedienung.js`); was dabei geschehen muss, hängt am
 `close`-Ereignis des Fensters. Ohne × bleibt nur „Bitte anmelden“. Felder in Fenstern sind 40 px
-hoch, in der Einrichtung 44 px. Ein Wert neben den Stufen braucht einen Kommentar, warum. `blatt.css` rechnet in
+hoch, in der Einrichtung 44 px. **Fokus:** Knöpfe und Marken zeigen eine Linie mit Abstand, Felder
+eine dunkle Kante mit weichem Ring (`--fokus-ring`); nur das Schreibfeld des Tages hat eine Kante
+oben. **Bewegung:** Fenster, Menüs und Popover erscheinen mit `auftauchen` (kurz von unten); unter
+`prefers-reduced-motion` ohne. Ein Wert neben den Stufen braucht einen Kommentar, warum. `blatt.css` rechnet in
 pt und mm des Vordrucks und bleibt davon ausgenommen.
 
 ## Datenmodell

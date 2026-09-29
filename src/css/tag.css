@@ -14,7 +14,6 @@
   overflow: hidden; padding: 0 var(--luft-5) var(--luft-4);
   animation: auftauchen .18s ease-out;
 }
-@keyframes auftauchen { from { opacity: 0; transform: translateY(3px); } }
 /* Freier Tag: Karten im Grau. */
 .tagpanel.frei .sektion { background: var(--band); }
 .ruhig { color: var(--schiefer); font-size: var(--schrift-text); }
@@ -49,10 +48,11 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   border: 1px solid var(--linie); border-radius: var(--rund); box-shadow: var(--schatten);
 }
 .sektion.wachsend { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 110px; }
+/* Überschriften in normaler Schreibung: Kleine Versalien in jeder Karte lasen sich schwer und
+   machten alles gleich laut. Versalien bleiben kleinen Nebenangaben (.vordruckfeld, .seitentitel). */
 .sektionskopf {
-  margin: 0; padding: var(--luft-2) var(--luft-3) var(--luft-2) var(--luft-4); min-height: 38px; display: flex; align-items: center; gap: var(--luft-2);
-  font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung); line-height: 1.35;
-  text-transform: uppercase; color: var(--text);
+  margin: 0; padding: var(--luft-2) var(--luft-3) var(--luft-2) var(--luft-4); min-height: 44px; display: flex; align-items: center; gap: var(--luft-2);
+  font-size: var(--schrift-text); font-weight: 600; line-height: 1.35; color: var(--text);
   background: var(--band); border-bottom: 1px solid var(--linie);
 }
 .sektionskopf > span:first-child { flex: 1 1 auto; min-width: 0; }
@@ -87,8 +87,7 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 }
 .sektionsknopf {
   flex: none; display: inline-flex; align-items: center; gap: var(--luft-1);
-  font: inherit; font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung);
-  text-transform: uppercase; white-space: nowrap;
+  font: inherit; font-size: var(--schrift-klein); font-weight: 600; white-space: nowrap;
   background: var(--flaeche); color: var(--text);
   border: 1px solid var(--linie); border-radius: var(--rund-voll); padding: var(--luft-1) var(--luft-3);
   transition: background-color .15s, color .15s, border-color .15s;
@@ -212,10 +211,23 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-klein);
   padding: var(--luft-1) var(--luft-2);
 }
-.tagpanel select:hover, .tagpanel select:focus { background: var(--band); border-color: var(--linie-fest); }
+.tagpanel select:hover { background: var(--band); border-color: var(--linie-fest); }
 
+/* Eine Karte je Tag: Datum als Titel, Art und Stunden daneben, darüber dem Text das Feld des
+   Vordrucks. Vorher standen Tageskopf und Text in zwei Karten übereinander. */
+.tagkarte > .sektionskopf { font-size: var(--schrift-gross); }
+.tagfelder { display: flex; align-items: center; gap: var(--luft-3); font-size: var(--schrift-text); font-weight: 400; }
+.tagkarte .tagfelder { margin-left: auto; }
+.tagkarte .feldetikett, .artkopf .feldetikett {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.vordruckfeld {
+  flex: none; display: block; padding: var(--luft-3) var(--luft-4) 0;
+  font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung);
+  text-transform: uppercase; color: var(--schiefer);
+}
 .tagpanel textarea {
-  flex: 1 1 auto; width: 100%; min-height: 100px; padding: var(--luft-3) var(--luft-4);
+  flex: 1 1 auto; width: 100%; min-height: 100px; padding: var(--luft-2) var(--luft-4) var(--luft-3);
   font: inherit; font-size: var(--schrift-gross); line-height: 1.6;
   color: var(--text); background: var(--flaeche);
   border: none; resize: none; overflow: auto;
@@ -248,7 +260,6 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   min-width: 200px; flex: 1 1 320px; max-width: 420px;
 }
 .abteilungsfeld:hover { border-color: var(--linie-fest); }
-.abteilungsfeld:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px var(--fokus-ring); }
 
 /* Zeilenstand unter dem Text: passt der Text in den Vordruck? */
 .textfuss {
@@ -308,7 +319,7 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 
 /* Buchungen aus Kimai neben dem Text. */
 .postenzahl {
-  flex: none; font-size: var(--schrift-fein); letter-spacing: var(--sperrung); color: var(--schiefer);
+  flex: none; font-size: var(--schrift-fein); font-weight: 400; color: var(--schiefer);
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-voll); padding: 1px var(--luft-2);
 }
 .sektion.posten .sektionsleib { padding: 0; display: block; overflow: hidden; }
@@ -331,7 +342,7 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   -webkit-line-clamp: 2; overflow: hidden;
 }
 .postenliste p.offen .ptext { display: block; -webkit-line-clamp: unset; color: var(--text); }
-.postenliste .pleer { color: var(--blass); font-style: italic; border-bottom: none; }
+.postenliste .pleer { color: var(--schiefer); border-bottom: none; }
 /* Plus am Ende der Buchung: als Zeile in den Text (postenSektion). */
 .postenliste p:has(.pdazu) { position: relative; padding-right: var(--luft-8); }
 .pdazu {

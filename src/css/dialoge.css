@@ -347,6 +347,7 @@
   padding: var(--luft-2) var(--luft-3);
 }
 .gefahrfrage input::placeholder { color: #D99; }
+.gefahrfrage input:focus { border-color: var(--acht); box-shadow: 0 0 0 3px var(--acht-hell); }
 .gefahrfuss { display: flex; justify-content: flex-end; gap: var(--luft-2); margin-top: var(--luft-3); }
 .gefahrfuss .knopf { border-color: var(--acht); color: var(--acht); }
 .gefahrfuss .knopf:hover:not(:disabled) { background: var(--acht-hell); border-color: var(--acht); }
