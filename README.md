@@ -63,7 +63,8 @@ einfach selbst.
   mit Schule schreibst du die Themen einmal für die ganze Woche.
 - **Ausgabe** als Word oder PDF, im Vordruck mit wöchentlicher oder täglicher Notierung, mit
   Vorschau des Blatts.
-- **Übersicht aller Wochen** mit Schul-, Urlaubs- und Krankheitstagen je Ausbildungsjahr.
+- **Übersicht aller Wochen** wie die Aktivität bei GitHub: jeder Werktag ein Feld, grün fertig,
+  rot offen, dazu Schul-, Urlaubs- und Krankheitstage je Ausbildungsjahr.
 - **Optional mit eigenem Sprachmodell:** [Ollama](https://ollama.com) fasst den Tag in so vielen
   Zeilen zusammen, wie dein Ausbilder verlangt.
 

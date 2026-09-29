@@ -254,7 +254,7 @@ function dauer(start) {
     await h.stammdatenOeffnen(joerg.p);
     await h.stammFuellen(joerg.p, '#f-vorname', 'Jörg');
     await h.stammFuellen(joerg.p, '#f-nachname', 'Übermüller');
-    await h.stammFuellen(joerg.p, '#f-beruf', 'Fachinformatiker für Systemintegration');
+    await h.stammFuellen(joerg.p, '#f-berufwahl', 'Fachinformatiker für Systemintegration');
     await h.stammFuellen(joerg.p, '#f-beginn', '2026-08-01');
     await h.stammFuellen(joerg.p, '#f-ende', '2029-07-31');
     // Bleibt im Browser: Namensliste und eigene KI-Anweisungen (docs/SERVER.md, „Was wo liegt“).

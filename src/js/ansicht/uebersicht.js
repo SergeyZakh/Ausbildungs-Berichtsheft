@@ -1,9 +1,10 @@
 /* ============================================================
- * Übersicht: jede Woche der Ausbildung als Kästchen, je Ausbildungsjahr,
- * dazu die Tage in der Berufsschule, im Urlaub und krank
+ * Übersicht: jeder Werktag der Ausbildung als Feld, je Ausbildungsjahr ein Raster wie die
+ * Aktivität bei GitHub (Spalten Wochen, Zeilen Mo–Fr), dazu die Tage in der Berufsschule,
+ * im Urlaub und krank
  *
- * Die Farben sind dieselben wie in den Reitern und im Monatsraster: grün fertig, rot ungelesen.
- * Ein Klick auf ein Kästchen öffnet die Woche.
+ * Die Farben sind dieselben wie im Monatsraster: grün fertig, rot ungelesen, blassrot fehlt.
+ * Ein Klick auf ein Feld öffnet den Tag. Am Rechner passen drei Jahre ohne Scrollen hinein.
  * ========================================================== */
 
 /* Welche Arten gezählt werden, in dieser Reihenfolge. */
@@ -37,8 +38,81 @@ function wochenKaestchen(montagIso, heuteMontag) {
 
 var KAESTCHEN_WORTE = {
   fertig: "fertig", pruefen: "nicht gegengelesen", luecke: "Text fehlt",
-  frei: "nichts nötig", kommt: "kommt noch"
+  frei: "frei", kommt: "kommt noch"
 };
+
+/**
+ * Ein Werktag als Feld: dieselbe Rechnung wie im Monatsraster (tagLage(), fehlenderWerktag()).
+ * „aussen“ sind die Tage der ersten und letzten Spalte vor Beginn oder nach Ende.
+ */
+function tagFeld(key, z, heute) {
+  if (key < z.von || key > z.bis) return "aussen";
+  if (key > heute) return "kommt";
+  var lage = tagLage(key);
+  if (lage === "fertig") return "fertig";
+  if (lage === "voll") return "pruefen";
+  if (lage === "offen" || (lage === "nichts" && fehlenderWerktag(key))) return "luecke";
+  return "frei";
+}
+
+/**
+ * Das Raster eines Ausbildungsjahrs: oben die Monate, links Mo, Mi, Fr, je Woche eine Spalte.
+ * Die Felder sind Spalte für Spalte angeordnet (Woche 1 Mo–Fr, Woche 2 …), gesetzt über die
+ * Rasterposition. Klicks fängt das Raster selbst ab, statt Hunderte Knöpfe zu verdrahten.
+ */
+function jahresRaster(j, z) {
+  var heute = iso(new Date());
+  var raster = document.createElement("div");
+  raster.className = "uraster";
+  raster.style.setProperty("--wochen", j.wochen.length);
+  raster.setAttribute("role", "group");
+  raster.setAttribute("aria-label", "Werktage " + dmy(vonIso(j.von)) + " – " + dmy(vonIso(j.bis)));
+
+  // Eine Woche gehört zu dem Monat, in dem ihr Donnerstag liegt (wie die Kalenderwoche): Die
+  // Woche vom 29.7. bis 2.8. steht unter „Aug“, nicht unter „Jul“.
+  function monatVon(w) { return plus(vonIso(w.montag), 3).getMonth(); }
+  var zuletzt = -9;
+  j.wochen.forEach(function (w, s) {
+    var montag = vonIso(w.montag);
+    // Der Monat steht über seiner ersten Woche; zu dicht aufeinander nicht.
+    var neu = s === 0 || monatVon(w) !== monatVon(j.wochen[s - 1]);
+    if (neu && s - zuletzt >= 3) {
+      var monat = document.createElement("span");
+      monat.className = "umonat";
+      monat.textContent = MON_KURZ[monatVon(w)];
+      monat.style.gridColumn = String(s + 2);
+      raster.appendChild(monat);
+      zuletzt = s;
+    }
+    for (var d = 0; d < 5; d++) {
+      var datum = plus(montag, d), key = iso(datum), zustand = tagFeld(key, z, heute);
+      var feld = document.createElement("span");
+      feld.className = "utag " + zustand + (key === heute ? " heute" : "");
+      feld.style.gridColumn = String(s + 2);
+      feld.style.gridRow = String(d + 2);
+      if (zustand !== "aussen") {
+        feld.setAttribute("data-datum", key);
+        feld.title = WOCHENTAGE[datum.getDay()] + ", " + dmy(datum) + " · " + KAESTCHEN_WORTE[zustand];
+      }
+      raster.appendChild(feld);
+    }
+  });
+  ["Mo", "", "Mi", "", "Fr"].forEach(function (k, d) {
+    if (!k) return;
+    var name = document.createElement("span");
+    name.className = "uwt";
+    name.textContent = k;
+    name.style.gridRow = String(d + 2);
+    raster.appendChild(name);
+  });
+  raster.addEventListener("click", function (e) {
+    var feld = e.target.closest("[data-datum]");
+    if (!feld) return;
+    $("dlg-uebersicht").close();
+    stelleZeigen(feld.getAttribute("data-datum"));
+  });
+  return raster;
+}
 
 /**
  * Alles, was die Übersicht zeigt, nach Ausbildungsjahren: je Jahr die Wochen mit Zustand und
@@ -129,33 +203,22 @@ function uebersichtZeichnen() {
   inhalt.appendChild(kopf);
 
   var mitBeginn = !!$("f-beginn").value;
+  var z = uebersichtZeitraum();
   jahre.forEach(function (j) {
     var teil = document.createElement("section");
     teil.className = "ujahr";
+    var kopfzeile = document.createElement("div");
+    kopfzeile.className = "ukopf";
     var titel = document.createElement("h3");
     titel.innerHTML = (mitBeginn ? j.jahr + ". Ausbildungsjahr" : "Bisher") +
       " <span>" + dmy(vonIso(j.von)) + " – " + dmy(vonIso(j.bis)) + "</span>";
-    teil.appendChild(titel);
+    kopfzeile.appendChild(titel);
+    teil.appendChild(kopfzeile);
 
     var zahl = { fertig: 0, faellig: 0 };
-    var raster = document.createElement("div");
-    raster.className = "uraster";
     j.wochen.forEach(function (w) {
-      var montag = vonIso(w.montag);
       if (w.zustand !== "kommt") zahl.faellig++;
       if (w.zustand === "fertig") zahl.fertig++;
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "ukw " + w.zustand;
-      b.textContent = kalenderwoche(montag);
-      b.title = "KW " + kalenderwoche(montag) + " · " + langSpanne(montag) + " · " + KAESTCHEN_WORTE[w.zustand];
-      b.setAttribute("aria-label", b.title);
-      if (w.montag === aktiveWoche) b.setAttribute("aria-current", "true");
-      b.addEventListener("click", function () {
-        $("dlg-uebersicht").close();
-        wocheZeigen(w.montag);
-      });
-      raster.appendChild(b);
     });
     var stand = document.createElement("p");
     stand.className = "ustand";
@@ -165,8 +228,7 @@ function uebersichtZeichnen() {
         (kommen ? ", " + kommen + " kommen noch" : "")
       : kommen ? mehrzahl(kommen, " Woche kommt", " Wochen kommen") + " noch"
       : "Die Wochen zählen zum Jahr davor.";
-    teil.appendChild(stand);
-    if (j.wochen.length) teil.appendChild(raster);
+    if (j.wochen.length) teil.appendChild(jahresRaster(j, z));
 
     var arten = UEBERSICHT_ARTEN.filter(function (a) { return j.tage[a]; });
     var tageZeile = document.createElement("p");
@@ -175,16 +237,19 @@ function uebersichtZeichnen() {
       ? arten.map(function (a) {
           return '<span><b>' + j.tage[a] + "</b> " + sicher(a) + "</span>";
         }).join("")
-      : '<span class="leise">Noch keine Schul-, Urlaubs- oder Krankheitstage.</span>';
-    teil.appendChild(tageZeile);
+      : "";
+    // Tage und Stand in der Zeile des Titels: So passen drei Jahre ohne Scrollen auf den Schirm.
+    kopfzeile.appendChild(tageZeile);
+    kopfzeile.appendChild(stand);
     inhalt.appendChild(teil);
   });
 
   var legende = document.createElement("p");
   legende.className = "ulegende";
   legende.innerHTML = ["fertig", "pruefen", "luecke", "frei", "kommt"].map(function (k) {
-    return '<span><i class="ukw ' + k + '"></i>' + KAESTCHEN_WORTE[k] + "</span>";
-  }).join("") + '<span class="leise">Tage gezählt bis heute, Berufsschule auch laut Schulplan.</span>';
+    return '<span><i class="utag ' + k + '"></i>' + KAESTCHEN_WORTE[k] + "</span>";
+  }).join("") + '<span class="leise">Ein Klick auf einen Tag öffnet ihn. Tage gezählt bis heute, ' +
+    "Berufsschule auch laut Schulplan.</span>";
   inhalt.appendChild(legende);
 }
 

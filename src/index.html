@@ -25,8 +25,8 @@
   <div class="wochenbalken">
     <!-- Am Rechner erst die Pfeile, dann die Woche als Titel; am Handy ‹ Woche › (handy.css). -->
     <div class="wochenschalter">
-      <button type="button" class="rundknopf" id="woche-zurueck" aria-label="Vorige Woche"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-      <button type="button" class="rundknopf" id="woche-vor" aria-label="Nächste Woche"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button type="button" class="rundknopf" id="woche-zurueck" aria-label="Vorige Woche" title="Vorige Woche (Alt + ←)" aria-keyshortcuts="Alt+ArrowLeft"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="rundknopf" id="woche-vor" aria-label="Nächste Woche" title="Nächste Woche (Alt + →)" aria-keyshortcuts="Alt+ArrowRight"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       <button type="button" class="wochenknopf" id="wochenlabel" aria-haspopup="dialog" aria-expanded="false"></button>
     </div>
   </div>
@@ -110,15 +110,25 @@
       <button type="button" class="rundknopf" id="monat-vor" aria-label="Nächster Monat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
     <div class="wochenliste" id="wochenliste"></div>
-    <!-- Am Handy gibt es kein Überfahren mit der Maus: Was Kreise und Marken heißen, steht hier. -->
+    <!-- Am Handy gibt es kein Überfahren mit der Maus: Was Kreise und Marken heißen, steht hier.
+         Links die Marken der Reiter oben, rechts die Kreise dieses Rasters, je mit ihrem Muster. -->
     <div class="legende">
-      <span><b class="lm rot">E</b>Entwurf</span>
-      <span><b class="lm rot">KI</b>von der KI</span>
-      <span><b class="lm rot">!</b>eigener Text, nicht fertig</span>
-      <span><b class="lm gruen">✓</b>fertig</span>
-      <span><i class="lr"></i>Text fehlt</span>
-      <span><i class="lf"></i>nichts eingetragen</span>
-      <span><s>12</s>frei</span>
+      <div>
+        <p class="ltitel">Marken an den Tagen</p>
+        <span><b class="lm rot">E</b>Entwurf</span>
+        <span><b class="lm rot">KI</b>von der KI</span>
+        <span><b class="lm rot">!</b>eigener Text</span>
+        <span><b class="lm gruen">✓</b>fertig</span>
+        <span><i class="lr"></i>Text fehlt</span>
+      </div>
+      <div>
+        <p class="ltitel">Im Kalender</p>
+        <span><i class="lk voll">7</i>nicht gegengelesen</span>
+        <span><i class="lk fertig">7</i>fertig</span>
+        <span><i class="lk offen">7</i>Stunden ohne Text</span>
+        <span><i class="lk fehlt">7</i>nichts eingetragen</span>
+        <span><i class="lk frei">7</i>frei</span>
+      </div>
     </div>
     <div class="sprungzeile">
       <button type="button" class="knopf" id="sprung-offen">Erste offene Woche</button>
@@ -156,8 +166,14 @@
         <label><span>Vorname <i>*</i></span><input id="f-vorname" type="text" autocomplete="given-name" placeholder="Max"></label>
         <label><span>Nachname <i>*</i></span><input id="f-nachname" type="text" autocomplete="family-name" placeholder="Mustermann"></label>
         <input id="f-name" type="hidden">
-        <label><span>Ausbildungsberuf <i>*</i></span><input id="f-beruf" type="text" list="er-berufe" placeholder="Fachinformatiker/in"></label>
+        <!-- Gespeichert wird f-beruf, etwa „Fachinformatiker/in – Systemintegration“ (berufe.js). -->
+        <label><span>Ausbildungsberuf <i>*</i></span><input id="f-berufwahl" type="text" autocomplete="off" placeholder="Beruf suchen oder eintippen"></label>
         <label><span>Ausbildungsbetrieb <i>*</i></span><input id="f-betrieb" type="text" placeholder="Muster GmbH"></label>
+        <input id="f-beruf" type="hidden">
+        <div class="weit berufliste" id="f-berufliste" role="listbox" aria-label="Ausbildungsberufe" hidden></div>
+        <div class="weit fachwahl" id="f-fach" role="radiogroup" aria-label="Fachrichtung" hidden>
+          <span class="feldname">Fachrichtung</span><div class="fachknoepfe"></div>
+        </div>
         <label><span>Beginn laut Vertrag <i>*</i></span><input id="f-beginn" type="date"></label>
         <label><span>Ende laut Vertrag <i>*</i></span><input id="f-ende" type="date"></label>
         <label><span>Ausbildungsjahr</span><output id="f-jahr" class="leer" aria-live="polite">Beginn eintragen</output></label>
@@ -347,25 +363,14 @@
         <label><span>Nachname <i>*</i></span>
           <input id="w-nachname" type="text" autocomplete="family-name" placeholder="Mustermann"></label>
         <label class="weit"><span>Ausbildungsberuf <i>*</i></span>
-          <input id="w-beruf" data-feld="f-beruf" type="text" list="er-berufe" placeholder="z. B. Fachinformatiker/in"></label>
+          <input id="w-beruf" type="text" autocomplete="off" placeholder="Beruf suchen oder eintippen"></label>
+        <div class="weit berufliste" id="w-berufliste" role="listbox" aria-label="Ausbildungsberufe" hidden></div>
+        <div class="weit fachwahl" id="w-fach" role="radiogroup" aria-label="Fachrichtung" hidden>
+          <span class="feldname">Fachrichtung</span><div class="fachknoepfe"></div>
+        </div>
         <label class="weit"><span>Ausbildungsbetrieb <i>*</i></span>
           <input id="w-betrieb" data-feld="f-betrieb" type="text" autocomplete="organization" placeholder="Muster GmbH"></label>
       </div>
-      <datalist id="er-berufe">
-        <option value="Fachinformatiker/in – Anwendungsentwicklung">
-        <option value="Fachinformatiker/in – Systemintegration">
-        <option value="Fachinformatiker/in – Daten- und Prozessanalyse">
-        <option value="Fachinformatiker/in – Digitale Vernetzung">
-        <option value="IT-System-Elektroniker/in">
-        <option value="Kaufmann/Kauffrau für Digitalisierungsmanagement">
-        <option value="Kaufmann/Kauffrau für IT-System-Management">
-        <option value="Kaufmann/Kauffrau für Büromanagement">
-        <option value="Industriekaufmann/Industriekauffrau">
-        <option value="Kaufmann/Kauffrau im Einzelhandel">
-        <option value="Elektroniker/in für Betriebstechnik">
-        <option value="Mechatroniker/in">
-        <option value="Industriemechaniker/in">
-      </datalist>
     </section>
 
     <section class="er-schritt" data-schritt="ausbildung" hidden>

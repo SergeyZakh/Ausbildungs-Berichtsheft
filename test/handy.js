@@ -130,6 +130,8 @@ async function durchgang(browser, breite) {
   await page.click('#btn-beispiel');
   await page.waitForTimeout(1200);
   pruefe('Das Beispiel öffnet einen Tag' + bei, await page.locator('.tagpanel textarea').isVisible());
+  pruefe('Am Handy keine Tasten an den Reitern' + bei, await page.evaluate(() =>
+    [...document.querySelectorAll('#reiter button')].every((k) => getComputedStyle(k, '::before').content === 'none')));
   await nichtsRaus('Tag');
   await nichtsDarunter('Tag');
   // Die Wochentage saßen auf der Trennlinie der Kopfleiste, ihr oberer Rand war abgeschnitten.

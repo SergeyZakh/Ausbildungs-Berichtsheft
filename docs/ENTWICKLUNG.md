@@ -57,7 +57,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `grundlagen.js` | Zustand (`tage`, `wochen`, `aktiveWoche` …), Konstanten, Datums- und Texthelfer, Feiertage je Bundesland (dieselben Regeln in `server/feiertage.js`) |
 | `zustand.js` | Stand je Tag/Woche (`wochenBilanz()`: was eine Woche noch braucht), Schulplan (`tagArt()`), Blockwoche (`blockwoche()`, `tagImWochenfeld()`), nächster offener Tag (`naechsterOffenerTag()`), Stammdaten, Speichern, Zeitstempel für den Abgleich, Fußleistenmeldung `sage()` (bei offenem Dialog auch im Dialog, am Handy nach acht Sekunden leise) |
 | `sicherung.js` | Sicherung als JSON speichern und laden, Rückfrage `frage()` |
-| `bedienung.js` | Menüs und Tastatur |
+| `bedienung.js` | Menüs und Tastatur; die Taste jedes Reiters steht am Rechner in seiner Ecke (`tasteZeigen()` in `reiter.js`) |
 | `start.js` | Testzugänge (`window.__…`), Wiederherstellen des letzten Stands, beim ersten Start die Einrichtung (Azubis) oder der Rundgang (Ausbilder, am Handy nicht, `amHandy`) |
 
 **`import/`**
@@ -90,12 +90,13 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang und KI; heruntergeladen wird über „Exportieren“ |
 | `schulwoche.js` | Themen einer Blockwoche (`schulwocheSektion()`) und die Tage der Blockwoche mit ihrer Art |
 | `stammdaten.js` | Dialog „Deine Daten“ (Reiter Ausbildung, Schule, Vordruck, Deckblatt, KI, Löschen), Verbindungsprüfung, Löschen und Verwerfen |
+| `berufe.js` | Ausbildungsberuf: eigene Liste beim Tippen (nach Bereichen, `BERUFE`), danach die Fachrichtung zum Antippen; gespeichert in `f-beruf` als „Fachinformatiker/in – Systemintegration“ (`berufsfeld()`, `berufTeilen()`) |
 | `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
 | `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
 | `rundgang.js` | Rundgang der Ausbilder beim ersten Start und über **?**; Azubis bekommen stattdessen die Einrichtung |
 | `einrichtung.js` | Einrichtung beim ersten Start: die Angaben fürs Wochenblatt in sechs Schritten, jede Eingabe geht sofort in das Feld von „Deine Daten“ (`data-feld`) |
 | `hinweise.js` | Hinweis über den Reitern: Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
-| `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Kästchen pro Woche und die Tage je Art (`uebersichtDaten()`) |
+| `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Raster der Werktage wie bei GitHub (`jahresRaster()`) und die Tage je Art (`uebersichtDaten()`) |
 
 **`ausgabe/`**
 
@@ -350,9 +351,13 @@ nicht neu ein.
    davon, nach denselben Regeln wie `wochenStand()`. Der Sprung führt auf diesen Tag.
 
 Die **Übersicht** (Menü ⋯) zeigt je Ausbildungsjahr (Grenzen ab dem Ausbildungsbeginn, das Jahr einer
-Woche nach ihrem Montag wie im Vordruck) ein Kästchen pro Woche: fertig, nicht gegengelesen, Text
-fehlt, nichts nötig, kommt noch. Darunter die Tage je Art bis heute nach `tagArt()`, also mit
-Schultagen laut Plan; ein leerer gesetzlicher Feiertag zählt als Feiertag.
+Woche nach ihrem Montag wie im Vordruck) ein Raster wie die Aktivität bei GitHub (`jahresRaster()`):
+eine Spalte je Woche, die Zeilen Mo–Fr, oben die Monate (eine Woche gehört zum Monat ihres
+Donnerstags). Jedes Feld ist ein Werktag mit derselben Rechnung wie im Monatsraster (`tagFeld()`:
+fertig, nicht gegengelesen, Text fehlt, frei, kommt noch); ein Klick öffnet den Tag. In der Zeile des
+Titels stehen die Tage je Art bis heute nach `tagArt()`, also mit Schultagen laut Plan (ein leerer
+gesetzlicher Feiertag zählt als Feiertag), und wie viele Wochen fertig sind. Am Rechner passen drei
+Jahre ohne Scrollen auf 1366 × 768 (`test/hinweise.js`); am Handy scrollt das Raster seitlich.
 
 ### Spalten erkennen (`csvAnalysieren()`)
 
@@ -588,7 +593,7 @@ npm test
 | `test/import.js` | Formate unter `test/daten/formate/`, Werte, Zeichensatz, Zuordnungsdialog, gemerkte Zuordnung, Beispiel |
 | `test/vorbehandlung.js` | Bereinigung gegen `test/korpus.js`, Vorlage für das Modell |
 | `test/ki.js` | Anbindung gegen einen nachgebauten Ollama: Prompt, Warnungen, Fehler, Wochenlauf, Abbruch; Anfragen nur an das eigene Ollama |
-| `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start, Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen |
+| `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start (Vor- und Nachname, Berufsliste und Fachrichtung), Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen |
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |

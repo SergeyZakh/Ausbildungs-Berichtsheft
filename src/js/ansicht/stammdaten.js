@@ -174,7 +174,7 @@ Array.prototype.forEach.call(dlg.querySelectorAll(".blattleiste button"), functi
 
 $("btn-stamm").addEventListener("click", function () {
   menueSchliessen(); lehrjahrZeigen(); stammStandZeigen(); anweisungenZaehlen(); gefahrZeilenZeigen();
-  schulplanZeigen(); nameZeigen($("f-vorname"), $("f-nachname"));
+  schulplanZeigen(); nameZeigen($("f-vorname"), $("f-nachname")); stammBeruf.zeigen();
   blattZeigen("ausbildung"); dlg.showModal();
 });
 $("dlg-zu").addEventListener("click", function () { dlg.close(); });
