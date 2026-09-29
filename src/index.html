@@ -100,7 +100,7 @@
 <div class="wpopover" id="dlg-wochen" hidden role="dialog" aria-labelledby="wtitel">
   <div class="dkopf">
     <h2 id="wtitel">Woche wählen</h2>
-    <button type="button" class="knopf" id="w-zu">Schließen</button>
+    <button type="button" class="rundknopf dlg-x" id="w-zu" aria-label="Schließen">×</button>
   </div>
   <div class="dkoerper">
     <div class="monatszeile">
@@ -445,6 +445,7 @@
 <dialog id="dlg-zuordnung">
   <div class="dkopf">
     <h2>Spalten zuordnen</h2>
+    <button type="button" class="rundknopf dlg-x" aria-label="Abbrechen">×</button>
   </div>
   <div class="dkoerper">
     <p class="pruef-vorwort" id="zu-vorwort"></p>
@@ -476,7 +477,6 @@
     <p class="pruef-vorwort" id="anmelden-text"></p>
   </div>
   <div class="dfuss">
-    <span></span>
     <a class="knopf voll" id="anmelden-los" href="anmeldung">Anmelden</a>
   </div>
 </dialog>
@@ -485,6 +485,7 @@
 <dialog id="dlg-frage">
   <div class="dkopf">
     <h2 id="frage-titel"></h2>
+    <button type="button" class="rundknopf dlg-x" aria-label="Abbrechen">×</button>
   </div>
   <div class="dkoerper">
     <p class="pruef-vorwort" id="frage-text"></p>
@@ -499,6 +500,7 @@
 <dialog id="dlg-pruefung">
   <div class="dkopf">
     <h2 id="pruef-titel">Vor dem Export</h2>
+    <button type="button" class="rundknopf dlg-x" aria-label="Zurück">×</button>
   </div>
   <div class="dkoerper">
     <p class="pruef-vorwort" id="pruef-vorwort"></p>
@@ -514,7 +516,7 @@
 <dialog id="dlg-uebersicht" aria-labelledby="ueb-titel">
   <div class="dkopf">
     <h2 id="ueb-titel">Übersicht</h2>
-    <button type="button" class="knopf" id="ueb-zu">Schließen</button>
+    <button type="button" class="rundknopf dlg-x" id="ueb-zu" aria-label="Schließen">×</button>
   </div>
   <div class="dkoerper" id="ueb-inhalt"></div>
 </dialog>
@@ -526,6 +528,7 @@
       <h2 id="zr-titel">Blockunterricht</h2>
       <p class="zr-unter">Ersten und letzten Tag antippen</p>
     </div>
+    <button type="button" class="rundknopf dlg-x" aria-label="Schließen">×</button>
   </div>
   <div class="dkoerper">
     <!-- Wo man steht: erster Tag, letzter Tag. Der aktive Schritt ist umrandet. -->
@@ -554,11 +557,11 @@
 </dialog>
 
 <dialog id="dlg-gruppe">
-  <div class="dkopf"><h2>Gruppe verwalten</h2></div>
-  <div class="dkoerper" id="dlg-gruppe-inhalt"></div>
-  <div class="dfuss">
-    <button type="button" class="knopf" id="gruppe-zu">Schließen</button>
+  <div class="dkopf">
+    <h2>Gruppe verwalten</h2>
+    <button type="button" class="rundknopf dlg-x" id="gruppe-zu" aria-label="Schließen">×</button>
   </div>
+  <div class="dkoerper" id="dlg-gruppe-inhalt"></div>
 </dialog>
 
 <!-- #druck nimmt die Blätter für den Druckdialog auf, #messung misst sie vorher aus. -->

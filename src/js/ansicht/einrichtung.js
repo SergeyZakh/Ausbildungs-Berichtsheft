@@ -68,10 +68,13 @@ function erZeigen(i) {
   $("er-weiter").textContent = i === 0 ? "Los geht's" : "Weiter";
   $("er-spaeter").hidden = name === "los";
   erFehlt("");
-  // Am Handy nicht: Der Fokus holte bei jedem Schritt die Tastatur hoch.
+  // Das erste Feld, am Handy nicht: Der Fokus holte bei jedem Schritt die Tastatur hoch. Ohne Feld
+  // die Überschrift, sonst blieb der Fokus auf „Später“ stehen, das der Dialog beim Öffnen wählt.
   var amHandy = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-  var erstes = erDlg.querySelector('.er-schritt[data-schritt="' + name + '"] input:not([type=checkbox])');
+  var schritt = erDlg.querySelector('.er-schritt[data-schritt="' + name + '"]');
+  var erstes = schritt.querySelector("input:not([type=checkbox])");
   if (erstes && !amHandy) erstes.focus();
+  else if (!erstes) { var titel = schritt.querySelector("h2"); titel.tabIndex = -1; titel.focus({ preventScroll: true }); }
 }
 
 function erFehlt(text) {

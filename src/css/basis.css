@@ -209,14 +209,15 @@ dialog::backdrop {
   -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
 }
 .dkopf {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--luft-3);
   padding: var(--luft-4) var(--luft-5); border-bottom: 1px solid var(--linie);
 }
-.dkopf h2 { margin: 0; font-size: var(--schrift-gross); font-weight: 600; }
+.dkopf h2 { margin: 0; font-size: var(--schrift-titel); font-weight: 600; letter-spacing: var(--sperrung-eng); }
 .dkoerper { padding: var(--luft-4) var(--luft-5); }
+/* Knöpfe rechts, die Hauptaktion ganz außen; ein Hinweis (flex: 1) steht links davon. */
 .dfuss {
-  padding: 0 var(--luft-5) var(--luft-5); display: flex; align-items: center; gap: var(--luft-4);
-  justify-content: space-between;
+  padding: 0 var(--luft-5) var(--luft-5); display: flex; align-items: center; gap: var(--luft-2);
+  justify-content: flex-end;
 }
 
 /* ---------- Formularfelder im Dialog ---------- */
@@ -235,7 +236,9 @@ dialog::backdrop {
 }
 .felder textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
 .felder small { display: block; margin-top: var(--luft-1); font-size: var(--schrift-klein); color: var(--schiefer); }
-.felder output { display: flex; align-items: center; min-height: 36px; background: var(--band); }
+/* Alle Felder gleich hoch; Datumsfelder und Auswahllisten brachten sonst ihre eigene Höhe mit. */
+.felder input, .felder select { min-height: 40px; }
+.felder output { display: flex; align-items: center; min-height: 40px; background: var(--band); }
 .felder output.leer { color: var(--schiefer); }
 .felder .weit { grid-column: 1 / -1; }
 
