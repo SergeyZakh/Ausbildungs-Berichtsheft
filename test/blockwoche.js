@@ -212,8 +212,12 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
       tage[d] = { text: 'erledigt', art: '', geprueft: true };
     });
     Object.keys(tage).filter((d) => d > '2026-09-28').forEach((d) => { delete tage[d]; });
-    for (const d = new Date('2026-09-29T12:00:00'); d <= new Date(); d.setDate(d.getDate() + 1)) {
-      tage[d.toISOString().slice(0, 10)] = { text: 'erledigt', art: '', geprueft: true };
+    // Bis zum Ende von heute, sonst fehlt heute am Vormittag; Datum in Ortszeit wie in der App.
+    const heute = new Date();
+    heute.setHours(23, 59, 59, 999);
+    for (const d = new Date('2026-09-29T12:00:00'); d <= heute; d.setDate(d.getDate() + 1)) {
+      const t = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      tage[t] = { text: 'erledigt', art: '', geprueft: true };
     }
     window.__merkenJetzt();
   });
