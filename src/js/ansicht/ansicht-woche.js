@@ -5,6 +5,10 @@
 /* Welcher Monat im Raster steht; bleibt beim Blättern erhalten. */
 var monatAnker = null;
 
+/* Die Winkel der Blätterpfeile, gleich wie in index.html; die Striche kommen aus leiste.css. */
+var PFEIL_LINKS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
+var PFEIL_RECHTS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+
 /** Wochenknopf, Blätterpfeile und Stundensumme. wochen[] ist absteigend sortiert. */
 function zeichneWochenwahl() {
   var etikett = $("wochenlabel");
@@ -19,9 +23,11 @@ function zeichneWochenwahl() {
   }
   var l = lage(aktiveWoche);
   var wstand = wochenStand(aktiveWoche);
-  // Nur der Zeitraum: Den Stand zeigen die Farbe und daneben „3/5 fertig“.
+  // Nur der Zeitraum: Den Stand zeigen die Tage und daneben „3/5 fertig“. Am Rechner steht er
+  // ausgeschrieben als Titel, am Handy kurz im Knopf (leiste.css).
   etikett.className = "wochenknopf" + (wstand ? " " + wstand : "");
-  etikett.textContent = kurzSpanne(vonIso(aktiveWoche));
+  etikett.innerHTML = '<span class="lang">' + langSpanne(vonIso(aktiveWoche)) + "</span>" +
+    '<span class="kurz">' + kurzSpanne(vonIso(aktiveWoche)) + "</span>";
   $("woche-zurueck").disabled = false;
   $("woche-vor").disabled = false;
   var anteil = wochenAnteil(aktiveWoche);
@@ -89,6 +95,9 @@ function wochenzeile(montag) {
   for (var d = 0; d < TAGE_JE_WOCHE; d++) {
     var tag = plus(montag, d);
     var zustand = hatDaten ? tagLage(iso(tag)) : "nichts";
+    // Ein Werktag der Ausbildung bis heute ohne jeden Eintrag fehlt im Heft, auch in einer Woche
+    // ganz ohne Daten: So sieht man im Raster, wo noch gar nichts steht (fehlenderWerktag()).
+    if (zustand === "nichts" && fehlenderWerktag(iso(tag))) zustand = "fehlt";
     teile.push('<span class="wtag ' + zustand + '"><b>' + tag.getDate() + "</b></span>");
   }
   teile.push('<span class="wstd">' + (hatDaten ? (l.summe ? stundenText(l.summe) : "") : "+") + "</span>");

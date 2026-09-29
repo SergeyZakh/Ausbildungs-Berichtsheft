@@ -23,10 +23,11 @@
 
 <header class="leiste">
   <div class="wochenbalken">
+    <!-- Am Rechner erst die Pfeile, dann die Woche als Titel; am Handy ‹ Woche › (handy.css). -->
     <div class="wochenschalter">
-      <button type="button" class="rundknopf" id="woche-zurueck" aria-label="Vorige Woche">‹</button>
+      <button type="button" class="rundknopf" id="woche-zurueck" aria-label="Vorige Woche"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="rundknopf" id="woche-vor" aria-label="Nächste Woche"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       <button type="button" class="wochenknopf" id="wochenlabel" aria-haspopup="dialog" aria-expanded="false"></button>
-      <button type="button" class="rundknopf" id="woche-vor" aria-label="Nächste Woche">›</button>
     </div>
   </div>
   <div class="wochensumme" id="wochensumme"></div>
@@ -104,9 +105,9 @@
   </div>
   <div class="dkoerper">
     <div class="monatszeile">
-      <button type="button" class="rundknopf" id="monat-zurueck" aria-label="Voriger Monat">‹</button>
+      <button type="button" class="rundknopf" id="monat-zurueck" aria-label="Voriger Monat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
       <span id="monatslabel"></span>
-      <button type="button" class="rundknopf" id="monat-vor" aria-label="Nächster Monat">›</button>
+      <button type="button" class="rundknopf" id="monat-vor" aria-label="Nächster Monat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
     <div class="wochenliste" id="wochenliste"></div>
     <!-- Am Handy gibt es kein Überfahren mit der Maus: Was Kreise und Marken heißen, steht hier. -->
@@ -116,6 +117,7 @@
       <span><b class="lm rot">!</b>eigener Text, nicht fertig</span>
       <span><b class="lm gruen">✓</b>fertig</span>
       <span><i class="lr"></i>Text fehlt</span>
+      <span><i class="lf"></i>nichts eingetragen</span>
       <span><s>12</s>frei</span>
     </div>
     <div class="sprungzeile">
@@ -150,7 +152,10 @@
   <div class="dkoerper">
     <div class="dlg-blatt" data-blatt="ausbildung">
       <div class="felder">
-        <label class="weit"><span>Name, Vorname <i>*</i></span><input id="f-name" type="text" placeholder="Mustermann, Max"></label>
+        <!-- Gespeichert wird f-name als „Nachname, Vorname“ wie im Vordruck (nameZusammen()). -->
+        <label><span>Vorname <i>*</i></span><input id="f-vorname" type="text" autocomplete="given-name" placeholder="Max"></label>
+        <label><span>Nachname <i>*</i></span><input id="f-nachname" type="text" autocomplete="family-name" placeholder="Mustermann"></label>
+        <input id="f-name" type="hidden">
         <label><span>Ausbildungsberuf <i>*</i></span><input id="f-beruf" type="text" list="er-berufe" placeholder="Fachinformatiker/in"></label>
         <label><span>Ausbildungsbetrieb <i>*</i></span><input id="f-betrieb" type="text" placeholder="Muster GmbH"></label>
         <label><span>Beginn laut Vertrag <i>*</i></span><input id="f-beginn" type="date"></label>
@@ -337,8 +342,10 @@
       <h2>Du und dein Betrieb</h2>
       <p class="er-text">So steht es oben auf jedem Wochenblatt.</p>
       <div class="felder er-felder">
-        <label class="weit"><span>Dein Name <i>*</i></span>
-          <input id="w-name" data-feld="f-name" type="text" autocomplete="name" placeholder="Mustermann, Max"></label>
+        <label><span>Vorname <i>*</i></span>
+          <input id="w-vorname" type="text" autocomplete="given-name" placeholder="Max"></label>
+        <label><span>Nachname <i>*</i></span>
+          <input id="w-nachname" type="text" autocomplete="family-name" placeholder="Mustermann"></label>
         <label class="weit"><span>Ausbildungsberuf <i>*</i></span>
           <input id="w-beruf" data-feld="f-beruf" type="text" list="er-berufe" placeholder="z. B. Fachinformatiker/in"></label>
         <label class="weit"><span>Ausbildungsbetrieb <i>*</i></span>

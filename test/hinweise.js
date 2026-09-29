@@ -281,10 +281,14 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     pruefe('Das Plus hängt die bereinigte Zeile an',
       text === 'Kundensupport: Lagerdrucker am PC wieder eingebunden, Ticket geschlossen\nKurze Teambesprechung zum Tagesstart', JSON.stringify(text));
     pruefe('Kunde, Ticketnummer und Rechnername kommen nicht mit', !/Sonnenschein|48213|LAGER02/.test(text));
-    pruefe('Übernommene Buchungen zeigen einen Haken',
-      (await page.locator('.postenliste .pdazu.drin').count()) === 2);
-    await plusKnoepfe.nth(2).click();
+    pruefe('Übernommene Buchungen haben kein Plus mehr, auch keinen Haken',
+      (await page.locator('.postenliste .pdazu:visible').count()) === 3 &&
+      !(await plusKnoepfe.nth(2).isVisible()) && (await plusKnoepfe.nth(2).textContent()) === '+');
+    await plusKnoepfe.nth(2).evaluate((k) => k.click());
     pruefe('Zweimal dieselbe Zeile gibt es nicht', (await page.inputValue('.tagpanel textarea')) === text);
+    await page.fill('.tagpanel textarea', text.split('\n')[1]);
+    pruefe('Fliegt die Zeile aus dem Text, ist das Plus wieder da', await plusKnoepfe.nth(2).isVisible());
+    await page.fill('.tagpanel textarea', text);
     const gespeichert = await page.evaluate((s) => { window.__merkenJetzt(); return JSON.parse(localStorage.getItem(s)).tage['2026-09-07'].text; }, h.SPEICHER);
     pruefe('Übernommenes wird gespeichert', gespeichert === text, gespeichert);
 
@@ -292,7 +296,12 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.waitForTimeout(250);
     const legende = await page.locator('#dlg-wochen .legende').innerText();
     pruefe('Kalender erklärt die Marken', /Entwurf/.test(legende) && /KI/.test(legende) && /eigener Text/.test(legende) &&
-      /fertig/.test(legende) && /Text fehlt/.test(legende), legende);
+      /fertig/.test(legende) && /Text fehlt/.test(legende) && /nichts eingetragen/.test(legende), legende);
+    // Das Beispiel beginnt die Ausbildung am 1.8.2025; die Woche vor den Beispielwochen ist leer.
+    const ersteZeile = await page.$$eval('#wochenliste button:first-of-type .wtag', (t) => t.map((x) => x.className));
+    pruefe('Werktage der Ausbildung ohne Eintrag sind im Kalender blassrot, das Wochenende nicht',
+      ersteZeile.slice(0, 5).every((k) => /\bfehlt\b/.test(k)) && ersteZeile.slice(5).every((k) => !/\bfehlt\b/.test(k)),
+      JSON.stringify(ersteZeile));
     await page.click('#w-zu');
 
     await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
@@ -409,7 +418,7 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       const n = document.getElementById('notiz');
       return { klasse: n.className, hoehe: n.getBoundingClientRect().height,
         leiste: getComputedStyle(n.closest('.fussleiste')).backgroundColor,
-        flaeche: getComputedStyle(document.querySelector('.leiste .rundknopf')).backgroundColor };
+        flaeche: getComputedStyle(document.getElementById('btn-mehr')).backgroundColor };
     });
     pruefe('Nach acht Sekunden: Meldung auf einer Zeile', still.klasse.includes('still') && still.hoehe <= zeile + 2, JSON.stringify(still));
     pruefe('… und ohne farbige Leiste', still.leiste === still.flaeche, JSON.stringify(still));

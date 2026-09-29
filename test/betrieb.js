@@ -252,7 +252,8 @@ function dauer(start) {
 
     // Stammdaten über die Oberfläche, wie ein Azubi sie einträgt.
     await h.stammdatenOeffnen(joerg.p);
-    await h.stammFuellen(joerg.p, '#f-name', 'Jörg Übermüller');
+    await h.stammFuellen(joerg.p, '#f-vorname', 'Jörg');
+    await h.stammFuellen(joerg.p, '#f-nachname', 'Übermüller');
     await h.stammFuellen(joerg.p, '#f-beruf', 'Fachinformatiker für Systemintegration');
     await h.stammFuellen(joerg.p, '#f-beginn', '2026-08-01');
     await h.stammFuellen(joerg.p, '#f-ende', '2029-07-31');
@@ -279,7 +280,7 @@ function dauer(start) {
       ['.sektionsknopf.bearbeiten', 3, 'davor'],  // fertig – zum Ändern wieder öffnen
     ]);
     pruefe('Die Stammdaten liegen im Konto',
-      sql("SELECT daten->>'name' FROM stammdaten") === 'Jörg Übermüller', sql('SELECT daten FROM stammdaten'));
+      sql("SELECT daten->>'name' FROM stammdaten") === 'Übermüller, Jörg', sql('SELECT daten FROM stammdaten'));
 
     const dump = stapel(['exec', '-T', 'datenbank', 'pg_dump', '-U', 'berichtsheft', '-d', 'berichtsheft', '--data-only']).text;
     pruefe('Kundennamen aus dem Export liegen nirgends auf dem Server', !dump.includes('Meyer'));

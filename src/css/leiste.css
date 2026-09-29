@@ -2,28 +2,16 @@
  * Kopfleiste, Wochenbalken und Reiter
  * ========================================================== */
 
-/* ---------- Kopfleiste: Name, Woche mit Summe, Aktionen ---------- */
+/* ---------- Kopfleiste: links die Woche als Titel, rechts die Aktionen ---------- */
 .leiste {
-  flex: none; display: flex; align-items: center; gap: var(--luft-3);
-  padding: var(--luft-3) var(--luft-5);
+  flex: none; display: flex; align-items: center; gap: var(--luft-4);
+  padding: var(--luft-4) var(--luft-5);
 }
-.leiste .schub { flex: none; display: flex; align-items: center; gap: var(--luft-2); }
+.leiste .schub { flex: none; display: flex; align-items: center; gap: var(--luft-2); margin-left: auto; }
 /* Ohne Woche: statt leerem Wochenknopf und gesperrtem Export nur der Name und das Menü. */
 body.ohnewoche .wochenbalken, body.ohnewoche #btn-export { display: none; }
-.leiste::before { font-size: var(--schrift-gross); font-weight: 600; }
-body.ohnewoche .leiste::before { content: "Berichtsheft"; }
-body.ohnewoche .leiste .schub { margin-left: auto; }
+body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schrift-gross); font-weight: 600; }
 .leiste .schub .knopf { text-align: center; }
-/* Am Rechner drei Teile: links der Name, in der Mitte die Woche mit ihrem Stand, rechts die
-   Aktionen. Die Mitte steht genau mittig, gleich wie breit die Seiten sind; ohne Woche bleibt es
-   bei Name und Menü (oben). Am Handy stehen Summe und Aktionen über der Woche (handy.css). */
-@media (min-width: 821px) {
-  body:not(.ohnewoche) .leiste { display: grid; grid-template-columns: 1fr auto auto 1fr; }
-  .leiste::before { content: "Berichtsheft"; grid-column: 1; justify-self: start; }
-  .leiste .wochenbalken { grid-column: 2; margin-right: 0; }
-  .leiste .wochensumme { grid-column: 3; }
-  .leiste .schub { grid-column: 4; justify-self: end; }
-}
 /* Pfeil am Exportknopf: Er öffnet ein Menü. */
 #btn-export { display: inline-flex; align-items: center; gap: var(--luft-2); }
 #btn-export::after { content: "\25BE"; font-size: var(--schrift-fein); opacity: .7; }
@@ -66,12 +54,40 @@ body.ohnewoche .leiste .schub { margin-left: auto; }
   letter-spacing: var(--sperrung); text-transform: uppercase; color: var(--schiefer);
 }
 
-/* ---------- Wochenbalken: Blättern, Wochenknopf, Summe ---------- */
-/* Die Wochenwahl kompakt links, Stand und Aktionen rechts: Ein Knopf über die ganze Breite mit
-   etwas Text in der Mitte wirkte leer. Am Handy füllt sie ihre eigene Zeile (handy.css). */
-.wochenbalken { flex: 0 1 auto; min-width: 0; display: flex; align-items: center; margin-right: auto; }
-.wochenschalter { display: flex; align-items: center; gap: var(--luft-2); flex: 1 1 auto; min-width: 0; }
-.wochenschalter .rundknopf { width: 36px; height: 36px; font-size: var(--schrift-titel); }
+/* ---------- Wochenbalken: Blättern, Woche, Stand ----------
+   Am Rechner ist die Woche der Titel der Seite: groß und ohne Rahmen, davor die Pfeile als leise
+   Kreise, dahinter der Stand in Grau. Vorher standen vier umrandete Formen nebeneinander, und die
+   Summe sah aus wie ein Knopf. Am Handy und beim Ausbilder bleibt die Woche ein Knopf (handy.css). */
+.wochenbalken { flex: 0 1 auto; min-width: 0; display: flex; align-items: center; }
+.wochenschalter { display: flex; align-items: center; gap: var(--luft-1); flex: 1 1 auto; min-width: 0; }
+/* Winkel statt ‹ ›: Die Zeichen saßen klein und schief im Kreis. Fläche statt Rand, damit die
+   Pfeile als Knöpfe erkennbar sind, ohne sich vorzudrängen. */
+.wochenschalter .rundknopf, .monatszeile .rundknopf { width: 32px; height: 32px; border: none; background: var(--hauch); }
+.wochenschalter .rundknopf:hover:not(:disabled), .monatszeile .rundknopf:hover:not(:disabled) { background: var(--band); }
+.wochenschalter .rundknopf svg, .monatszeile .rundknopf svg {
+  width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.wochenknopf .lang { display: none; }
+@media (min-width: 821px) {
+  .leiste .wochenknopf {
+    min-width: 0; height: 40px; line-height: 40px; margin-left: var(--luft-2); padding: 0 var(--luft-2);
+    border: none; border-radius: var(--rund-klein); background: transparent;
+    font-size: var(--schrift-kopf); font-weight: 600; letter-spacing: var(--sperrung-eng);
+  }
+  .leiste .wochenknopf .lang { display: inline; }
+  .leiste .wochenknopf .kurz { display: none; }
+  /* Das Dreieck sagt: Hier geht der Kalender auf. */
+  .leiste .wochenknopf::after {
+    content: "\25BE"; margin-left: var(--luft-2); vertical-align: 3px;
+    font-size: var(--schrift-klein); font-weight: 400; color: var(--schiefer);
+  }
+  /* Den Stand zeigen die Tage darunter; der Titel bleibt in Textfarbe. */
+  .leiste .wochenknopf, .leiste .wochenknopf.pruefen, .leiste .wochenknopf.fertig { color: var(--text); }
+  .leiste .wochenknopf:hover, .leiste .wochenknopf.pruefen:hover, .leiste .wochenknopf.fertig:hover { background: var(--hauch); }
+  .leiste .wochensumme { height: auto; padding: 0; gap: var(--luft-2); background: none; border: none; color: var(--schiefer); }
+  .leiste .wsanteil::after { content: "·"; margin-left: var(--luft-1); color: var(--blass); }
+}
 /* block statt flex, sonst schneidet ein zu langes Etikett links und rechts ab
    statt mit Auslassungspunkten zu enden. */
 .wochenknopf {

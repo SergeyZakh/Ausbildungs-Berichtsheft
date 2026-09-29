@@ -396,8 +396,8 @@ function kiKnopf(key, t) {
  *
  * Das Plus hängt eine Buchung als Zeile an den Text, bereinigt wie im Entwurf (postenZeile):
  * Wer den Entwurf gelöscht hat und neu schreibt, holt sich so einzelne Zeilen zurück, ohne
- * Kundennamen und Ticketnummern abzutippen. Steht die Zeile schon im Text, zeigt der Knopf
- * einen Haken.
+ * Kundennamen und Ticketnummern abzutippen. Steht die Zeile schon im Text, fällt das Plus weg:
+ * Ein Haken an jeder Buchung sah nach „erledigt“ aus und machte die Liste unruhig.
  */
 function postenSektion(posten, ta) {
   var s = sektion("Buchungen", "posten");
@@ -436,6 +436,9 @@ function postenSektion(posten, ta) {
       var dazu = document.createElement("button");
       dazu.type = "button";
       dazu.className = "pdazu";
+      dazu.textContent = "+";
+      dazu.title = "Als Zeile in den Text übernehmen";
+      dazu.setAttribute("aria-label", dazu.title + ": " + zeile);
       dazu.setAttribute("data-zeile", zeile);
       dazu.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -455,11 +458,7 @@ function postenSektion(posten, ta) {
   function postenAbgleichen() {
     if (!ta) return;
     Array.prototype.forEach.call(liste.querySelectorAll(".pdazu"), function (k) {
-      var drin = imText(ta.value, k.getAttribute("data-zeile"));
-      k.classList.toggle("drin", drin);
-      k.textContent = drin ? "✓" : "+";
-      k.title = drin ? "Steht schon im Text" : "Als Zeile in den Text übernehmen";
-      k.setAttribute("aria-label", k.title + ": " + k.getAttribute("data-zeile"));
+      k.hidden = imText(ta.value, k.getAttribute("data-zeile"));
     });
   }
   if (ta) ta.addEventListener("input", postenAbgleichen);

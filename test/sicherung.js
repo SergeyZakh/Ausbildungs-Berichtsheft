@@ -64,7 +64,8 @@ async function laden(seite, datei) {
   await a.seite.waitForTimeout(900);
   await a.seite.locator('.tagpanel textarea').first().fill(EIGENER_TEXT);
   await h.stammdatenOeffnen(a.seite);
-  await h.stammFuellen(a.seite, '#f-name', NAME);
+  await h.stammFuellen(a.seite, '#f-vorname', 'Mia');
+  await h.stammFuellen(a.seite, '#f-nachname', 'Muster');
   await a.seite.click('#dlg-fertig');
   await a.seite.waitForTimeout(400);
   const vorher = await stand(a.seite);

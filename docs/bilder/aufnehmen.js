@@ -21,7 +21,8 @@ const ziel = (name) => path.join(__dirname, name);
   await h.oeffnen(erst);
   await erst.waitForSelector('#dlg-einrichtung[open]');
   await erst.click('#er-weiter');
-  await erst.fill('#w-name', 'Muster, Max');
+  await erst.fill('#w-vorname', 'Max');
+  await erst.fill('#w-nachname', 'Muster');
   await erst.fill('#w-beruf', 'Fachinformatiker/in – Systemintegration');
   await erst.fill('#w-betrieb', 'Beispiel IT GmbH');
   await erst.evaluate(() => document.activeElement && document.activeElement.blur());
@@ -71,7 +72,7 @@ const ziel = (name) => path.join(__dirname, name);
   await page.click('.reiter button >> nth=7');
   await page.waitForTimeout(900);
   await h.markieren(page, [
-    ['.wochenbalken', 1, 'davor'],             // Woche wählen, samt Pfeilen; davor ist frei
+    ['#wochenlabel', 1, 'rechts'],             // Woche wählen: der Titel öffnet den Kalender
     ['#feld-abteilung', 2, 'rechts'],          // gilt für die ganze Woche
     ['#feld-unterweisungen', 3],
     ['.sektion.vorschau', 4],                  // so wird das Blatt gedruckt

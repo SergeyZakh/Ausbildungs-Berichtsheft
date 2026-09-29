@@ -74,7 +74,8 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
 
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere
    ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig; was die Zeichen in den
-   Reitern heißen, erklärt der Kalender unter dem Wochenknopf. Im Reiter **Woche** trägst du
+   Reitern heißen, erklärt der Kalender unter der Woche oben; blassrot sind dort Werktage, an denen
+   noch gar nichts steht. Im Reiter **Woche** trägst du
    Abteilung und Unterweisungen ein. Was über alle Wochen noch fehlt, zeigt **⋯ → Übersicht aller
    Wochen**.
 

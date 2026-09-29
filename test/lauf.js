@@ -157,7 +157,8 @@ const NAME = 'Mustermann, Max';
 
   /* ---------- 9. Stammdaten ---------- */
   await h.stammdatenOeffnen(page);
-  await h.stammFuellen(page, '#f-name', NAME);
+  await h.stammFuellen(page, '#f-vorname', 'Max');
+  await h.stammFuellen(page, '#f-nachname', 'Mustermann');
   await h.stammFuellen(page, '#f-beruf', 'Fachinformatiker für Systemintegration');
   await h.stammFuellen(page, '#f-abteilung', 'Systemintegration');
   await h.stammFuellen(page, '#f-beginn', '2025-09-01');
@@ -176,6 +177,27 @@ const NAME = 'Mustermann, Max';
     try { return JSON.parse(localStorage.getItem(schluessel)).stamm.name; } catch (e) { return null; }
   }, h.SPEICHER);
   pruefe('Stammdaten landen im Browserspeicher', gespeichert === NAME, gespeichert);
+
+  // Vor- und Nachname sind zwei Felder, gespeichert bleibt „Nachname, Vorname“. Ältere Stände
+  // ohne Komma teilen sich am letzten Leerzeichen; ein Vorname allein bleibt Vorname.
+  const namensfelder = async (name) => {
+    await page.evaluate((n) => { document.getElementById('f-name').value = n; }, name);
+    await h.stammdatenOeffnen(page);
+    const felder = [await page.inputValue('#f-vorname'), await page.inputValue('#f-nachname')];
+    await page.click('#dlg-zu');
+    await page.waitForTimeout(200);
+    return felder.join('|');
+  };
+  pruefe('Alter Name ohne Komma wird in Vor- und Nachname geteilt',
+    (await namensfelder('Erika Mustermann')) === 'Erika|Mustermann' && (await namensfelder('Anna-Lena Groß')) === 'Anna-Lena|Groß');
+  pruefe('Nur ein Vorname bleibt beim nächsten Öffnen Vorname', (await namensfelder(', Max')) === 'Max|');
+  await h.stammdatenOeffnen(page);
+  pruefe('Ohne Nachname fehlt der Name noch',
+    (await page.textContent('#stamm-stand')).includes('Vor- und Nachname'), await page.textContent('#stamm-stand'));
+  await h.stammFuellen(page, '#f-nachname', 'Mustermann');
+  pruefe('Mit beiden Teilen steht der Name wie im Vordruck', (await page.inputValue('#f-name')) === NAME);
+  await page.click('#dlg-fertig');
+  await page.waitForTimeout(300);
 
   /* ---------- 10. Wochenangaben ---------- */
   await page.click('.reiter button >> nth=7');
@@ -569,9 +591,10 @@ const NAME = 'Mustermann, Max';
     await seite.click('#er-weiter');
     await seite.click('#er-weiter');
     pruefe('Ohne Pflichtangaben geht es nicht weiter, das Fehlende steht da',
-      (await schritt()) === 'du' && (await seite.textContent('#er-fehlt')).includes('deinen Namen, den Ausbildungsberuf und den Betrieb'),
+      (await schritt()) === 'du' && (await seite.textContent('#er-fehlt')).includes('deinen Vornamen, deinen Nachnamen, den Ausbildungsberuf und den Betrieb'),
       await seite.textContent('#er-fehlt'));
-    await seite.fill('#w-name', 'Muster, Max');
+    await seite.fill('#w-vorname', 'Max');
+    await seite.fill('#w-nachname', 'Muster');
     await seite.fill('#w-beruf', 'Fachinformatiker/in – Systemintegration');
     await seite.fill('#w-betrieb', 'Beispiel IT GmbH');
     await seite.click('#er-weiter');
@@ -602,6 +625,8 @@ const NAME = 'Mustermann, Max';
       JSON.stringify(stamm));
     pruefe('„Selbst schreiben“ öffnet die aktuelle Woche',
       !(await seite.locator('#dlg-einrichtung').isVisible()) && (await seite.locator('.reiter button').count()) === 8);
+    pruefe('Ohne geschriebene Woche geht das ganze Heft als Word wie als PDF',
+      !(await seite.locator('#btn-heft').isDisabled()) && !(await seite.locator('#btn-pdf-heft').isDisabled()));
     pruefe('Gesehene Einrichtung steht als 1 im Speicher', (await gemerkt()) === '1');
 
     await seite.reload();

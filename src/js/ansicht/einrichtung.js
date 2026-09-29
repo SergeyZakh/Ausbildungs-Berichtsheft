@@ -11,7 +11,8 @@ var ER_SCHRITTE = ["start", "du", "ausbildung", "schule", "vordruck", "los"];
 
 /* Was vor „Weiter“ dastehen muss, je Schritt: Feld und wie es im Satz heißt. */
 var ER_PFLICHT = {
-  du: [["w-name", "deinen Namen"], ["w-beruf", "den Ausbildungsberuf"], ["w-betrieb", "den Betrieb"]],
+  du: [["w-vorname", "deinen Vornamen"], ["w-nachname", "deinen Nachnamen"],
+       ["w-beruf", "den Ausbildungsberuf"], ["w-betrieb", "den Betrieb"]],
   ausbildung: [["w-beginn", "den Beginn"], ["w-ende", "das Ende"]]
 };
 
@@ -44,6 +45,7 @@ function einrichtungNoetig() {
 function einrichtungStarten() {
   // Was schon in „Deine Daten“ steht, steht auch hier: nach „Später“ oder aus dem Konto.
   erFelder.forEach(function (el) { el.value = $(el.getAttribute("data-feld")).value; });
+  nameZeigen($("w-vorname"), $("w-nachname"));
   erSchultageZeigen();
   erBloeckeZeigen();
   erVordruckZeigen();
@@ -120,6 +122,14 @@ erFelder.forEach(function (el) {
   });
 });
 
+/* Vor- und Nachname: zwei Felder hier, gespeichert wird f-name (stammdaten.js). */
+[$("w-vorname"), $("w-nachname")].forEach(function (el) {
+  el.addEventListener("input", function () {
+    el.classList.remove("fehlt");
+    nameUebernehmen($("w-vorname"), $("w-nachname"));
+  });
+});
+
 function erJahrZeigen() {
   var jahr = ausbildungsjahr({ beginn: $("w-beginn").value }, berichtsdatum());
   $("er-jahr").textContent = jahr ? "Du bist im " + jahr + ". Ausbildungsjahr." : "";
@@ -191,5 +201,5 @@ $("er-schreiben").addEventListener("click", function () {
 
 /** Fehlt noch eine Pflichtangabe für den Vordruck? Für die Startkarte. */
 function angabenFehlen() {
-  return PFLICHT.some(function (f) { return !$(f[0]).value.trim(); });
+  return PFLICHT.some(function (f) { return pflichtFehlt(f[0]); });
 }
