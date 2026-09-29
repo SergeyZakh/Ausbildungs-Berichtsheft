@@ -40,23 +40,30 @@
     </button>
     <div class="menuehalter">
       <button type="button" class="knopf voll" id="btn-export" aria-haspopup="true" aria-expanded="false">Exportieren</button>
+      <!-- Zwei Gruppen mit Überschrift: erst was, dann in welchem Format. -->
       <div class="menue" id="menue-export" hidden role="menu">
-        <button type="button" role="menuitem" id="btn-wochenblatt">Wochenblatt als Word</button>
-        <button type="button" role="menuitem" id="btn-pdf-woche">Wochenblatt als PDF drucken</button>
+        <p class="menuetitel" aria-hidden="true">Diese Woche</p>
+        <button type="button" role="menuitem" id="btn-wochenblatt" aria-label="Wochenblatt als Word-Datei">Als Word-Datei</button>
+        <button type="button" role="menuitem" id="btn-pdf-woche" aria-label="Wochenblatt als PDF drucken">Als PDF drucken</button>
         <div class="menuetrenner" role="separator"></div>
-        <button type="button" role="menuitem" id="btn-heft">Gesamtheft als Word</button>
-        <button type="button" role="menuitem" id="btn-pdf-heft">Gesamtheft als PDF drucken</button>
+        <p class="menuetitel" aria-hidden="true">Ganzes Heft mit Deckblatt</p>
+        <button type="button" role="menuitem" id="btn-heft" aria-label="Gesamtheft als Word-Datei">Als Word-Datei</button>
+        <button type="button" role="menuitem" id="btn-pdf-heft" aria-label="Gesamtheft als PDF drucken">Als PDF drucken</button>
       </div>
     </div>
     <div class="menuehalter">
-      <button type="button" class="rundknopf" id="btn-mehr" aria-label="Weitere Aktionen" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <button type="button" class="rundknopf" id="btn-mehr" aria-label="Menü" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <!-- Nach Zweck gruppiert: dein Heft, Daten hinein, Sicherung, Hilfe. -->
       <div class="menue" id="menue-mehr" hidden role="menu">
+        <button type="button" role="menuitem" id="btn-stamm">Deine Daten</button>
         <button type="button" role="menuitem" id="btn-uebersicht">Übersicht aller Wochen</button>
-        <button type="button" role="menuitem" id="btn-laden">Zeiten importieren (CSV)</button>
+        <div class="menuetrenner" role="separator"></div>
+        <button type="button" role="menuitem" id="btn-laden">Zeiterfassung laden (CSV)</button>
+        <div class="menuetrenner" role="separator"></div>
         <button type="button" role="menuitem" id="btn-sicherung">Sicherung speichern</button>
         <button type="button" role="menuitem" id="btn-sicherung-laden">Sicherung laden</button>
-        <button type="button" role="menuitem" id="btn-stamm">Deine Daten</button>
-        <button type="button" role="menuitem" id="btn-hilfe">Rundgang noch einmal</button>
+        <div class="menuetrenner" id="trenner-hilfe" role="separator"></div>
+        <button type="button" role="menuitem" id="btn-hilfe">Kurzer Rundgang</button>
       </div>
     </div>
   </div>
@@ -130,41 +137,55 @@
 <dialog id="dlg-stamm">
   <div class="dkopf">
     <h2 id="dlg-titel">Deine Daten</h2>
-    <button type="button" class="knopf" id="dlg-zu">Schließen</button>
+    <button type="button" class="rundknopf dlg-x" id="dlg-zu" aria-label="Schließen">×</button>
   </div>
+  <!-- Dieselbe Reihenfolge wie die Einrichtung beim ersten Start. Was nur das Deckblatt braucht,
+       hat einen eigenen Reiter; Löschen steht zuletzt. -->
   <div class="blattleiste" role="tablist">
-    <button type="button" role="tab" data-ziel="person" aria-selected="true">Person</button>
-    <button type="button" role="tab" data-ziel="ausbildung" aria-selected="false">Ausbildung</button>
+    <button type="button" role="tab" data-ziel="ausbildung" aria-selected="true">Ausbildung</button>
     <button type="button" role="tab" data-ziel="schule" aria-selected="false">Schule</button>
-    <button type="button" role="tab" data-ziel="verarbeitung" aria-selected="false">Verarbeitung</button>
-    <button type="button" role="tab" data-ziel="ki" aria-selected="false">Sprachmodell</button>
-    <button type="button" role="tab" data-ziel="gefahr" aria-selected="false" class="rot">Gefahr</button>
+    <button type="button" role="tab" data-ziel="verarbeitung" aria-selected="false">Vordruck</button>
+    <button type="button" role="tab" data-ziel="person" aria-selected="false">Deckblatt</button>
+    <button type="button" role="tab" data-ziel="ki" aria-selected="false" title="Sprachmodell">KI</button>
+    <button type="button" role="tab" data-ziel="gefahr" aria-selected="false" class="rot">Löschen</button>
   </div>
   <div class="dkoerper">
-    <div class="dlg-blatt" data-blatt="person">
+    <div class="dlg-blatt" data-blatt="ausbildung">
       <div class="felder">
-        <label><span>Name, Vorname <i>*</i></span><input id="f-name" type="text" placeholder="Mustermann, Max"></label>
+        <label class="weit"><span>Name, Vorname <i>*</i></span><input id="f-name" type="text" placeholder="Mustermann, Max"></label>
+        <label><span>Ausbildungsberuf <i>*</i></span><input id="f-beruf" type="text" list="er-berufe" placeholder="Fachinformatiker/in"></label>
+        <label><span>Ausbildungsbetrieb <i>*</i></span><input id="f-betrieb" type="text" placeholder="Muster GmbH"></label>
+        <label><span>Beginn laut Vertrag <i>*</i></span><input id="f-beginn" type="date"></label>
+        <label><span>Ende laut Vertrag <i>*</i></span><input id="f-ende" type="date"></label>
+        <label><span>Ausbildungsjahr</span><output id="f-jahr" class="leer" aria-live="polite">Beginn eintragen</output></label>
+        <label><span>Bundesland (für die Feiertage)</span><select id="f-land">
+          <option value="">nur bundesweite Feiertage</option>
+          <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option>
+          <option value="BE">Berlin</option><option value="BB">Brandenburg</option>
+          <option value="HB">Bremen</option><option value="HH">Hamburg</option>
+          <option value="HE">Hessen</option><option value="MV">Mecklenburg-Vorpommern</option>
+          <option value="NI">Niedersachsen</option><option value="NW">Nordrhein-Westfalen</option>
+          <option value="RP">Rheinland-Pfalz</option><option value="SL">Saarland</option>
+          <option value="SN">Sachsen</option><option value="ST">Sachsen-Anhalt</option>
+          <option value="SH">Schleswig-Holstein</option><option value="TH">Thüringen</option>
+        </select></label>
+        <label><span>Abteilung</span><input id="f-abteilung" type="text" placeholder="z. B. IT"></label>
+        <label><span>Ausbilder/in</span><input id="f-ausbilder" type="text"></label>
+      </div>
+    </div>
+
+    <div class="dlg-blatt" data-blatt="person" hidden>
+      <p class="blattvorwort">Nur für das Deckblatt des Gesamthefts. Fürs Wochenblatt braucht es nichts davon.</p>
+      <div class="felder">
         <label><span>Geburtsdatum</span><input id="f-geburtsdatum" type="date"></label>
         <label><span>Geburtsort</span><input id="f-geburtsort" type="text"></label>
         <label class="weit"><span>Anschrift</span>
           <input id="f-anschrift" type="text" placeholder="Straße Nr., PLZ Ort"></label>
-        <label><span>Gesetzl. Vertreter, Name</span><input id="f-vertreterName" type="text"></label>
+        <label><span>Vertrag abgeschlossen am</span><input id="f-vertragAm" type="date"></label>
+        <label><span>Geschäftszweig des Betriebs</span><input id="f-zweig" type="text" placeholder="z. B. IT-Dienstleistung"></label>
+        <label class="weit"><span>Gesetzl. Vertreter, Name</span><input id="f-vertreterName" type="text"></label>
         <label class="weit"><span>Gesetzl. Vertreter, Anschrift</span>
           <input id="f-vertreterAnschrift" type="text" placeholder="Straße Nr., PLZ Ort"></label>
-      </div>
-    </div>
-
-    <div class="dlg-blatt" data-blatt="ausbildung" hidden>
-      <div class="felder">
-        <label><span>Ausbildungsberuf <i>*</i></span><input id="f-beruf" type="text" placeholder="Fachinformatiker/in"></label>
-        <label><span>Ausbildungsfirma <i>*</i></span><input id="f-betrieb" type="text" placeholder="Muster GmbH"></label>
-        <label><span>Geschäftszweig</span><input id="f-zweig" type="text" placeholder="z. B. IT-Dienstleistung"></label>
-        <label><span>Ausbildungsabteilung</span><input id="f-abteilung" type="text" placeholder="z. B. IT"></label>
-        <label class="weit"><span>Ausbilder/in</span><input id="f-ausbilder" type="text"></label>
-        <label><span>Vertragliche Laufzeit – Beginn <i>*</i></span><input id="f-beginn" type="date"></label>
-        <label><span>Vertragliche Laufzeit – Ende <i>*</i></span><input id="f-ende" type="date"></label>
-        <label><span>Lehrjahr</span><output id="f-jahr" class="leer" aria-live="polite">Beginn eintragen</output></label>
-        <label><span>Vertrag abgeschlossen am</span><input id="f-vertragAm" type="date"></label>
       </div>
     </div>
 
@@ -205,27 +226,17 @@
     <div class="dlg-blatt" data-blatt="verarbeitung" hidden>
       <div class="felder">
         <label class="weit"><span>Vordruck</span><select id="f-vordruck">
-          <option value="">Wöchentliche Notierung: die Tätigkeiten der Woche in einem Feld</option>
-          <option value="taeglich">Tägliche Notierung: eine Zeile je Tag</option>
+          <option value="">Wöchentlich – ein Feld je Woche</option>
+          <option value="taeglich">Täglich – eine Zeile je Tag</option>
         </select>
         </label>
+        <p class="zwischentitel weit">Beim Laden der Zeiterfassung</p>
         <label class="weit"><span>Nicht ins Heft übernehmen</span>
           <input id="f-ausblenden" type="text" placeholder="Allgemein, Daily, Orga"></label>
         <label class="weit"><span>Projektnamen nicht voranstellen</span>
           <input id="f-projektraus" type="text" value="Ausbildung, intern" placeholder="Ausbildung, intern"></label>
         <label class="weit"><span>Namen und Kürzel entfernen</span>
           <input id="f-namen" type="text" placeholder="Weber, Schmidt, MW, SZ"></label>
-        <label class="weit"><span>Feiertage beim Import (Bundesland)</span><select id="f-land">
-          <option value="">nur bundesweite Feiertage</option>
-          <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option>
-          <option value="BE">Berlin</option><option value="BB">Brandenburg</option>
-          <option value="HB">Bremen</option><option value="HH">Hamburg</option>
-          <option value="HE">Hessen</option><option value="MV">Mecklenburg-Vorpommern</option>
-          <option value="NI">Niedersachsen</option><option value="NW">Nordrhein-Westfalen</option>
-          <option value="RP">Rheinland-Pfalz</option><option value="SL">Saarland</option>
-          <option value="SN">Sachsen</option><option value="ST">Sachsen-Anhalt</option>
-          <option value="SH">Schleswig-Holstein</option><option value="TH">Thüringen</option>
-        </select></label>
       </div>
     </div>
 
@@ -303,11 +314,119 @@
   </div>
   <div class="dfuss">
     <p class="hinweis-stamm" id="stamm-stand"></p>
-    <button type="button" class="knopf voll" id="dlg-fertig">Speichern</button>
+    <button type="button" class="knopf voll" id="dlg-fertig">Fertig</button>
   </div>
 </dialog>
 
-<!-- Rundgang beim ersten Start -->
+<!-- Einrichtung beim ersten Start (einrichtung.js). Die Felder hier sind eigene; jede Eingabe geht
+     sofort in das gleichnamige Feld von „Deine Daten“ (w-name → f-name) und wird dort gespeichert. -->
+<dialog id="dlg-einrichtung" aria-labelledby="er-titel">
+  <div class="er-kopf">
+    <ol class="er-punkte" id="er-punkte" aria-hidden="true"></ol>
+    <button type="button" class="textknopf" id="er-spaeter">Später</button>
+  </div>
+  <div class="er-leib">
+    <section class="er-schritt" data-schritt="start">
+      <p class="er-marke">Berichtsheft</p>
+      <h2 id="er-titel">Willkommen! Richten wir dein Berichtsheft ein.</h2>
+      <p class="er-text">Ein paar Angaben, dann steht im IHK-Vordruck schon alles, was er verlangt.
+        Das dauert etwa eine Minute. <span id="er-wo">Alles bleibt in diesem Browser.</span></p>
+      <p class="er-anders">Oder: <button type="button" class="textknopf" id="er-beispiel">erst das Beispiel ansehen</button>
+        · <button type="button" class="textknopf" id="er-sicherung">Sicherung laden</button></p>
+    </section>
+
+    <section class="er-schritt" data-schritt="du" hidden>
+      <h2>Du und dein Betrieb</h2>
+      <p class="er-text">So steht es oben auf jedem Wochenblatt.</p>
+      <div class="felder er-felder">
+        <label class="weit"><span>Dein Name <i>*</i></span>
+          <input id="w-name" data-feld="f-name" type="text" autocomplete="name" placeholder="Mustermann, Max"></label>
+        <label class="weit"><span>Ausbildungsberuf <i>*</i></span>
+          <input id="w-beruf" data-feld="f-beruf" type="text" list="er-berufe" placeholder="z. B. Fachinformatiker/in"></label>
+        <label class="weit"><span>Ausbildungsbetrieb <i>*</i></span>
+          <input id="w-betrieb" data-feld="f-betrieb" type="text" autocomplete="organization" placeholder="Muster GmbH"></label>
+      </div>
+      <datalist id="er-berufe">
+        <option value="Fachinformatiker/in – Anwendungsentwicklung">
+        <option value="Fachinformatiker/in – Systemintegration">
+        <option value="Fachinformatiker/in – Daten- und Prozessanalyse">
+        <option value="Fachinformatiker/in – Digitale Vernetzung">
+        <option value="IT-System-Elektroniker/in">
+        <option value="Kaufmann/Kauffrau für Digitalisierungsmanagement">
+        <option value="Kaufmann/Kauffrau für IT-System-Management">
+        <option value="Kaufmann/Kauffrau für Büromanagement">
+        <option value="Industriekaufmann/Industriekauffrau">
+        <option value="Kaufmann/Kauffrau im Einzelhandel">
+        <option value="Elektroniker/in für Betriebstechnik">
+        <option value="Mechatroniker/in">
+        <option value="Industriemechaniker/in">
+      </datalist>
+    </section>
+
+    <section class="er-schritt" data-schritt="ausbildung" hidden>
+      <h2>Deine Ausbildung</h2>
+      <p class="er-text">Aus dem Beginn ergibt sich das Ausbildungsjahr, aus dem Bundesland die Feiertage.</p>
+      <div class="felder er-felder">
+        <label><span>Beginn laut Vertrag <i>*</i></span><input id="w-beginn" data-feld="f-beginn" type="date"></label>
+        <label><span>Ende laut Vertrag <i>*</i></span><input id="w-ende" data-feld="f-ende" type="date"></label>
+        <label class="weit"><span>Bundesland</span><select id="w-land" data-feld="f-land"></select></label>
+        <label><span>Abteilung</span><input id="w-abteilung" data-feld="f-abteilung" type="text" placeholder="z. B. IT"></label>
+        <label><span>Ausbilder/in</span><input id="w-ausbilder" data-feld="f-ausbilder" type="text"></label>
+      </div>
+      <p class="er-jahr" id="er-jahr" aria-live="polite"></p>
+    </section>
+
+    <section class="er-schritt" data-schritt="schule" hidden>
+      <h2>Berufsschule</h2>
+      <p class="er-text">An diesen Tagen steht schon „Berufsschule“ da, wenn du sie öffnest.</p>
+      <div class="felder er-felder">
+        <label class="weit"><span>Name der Berufsschule</span>
+          <input id="w-schule" data-feld="f-schule" type="text" placeholder="Berufskolleg Musterstadt"></label>
+        <fieldset class="tagwahl weit" id="w-schultage">
+          <legend>Feste Schultage</legend>
+          <label><input type="checkbox" value="Mo"><span>Mo</span></label>
+          <label><input type="checkbox" value="Di"><span>Di</span></label>
+          <label><input type="checkbox" value="Mi"><span>Mi</span></label>
+          <label><input type="checkbox" value="Do"><span>Do</span></label>
+          <label><input type="checkbox" value="Fr"><span>Fr</span></label>
+        </fieldset>
+        <div class="weit zeitraumfeld">
+          <span class="feldname" id="w-bloecke-name">Blockunterricht</span>
+          <div class="zeitraeume" id="w-bloecke" role="group" aria-labelledby="w-bloecke-name"></div>
+        </div>
+      </div>
+      <p class="er-still">Alles hier ist freiwillig und lässt sich später unter „Deine Daten“ ändern.</p>
+    </section>
+
+    <section class="er-schritt" data-schritt="vordruck" hidden>
+      <h2>Welcher Vordruck?</h2>
+      <p class="er-text">Beide sind IHK-Vordrucke. Unsicher? Frag deinen Ausbilder, meist ist es der wöchentliche.</p>
+      <div class="er-karten" role="radiogroup" aria-label="Vordruck">
+        <button type="button" class="er-karte" role="radio" data-vordruck="">
+          <b>Wöchentlich</b><span>Ein Feld je Woche für Tätigkeiten, Unterweisungen und Berufsschule.</span></button>
+        <button type="button" class="er-karte" role="radio" data-vordruck="taeglich">
+          <b>Täglich</b><span>Eine Zeile je Tag.</span></button>
+      </div>
+    </section>
+
+    <section class="er-schritt" data-schritt="los" hidden>
+      <h2>Fertig eingerichtet</h2>
+      <p class="er-text">Jetzt fehlen nur noch deine Tage. Lädst du den Export deiner Zeiterfassung, steht für
+        jeden Tag schon ein Entwurf da. Ohne Zeiterfassung schreibst du die Tage einfach selbst.</p>
+      <div class="er-wahl">
+        <button type="button" class="knopf voll" id="er-laden">Zeiterfassung laden (CSV)</button>
+        <button type="button" class="knopf" id="er-schreiben">Selbst schreiben</button>
+      </div>
+    </section>
+  </div>
+  <div class="er-fuss">
+    <button type="button" class="knopf" id="er-zurueck">Zurück</button>
+    <p class="er-fehlt" id="er-fehlt" role="status"></p>
+    <button type="button" class="knopf voll" id="er-weiter">Weiter</button>
+  </div>
+</dialog>
+
+<!-- Rundgang, über das Menü -->
 <div class="onb" id="onboarding" hidden>
   <div class="onb-loch" id="onb-loch"></div>
   <div class="onb-karte" id="onb-karte" role="dialog" aria-modal="true" aria-labelledby="onb-titel">
@@ -405,17 +524,34 @@
 <!-- Blockunterricht oder Schulferien im Kalender wählen (zeitraum.js), über „Deine Daten“ -->
 <dialog id="dlg-zeitraum" aria-labelledby="zr-titel">
   <div class="dkopf">
-    <h2 id="zr-titel">Blockunterricht wählen</h2>
-    <button type="button" class="knopf voll" id="zr-fertig">Fertig</button>
+    <div>
+      <h2 id="zr-titel">Blockunterricht</h2>
+      <p class="zr-unter">Ersten und letzten Tag antippen</p>
+    </div>
   </div>
   <div class="dkoerper">
-    <div class="zr-leiste">
-      <button type="button" class="rundknopf" id="zr-zurueck" aria-label="Voriger Monat">‹</button>
-      <p class="zr-hilfe" id="zr-hilfe" aria-live="polite"></p>
-      <button type="button" class="rundknopf" id="zr-vor" aria-label="Nächster Monat">›</button>
+    <!-- Wo man steht: erster Tag, letzter Tag. Der aktive Schritt ist umrandet. -->
+    <div class="zr-schritte">
+      <div class="zr-schritt" id="zr-schritt-von"><span>Erster Tag</span><b id="zr-von">–</b>
+        <button type="button" class="zr-neu" id="zr-neu" aria-label="Neu beginnen" title="Neu beginnen">×</button></div>
+      <span class="zr-pfeil" aria-hidden="true">→</span>
+      <div class="zr-schritt" id="zr-schritt-bis"><span>Letzter Tag</span><b id="zr-bis">–</b>
+        <small id="zr-tage"></small></div>
     </div>
-    <div class="zr-raster" id="zr-raster"></div>
-    <div class="zeitraeume zr-liste" id="zr-liste"></div>
+    <div class="zr-kalender">
+      <button type="button" class="rundknopf zr-blaettern" id="zr-zurueck" aria-label="Voriger Monat">‹</button>
+      <button type="button" class="rundknopf zr-blaettern" id="zr-vor" aria-label="Nächster Monat">›</button>
+      <div class="zr-raster" id="zr-raster"></div>
+    </div>
+    <p class="zr-legende" id="zr-legende"></p>
+    <div class="zr-eingetragen">
+      <span class="zr-liste-titel" id="zr-liste-titel">Eingetragen</span>
+      <div class="zeitraeume zr-liste" id="zr-liste"></div>
+    </div>
+  </div>
+  <div class="dfuss">
+    <p class="zr-hilfe" id="zr-hilfe" role="status"></p>
+    <button type="button" class="knopf voll" id="zr-fertig">Fertig</button>
   </div>
 </dialog>
 

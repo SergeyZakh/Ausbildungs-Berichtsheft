@@ -55,10 +55,10 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | Datei | Inhalt |
 | --- | --- |
 | `grundlagen.js` | Zustand (`tage`, `wochen`, `aktiveWoche` …), Konstanten, Datums- und Texthelfer, Feiertage je Bundesland (dieselben Regeln in `server/feiertage.js`) |
-| `zustand.js` | Stand je Tag/Woche (`wochenBilanz()`: was eine Woche noch braucht), Schulplan (`tagArt()`), Stammdaten, Speichern, Zeitstempel für den Abgleich, Fußleistenmeldung `sage()` (bei offenem Dialog auch im Dialog, am Handy nach acht Sekunden leise) |
+| `zustand.js` | Stand je Tag/Woche (`wochenBilanz()`: was eine Woche noch braucht), Schulplan (`tagArt()`), Blockwoche (`blockwoche()`, `tagImWochenfeld()`), nächster offener Tag (`naechsterOffenerTag()`), Stammdaten, Speichern, Zeitstempel für den Abgleich, Fußleistenmeldung `sage()` (bei offenem Dialog auch im Dialog, am Handy nach acht Sekunden leise) |
 | `sicherung.js` | Sicherung als JSON speichern und laden, Rückfrage `frage()` |
 | `bedienung.js` | Menüs und Tastatur |
-| `start.js` | Testzugänge (`window.__…`), Wiederherstellen des letzten Stands, Start des Rundgangs (am Handy nicht, `amHandy`) |
+| `start.js` | Testzugänge (`window.__…`), Wiederherstellen des letzten Stands, beim ersten Start die Einrichtung (Azubis) oder der Rundgang (Ausbilder, am Handy nicht, `amHandy`) |
 
 **`import/`**
 
@@ -84,14 +84,16 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 
 | Datei | Inhalt |
 | --- | --- |
-| `ansicht-woche.js` | Wochenbalken, Monatsraster, Navigation durch jede Kalenderwoche |
-| `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“ |
+| `ansicht-woche.js` | Wochenbalken, Monatsraster, Navigation durch jede Kalenderwoche, nach „Fertig“ weiter zum nächsten offenen Tag (`weiterNachFertig()`) |
+| `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“; in einer Blockwoche nur der Reiter „Blockwoche“ |
 | `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: Text, Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche |
 | `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang, Vordruck (`vordruckSchalter()`), KI und Herunterladen |
-| `stammdaten.js` | Dialog „Deine Daten“, Verbindungsprüfung, Löschen und Verwerfen |
+| `schulwoche.js` | Themen einer Blockwoche (`schulwocheSektion()`) und die Tage der Blockwoche mit ihrer Art |
+| `stammdaten.js` | Dialog „Deine Daten“ (Reiter Ausbildung, Schule, Vordruck, Deckblatt, KI, Löschen), Verbindungsprüfung, Löschen und Verwerfen |
 | `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
-| `farbe.js` | Knopf hell/dunkel in der Kopfleiste |
-| `rundgang.js` | Rundgänge beim ersten Start, für Azubis und für Ausbilder |
+| `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
+| `rundgang.js` | Rundgang über das Menü; beim ersten Start nur für Ausbilder |
+| `einrichtung.js` | Einrichtung beim ersten Start: die Angaben fürs Wochenblatt in sechs Schritten, jede Eingabe geht sofort in das Feld von „Deine Daten“ (`data-feld`) |
 | `hinweise.js` | Hinweis über den Reitern: Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
 | `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Kästchen pro Woche und die Tage je Art (`uebersichtDaten()`) |
 
@@ -144,7 +146,9 @@ tage    "JJJJ-MM-TT" → {
           geprueft    true = ausdrücklich übernommen
           geaendert   ISO-Zeit der letzten Änderung im Nachweis (für den Abgleich)
         }
-wochen  Montag → { abteilung, unterweisungen }
+wochen  Montag → { abteilung, unterweisungen, schule, schuleGeprueft }
+        schule          Themen der Berufsschule für die ganze Woche (Blockwoche)
+        schuleGeprueft  true = diese Themen sind übernommen
 kunden  Kundennamen aus dem letzten Import
 stand   { woche, tag } zuletzt geöffnet
 geaendert { stamm, jeWoche }  letzte Änderung der Stammdaten; je Montag die der Wochenangaben
@@ -178,8 +182,9 @@ Datenbank beim letzten Abgleich und steuert, was herunterkommt; `gesendet` die B
 erfolgreichen Hochladen und steuert, was hochgeht. Mit nur einer Marke gingen Eingaben verloren, die
 während eines Abgleichs entstanden oder deren Rechneruhr nachging.
 
-`localStorage["berichtsheft-onboarding"] = "1"`: Rundgang gesehen; `berichtsheft-onboarding-ausbilder`
-dasselbe für den Rundgang der Ausbilder (`RUNDGANG_AUSBILDER`). Er startet erst, wenn `kontoStarten()`
+`localStorage["berichtsheft-onboarding"] = "1"`: Einrichtung gesehen (früher: Rundgang gesehen, darum
+derselbe Schlüssel); `berichtsheft-onboarding-ausbilder` dasselbe für den Rundgang der Ausbilder
+(`RUNDGANG_AUSBILDER`). Beides startet erst, wenn `kontoStarten()`
 die Rolle kennt.
 
 `localStorage["berichtsheft-zuordnungen"]`: bestätigte Zuordnungen je Kopfzeile,
@@ -189,7 +194,10 @@ die Rolle kennt.
 Gerät abweicht; sonst fehlt der Eintrag, und die Seite folgt `prefers-color-scheme`. Ein kleines
 Skript im Kopf von `index.html` setzt daraus `data-farbe` am `html`-Element, bevor etwas gezeichnet
 wird. `basis.css` führt die dunklen Farben deshalb zweimal (für das Gerät und für `data-farbe`);
-`test/hinweise.js` prüft, dass beide gleich sind.
+`test/hinweise.js` prüft, dass beide gleich sind. Beim Umschalten sind die Übergänge einzelner
+Elemente aus (Klasse `farbwechsel`): Sonst blendeten Knöpfe über 0,15 s über, während Text und Kanten
+sprangen. Darüber zieht eine View Transition die neue Farbe als Kreis vom Knopf auf; ohne diese
+Schnittstelle oder mit „Bewegung reduzieren“ wechselt die Seite in einem Schritt.
 
 ### Stand eines Tages (`tagStand()`)
 
@@ -214,6 +222,27 @@ vergleicht beide Seiten Fall für Fall.
   Feld im Vordruck.
 - Ein Werktag im Ausbildungszeitraum ohne Text ist eine Lücke, ob ganz ohne Eintrag oder mit
   geleertem Text. Ein gesetzlicher Feiertag ohne Text fehlt nicht, Tage in der Zukunft auch nicht.
+- Hat die Woche Themen für die Berufsschule (`wochen.schule`), steht jeder Werktag ohne eigenen
+  Text, der nicht frei ist, unter ihnen und hat ihren Stand (`tagImWochenfeld()`). Das gilt für
+  jeden solchen Tag, nicht nur für Schultage laut Plan: Der Server kennt den Plan nicht.
+
+### Einrichtung beim ersten Start (`einrichtung.js`)
+
+Statt eines Rundgangs über eine leere Seite fragt das Werkzeug beim ersten Start in sechs Schritten,
+was im Kopf jedes Wochenblatts steht: Willkommen (mit „Beispiel ansehen“ und „Sicherung laden“),
+Name/Beruf/Betrieb, Beginn/Ende und Bundesland, Berufsschule (feste Schultage, Blockunterricht im
+Kalender), Vordruck, zuletzt „Zeiterfassung laden (CSV)“ oder „Selbst schreiben“. Pflicht sind die
+Angaben aus `PFLICHT` in `stammdaten.js`; „Weiter“ nennt, was fehlt, und ein Ende vor dem Beginn.
+
+- Die Felder der Einrichtung sind eigene (`w-…`), jedes nennt in `data-feld` sein Feld in „Deine
+  Daten“. Jede Eingabe geht sofort dorthin und löst dort `input` aus; gespeichert und abgeglichen
+  wird wie beim Tippen im Dialog. Schultage schreiben `f-schultage`, der Blockunterricht nutzt die
+  Marken und den Kalender aus `zeitraum.js`.
+- Sie kommt nur, wenn noch nichts eingetragen ist (`einrichtungNoetig()`: keine Tage, kein Name,
+  kein Beginn), nicht für Ausbilder, und erst nach `kontoStarten()`: Mit Konto bringt der Abgleich
+  vorher mit, was schon eingetragen ist. Am Handy steht sie im Vollbild.
+- „Später“, Escape und jeder Ausgang merken sie als gesehen (`berichtsheft-onboarding`). Fehlen
+  dann noch Pflichtangaben, bietet die Startkarte „Jetzt einrichten“ an (`angabenFehlen()`).
 
 ### Schulplan (`tagArt()`, `schultagLautPlan()`)
 
@@ -221,8 +250,10 @@ Unter „Deine Daten → Schule“ stehen feste Schultage (Mo–Fr), Blockunterr
 Zeiträume (`schulbloeckeLesen()`: `02.03.–20.03.2026; 04.05.2026–22.05.2026`, auch ISO-Daten und ein
 einzelner Tag). In den Ferien entfallen die festen Schultage; ein Block gilt auch dort.
 Getippt werden Blöcke und Ferien nicht mehr: `zeitraum.js` zeigt sie als Marken mit ×, und „Im
-Kalender wählen“ öffnet ein Monatsraster (am Rechner zwei Monate, am Handy einer). Erster Tag, letzter
-Tag, in beliebiger Richtung; Überlappendes wird ein Zeitraum (`zeitraeumeOrdnen()`). Gespeichert wird
+Kalender wählen“ öffnet ein Monatsraster (am Rechner zwei Monate, am Handy einer). Oben stehen die
+zwei Schritte (erster Tag, letzter Tag, dazu die Werktage ohne Feiertage), ein Zeitraum ist ein helles
+Band mit dunklen Kreisen an Anfang und Ende. Erster Tag, letzter Tag, in beliebiger Richtung;
+Überlappendes wird ein Zeitraum (`zeitraeumeOrdnen()`). Gespeichert wird
 weiter der Text in `f-schulbloecke` und `f-schulferien`, den ältere Stände und das Konto kennen; was
 darin unlesbar ist, steht als rote Marke da, bis man es entfernt. `tagArt()` liefert für einen Tag die gespeicherte Art oder, wenn der Tag nichts
 Eigenes hat (keine Art, kein Text, keine Buchungen, keine Stunden, nicht `artVonHand`), laut Plan
@@ -237,6 +268,39 @@ Eigenes hat (keine Art, kein Text, keine Buchungen, keine Stunden, nicht `artVon
   gleich wieder auf dem Plan, und ein neuer Import setzte einen Feiertag zurück.
 - Die Schalter im Dialog spiegeln das versteckte Feld `f-schultage`; nur das wird gespeichert und
   mit dem Konto abgeglichen.
+
+### Blockwoche (`blockwoche()`, `schulwoche.js`)
+
+Der wöchentliche Vordruck hat für die Berufsschule ein Feld je Woche. Ist in einer Woche jeder
+Werktag Berufsschule oder frei, gibt es deshalb statt der sieben Tagesreiter nur den Reiter
+„Blockwoche“ und im Reiter „Woche“ oben ein Feld für die Themen der ganzen Woche, darunter die fünf
+Tage mit ihrer Art. Einmal schreiben, einmal „Fertig“: Die Woche ist dann 5/5. Über dem Feld
+steht nichts, weder Vorschläge noch Erklärungen; der Reiter sagt schon, dass es eine Blockwoche ist.
+
+`blockwoche()` verlangt:
+
+- den wöchentlichen Vordruck: Der tägliche braucht eine Zeile je Tag, dort bleiben die Reiter;
+- keinen Tag mit eigenem Text: Geschriebenes bleibt, wo es steht, die Woche bleibt tageweise;
+- jeden Werktag Berufsschule (gespeichert oder laut Plan) oder frei: Urlaub, Krank, Feiertag
+  (gespeichert oder gesetzlich ohne Eintrag), außerhalb der Ausbildung;
+- mindestens zwei Schultage: Ein fester Schultag in einer Urlaubswoche ist kein Block.
+
+Wer in der Liste der Tage „Arbeitstag“ wählt (`artVonHand`), macht die Woche wieder tageweise; die
+Themen bleiben im Reiter „Woche“ stehen und decken weiter die Tage ohne eigenen Text. Ein solcher
+Tag sagt das in der Tagesansicht (`wochenfeldHinweis()`).
+
+Die Themen stehen in `wochen[montag].schule`, übernommen mit `schuleGeprueft`, und gehen mit
+Abteilung und Unterweisungen ins Konto (`wocheKennung()` enthält beide). Eine Woche mit Themen
+gehört zu `wochen` (`wochenNeu()`), auch ohne einen Tageseintrag: Sonst fehlte sie im Gesamtheft.
+
+### Weiter nach „Fertig“ (`naechsterOffenerTag()`)
+
+„Fertig“ am Tag und bei den Themen einer Blockwoche springt zum nächsten Tag, der noch etwas
+braucht (`tagBrauchtNoch()`, die Regeln von `wochenBilanz()`), auch in eine andere Woche. Gesucht
+wird bis heute oder bis zum letzten Eintrag (`offenerTagAb()`), und nur nach vorn: Wer den heutigen
+Tag fertig macht und ältere Lücken hat, soll nicht an den Anfang der Ausbildung geworfen werden.
+Dann nennt die Meldung „Danach ist nichts mehr offen“ und bietet den frühesten offenen Tag als
+Knopf an (`ersterOffenerTag()`). Nach einem Sprung führt „Zurück“ hinter der Meldung wieder her.
 
 ### Hinweise und Übersicht (`hinweise.js`, `uebersicht.js`)
 
@@ -440,7 +504,7 @@ Wochenlauf arbeitet die Tage nacheinander ab und lässt sich abbrechen.
 | --- | --- |
 | Betriebliche Tätigkeit | Arbeitstage mit Text; Urlaub, Krank, Feiertag mit ihrem Grund |
 | Unterweisungen … | Text aus dem Wochenreiter, Tage mit Art „Betriebsversammlung“ |
-| Berufsschule | Tage mit Art „Berufsschule“ |
+| Berufsschule | Themen einer Blockwoche ohne Wochentag davor, dann Tage mit Art „Berufsschule“ |
 
 Jede Textzeile wird ein Stichpunkt, durchgehend in normaler Schrift; fett
 ist nur der Wochentag darüber. Punkt, Semikolon und Komma am Zeilenende fallen weg
@@ -468,9 +532,10 @@ verkleinert per `transform`. Dieselbe Quelle wie der Druck, also auch
 dieselbe Aufteilung auf mehrere Blätter.
 
 **Tägliche Notierung:** der zweite Vordruck der IHK, gewählt mit `stamm.vordruck = "taeglich"`
-(„Deine Daten → Verarbeitung“ oder der Schalter neben der Vorschau). `tagesZeilen()` in `word.js`
+(„Deine Daten → Vordruck“, die Einrichtung oder der Schalter neben der Vorschau). `tagesZeilen()` in `word.js`
 liefert je Tag eine Zeile mit Datum und Art, Montag bis Freitag immer, das Wochenende nur mit
-Eintrag, zuletzt die Unterweisungen der Woche. Stunden stehen auch hier nicht im Blatt: Die IHK fragt
+Eintrag, zuletzt die Themen einer Blockwoche (die Tage darunter stehen als „Berufsschule“) und die
+Unterweisungen der Woche. Stunden stehen auch hier nicht im Blatt: Die IHK fragt
 nach Tätigkeiten, nicht nach Stunden.
 `wochenSeite()` und `druckBlatt()` wählen den Vordruck selbst, auch beim Ausbilder, der die
 Stammdaten des Azubis mitbringt. Im Druck teilt `druckAufteilen()` eine volle Woche zeilenweise auf
@@ -478,7 +543,7 @@ wie beim wöchentlichen Blatt; in Word wiederholt sich die Kopfzeile der Tabelle
 Das Deckblatt nennt den Vordruck (`notierungTitel()`).
 
 **Kontrolle vor dem Export:** Tage mit nicht übernommenem Text oder mehr als
-Stichpunkten je Tag werden aufgelistet, ebenso ein fehlendes
+Stichpunkten je Tag werden aufgelistet, ebenso nicht übernommene Themen einer Blockwoche und ein fehlendes
 Ausbildungsjahr (sonst stünde im Kopf nur „2 /“); exportieren lässt sich trotzdem.
 
 ## Tests
@@ -495,12 +560,13 @@ npm test
 | `test/import.js` | Formate unter `test/daten/formate/`, Werte, Zeichensatz, Zuordnungsdialog, gemerkte Zuordnung, Beispiel |
 | `test/vorbehandlung.js` | Bereinigung gegen `test/korpus.js`, Vorlage für das Modell |
 | `test/ki.js` | Anbindung gegen einen nachgebauten Ollama: Prompt, Warnungen, Fehler, Wochenlauf, Abbruch; Anfragen nur an das eigene Ollama |
-| `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Rundgang, Löschen; Feiertage und Wochenstand gleich wie auf dem Server |
+| `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start, Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen |
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten neben der Vorschau, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
+| `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), Themen schreiben und übernehmen, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy |
 | `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), leise Meldung und kurzer Titel am Handy |
-| `test/handy.js` | Bei 390 und 320 px: keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
+| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
 mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).
@@ -514,7 +580,7 @@ Die Tests öffnen die Seite über http: `h.starteBrowser()` startet einen kleine
 verlor Chromium in CI gelegentlich, was die Seite direkt vor dem Neuladen gespeichert hatte
 (Bundesland, geladene Sicherung, untergeschobener Tag); lokal trat das nie auf. Bei `file://`
 bleiben nur Tests, die genau das prüfen, mit `h.DATEI_SEITE` bzw. `h.EINZELDATEI`: die
-Einzeldatei (`test/lokal.js`), das Neuladen bei leerem Speicher (Rundgang in `test/lauf.js`) und die
+Einzeldatei (`test/lokal.js`), das Neuladen bei leerem Speicher (Einrichtung in `test/lauf.js`) und die
 Suche nach dem Sprachmodell (`test/ki.js`). Solche Seiten öffnet `h.oeffnen()` zweimal:
 `ohneRundgang()` schreibt schon beim Dokumentstart in den Speicher. Das ist genau der frühe Zugriff,
 der den Speicher abkoppeln kann, und `speicherNeuLaden()` sieht dann keinen leeren Speicher. Ohne

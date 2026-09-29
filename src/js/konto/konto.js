@@ -157,7 +157,8 @@ function kontoPaket(seit, gesendet) {
     var w = wochendaten[montag] || {};
     paket.wochen.push({
       montag: montag, abteilung: w.abteilung || "",
-      unterweisungen: w.unterweisungen || "", geaendert: stempel
+      unterweisungen: w.unterweisungen || "",
+      schule: w.schule || "", schuleGeprueft: !!w.schuleGeprueft, geaendert: stempel
     });
   });
   if (stammGeaendert && (!gesendet || stammGeaendert > gesendet)) {
@@ -195,7 +196,10 @@ function kontoUebernehmen(antwort) {
   (antwort.wochen || []).forEach(function (s) {
     var eigen = wochenGeaendert[s.montag];
     if (eigen && s.geaendert <= eigen) return;
-    wochendaten[s.montag] = { abteilung: s.abteilung || "", unterweisungen: s.unterweisungen || "" };
+    wochendaten[s.montag] = {
+      abteilung: s.abteilung || "", unterweisungen: s.unterweisungen || "",
+      schule: s.schule || "", schuleGeprueft: !!s.schuleGeprueft
+    };
     wochenGeaendert[s.montag] = s.geaendert;
     zuletztGesichert["__woche:" + s.montag] = wocheKennung(wochendaten[s.montag]);
     neu = true;

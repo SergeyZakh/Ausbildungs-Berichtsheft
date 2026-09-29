@@ -12,6 +12,10 @@
  *
  * Ein gesetzlicher Feiertag ohne Eintrag zählt als frei, nicht als fehlend (feiertage.js). Ein
  * Eintrag ohne Text, Art und Stunden zählt wie keiner, etwa nach „Importierte Daten entfernen“.
+ *
+ * Hat eine Woche Themen für die Berufsschule (Blockwoche, wochen.schule), steht jeder Werktag ohne
+ * eigenen Text, der nicht frei ist, unter ihnen und hat ihren Stand. Der Server kennt den Schulplan
+ * nicht; der Browser zählt deshalb genauso (tagImWochenfeld() in src/js/kern/zustand.js).
  */
 'use strict';
 
@@ -24,6 +28,11 @@ function tagStand(tag) {
   if (tag.art && !SCHULTAGE.includes(tag.art)) return 'frei';
   if (!String(tag.text || '').trim()) return 'fehlt';
   return tag.geprueft ? 'fertig' : 'offen';
+}
+
+/** Steht der Tag unter den Themen seiner Woche: nicht frei und ohne eigenen Text? */
+function imWochenfeld(tag) {
+  return !tag || (!(tag.art && !SCHULTAGE.includes(tag.art)) && !String(tag.text || '').trim());
 }
 
 /** Kein Eintrag oder einer, in dem nichts steht. */
@@ -64,16 +73,21 @@ function werktage(von, bis) {
  * @param {string} von, bis  Zeitraum (Werktage)
  * @param {Array}  tage      Zeilen aus der Tabelle „tage“
  * @param {string} land      Kürzel des Bundeslands aus den Stammdaten, leer = bundesweit
+ * @param {Array}  angaben   Zeilen aus der Tabelle „wochen“, für die Themen einer Blockwoche
  * @returns {Array} [{ montag, fertig, offen, frei, fehlt, stand }]
  */
-function wochenUebersicht(von, bis, tage, land = '') {
+function wochenUebersicht(von, bis, tage, land = '', angaben = []) {
   const nachDatum = new Map(tage.map((t) => [t.datum, t]));
+  const schulwochen = new Map(angaben.filter((w) => String(w.schule || '').trim()).map((w) => [w.montag, w]));
   const wochen = new Map();
   for (const datum of werktage(von, bis)) {
     const schluessel = montag(datum);
     const woche = wochen.get(schluessel) || { montag: schluessel, fertig: 0, offen: 0, frei: 0, fehlt: 0 };
     const tag = nachDatum.get(datum);
-    woche[ohneEintrag(tag) && istFeiertag(datum, land) ? 'frei' : tagStand(tag)]++;
+    const block = schulwochen.get(schluessel);
+    if (ohneEintrag(tag) && istFeiertag(datum, land)) woche.frei++;
+    else if (block && imWochenfeld(tag)) woche[block.schuleGeprueft ? 'fertig' : 'offen']++;
+    else woche[tagStand(tag)]++;
     wochen.set(schluessel, woche);
   }
   return [...wochen.values()].map((w) => ({

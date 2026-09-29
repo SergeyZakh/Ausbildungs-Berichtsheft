@@ -65,7 +65,7 @@ function zeichneWochenliste() {
   if (!wochen.length) {
     var leer = document.createElement("p");
     leer.className = "leerzeile";
-    leer.textContent = "Noch kein Export geladen.";
+    leer.textContent = "Noch keine Woche mit Einträgen.";
     liste.appendChild(leer);
   }
 }
@@ -113,6 +113,49 @@ function wocheZeigen(montagIso, tag) {
   wochenwahlSchliessen();
   zeichnen();
   merken();
+}
+
+/** "Dienstag, 15.09." oder, in einer Blockwoche, "der Blockwoche 14.–20. Sep." */
+function stelleText(datumIso) {
+  var datum = vonIso(datumIso), montag = iso(montagVon(datum));
+  return blockwoche(montag)
+    ? "der Blockwoche " + kurzSpanne(vonIso(montag)) + "."
+    : WOCHENTAGE[datum.getDay()] + ", " + dm(datum);
+}
+
+/** Einen Tag öffnen; in einer Blockwoche öffnet zeichneReiter() von selbst die Woche. */
+function stelleZeigen(datumIso) {
+  var datum = vonIso(datumIso);
+  wocheZeigen(iso(montagVon(datum)), tagIndex(datum));
+  if ($("mitte")) $("mitte").scrollTop = 0;
+}
+
+/**
+ * Nach „Fertig“ gleich zum nächsten Tag, der noch etwas braucht, auch in eine andere Woche: Wer
+ * einen Block oder eine liegengebliebene Woche nacharbeitet, muss sich nicht selbst durch die
+ * Reiter klicken. „Zurück“ hinter der Meldung führt wieder her. Danach nichts mehr offen, aber
+ * davor: kein Sprung zurück, nur ein Knopf dorthin. `datumIso` ist der letzte Tag dessen, was eben
+ * fertig wurde (bei den Themen einer Woche ihr Sonntag).
+ */
+function weiterNachFertig(datumIso, meldung) {
+  var ziel = naechsterOffenerTag(datumIso);
+  if (!ziel) {
+    var frueher = ersterOffenerTag(datumIso);
+    if (!frueher) { sage(meldung + " Alles bis heute ist fertig.", "gut"); return; }
+    sage(meldung + " Danach ist nichts mehr offen.", "gut");
+    notizKnopf("Früher offen: " + dm(vonIso(frueher)), function () { stelleZeigen(frueher); });
+    return;
+  }
+  var vorher = { woche: aktiveWoche, tag: aktiverTag };
+  stelleZeigen(ziel);
+  sage(meldung + " Weiter mit " + stelleText(ziel), "gut");
+  notizKnopf("Zurück", function () {
+    aktiveWoche = vorher.woche;
+    aktiverTag = vorher.tag;
+    zeichnen();
+    merken();
+    sage("Zurück.", "");
+  });
 }
 
 /** Zu einem Datum springen – auf den Tag selbst, nicht auf seinen Montag. */

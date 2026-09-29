@@ -14,6 +14,11 @@ function zeichneWochenblatt(bereich) {
   spalte.className = "wochenspalte";
   var vorschau = blattVorschau();
 
+  // In einer Blockwoche sind die Themen das Einzige, was zu schreiben ist; sie stehen deshalb oben.
+  var block = blockwoche(aktiveWoche);
+  if (block || wochenSchule(aktiveWoche)) spalte.appendChild(schulwocheSektion(vorschau));
+  if (block) spalte.appendChild(blockTageSektion());
+
   var sAbt = sektion("Angaben für die ganze Woche");
 
   var abt = document.createElement("input");

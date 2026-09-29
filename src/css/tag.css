@@ -28,6 +28,9 @@
 .leerbild p { margin: 0 0 18px; color: var(--schiefer); }
 .leerbild .knopf + .knopf { margin-left: 8px; }
 .leerbild .leerfuss { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--linie); font-size: 12.5px; }
+/* Fehlen Pflichtangaben, steht der Weg zur Einrichtung unter der Karte, rot wie jede Lücke. */
+.leerbild .leerfehlt { margin: 10px 0 0; font-size: 12.5px; color: var(--acht); }
+.leerbild .leerfehlt .textknopf { color: inherit; }
 /* Ohne Woche steht die Startkarte allein in der Mitte des Fensters. */
 body.ohnewoche #tagbereich { align-items: center; justify-content: center; padding-bottom: 6vh; }
 body.ohnewoche .leerbild { margin: 8px 20px; }
@@ -458,3 +461,27 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 }
 .fussleiste.gut .speicherstand  { color: var(--gut); }
 .fussleiste.warn .speicherstand { color: var(--acht); }
+
+/* ---------- Blockwoche (schulwoche.js) ---------- */
+
+/* Der Satz über den Themen einer Woche, die keine Blockwoche mehr ist. */
+.schulhinweis { flex: none; margin: 0; padding: 10px 14px 0; line-height: 1.45; }
+.sektion.fertig .schulhinweis { display: none; }
+
+/* Die Tage einer Blockwoche, je eine Zeile mit ihrer Art. */
+.blocktage .sektionsleib { display: block; padding: 4px 14px 8px; }
+.blocktag {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid var(--linie);
+}
+.blocktag:last-child { border-bottom: none; }
+.blocktagname { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.blocktagfest { font-size: 13px; color: var(--schiefer); padding: 5px 8px; }
+.blocktag select { flex: 0 1 180px; min-width: 0; }
+
+/* Ein Tag unter den Themen seiner Woche: sagt, wo die Themen stehen. */
+.wochenfeldhinweis {
+  flex: none; margin: 0 0 12px; padding: 10px 14px;
+  font-size: 13px; line-height: 1.45; color: var(--schiefer);
+  background: var(--flaeche); border: 1px solid var(--gut-kante); border-radius: var(--rund);
+}

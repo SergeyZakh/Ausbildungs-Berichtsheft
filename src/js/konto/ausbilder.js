@@ -335,6 +335,18 @@ function azubiTagLeer(t) {
 }
 
 /**
+ * Die Woche, wenn der Tag unter ihren Themen für die Berufsschule steht (Blockwoche), sonst null.
+ * Dieselbe Regel wie auf dem Server (server/stand.js) und im Heft (tagImWochenfeld()).
+ */
+function azubiWochenfeld(stand, datumIso, t) {
+  var w = stand.wochen && stand.wochen[iso(montagVon(vonIso(datumIso)))];
+  if (!w || !String(w.schule || "").trim()) return null;
+  if (azubiTagLeer(t) && feiertagAn(datumIso, azubiLand(stand))) return null;
+  if (t && ((t.art && !istSchultag(t.art)) || String(t.text || "").trim())) return null;
+  return w;
+}
+
+/**
  * Lage eines Tages im Raster, mit denselben Klassen wie im Heft (tagLage()):
  *   voll    Text da, noch nicht übernommen (roter Kreis)
  *   fertig  übernommen (grüner Kreis)
@@ -343,8 +355,10 @@ function azubiTagLeer(t) {
  *   nichts  kein Eintrag
  * Ein gesetzlicher Feiertag ohne Eintrag ist frei, wie im Heft und auf dem Server.
  */
-function azubiTagLage(t, datumIso, land) {
-  if (azubiTagLeer(t)) return feiertagAn(datumIso, land) ? "frei" : "nichts";
+function azubiTagLage(t, datumIso, stand) {
+  var block = azubiWochenfeld(stand, datumIso, t);
+  if (block) return block.schuleGeprueft ? "fertig" : "voll";
+  if (azubiTagLeer(t)) return feiertagAn(datumIso, azubiLand(stand)) ? "frei" : "nichts";
   var schule = istSchultag(t.art);
   if (t.art && !schule) return "frei";
   if (!String(t.text || "").trim()) return (t.stunden || schule) ? "offen" : "nichts";
@@ -366,7 +380,7 @@ function monatsrasterZeile(montag) {
   for (var i = 0; i < TAGE_JE_WOCHE; i++) {
     var tag = plus(montag, i), t = stand.tage[iso(tag)];
     if (t && t.stunden) summe += Number(t.stunden);
-    felder.push('<span class="wtag ' + azubiTagLage(t, iso(tag), azubiLand(stand)) + '"><b>' + tag.getDate() + "</b></span>");
+    felder.push('<span class="wtag ' + azubiTagLage(t, iso(tag), stand) + '"><b>' + tag.getDate() + "</b></span>");
   }
   b.innerHTML = '<span class="wkw">' + kalenderwoche(montag) + "</span>" + felder.join("") +
     '<span class="wstd">' + (summe ? stundenText(summe) : "") + "</span>";
@@ -441,6 +455,12 @@ function tageSpalte(stand) {
     var wort = { fertig: "übernommen", offen: "nicht übernommen", frei: frei ? sicher(t.art) : "Feiertag",
       fehlt: leer ? "kein Eintrag" : "kein Text", kommt: "steht noch aus" }[lage];
     if (schule) wort = sicher(t.art) + ", " + wort;
+    // In einer Blockwoche gilt für den Tag, was mit den Themen der Woche ist.
+    var block = azubiWochenfeld(stand, key, t);
+    if (block) {
+      lage = block.schuleGeprueft ? "fertig" : "offen";
+      wort = "Blockwoche, " + (block.schuleGeprueft ? "übernommen" : "nicht übernommen");
+    }
     var marke = lage === "fertig" ? '<span class="haken">✓</span>'
       : lage === "offen" ? '<span class="marke">!</span>' : '<span class="punkt"></span>';
     zeilen.push('<li class="' + lage + '"><span class="atagname">' + KURZ[datum.getDay()] + " " + dm(datum) + "</span>" +
@@ -466,7 +486,8 @@ function angabenSektion(stand) {
   };
   sW.leib.innerHTML =
     wert("Abteilung", (w && w.abteilung) || stamm.abteilung, "nicht angegeben") +
-    wert("Unterweisungen", w && w.unterweisungen, "nichts eingetragen");
+    wert("Unterweisungen", w && w.unterweisungen, "nichts eingetragen") +
+    (w && String(w.schule || "").trim() ? wert("Berufsschule (Blockwoche)", w.schule, "") : "");
   return sW.wurzel;
 }
 
@@ -536,7 +557,9 @@ function mitAzubiStand(stand, aufgabe) {
   tage = eigeneTage;
   wochendaten = {};
   Object.keys(stand.wochen).forEach(function (m) {
-    wochendaten[m] = { abteilung: stand.wochen[m].abteilung || "", unterweisungen: stand.wochen[m].unterweisungen || "" };
+    var w = stand.wochen[m];
+    wochendaten[m] = { abteilung: w.abteilung || "", unterweisungen: w.unterweisungen || "",
+      schule: w.schule || "", schuleGeprueft: !!w.schuleGeprueft };
   });
   var azubiStamm = (stand.stamm && stand.stamm.daten) || {};
   Object.keys(azubiStamm).forEach(function (k) {
