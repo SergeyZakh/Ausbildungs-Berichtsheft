@@ -10,30 +10,30 @@
   display: flex; flex-direction: column;
 }
 .tagpanel {
-  flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px;
-  overflow: hidden; padding: 0 20px 16px;
+  flex: 1 1 auto; display: flex; flex-direction: column; gap: var(--luft-3);
+  overflow: hidden; padding: 0 var(--luft-5) var(--luft-4);
   animation: auftauchen .18s ease-out;
 }
 @keyframes auftauchen { from { opacity: 0; transform: translateY(3px); } }
 /* Freier Tag: Karten im Grau. */
 .tagpanel.frei .sektion { background: var(--band); }
-.ruhig { color: var(--schiefer); font-size: 13px; }
+.ruhig { color: var(--schiefer); font-size: var(--schrift-text); }
 
 .leerbild {
-  margin: 8px 20px; padding: 40px 36px; max-width: 520px;
+  margin: var(--luft-2) var(--luft-5); padding: var(--luft-8); max-width: 520px;
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund);
   box-shadow: var(--schatten);
 }
-.leerbild h2 { margin: 0 0 8px; font-size: 17px; }
-.leerbild p { margin: 0 0 18px; color: var(--schiefer); }
-.leerbild .knopf + .knopf { margin-left: 8px; }
-.leerbild .leerfuss { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--linie); font-size: 12.5px; }
+.leerbild h2 { margin: 0 0 var(--luft-2); font-size: var(--schrift-titel); }
+.leerbild p { margin: 0 0 var(--luft-5); color: var(--schiefer); }
+.leerbild .knopf + .knopf { margin-left: var(--luft-2); }
+.leerbild .leerfuss { margin: var(--luft-5) 0 0; padding-top: var(--luft-4); border-top: 1px solid var(--linie); font-size: var(--schrift-klein); }
 /* Fehlen Pflichtangaben, steht der Weg zur Einrichtung unter der Karte, rot wie jede Lücke. */
-.leerbild .leerfehlt { margin: 10px 0 0; font-size: 12.5px; color: var(--acht); }
+.leerbild .leerfehlt { margin: var(--luft-3) 0 0; font-size: var(--schrift-klein); color: var(--acht); }
 .leerbild .leerfehlt .textknopf { color: inherit; }
 /* Ohne Woche steht die Startkarte allein in der Mitte des Fensters. */
 body.ohnewoche #tagbereich { align-items: center; justify-content: center; padding-bottom: 6vh; }
-body.ohnewoche .leerbild { margin: 8px 20px; }
+body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 .textknopf {
   padding: 0; font: inherit; color: var(--text); background: none; border: 0;
   text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--linie-fest);
@@ -50,20 +50,20 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 }
 .sektion.wachsend { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 110px; }
 .sektionskopf {
-  margin: 0; padding: 7px 10px 7px 14px; min-height: 38px; display: flex; align-items: center; gap: 8px;
-  font-size: 11px; font-weight: 600; letter-spacing: .09em; line-height: 1.35;
+  margin: 0; padding: var(--luft-2) var(--luft-3) var(--luft-2) var(--luft-4); min-height: 38px; display: flex; align-items: center; gap: var(--luft-2);
+  font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung); line-height: 1.35;
   text-transform: uppercase; color: var(--text);
   background: var(--band); border-bottom: 1px solid var(--linie);
 }
 .sektionskopf > span:first-child { flex: 1 1 auto; min-width: 0; }
-.sektionsleib { padding: 10px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 26px; }
+.sektionsleib { padding: var(--luft-3) var(--luft-4); display: flex; flex-wrap: wrap; align-items: center; gap: var(--luft-2) var(--luft-6); }
 .sektion.wachsend .sektionsleib {
   flex: 1 1 auto; padding: 0; min-height: 0;
   display: flex; flex-direction: column; align-items: stretch;
 }
 
 /* Text links, Buchungen rechts (nach .sektion.wachsend, damit flex hier gilt). */
-.tagflaeche { flex: 1 1 auto; display: flex; gap: 12px; min-height: 0; align-items: stretch; }
+.tagflaeche { flex: 1 1 auto; display: flex; gap: var(--luft-3); min-height: 0; align-items: stretch; }
 .tagflaeche > .sektion { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
 .tagflaeche > .sektion.posten { flex: 0 0 340px; }
 .tagflaeche > .sektion > .sektionsleib { flex: 1 1 auto; min-height: 0; }
@@ -82,28 +82,28 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 /* Drei Gewichte im Band: Fahne = Marke, Knopf = Möglichkeit,
    gefüllter Knopf = nächster Schritt. Alle als Pillen. */
 .sektionsfahne {
-  flex: none; padding: 2px 9px; border: 1px solid currentColor; border-radius: 999px;
-  background: transparent; font-size: 9.5px; font-weight: 600; letter-spacing: .1em; color: var(--acht);
+  flex: none; padding: 2px var(--luft-2); border: 1px solid currentColor; border-radius: var(--rund-voll);
+  background: transparent; font-size: var(--schrift-marke); font-weight: 600; letter-spacing: var(--sperrung); color: var(--acht);
 }
 .sektionsknopf {
-  flex: none; display: inline-flex; align-items: center; gap: 5px;
-  font: inherit; font-size: 10.5px; font-weight: 600; letter-spacing: .06em;
+  flex: none; display: inline-flex; align-items: center; gap: var(--luft-1);
+  font: inherit; font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung);
   text-transform: uppercase; white-space: nowrap;
   background: var(--flaeche); color: var(--text);
-  border: 1px solid var(--linie); border-radius: 999px; padding: 5px 12px;
+  border: 1px solid var(--linie); border-radius: var(--rund-voll); padding: var(--luft-1) var(--luft-3);
   transition: background-color .15s, color .15s, border-color .15s;
 }
 .sektionsknopf:hover { background: var(--band); border-color: var(--linie-fest); }
 .sektionsknopf:disabled { opacity: .45; cursor: default; }
 .sektionsknopf.uebernehmen { background: var(--acht); color: #fff; border-color: var(--acht); }
-.sektionsknopf.uebernehmen::before { content: "\2713"; font-size: 11px; }
+.sektionsknopf.uebernehmen::before { content: "\2713"; font-size: var(--schrift-fein); }
 .sektionsknopf.uebernehmen:hover { background: var(--acht-tief); border-color: var(--acht-tief); }
 .sektionsknopf.bearbeiten { border-color: var(--gut); color: var(--gut); background: var(--flaeche); }
 .sektionsknopf.bearbeiten:hover { background: var(--gut); color: #fff; }
-.sektionsknopf .stift { font-size: 12px; line-height: 1; }
+.sektionsknopf .stift { font-size: var(--schrift-klein); line-height: 1; }
 
 /* ---------- Wochenansicht: Angaben links, Blattvorschau rechts ---------- */
-.wochenspalte { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.wochenspalte { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--luft-3); }
 
 /* Woche (Azubi) und Heft eines Azubis (Ausbilder): das Blatt in der Mitte, links was man
    einträgt bzw. der Stand der Tage, rechts Stand des Blatts, KI und Export. */
@@ -111,7 +111,7 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 .tagflaeche.dreispaltig > .wochenspalte { flex: 1 1 0; max-width: 440px; }
 .tagflaeche.dreispaltig > .sektion.vorschau { flex: 0 1 640px; }
 .tagflaeche.dreispaltig > .sektion.vorschau .textfuss { display: none; }
-.seitenspalte { flex: 0 1 300px; min-width: 220px; display: flex; flex-direction: column; gap: 12px; }
+.seitenspalte { flex: 0 1 300px; min-width: 220px; display: flex; flex-direction: column; gap: var(--luft-3); }
 
 /* Scrollen wie im Heft eines Azubis: Das ganze Feld scrollt, das Blatt steht in voller Länge,
    links und rechts bleiben stehen. Beim Azubi scrollt dafür das Panel selbst, beim Ausbilder
@@ -164,17 +164,17 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 /* Rechte Spalte: eine Karte, darin Umfang und KI als Blöcke mit gleichem Rand.
    Der Kartenkörper ist sonst eine Flex-Zeile und schob die Knöpfe auf Textbreite zusammen. */
 .seitenspalte .sektionsleib { display: block; padding: 0; }
-.seitenblock { padding: 12px 14px 14px; }
+.seitenblock { padding: var(--luft-3) var(--luft-4) var(--luft-4); }
 .seitenblock + .seitenblock { border-top: 1px solid var(--linie); }
 .seitenblock[hidden] { display: none; }
 .seitentitel {
-  font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--schiefer); margin-bottom: 8px;
+  font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung); text-transform: uppercase;
+  color: var(--schiefer); margin-bottom: var(--luft-2);
 }
-.seitenwert { margin: 0; font-size: 13px; line-height: 1.45; white-space: pre-line; overflow-wrap: anywhere; }
+.seitenwert { margin: 0; font-size: var(--schrift-text); line-height: 1.5; white-space: pre-line; overflow-wrap: anywhere; }
 .seitenspalte .textfuss { border: 0; padding: 0; }
-.seitenspalte .textstand { margin-left: 0; font-size: 13px; }
-.seitenspalte .kislot { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; }
+.seitenspalte .textstand { margin-left: 0; font-size: var(--schrift-text); }
+.seitenspalte .kislot { display: flex; flex-direction: column; align-items: stretch; gap: var(--luft-2); padding: 0; }
 .seitenspalte .kislot > * { width: 100%; justify-content: center; }
 @media (max-width: 1180px) {
   .tagflaeche.dreispaltig { flex-wrap: wrap; }
@@ -188,10 +188,10 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 .sektion.vorschau .sektionsleib {
   padding: 0; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; overflow: hidden;
 }
-.sektion.vorschau .textfuss { border-top: 1px solid var(--linie); gap: 10px; flex-wrap: wrap; }
+.sektion.vorschau .textfuss { border-top: 1px solid var(--linie); gap: var(--luft-3); flex-wrap: wrap; }
 .vorschaubuehne {
-  flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 16px;
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: var(--luft-4);
+  display: flex; flex-direction: column; align-items: center; gap: var(--luft-4);
   background: var(--buehne);
 }
 /* Ein A4-Bogen in echter Größe, verkleinert per transform; der Rahmen
@@ -204,19 +204,19 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 }
 
 /* ---------- Eingaben im Tag ---------- */
-.feldpaar { display: flex; align-items: center; gap: 8px; }
-.feldetikett { font-size: 12px; color: var(--schiefer); white-space: nowrap; }
+.feldpaar { display: flex; align-items: center; gap: var(--luft-2); }
+.feldetikett { font-size: var(--schrift-klein); color: var(--schiefer); white-space: nowrap; }
 
 .tagpanel select {
-  font: inherit; font-size: 13px; color: var(--text); width: auto;
+  font: inherit; font-size: var(--schrift-text); color: var(--text); width: auto;
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-klein);
-  padding: 5px 8px;
+  padding: var(--luft-1) var(--luft-2);
 }
 .tagpanel select:hover, .tagpanel select:focus { background: var(--band); border-color: var(--linie-fest); }
 
 .tagpanel textarea {
-  flex: 1 1 auto; width: 100%; min-height: 100px; padding: 12px 14px;
-  font: inherit; font-size: 14.5px; line-height: 1.6;
+  flex: 1 1 auto; width: 100%; min-height: 100px; padding: var(--luft-3) var(--luft-4);
+  font: inherit; font-size: var(--schrift-gross); line-height: 1.6;
   color: var(--text); background: var(--flaeche);
   border: none; resize: none; overflow: auto;
 }
@@ -234,17 +234,17 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 .tagpanel textarea[readonly]:focus,
 .tagpanel textarea[readonly]:focus-visible { box-shadow: none; }
 
-.stdwrap { display: inline-flex; align-items: baseline; gap: 3px; }
-.stdwrap .einheit { font-size: 12.5px; color: var(--schiefer); }
+.stdwrap { display: inline-flex; align-items: baseline; gap: var(--luft-1); }
+.stdwrap .einheit { font-size: var(--schrift-klein); color: var(--schiefer); }
 .stdfeld {
   display: inline-block; min-width: 52px; text-align: right;
-  font: inherit; font-size: 13.5px; font-weight: 600;
+  font: inherit; font-size: var(--schrift-text); font-weight: 600;
   color: var(--text); font-variant-numeric: tabular-nums;
 }
 
 .abteilungsfeld {
-  font: inherit; font-size: 13.5px; color: var(--text); background: var(--flaeche);
-  border: 1px solid var(--linie); border-radius: var(--rund-klein); padding: 6px 10px;
+  font: inherit; font-size: var(--schrift-text); color: var(--text); background: var(--flaeche);
+  border: 1px solid var(--linie); border-radius: var(--rund-klein); padding: var(--luft-2) var(--luft-3);
   min-width: 200px; flex: 1 1 320px; max-width: 420px;
 }
 .abteilungsfeld:hover { border-color: var(--linie-fest); }
@@ -252,10 +252,10 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 
 /* Zeilenstand unter dem Text: passt der Text in den Vordruck? */
 .textfuss {
-  flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 12px 10px 10px;
-  font-size: 11.5px; font-variant-numeric: tabular-nums; font-weight: 500;
+  flex: none; display: flex; align-items: center; gap: var(--luft-3); padding: var(--luft-2) var(--luft-3) var(--luft-3);
+  font-size: var(--schrift-klein); font-variant-numeric: tabular-nums; font-weight: 600;
 }
-.textstand { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.textstand { margin-left: auto; display: flex; align-items: center; gap: var(--luft-2); }
 .textstand::before {
   content: ""; width: 8px; height: 8px; border-radius: 50%;
   background: currentColor; flex: none;
@@ -267,62 +267,62 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 
 /* KI unten links im Feld: schwarze Pille mit ✦ im weißen Kreis. Während
    des Laufs steht an derselben Stelle eine gleich gebaute Statuspille. */
-.kislot { display: flex; gap: 6px; min-width: 0; flex-wrap: wrap; }
+.kislot { display: flex; gap: var(--luft-2); min-width: 0; flex-wrap: wrap; }
 .sektionsknopf.kiknopf,
 .kistatus {
-  display: inline-flex; align-items: center; gap: 8px; height: 30px;
-  border-radius: 999px; font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none;
+  display: inline-flex; align-items: center; gap: var(--luft-2); height: 30px;
+  border-radius: var(--rund-voll); font-size: var(--schrift-klein); font-weight: 600; letter-spacing: 0; text-transform: none;
   background: var(--text); color: var(--flaeche); border: 1px solid var(--text);
 }
-.sektionsknopf.kiknopf { padding: 0 16px 0 3px; }
+.sektionsknopf.kiknopf { padding: 0 var(--luft-4) 0 var(--luft-1); }
 .sektionsknopf.kiknopf::before {
   content: "\2726"; flex: none; display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border-radius: 50%; font-size: 11px;
+  width: 22px; height: 22px; border-radius: 50%; font-size: var(--schrift-fein);
   background: var(--flaeche); color: var(--text);
 }
 .sektionsknopf.kiknopf:hover:not(:disabled) { background: var(--voll-hover); border-color: var(--voll-hover); }
 .sektionsknopf.kiknopf:disabled { opacity: .35; }
 /* "Original zurück": helle Pille, Pfeil im dunklen Kreis. */
 .sektionsknopf.kiknopf.zurueck { background: var(--flaeche); color: var(--text); border-color: var(--linie); }
-.sektionsknopf.kiknopf.zurueck::before { content: "\21BA"; font-size: 13px; background: var(--text); color: var(--flaeche); }
+.sektionsknopf.kiknopf.zurueck::before { content: "\21BA"; font-size: var(--schrift-text); background: var(--text); color: var(--flaeche); }
 .sektionsknopf.kiknopf.zurueck:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
 .sektionsknopf.kiknopf.zurueck.sicher,
 .sektionsknopf.kiknopf.zurueck.sicher:hover:not(:disabled) { background: var(--acht); border-color: var(--acht); color: #fff; }
 .sektionsknopf.kiknopf.zurueck.sicher::before { background: #fff; color: var(--acht); }
 
-.kistatus { padding: 0 3px 0 6px; white-space: nowrap; }
+.kistatus { padding: 0 var(--luft-1) 0 var(--luft-2); white-space: nowrap; }
 .kistatus .fpunkt {
   flex: none; width: 16px; height: 16px; border-radius: 50%;
   border: 2px solid color-mix(in srgb, var(--flaeche) 25%, transparent); border-top-color: var(--flaeche);
   animation: dreh .9s linear infinite;
 }
-.kistatus b { font-weight: 500; }
+.kistatus b { font-weight: 600; }
 .kistatus .ksek { font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--flaeche) 60%, transparent); }
 .kistatus .ksek:empty { display: none; }
 .kiabbruch {
-  font: inherit; font-size: 11.5px; color: var(--flaeche); cursor: pointer;
-  background: color-mix(in srgb, var(--flaeche) 14%, transparent); border: none; border-radius: 999px; padding: 3px 11px;
+  font: inherit; font-size: var(--schrift-klein); color: var(--flaeche); cursor: pointer;
+  background: color-mix(in srgb, var(--flaeche) 14%, transparent); border: none; border-radius: var(--rund-voll); padding: var(--luft-1) var(--luft-3);
 }
 .kiabbruch:hover:not(:disabled) { background: color-mix(in srgb, var(--flaeche) 24%, transparent); }
 .kiabbruch:disabled { opacity: .5; cursor: default; }
 
 /* Buchungen aus Kimai neben dem Text. */
 .postenzahl {
-  flex: none; font-size: 10px; letter-spacing: .07em; color: var(--schiefer);
-  background: var(--flaeche); border: 1px solid var(--linie); border-radius: 999px; padding: 1px 8px;
+  flex: none; font-size: var(--schrift-fein); letter-spacing: var(--sperrung); color: var(--schiefer);
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-voll); padding: 1px var(--luft-2);
 }
 .sektion.posten .sektionsleib { padding: 0; display: block; overflow: hidden; }
 .postenliste {
   flex: none; height: 100%; overflow-y: auto;
-  background: var(--posten-grund); padding: 8px 14px 10px;
+  background: var(--posten-grund); padding: var(--luft-2) var(--luft-4) var(--luft-3);
 }
 .postenliste p {
-  margin: 0; padding: 5px 0; font-size: 12.5px; color: var(--schiefer);
-  display: flex; gap: 12px; align-items: baseline;
+  margin: 0; padding: var(--luft-2) 0; font-size: var(--schrift-klein); color: var(--schiefer);
+  display: flex; gap: var(--luft-3); align-items: baseline;
   border-bottom: 1px solid var(--linie-leise);
 }
 .postenliste p:last-child { border-bottom: none; }
-.postenliste .pzeit { flex: 0 0 92px; font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--text); }
+.postenliste .pzeit { flex: 0 0 92px; font-size: var(--schrift-klein); font-variant-numeric: tabular-nums; color: var(--text); }
 /* Zwei Zeilen je Buchung, der Rest auf Klick. */
 .postenliste p:has(.ptext) { cursor: pointer; }
 .postenliste p:has(.ptext):hover .ptext { color: var(--text); }
@@ -333,37 +333,36 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 .postenliste p.offen .ptext { display: block; -webkit-line-clamp: unset; color: var(--text); }
 .postenliste .pleer { color: var(--blass); font-style: italic; border-bottom: none; }
 /* Plus am Ende der Buchung: als Zeile in den Text (postenSektion). */
-.postenliste p:has(.pdazu) { position: relative; padding-right: 38px; }
+.postenliste p:has(.pdazu) { position: relative; padding-right: var(--luft-8); }
 .pdazu {
   position: absolute; right: 0; top: 50%; transform: translateY(-50%);
   width: 26px; height: 26px; padding: 0; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
-  font: inherit; font-size: 15px; line-height: 1; color: var(--text);
+  font: inherit; font-size: var(--schrift-gross); line-height: 1; color: var(--text);
   background: var(--flaeche); border: 1px solid var(--linie);
   transition: background-color .15s, border-color .15s;
 }
 .pdazu:hover { background: var(--band); border-color: var(--linie-fest); }
-.pdazu.drin { font-size: 12px; color: var(--gut); background: var(--gut-hell); border-color: var(--gut-kante); }
+.pdazu.drin { font-size: var(--schrift-klein); color: var(--gut); background: var(--gut-hell); border-color: var(--gut-kante); }
 
 /* ---------- Hinweis über den Reitern (hinweise.js) ----------
    Eine Karte wie der Fortschritt darunter. Rot nur im Titel: Der Hinweis soll auffallen, aber
    nicht aussehen wie ein Tag, der gegengelesen werden muss. */
-.hinweise { flex: none; margin: 0 20px 12px; }
+.hinweise { flex: none; margin: 0 var(--luft-5) var(--luft-3); }
 .hinweis {
-  position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px;
-  padding: 10px 44px 10px 16px;
+  position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: var(--luft-2) var(--luft-4);
+  padding: var(--luft-3) var(--luft-8) var(--luft-3) var(--luft-4);
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund);
   box-shadow: var(--schatten); animation: auftauchen .2s ease-out;
 }
-.hinweistext { flex: 1 1 320px; margin: 0; font-size: 13px; line-height: 1.45; color: var(--schiefer); }
+.hinweistext { flex: 1 1 320px; margin: 0; font-size: var(--schrift-text); line-height: 1.5; color: var(--schiefer); }
 .hinweistext b { color: var(--text); font-weight: 600; margin-right: 2px; }
 .hinweis.warn .hinweistext b { color: var(--acht); }
-.hinweisknoepfe { flex: none; display: flex; gap: 8px; flex-wrap: wrap; }
-.hinweisknoepfe .knopf { border-radius: 999px; }
+.hinweisknoepfe { flex: none; display: flex; gap: var(--luft-2); flex-wrap: wrap; }
 .hinweiszu {
   position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; padding: 0;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 18px; line-height: 1; color: var(--schiefer);
+  font-size: var(--schrift-titel); line-height: 1; color: var(--schiefer);
   background: transparent; border: 0; border-radius: 50%;
 }
 .hinweiszu:hover { background: var(--band); color: var(--text); }
@@ -373,15 +372,15 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
    werden der Tag und die verstrichene Zeit, als schwebende Glasleiste
    über dem Text. */
 .fortschritt {
-  flex: none; display: flex; align-items: center; gap: 12px;
-  margin: 0 20px 12px; padding: 7px 7px 7px 14px;
+  flex: none; display: flex; align-items: center; gap: var(--luft-3);
+  margin: 0 var(--luft-5) var(--luft-3); padding: var(--luft-2) var(--luft-2) var(--luft-2) var(--luft-4);
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund);
   box-shadow: var(--schatten);
   animation: auftauchen .2s ease-out;
 }
 .ftext {
-  flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px;
-  font-size: 12.5px; font-variant-numeric: tabular-nums;
+  flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: var(--luft-3);
+  font-size: var(--schrift-klein); font-variant-numeric: tabular-nums;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text);
 }
 /* Statt eines Punkts ein drehender Ring: Es arbeitet, wie lange, weiß keiner. */
@@ -391,10 +390,10 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
   animation: dreh .9s linear infinite;
 }
 .fuhr {
-  flex: none; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--schiefer);
-  padding: 2px 9px; border-radius: 999px; background: var(--band); border: 1px solid var(--linie);
+  flex: none; font-size: var(--schrift-klein); font-variant-numeric: tabular-nums; color: var(--schiefer);
+  padding: 2px var(--luft-2); border-radius: var(--rund-voll); background: var(--band); border: 1px solid var(--linie);
 }
-.fortschritt .knopf { flex: none; padding: 5px 13px; font-size: 12px; border-radius: 999px; }
+.fortschritt .knopf { flex: none; padding: var(--luft-1) var(--luft-3); font-size: var(--schrift-klein); }
 .ftext b { font-weight: 600; }
 .fzahl { color: var(--schiefer); }
 .fuhr:empty { display: none; }
@@ -403,25 +402,25 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
    Bei Erfolg oder Warnung färbt sich die ganze Leiste; der Wortlaut
    trägt die Aussage trotzdem allein. */
 .fussleiste {
-  flex: none; display: flex; align-items: center; gap: 14px;
-  padding: 5px 20px 6px; border-top: 1px solid var(--linie); background: var(--flaeche);
+  flex: none; display: flex; align-items: center; gap: var(--luft-4);
+  padding: var(--luft-1) var(--luft-5) var(--luft-2); border-top: 1px solid var(--linie); background: var(--flaeche);
   min-height: 28px; transition: background-color .15s, border-color .15s;
 }
 .fussleiste.gut  { background: var(--gut-hell); border-top-color: var(--gut-kante); }
 .fussleiste.warn { background: var(--acht-hell); border-top-color: var(--acht-kante); }
-.notiz { flex: 1 1 auto; margin: 0; font-size: 11.5px; color: var(--schiefer); }
-.notiz.gut  { color: var(--gut); font-weight: 500; }
-.notiz.warn { color: var(--acht); font-weight: 500; }
+.notiz { flex: 1 1 auto; margin: 0; font-size: var(--schrift-klein); color: var(--schiefer); }
+.notiz.gut  { color: var(--gut); font-weight: 600; }
+.notiz.warn { color: var(--acht); font-weight: 600; }
 /* Knopf hinter einer Meldung, etwa „Spalten prüfen“ nach dem Import. */
 .notizknopf {
-  margin-left: 10px; padding: 1px 8px; font: inherit; font-weight: 500; color: inherit;
-  background: transparent; border: 1px solid currentColor; border-radius: 999px; cursor: pointer; opacity: .85;
+  margin-left: var(--luft-3); padding: 1px var(--luft-2); font: inherit; font-weight: 600; color: inherit;
+  background: transparent; border: 1px solid currentColor; border-radius: var(--rund-voll); cursor: pointer; opacity: .85;
 }
 .notizknopf:hover { opacity: 1; background: color-mix(in srgb, var(--flaeche) 60%, transparent); }
 /* Wer das Werkzeug gebaut hat, für wen und unter welcher Lizenz. Leise gesetzt:
    Sie steht immer da und soll nie mit einer Meldung um Aufmerksamkeit ringen. */
 .signatur {
-  flex: none; margin: 0; font-size: 10.5px; color: var(--schiefer);
+  flex: none; margin: 0; font-size: var(--schrift-fein); color: var(--schiefer);
   white-space: nowrap; opacity: .7;
 }
 /* Kein eigener Farbton: Grün und Rot sind hier die einzigen Farben (basis.css). */
@@ -431,8 +430,8 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 
 /* Speicherstand mit Punkt, der nach jedem Speichern kurz aufleuchtet. */
 .speicherstand {
-  flex: none; display: inline-flex; align-items: center; gap: 6px;
-  font-size: 10.5px; color: var(--schiefer); white-space: nowrap;
+  flex: none; display: inline-flex; align-items: center; gap: var(--luft-2);
+  font-size: var(--schrift-fein); color: var(--schiefer); white-space: nowrap;
 }
 /* Der Punkt nimmt die Farbe der Leiste an, damit er einer roten Meldung
    nicht widerspricht. */
@@ -450,23 +449,23 @@ body.ohnewoche .leerbild { margin: 8px 20px; }
 /* ---------- Blockwoche (schulwoche.js) ---------- */
 
 /* Der Satz über den Themen einer Woche, die keine Blockwoche mehr ist. */
-.schulhinweis { flex: none; margin: 0; padding: 10px 14px 0; line-height: 1.45; }
+.schulhinweis { flex: none; margin: 0; padding: var(--luft-3) var(--luft-4) 0; line-height: 1.5; }
 .sektion.fertig .schulhinweis { display: none; }
 
 /* Die Tage einer Blockwoche, je eine Zeile mit ihrer Art. */
-.blocktage .sektionsleib { display: block; padding: 4px 14px 8px; }
+.blocktage .sektionsleib { display: block; padding: var(--luft-1) var(--luft-4) var(--luft-2); }
 .blocktag {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 5px 0; border-bottom: 1px solid var(--linie);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--luft-3);
+  padding: var(--luft-1) 0; border-bottom: 1px solid var(--linie);
 }
 .blocktag:last-child { border-bottom: none; }
-.blocktagname { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.blocktagfest { font-size: 13px; color: var(--schiefer); padding: 5px 8px; }
+.blocktagname { font-size: var(--schrift-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.blocktagfest { font-size: var(--schrift-text); color: var(--schiefer); padding: var(--luft-1) var(--luft-2); }
 .blocktag select { flex: 0 1 180px; min-width: 0; }
 
 /* Ein Tag unter den Themen seiner Woche: sagt, wo die Themen stehen. */
 .wochenfeldhinweis {
-  flex: none; margin: 0 0 12px; padding: 10px 14px;
-  font-size: 13px; line-height: 1.45; color: var(--schiefer);
+  flex: none; margin: 0 0 var(--luft-3); padding: var(--luft-3) var(--luft-4);
+  font-size: var(--schrift-text); line-height: 1.5; color: var(--schiefer);
   background: var(--flaeche); border: 1px solid var(--gut-kante); border-radius: var(--rund);
 }

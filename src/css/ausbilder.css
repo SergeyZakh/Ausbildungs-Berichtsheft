@@ -4,10 +4,10 @@
 
 /* ---------- Konto und Ausbilder-Ansicht (nur mit Berichtsheft-Server) ---------- */
 
-.konto { display: flex; align-items: center; gap: 10px; margin-right: 6px; }
-.kontoname { font-size: 13px; font-weight: 600; }
+.konto { display: flex; align-items: center; gap: var(--luft-3); margin-right: var(--luft-2); }
+.kontoname { font-size: var(--schrift-text); font-weight: 600; }
 /* Punkt davor: grün, solange alles im Konto liegt; rot, wenn etwas nur hier liegt. */
-.kontostand { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--schiefer); }
+.kontostand { display: inline-flex; align-items: center; gap: var(--luft-2); font-size: var(--schrift-klein); color: var(--schiefer); }
 /* Feste Breite für den längsten Text („nur auf diesem Gerät“, gemessen 128 px = 10,7em): Der Stand
    wechselt bei jedem Sichern, und mit ihm sprang der Wochenknopf daneben um 15 px hin und her. */
 .kontostand:not(:empty) { min-width: 10.8em; }
@@ -15,7 +15,7 @@
 .kontostand:empty::before { display: none; }
 .kontostand.offen { color: var(--acht); }
 .kontostand.offen::before { background: var(--acht); }
-.kontolink { font-size: 12px; color: var(--schiefer); }
+.kontolink { font-size: var(--schrift-klein); color: var(--schiefer); }
 
 /* Ausbilder führen kein eigenes Heft: Wochenwahl, Reiter und Tagesansicht des Hefts
    bleiben weg. Die Ansicht bringt ihr eigenes Gerüst im selben Aufbau mit. */
@@ -26,40 +26,39 @@ body.alsausbilder .reiter,
 body.alsausbilder #tagbereich { display: none; }
 body.alsausbilder .leiste { display: none; }
 /* Person und Abmelden stehen beim Ausbilder rechts in seiner Leiste, abgesetzt durch eine Linie. */
-.aleiste .konto { margin: 0 0 0 6px; padding-left: 16px; border-left: 1px solid var(--linie); height: 28px; }
+.aleiste .konto { margin: 0 0 0 var(--luft-2); padding-left: var(--luft-4); border-left: 1px solid var(--linie); height: 28px; }
 .aleiste #a-hilfe { flex: none; font-weight: 600; }
 
 #ausbilder { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
 
 /* Zweite Leiste: Wochenschalter, Stand der Woche, Export, Gruppe. */
-.aleiste { flex: none; display: flex; align-items: center; gap: 10px; padding: 8px 20px 12px; }
+.aleiste { flex: none; display: flex; align-items: center; gap: var(--luft-3); padding: var(--luft-2) var(--luft-5) var(--luft-3); }
 .aleiste .wochenschalter { flex: 1 1 auto; max-width: 560px; }
 .aleiste .menuehalter, .aleiste #btn-gruppe { flex: none; }
 .aleiste #a-exporthalter { margin-left: auto; }
 .aleiste #a-exporthalter[hidden] + #btn-gruppe { margin-left: auto; }
-.aleiste .knopf { border-radius: 999px; padding: 7px 16px; }
 #a-wochenlabel { font-variant-numeric: tabular-nums; }
 
 /* Inhalt scrollt, der Rahmen bleibt stehen – wie im Heft. */
-.abereich { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 0 20px 20px; }
+.abereich { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 0 var(--luft-5) var(--luft-5); }
 
 /* Stand eines Tages in der Liste neben der Blattvorschau. */
-.atagstand { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; letter-spacing: .02em; color: var(--schiefer); }
+.atagstand { display: inline-flex; align-items: center; gap: var(--luft-2); font-size: var(--schrift-klein); color: var(--schiefer); }
 .atagstand .marke { background: var(--acht); }
 .atagstand .haken { background: var(--gut); }
 .atagstand .marke, .atagstand .haken {
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px;
-  font-size: 9px; font-weight: 700; color: #fff;
+  min-width: 16px; height: 16px; padding: 0 var(--luft-1); border-radius: var(--rund-voll);
+  font-size: var(--schrift-marke); font-weight: 600; color: #fff;
 }
 .astunden { color: var(--text); font-variant-numeric: tabular-nums; }
 
 .gruppenliste { list-style: none; margin: 0; padding: 0; }
-.gruppenliste li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--linie); }
+.gruppenliste li { display: flex; align-items: center; justify-content: space-between; gap: var(--luft-3); padding: var(--luft-2) 0; border-bottom: 1px solid var(--linie); }
 .gruppenliste li:last-child { border-bottom: none; }
-#dlg-gruppe-inhalt h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--schiefer); margin: 14px 0 4px; }
+#dlg-gruppe-inhalt h3 { font-size: var(--schrift-klein); text-transform: uppercase; letter-spacing: var(--sperrung); color: var(--schiefer); margin: var(--luft-4) 0 var(--luft-1); }
 #dlg-gruppe-inhalt h3:first-child { margin-top: 0; }
-.knopf.klein { padding: 3px 11px; font-size: 12.5px; }
+.knopf.klein { padding: var(--luft-1) var(--luft-3); font-size: var(--schrift-klein); }
 
 @media (max-width: 820px) {
   .aleiste { flex-wrap: wrap; }
@@ -67,7 +66,7 @@ body.alsausbilder .leiste { display: none; }
 
 /* Ausbilder: schmale Spalte mit dem Stand der Tage neben der Blattvorschau. */
 .atageliste { list-style: none; margin: 0; padding: 0; }
-.atageliste li { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--linie); }
+.atageliste li { display: flex; align-items: center; gap: var(--luft-3); padding: var(--luft-2) 0; font-size: var(--schrift-text); border-bottom: 1px solid var(--linie); }
 .atageliste li:last-child { border-bottom: none; }
 .atagname { width: 5.5em; font-weight: 600; font-variant-numeric: tabular-nums; }
 .atageliste .astunden { margin-left: auto; color: var(--schiefer); font-variant-numeric: tabular-nums; }
@@ -76,12 +75,11 @@ body.alsausbilder .leiste { display: none; }
 .atageliste li.kommt { opacity: .6; }
 
 /* Ausbilder, Bild 1: Auswahl. Bild 2 (ein Heft) nutzt Wochenleiste und Sektionen wie im Heft. */
-.atitel { font-size: 17px; margin: 0; }
-.aleiste .knopf.zurueck { padding: 7px 14px; }
-.aauswahl { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.atitel { font-size: var(--schrift-titel); margin: 0; }
+.aauswahl { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--luft-2); }
 .aauswahlknopf {
-  width: 100%; display: flex; align-items: center; gap: 16px; text-align: left;
-  padding: 12px 14px; font: inherit; color: var(--text);
+  width: 100%; display: flex; align-items: center; gap: var(--luft-4); text-align: left;
+  padding: var(--luft-3) var(--luft-4); font: inherit; color: var(--text);
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-klein);
   transition: background-color .15s, border-color .15s;
 }
@@ -89,15 +87,15 @@ body.alsausbilder .leiste { display: none; }
 .aauswahlknopf.pruefen { border-color: var(--acht-kante); background: var(--acht-hell); }
 .aauswahlknopf.pruefen:hover { background: var(--acht-hover); }
 .aauswahlknopf.fertig { border-color: var(--gut-kante); background: var(--gut-hell); }
-.aauswahlknopf .aname { font-weight: 600; font-size: 14.5px; min-width: 12em; }
-.aauswahlknopf .alage { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+.aauswahlknopf .aname { font-weight: 600; font-size: var(--schrift-gross); min-width: 12em; }
+.aauswahlknopf .alage { display: inline-flex; align-items: center; gap: var(--luft-2); font-size: var(--schrift-text); }
 .aauswahlknopf.pruefen .alage { color: var(--acht); }
 .aauswahlknopf.fertig .alage { color: var(--gut); }
-.aauswahlknopf .azuletzt { margin-left: auto; font-size: 12.5px; color: var(--schiefer); }
+.aauswahlknopf .azuletzt { margin-left: auto; font-size: var(--schrift-klein); color: var(--schiefer); }
 .aauswahlknopf .marke, .aauswahlknopf .haken {
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px;
-  font-size: 9px; font-weight: 700; color: #fff; background: var(--schiefer);
+  min-width: 16px; height: 16px; padding: 0 var(--luft-1); border-radius: var(--rund-voll);
+  font-size: var(--schrift-marke); font-weight: 600; color: #fff; background: var(--schiefer);
 }
 .aauswahlknopf.pruefen .marke { background: var(--acht); }
 .aauswahlknopf.fertig .haken { background: var(--gut); }
