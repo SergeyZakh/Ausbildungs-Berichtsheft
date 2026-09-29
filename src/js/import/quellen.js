@@ -274,10 +274,3 @@ function tageAusBuchungen(buchungen) {
   });
   return neu;
 }
-
-/** Kurzweg für Tests und sichere Dateien: Text rein, Tage raus. Wirft, wenn gefragt werden müsste. */
-function csvEinlesen(text) {
-  var a = csvAnalysieren(text);
-  if (!a.sicher) throw new Error(a.gruende.join(" "));
-  return tageAusBuchungen(buchungenLesen(a).buchungen);
-}

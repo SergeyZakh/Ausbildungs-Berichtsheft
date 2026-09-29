@@ -425,10 +425,7 @@ function azubiWoche(azubi, stand) {
   flaeche.appendChild(tageSpalte(stand));
   var vorschau = azubiVorschau(stand);
   flaeche.appendChild(vorschau.wurzel);
-  flaeche.appendChild(seitenspalte(vorschau.fuss, null, [
-    ["Word", function () { azubiExport("wochenblatt"); }],
-    ["PDF", function () { azubiExport("pdf-woche"); }]
-  ], [angabenSektion(stand)]));
+  flaeche.appendChild(seitenspalte(vorschau.fuss, null, [angabenSektion(stand)]));
   panel.appendChild(flaeche);
   return panel;
 }

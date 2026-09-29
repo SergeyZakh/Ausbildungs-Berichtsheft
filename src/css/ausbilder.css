@@ -22,7 +22,7 @@
 body.alsausbilder .wochenbalken,
 body.alsausbilder .wochensumme:not(#a-summe),
 body.alsausbilder .menuehalter:not(#a-exporthalter),
-body.alsausbilder .reiter:not(#a-reiter),
+body.alsausbilder .reiter,
 body.alsausbilder #tagbereich { display: none; }
 body.alsausbilder .leiste { display: none; }
 /* Person und Abmelden stehen beim Ausbilder rechts in seiner Leiste, abgesetzt durch eine Linie. */
@@ -40,18 +40,11 @@ body.alsausbilder .leiste { display: none; }
 .aleiste .knopf { border-radius: 999px; padding: 7px 16px; }
 #a-wochenlabel { font-variant-numeric: tabular-nums; }
 
-#a-reiter .rkurz { font-size: 12px; }
-#a-reiter .rlage { gap: 5px; }
-
 /* Inhalt scrollt, der Rahmen bleibt stehen – wie im Heft. */
 .abereich { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 0 20px 20px; }
 
-/* Ein Tag = eine Sektion, wie im Heft, nur zum Lesen. */
-.atagpanel { display: flex; flex-direction: column; gap: 10px; }
-.atag .sektionskopf { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+/* Stand eines Tages in der Liste neben der Blattvorschau. */
 .atagstand { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; letter-spacing: .02em; color: var(--schiefer); }
-.atag.offen .atagstand { color: var(--acht); }
-.atag.fertig .atagstand { color: var(--gut); }
 .atagstand .marke { background: var(--acht); }
 .atagstand .haken { background: var(--gut); }
 .atagstand .marke, .atagstand .haken {
@@ -60,23 +53,6 @@ body.alsausbilder .leiste { display: none; }
   font-size: 9px; font-weight: 700; color: #fff;
 }
 .astunden { color: var(--text); font-variant-numeric: tabular-nums; }
-.atext { margin: 0; font-size: 14px; line-height: 1.55; white-space: normal; }
-.atext.ruhig { color: var(--schiefer); }
-.atag.fehlt .sektionskopf { color: var(--schiefer); }
-.atag.kommt { opacity: .65; }
-
-/* Reiter „Alle“: eine Zeile je Azubi. */
-.atabelle { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-.atabelle tr { cursor: pointer; }
-.atabelle tr:hover th, .atabelle tr:hover td { background: var(--band); }
-.atabelle tr + tr th, .atabelle tr + tr td { border-top: 1px solid var(--linie); }
-.atabelle th { text-align: left; font-weight: 600; padding: 10px 10px 10px 0; }
-.atabelle td { padding: 10px 10px 10px 0; color: var(--schiefer); }
-.atabelle td.alage { width: 16em; }
-.atabelle tr.warn td.alage { color: var(--acht); }
-.atabelle tr.gut td.alage { color: var(--gut); }
-.atabelle td.azuletzt { width: 13em; font-size: 12.5px; }
-.atabelle td.aknopf { width: 1%; padding-right: 0; text-align: right; }
 
 .gruppenliste { list-style: none; margin: 0; padding: 0; }
 .gruppenliste li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--linie); }
@@ -87,7 +63,6 @@ body.alsausbilder .leiste { display: none; }
 
 @media (max-width: 820px) {
   .aleiste { flex-wrap: wrap; }
-  .atabelle td.azuletzt { display: none; }
 }
 
 /* Ausbilder: schmale Spalte mit dem Stand der Tage neben der Blattvorschau. */

@@ -3,7 +3,7 @@
  * Tägliche Notierung: der zweite Vordruck der IHK, eine Zeile je Tag. Stunden stehen nicht darin,
  * wie im wöchentlichen Blatt: Die IHK fragt nach Tätigkeiten.
  *
- * Gewählt unter „Deine Daten → Verarbeitung“ oder gleich neben der Wochenvorschau. Er gilt für
+ * Gewählt in der Einrichtung oder unter „Deine Daten → Vordruck“. Er gilt für
  * Vorschau, Druck und Word, auch beim Ausbilder, weil er in den Stammdaten steht. Geprüft wird
  * am Beispiel (Montag bis Freitag mit gebuchten Stunden, donnerstags Berufsschule).
  *
@@ -31,14 +31,18 @@ const { pruefe, abschluss } = h.protokoll('Tägliche Notierung als zweiter Vordr
     const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click();
   });
 
-  /* ---------- Umschalten neben der Vorschau ---------- */
+  /* ---------- Umschalten unter „Deine Daten“ ---------- */
   await zurWoche();
   await page.waitForTimeout(900);
   pruefe('Vorgabe ist die wöchentliche Notierung',
-    (await vorschau()).includes('Betriebliche Tätigkeit') &&
-      (await page.getAttribute('.umschalter [data-vordruck=""]', 'aria-checked')) === 'true');
-  await page.click('.umschalter [data-vordruck="taeglich"]');
-  await page.waitForTimeout(600);
+    (await vorschau()).includes('Betriebliche Tätigkeit') && (await page.inputValue('#f-vordruck')) === '');
+  pruefe('Neben der Vorschau kein zweiter Umschalter und keine Knöpfe zum Herunterladen',
+    !(await page.locator('.seitenspalte [data-vordruck], .seitenspalte .knopf').count()));
+  await h.stammdatenOeffnen(page);
+  await h.stammReiter(page, '#f-vordruck');
+  await page.selectOption('#f-vordruck', 'taeglich');
+  await page.click('#dlg-fertig');
+  await page.waitForTimeout(900);
   const blatt = await vorschau();
   pruefe('Umschalten zeigt sofort das Tagesblatt', blatt.includes('tagestabelle') && !blatt.includes('Betriebliche Tätigkeit'));
   const zeilen = await page.evaluate(() =>
@@ -125,13 +129,12 @@ const { pruefe, abschluss } = h.protokoll('Tägliche Notierung als zweiter Vordr
   pruefe('Nach dem Neuladen bleibt die tägliche Notierung', (await vorschau()).includes('tagestabelle'));
   await h.stammdatenOeffnen(page);
   await h.stammReiter(page, '#f-vordruck');
-  pruefe('Deine Daten zeigt dieselbe Wahl', (await page.inputValue('#f-vordruck')) === 'taeglich');
+  pruefe('Deine Daten zeigt die Wahl weiter an', (await page.inputValue('#f-vordruck')) === 'taeglich');
   await page.selectOption('#f-vordruck', '');
   await page.click('#dlg-fertig');
   await page.waitForTimeout(900);
   pruefe('Zurück auf wöchentlich: wieder das Feld „Betriebliche Tätigkeit“',
-    (await vorschau()).includes('Betriebliche Tätigkeit') &&
-      (await page.getAttribute('.umschalter [data-vordruck=""]', 'aria-checked')) === 'true');
+    (await vorschau()).includes('Betriebliche Tätigkeit'));
 
   pruefe('Keine JavaScript-Fehler', jsFehler.length === 0, jsFehler.join(' | '));
   await browser.close();

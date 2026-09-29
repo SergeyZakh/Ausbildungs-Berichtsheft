@@ -47,11 +47,8 @@ function zeichneWochenblatt(bereich) {
   sUnt.leib.appendChild(ta);
   spalte.appendChild(sUnt.wurzel);
 
-  // Das Blatt steht in der Mitte: links, was man einträgt, rechts Stand und Knöpfe.
-  var seite = seitenspalte(vorschau.fuss, vorschau.slot, [
-    ["Word", function () { $("btn-wochenblatt").click(); }],
-    ["PDF", function () { $("btn-pdf-woche").click(); }]
-  ], null, [["Vordruck", vordruckSchalter(vorschau)]]);
+  // Das Blatt steht in der Mitte: links, was man einträgt, rechts, ob es passt.
+  var seite = seitenspalte(vorschau.fuss, vorschau.slot);
   flaeche.appendChild(spalte);
   flaeche.appendChild(vorschau.wurzel);
   flaeche.appendChild(seite);
@@ -124,44 +121,11 @@ function blattVorschau() {
 }
 
 /**
- * Wöchentliche oder tägliche Notierung, gleich neben der Vorschau: Wer umschaltet, sieht sofort
- * das andere Blatt. Gespeichert wird im Feld aus „Deine Daten → Verarbeitung“ (f-vordruck).
- */
-function vordruckSchalter(vorschau) {
-  var gruppe = document.createElement("div");
-  gruppe.className = "umschalter";
-  gruppe.setAttribute("role", "radiogroup");
-  gruppe.setAttribute("aria-label", "Vordruck");
-  [["", "Wöchentlich"], ["taeglich", "Täglich"]].forEach(function (v) {
-    var b = document.createElement("button");
-    b.type = "button";
-    b.setAttribute("role", "radio");
-    b.setAttribute("data-vordruck", v[0]);
-    b.textContent = v[1];
-    b.addEventListener("click", function () {
-      $("f-vordruck").value = v[0];
-      zeigen();
-      merken();
-      vorschau.jetzt();
-    });
-    gruppe.appendChild(b);
-  });
-  function zeigen() {
-    Array.prototype.forEach.call(gruppe.children, function (b) {
-      b.setAttribute("aria-checked", String(b.getAttribute("data-vordruck") === $("f-vordruck").value));
-    });
-  }
-  zeigen();
-  return gruppe;
-}
-
-/**
- * Rechte Spalte neben dem Wochenblatt: ob es aufs Blatt passt, die KI für die
- * Woche (nur mit Sprachmodell) und der Export genau dieser Woche.
+ * Rechte Spalte neben dem Wochenblatt: ob es aufs Blatt passt und die KI für die
+ * Woche (nur mit Sprachmodell). Heruntergeladen wird über „Exportieren“ oben.
  * vorne: weitere Sektionen, die oben stehen sollen (Ausbilder: Angaben der Woche).
- * extra: [Titel, Element] als weitere Blöcke nach dem Umfang (Azubi: der Vordruck).
  */
-function seitenspalte(fuss, kiSlot, exporte, vorne, extra) {
+function seitenspalte(fuss, kiSlot, vorne) {
   var spalte = document.createElement("div");
   spalte.className = "seitenspalte";
   (vorne || []).forEach(function (el) { spalte.appendChild(el); });
@@ -181,7 +145,6 @@ function seitenspalte(fuss, kiSlot, exporte, vorne, extra) {
     return b;
   };
   block("Umfang", fuss);
-  (extra || []).forEach(function (e) { block(e[0], e[1]); });
   if (kiSlot) {
     kiSlot.classList.add("kispalte");
     // Ohne Knöpfe (alles gekürzt, keine KI eingestellt) fällt der Block ganz weg.
@@ -190,18 +153,6 @@ function seitenspalte(fuss, kiSlot, exporte, vorne, extra) {
       .observe(kiSlot, { childList: true });
     kiBlock.hidden = !kiSlot.children.length;
   }
-
-  var knoepfe = document.createElement("div");
-  knoepfe.className = "exportknoepfe";
-  exporte.forEach(function (e) {
-    var k = document.createElement("button");
-    k.type = "button";
-    k.className = "knopf";
-    k.textContent = e[0];
-    k.addEventListener("click", e[1]);
-    knoepfe.appendChild(k);
-  });
-  block("Herunterladen", knoepfe);
   spalte.appendChild(karte.wurzel);
   return spalte;
 }
