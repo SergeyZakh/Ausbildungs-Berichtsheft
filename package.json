@@ -22,7 +22,7 @@
     "docker:up": "docker compose -f docker-compose.lokal.yml up -d --build"
   },
   "dependencies": {
-    "docx": "9.7.1"
+    "docx": "9.7.2"
   },
   "devDependencies": {
     "jszip": "^3.10.2",
