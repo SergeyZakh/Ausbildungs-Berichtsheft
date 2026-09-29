@@ -51,6 +51,10 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Deckblatt“, je als Word oder PDF. Das Laden der CSV heißt überall „Zeiterfassung laden“, damit es
   nicht mit „Exportieren“ verwechselt wird. Die Startkarte hat zwei Knöpfe, Beispiel und Sicherung
   stehen als Links darunter.
+- **Weniger doppelt:** Neben der Wochenvorschau stehen nur noch Umfang und KI, heruntergeladen wird
+  über „Exportieren“, auch beim Ausbilder. Über dem Tagestext steht nur noch die Fahne „KI“, der
+  Wochenknopf nennt nur den Zeitraum; den Stand zeigen Farbe und „3/5 fertig“.
+- **README** auf das Wesentliche gekürzt; Tipps, Tastatur und Bilder stehen in docs/START.md.
 - **Deine Daten** in der Reihenfolge der Einrichtung: Ausbildung (mit Name und Bundesland), Schule,
   Vordruck, Deckblatt (was nur das Deckblatt braucht), KI, Löschen. Statt „Schließen“ und „Speichern“
   gibt es × und „Fertig“; gespeichert wird ohnehin beim Tippen.
