@@ -2,7 +2,7 @@
  * Kopfleiste, Wochenbalken und Reiter
  * ========================================================== */
 
-/* ---------- Kopfleiste: Woche links, Summe, Aktionen rechts ---------- */
+/* ---------- Kopfleiste: Name, Woche mit Summe, Aktionen ---------- */
 .leiste {
   flex: none; display: flex; align-items: center; gap: var(--luft-3);
   padding: var(--luft-3) var(--luft-5);
@@ -10,9 +10,20 @@
 .leiste .schub { flex: none; display: flex; align-items: center; gap: var(--luft-2); }
 /* Ohne Woche: statt leerem Wochenknopf und gesperrtem Export nur der Name und das Menü. */
 body.ohnewoche .wochenbalken, body.ohnewoche #btn-export { display: none; }
-body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schrift-gross); font-weight: 600; }
+.leiste::before { font-size: var(--schrift-gross); font-weight: 600; }
+body.ohnewoche .leiste::before { content: "Berichtsheft"; }
 body.ohnewoche .leiste .schub { margin-left: auto; }
 .leiste .schub .knopf { text-align: center; }
+/* Am Rechner drei Teile: links der Name, in der Mitte die Woche mit ihrem Stand, rechts die
+   Aktionen. Die Mitte steht genau mittig, gleich wie breit die Seiten sind; ohne Woche bleibt es
+   bei Name und Menü (oben). Am Handy stehen Summe und Aktionen über der Woche (handy.css). */
+@media (min-width: 821px) {
+  body:not(.ohnewoche) .leiste { display: grid; grid-template-columns: 1fr auto auto 1fr; }
+  .leiste::before { content: "Berichtsheft"; grid-column: 1; justify-self: start; }
+  .leiste .wochenbalken { grid-column: 2; margin-right: 0; }
+  .leiste .wochensumme { grid-column: 3; }
+  .leiste .schub { grid-column: 4; justify-self: end; }
+}
 /* Pfeil am Exportknopf: Er öffnet ein Menü. */
 #btn-export { display: inline-flex; align-items: center; gap: var(--luft-2); }
 #btn-export::after { content: "\25BE"; font-size: var(--schrift-fein); opacity: .7; }

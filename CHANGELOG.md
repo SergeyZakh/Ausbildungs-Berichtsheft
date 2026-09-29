@@ -19,8 +19,9 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   und Abschluss stehen mittig, und beim Öffnen hat „Später“ keinen Fokusrahmen mehr.
 - **Eine Karte je Tag:** Das Datum ist ihr Titel, Art des Tages, Stunden und „Fertig“ stehen im
   Kopf, über dem Text klein das Feld des Vordrucks. Vorher standen Tageskopf und Text in zwei
-  Karten übereinander. Überschriften der Karten in normaler Schreibung statt Versalien, und die
-  Wochenwahl steht kompakt links in der Kopfleiste.
+  Karten übereinander. Überschriften der Karten in normaler Schreibung statt Versalien.
+- **Kopfleiste am Rechner in drei Teilen:** links der Name, in der Mitte die Woche mit ihrem Stand,
+  rechts Farbe, Export und Menü. Vorher klaffte zwischen der Woche und den Knöpfen eine Lücke.
 - **Feinschliff:** Ein Fokusrahmen für alle Felder (Kante mit Ring, gut sichtbar auch im dunklen
   Modus), eine kurze Einblendung für Fenster und Menüs, mit „Bewegung reduzieren“ ohne.
 
