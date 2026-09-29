@@ -6,6 +6,14 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
+## Unveröffentlicht
+
+### Geändert
+
+- **Einheitliche Maße:** Schrift in sechs Stufen statt rund zwanzig Größen, Abstände im
+  4-px-Raster, drei Eckenradien. Alle Textknöpfe sind Pillen in Textgröße, Symbolknöpfe Kreise.
+  Die Oberfläche wirkt dadurch ruhiger; am Handy ist der Text einen halben Punkt größer.
+
 ## [0.2.0] – 2026-09-29
 
 ### Neu

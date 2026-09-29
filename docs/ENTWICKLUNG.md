@@ -125,6 +125,20 @@ also dort keine Klassen aus dem Blatt wie `.tagkopf`, `.kasten` oder `.tagestabe
 `ausbilder.css` (Konto und Ausbilderansicht),
 `blatt.css` (der Drucksatz des Vordrucks).
 
+**Maße** stehen als Variablen oben in `basis.css`, und jede Regel nimmt eine dieser Stufen:
+
+| Was | Stufen |
+| --- | --- |
+| Schrift | `--schrift-fein` 11, `-klein` 12, `-text` 13,5 (am Handy 14), `-gross` 15, `-titel` 18, `-kopf` 22 px; `--schrift-marke` 9 px nur für Buchstaben in Marken |
+| Abstände (padding, margin, gap) | `--luft-1` bis `--luft-8`: 4, 8, 12, 16, 20, 24, 32, 40 px; 1 und 2 px nur für Haarlinien |
+| Ecken | `--rund-klein` 8 px (Felder), `--rund` 12 px (Karten, Dialoge), `--rund-voll` (Knöpfe, Pillen), Kreise mit 50 % |
+| Sperrung | `--sperrung` für Versal-Beschriftungen, `--sperrung-eng` für große Überschriften |
+| Schriftstärke | 400 und 600 |
+
+Was man klickt, ist rund (Textknöpfe als Pille, Symbolknöpfe als Kreis); was man ausfüllt oder
+liest, hat Ecken. Ein Wert neben den Stufen braucht einen Kommentar, warum. `blatt.css` rechnet in
+pt und mm des Vordrucks und bleibt davon ausgenommen.
+
 ## Datenmodell
 
 `localStorage["berichtsheft-v1"]`:

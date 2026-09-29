@@ -44,8 +44,23 @@
   --glas:      rgba(255, 255, 255, .68);
   --glas-kante:rgba(255, 255, 255, .9);
   --unschaerfe: blur(16px) saturate(1.5);
-  --rund:      14px;      /* Karten und Dialoge */
-  --rund-klein: 9px;      /* Knöpfe und Felder */
+  /* Maße. Jede Regel nimmt eine dieser Stufen; ein Wert dazwischen braucht einen Grund, der daneben
+     steht. Wildwuchs (zuletzt rund 20 Schriftgrößen und 32 Abstände) sah man als Unruhe. */
+  --schrift-marke: 9px;     /* nur Buchstaben in Marken und Kreisen (E, KI, ✓) */
+  --schrift-fein:  11px;    /* Versal-Beschriftungen, Legenden, Fußleiste */
+  --schrift-klein: 12px;    /* Menüs, Nebentext */
+  --schrift-text:  13.5px;  /* Fließtext, Felder, Knöpfe */
+  --schrift-gross: 15px;    /* Schreibfeld, Symbole */
+  --schrift-titel: 18px;    /* Titel einer Karte, große Symbole */
+  --schrift-kopf:  22px;    /* Überschrift der Einrichtung */
+  --sperrung:      .06em;   /* jede Versal-Beschriftung */
+  --sperrung-eng:  -.01em;  /* große Überschriften */
+  /* Abstände im 4-px-Raster; 1 und 2 px bleiben für Haarlinien. */
+  --luft-1: 4px;  --luft-2: 8px;  --luft-3: 12px; --luft-4: 16px;
+  --luft-5: 20px; --luft-6: 24px; --luft-7: 32px; --luft-8: 40px;
+  --rund:       12px;     /* Karten, Dialoge, Menüs */
+  --rund-klein: 8px;      /* Felder, Einträge in Menüs */
+  --rund-voll:  999px;    /* Knöpfe, Pillen */
   --schatten:  0 1px 2px rgba(22, 22, 26, .04), 0 6px 20px rgba(22, 22, 26, .05);
   --schatten-hoch: 0 2px 6px var(--hauch), 0 18px 48px rgba(22, 22, 26, .16);
   --sans: "Instrument Sans", system-ui, -apple-system, sans-serif;
@@ -147,7 +162,7 @@ html, body { height: 100%; margin: 0; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   background: var(--grund); color: var(--text);
-  font-family: var(--sans); font-size: 13.5px; line-height: 1.5;
+  font-family: var(--sans); font-size: var(--schrift-text); line-height: 1.5;
   display: flex; flex-direction: column; height: 100vh; overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -158,11 +173,13 @@ button { font: inherit; cursor: pointer; }
   * { transition: none !important; animation-duration: .01ms !important; }
 }
 
-/* ---------- Knöpfe ---------- */
+/* ---------- Knöpfe ----------
+   Was man klickt, ist rund: Textknöpfe als Pille, Symbolknöpfe als Kreis. Was man ausfüllt oder
+   liest, hat Ecken (Felder, Karten). */
 .knopf {
-  border: 1px solid var(--linie); border-radius: var(--rund-klein);
+  border: 1px solid var(--linie); border-radius: var(--rund-voll);
   background: var(--flaeche); color: var(--text);
-  padding: 6px 13px; font-size: 12.5px; white-space: nowrap;
+  padding: var(--luft-2) var(--luft-4); font-size: var(--schrift-text); line-height: 1.35; white-space: nowrap;
   transition: background-color .15s, border-color .15s, box-shadow .15s;
 }
 .knopf:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
@@ -175,7 +192,7 @@ button { font: inherit; cursor: pointer; }
   flex: none; display: inline-flex; align-items: center; justify-content: center;
   width: 32px; height: 32px; padding: 0; border-radius: 50%;
   border: 1px solid var(--linie); background: var(--flaeche); color: var(--text);
-  font-size: 16px; line-height: 1;
+  font-size: var(--schrift-gross); line-height: 1;
   transition: background-color .15s, border-color .15s;
 }
 .rundknopf:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
@@ -193,31 +210,31 @@ dialog::backdrop {
 }
 .dkopf {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-bottom: 1px solid var(--linie);
+  padding: var(--luft-4) var(--luft-5); border-bottom: 1px solid var(--linie);
 }
-.dkopf h2 { margin: 0; font-size: 15px; font-weight: 600; }
-.dkoerper { padding: 18px 20px; }
+.dkopf h2 { margin: 0; font-size: var(--schrift-gross); font-weight: 600; }
+.dkoerper { padding: var(--luft-4) var(--luft-5); }
 .dfuss {
-  padding: 0 20px 18px; display: flex; align-items: center; gap: 14px;
+  padding: 0 var(--luft-5) var(--luft-5); display: flex; align-items: center; gap: var(--luft-4);
   justify-content: space-between;
 }
 
 /* ---------- Formularfelder im Dialog ---------- */
-.felder { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+.felder { display: grid; grid-template-columns: 1fr 1fr; gap: var(--luft-3) var(--luft-4); }
 .felder label { display: block; }
-.felder label span { display: block; font-size: 12px; color: var(--schiefer); margin-bottom: 4px; }
+.felder label span { display: block; font-size: var(--schrift-klein); color: var(--schiefer); margin-bottom: var(--luft-1); }
 .felder label span i { font-style: normal; color: var(--text); }
 .felder input, .felder select, .felder output, .felder textarea {
-  width: 100%; font: inherit; font-size: 13.5px; color: var(--text);
+  width: 100%; font: inherit; font-size: var(--schrift-text); color: var(--text);
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-klein);
-  padding: 7px 10px; transition: border-color .15s, box-shadow .15s;
+  padding: var(--luft-2) var(--luft-3); transition: border-color .15s, box-shadow .15s;
 }
 .felder input:hover, .felder textarea:hover { border-color: var(--linie-fest); }
 .felder input:focus, .felder textarea:focus {
   outline: none; border-color: var(--text); box-shadow: 0 0 0 3px var(--fokus-ring);
 }
 .felder textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
-.felder small { display: block; margin-top: 4px; font-size: 11.5px; color: var(--schiefer); }
+.felder small { display: block; margin-top: var(--luft-1); font-size: var(--schrift-klein); color: var(--schiefer); }
 .felder output { display: flex; align-items: center; min-height: 36px; background: var(--band); }
 .felder output.leer { color: var(--schiefer); }
 .felder .weit { grid-column: 1 / -1; }
