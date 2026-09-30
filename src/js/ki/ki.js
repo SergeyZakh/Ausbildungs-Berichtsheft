@@ -370,6 +370,8 @@ function kiTageDerWoche(montagIso) {
     if (!t || t.vorKi != null) continue;
     if (t.art && !istSchultag(t.art)) continue;
     if (!(t.text || "").trim()) continue;
+    // Eine Fächerliste aus dem Import ist schon so knapp, wie das Feld sie will.
+    if (schulEntwurf(t)) continue;
     out.push({ key: key, tag: WOCHENTAGE[plus(montag, i).getDay()], daten: t });
   }
   return out;

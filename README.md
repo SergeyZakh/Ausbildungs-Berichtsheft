@@ -56,11 +56,13 @@ einfach selbst.
 ## Was es kann
 
 - **Import aus jeder Zeiterfassung mit CSV-Export**, deutsche und englische Spaltennamen, viele
-  Datums- und Zeitformate. Passt eine Spalte nicht, ordnest du sie einmal zu.
+  Datums- und Zeitformate, auch ohne Kopfzeile. Passt eine Spalte nicht, ordnest du sie einmal zu.
 - **Bereinigung:** `Ticket #149725`, `SRV-DC01`, `Herr Weber` und Kundennamen werden zu „Ticket“,
   „Server“, „einem Kollegen“ und „Kunde“. Was unsicher ist, bleibt lieber stehen.
 - **Berufsschule:** feste Schultage und Blockunterricht aus der Einrichtung; in einer Woche nur
-  mit Schule schreibst du die Themen einmal für die ganze Woche.
+  mit Schule schreibst du die Themen einmal für die ganze Woche. Bucht deine Zeiterfassung den
+  Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), wird er als Berufsschule erkannt,
+  je Fach eine Zeile.
 - **Ausgabe** als Word oder PDF, im Vordruck mit wöchentlicher oder täglicher Notierung, mit
   Vorschau des Blatts.
 - **Übersicht aller Wochen** wie die Aktivität bei GitHub: jeder Werktag ein Feld, grün fertig,
@@ -75,7 +77,7 @@ einfach selbst.
 | Clockify | Reports → Detailed → Export → CSV | nach Hilfeseite nachgebaut |
 | Harvest | Reports → Time → Detailed → Export → CSV | nach Hilfeseite nachgebaut |
 | Jira mit Tempo | Bericht der erfassten Zeiten → Export → CSV | nach Hilfeseite nachgebaut |
-| Kimai | Zeiterfassung → Export → CSV | nach Hilfeseite nachgebaut |
+| Kimai | Zeiterfassung → Export → CSV | mit echtem Export geprüft (englische Spalten) |
 | Toggl Track | Reports → Detailed → Export → CSV | nach Hilfeseite nachgebaut |
 | Excel, Google Sheets, eigene Listen | als „CSV UTF-8“ speichern | über die Zuordnung |
 

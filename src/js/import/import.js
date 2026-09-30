@@ -65,13 +65,18 @@ function importAnwenden(a, name) {
       Object.keys(frisch).forEach(function (k) {
         var g = gespeicherte[k], t = tage[k];
         if (!g || !t) return;
+        var erkannt = t.art;
         // Eine von Hand gewählte Art bleibt, auch „Arbeitstag“ an einem Feiertag.
         if (g.art || g.artVonHand) t.art = g.art || "";
         if (g.artVonHand) t.artVonHand = true;
         var warEntwurf = g.entwurf != null && g.text === g.entwurf;
         // Ältere Stände ohne kiText: gesetztes vorKi heißt Modellausgabe.
         var warKi = g.kiText != null ? g.text === g.kiText : g.vorKi != null;
-        if (g.text && !warEntwurf && !warKi) {
+        var eigen = g.text && !warEntwurf && !warKi;
+        // Wer den Tag als Arbeitstag beschrieben hat, bekommt ihn nicht als Schultag zurück.
+        if (eigen && !g.art && t.art === "Berufsschule") t.art = "";
+        if (t.art !== erkannt) { t.text = tagesEntwurf(t); t.entwurf = t.text; }
+        if (eigen) {
           t.text = g.text;
           if (g.vorKi != null) t.vorKi = g.vorKi;
           if (g.kiText != null) t.kiText = g.kiText;
@@ -79,6 +84,11 @@ function importAnwenden(a, name) {
         }
       });
     }
+    schulwochenZusammenfuehren(Object.keys(frisch).reduce(function (m, k) {
+      var montag = iso(montagVon(vonIso(k)));
+      if (m.indexOf(montag) === -1) m.push(montag);
+      return m;
+    }, []), gespeicherte);
     aktiveWoche = null;
     aktiverTag = 0;
     wochenNeu();
@@ -87,7 +97,9 @@ function importAnwenden(a, name) {
     letzterImport = { analyse: a, name: name, vorher: vorher };
     var neue = Object.keys(frisch).length;
     var gesamt = Object.keys(tage).length;
+    var schule = Object.keys(frisch).filter(function (k) { return tage[k].art === "Berufsschule"; }).length;
     sage((a.profil ? a.profil + ": " : "") + name + " geladen, " + mehrzahl(neue, " Tag", " Tage") +
+      (schule ? ", davon " + schule + " Berufsschule" : "") +
       (gesamt > neue ? " — " + gesamt + " Tage im Heft" : "") + ".", "gut");
     notizKnopf("Spalten prüfen", importKorrigieren);
   } catch (e) {

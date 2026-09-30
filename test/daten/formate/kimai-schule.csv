@@ -1,0 +1,13 @@
+Date,From,To,Duration,Name,User,E-mail,"Staff number",Customer,Project,Activity,Description,Billable,Tags,Type,category,Account,"Project number",VAT-ID,"Order number"
+2026-10-02,08:00,12:00,4:00,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Ausbildung,Task,"LF4: Subnetting",0,,timesheet,work,0004,0004,3,
+2026-10-02,12:30,16:00,3:30,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Support,Task,"Drucker im Empfang neu eingebunden",0,,timesheet,work,0004,0004,3,
+2026-10-01,08:00,16:00,8:00,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Intern,Task,"AD: Benutzer für neue Kollegin angelegt, PC: mit Standardsoftware aufgesetzt",0,,timesheet,work,0004,0004,3,
+2026-09-30,08:00,15:50,7:50,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Ausbildung,Task,"AEUP: Normalisierung, FUIT: Subnetting, Deutsch: Bewerbungsschreiben, E: Compiler and Interpreter",0,,timesheet,work,0004,0004,3,
+2026-09-29,08:00,15:50,7:50,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Ausbildung,Task,"AEUP: Datenbanken
+FUIT: IPv4
+ITT: ESP32
+E: Compiler and Interpreter",0,,timesheet,work,0004,0004,3,
+2026-09-28,08:00,12:00,4:00,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Netzwerk,Task,"Switch im Serverraum getauscht",0,,timesheet,work,0004,0004,3,
+2026-09-28,12:30,16:00,3:30,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Intern,Task,"Dokumentation im Wiki ergänzt",0,,timesheet,work,0004,0004,3,
+2026-10-06,08:00,15:00,7:00,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Ausbildung,Task,"WiSo: Tarifvertrag, LF5: Schleifen und Arrays, ITT: Sensoren",0,,timesheet,work,0004,0004,3,
+2026-10-07,08:00,13:00,5:00,"Max Muster",mm,mm@example.org,,Beispiel GmbH,Ausbildung,Task,"LF4: VLANs",0,,timesheet,work,0004,0004,3,

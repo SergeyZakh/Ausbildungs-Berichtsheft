@@ -8,6 +8,22 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ## Unveröffentlicht
 
+### Neu
+
+- **Berufsschultag aus der Zeiterfassung:** Bucht der Betrieb den Schultag mit den Fächern in der
+  Beschreibung („AEUP: Datenbanken, FUIT: IPv4“ oder je Fach eine Zeile), wird der Tag
+  Berufsschule, je Fach eine Zeile im Feld „Berufsschule (Unterrichtsthemen)“. Erkannt wird das an
+  mindestens drei Fächern, am Projekt oder an der Tätigkeit „Berufsschule“ oder am Schulplan. Zwei
+  Kürzel wie „AD: …, PC: …“ allein machen noch keinen Schultag, ein Tag mit Schule und Betrieb
+  bleibt Arbeitstag. Im wöchentlichen Vordruck kommen die Fächer mehrerer Schultage einer Woche
+  zusammen in die Themen der Woche, gleiche Fächer in eine Zeile („AEUP: Datenbanken,
+  Normalisierung“). Eigene Themen und eine von Hand gewählte Art bleiben beim nächsten Import. Die
+  KI lässt eine solche Fächerliste aus.
+- **CSV ohne Kopfzeile:** Beginnt der Export gleich mit der ersten Buchung, nimmt der Import sie
+  nicht mehr als Kopfzeile. Der Dialog „Spalten zuordnen“ sagt „Die Datei hat keine Kopfzeile“ und
+  schlägt die Spalten nach ihrem Inhalt vor: Datum, Uhrzeiten, Dauer und die längste Beschreibung.
+  Die Antwort gilt beim nächsten Export mit gleich vielen Spalten.
+
 ### Geändert
 
 - **Einheitliche Maße:** Schrift in sechs Stufen statt rund zwanzig Größen, Abstände im

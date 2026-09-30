@@ -125,7 +125,9 @@ function entwuerfeNeu() {
     var t = tage[k];
     if (!t.posten || !t.posten.length) return;
     if (t.entwurf != null && t.text !== t.entwurf) return;
-    t.text = rohtext(t.posten);
+    // Zusammengeführte Schultage stehen unter den Themen der Woche (schule.js).
+    if (tagImWochenfeld(k)) return;
+    t.text = tagesEntwurf(t);
     t.entwurf = t.text;
     delete t.geprueft;
   });

@@ -127,6 +127,49 @@ function kopfzeileFinden(zeilen) {
   return beste;
 }
 
+/* ---------- Dateien ohne Kopfzeile ----------
+   Manche Exporte lassen die Kopfzeile weg. Dann hielt die Suche oben die erste Buchung für die
+   Kopfzeile, und übrig blieb nichts. Eine Kopfzeile hat nie ein Datum oder eine Uhrzeit in einer
+   Spalte; eine Buchung fast immer. */
+
+var UHRZEIT = /^\d{1,2}:\d{2}(?::\d{2})?(?:\s*[ap]\.?\s*m\.?)?$/i;
+
+function siehtNachDatenAus(zeile) {
+  var datum = zeile.some(function (w) { return !!datumAusText(w, "tm") || !!datumAusText(w, "mt"); });
+  return datum && zeile.some(function (w) { return UHRZEIT.test(String(w).trim()) || /^\d+(?:[.,]\d+)?$/.test(String(w).trim()); });
+}
+
+/**
+ * Felder nach dem Inhalt der Spalten vorschlagen: Datum am Format, dann die Uhrzeiten der Reihe
+ * nach als Beginn, Ende und Dauer (bei nur einer ist es die Dauer), die Beschreibung ist der
+ * längste Text. Projekt, Kunde und Tätigkeit wählt man im Dialog.
+ */
+function spaltenNachInhalt(daten) {
+  var probe = daten.slice(0, 30), breite = 0, felder = {};
+  probe.forEach(function (z) { breite = Math.max(breite, z.length); });
+  FELDER.forEach(function (f) { felder[f.id] = -1; });
+  var anteil = function (i, test) {
+    var werte = probe.map(function (z) { return String(z[i] == null ? "" : z[i]).trim(); }).filter(Boolean);
+    return werte.length ? werte.filter(test).length / werte.length : 0;
+  };
+  var zeiten = [], laengste = 0;
+  for (var i = 0; i < breite; i++) {
+    if (felder.datum === -1 && anteil(i, function (w) { return datumAusText(w, "tm") || datumAusText(w, "mt"); }) >= 0.8) { felder.datum = i; continue; }
+    if (anteil(i, function (w) { return UHRZEIT.test(w); }) >= 0.8) { zeiten.push(i); continue; }
+    // Text: Buchstaben und keine E-Mail-Adresse; der längste im Schnitt ist die Beschreibung.
+    if (anteil(i, function (w) { return /[a-zäöü]{3}/i.test(w) && w.indexOf("@") === -1; }) < 0.8) continue;
+    var schnitt = probe.reduce(function (s, z) { return s + String(z[i] || "").length; }, 0) / probe.length;
+    if (schnitt > laengste) { laengste = schnitt; felder.beschreibung = i; }
+  }
+  if (zeiten.length === 1) felder.dauer = zeiten[0];
+  else if (zeiten.length) {
+    felder.von = zeiten[0];
+    felder.bis = zeiten[1];
+    if (zeiten.length > 2) felder.dauer = zeiten[2];
+  }
+  return felder;
+}
+
 /** Fingerabdruck einer Kopfzeile, unter dem eine Zuordnung gemerkt wird. */
 function kopfSignatur(kopf) {
   return kopf.map(spaltenName).join("|");
@@ -157,21 +200,38 @@ function csvAnalysieren(text) {
   var zeilen = csvZerlegen(text);
   if (!zeilen.length) throw new Error("Die Datei ist leer.");
   var k = kopfzeileFinden(zeilen);
-  var kopf = zeilen[k].map(function (h) { return String(h).trim(); });
-  var daten = zeilen.slice(k + 1);
-  var signatur = kopfSignatur(kopf);
+  var ohneKopf = siehtNachDatenAus(zeilen[k]);
+  var kopf, daten, signatur;
+  if (ohneKopf) {
+    // Zurück bis zur ersten Buchung. Steht davor eine Zeile mit gleich vielen Spalten, ist sie
+    // die Kopfzeile, nur mit Namen, die keiner kennt; sonst ist ab dort alles Daten.
+    while (k > 0 && siehtNachDatenAus(zeilen[k - 1])) k--;
+    if (k > 0 && zeilen[k - 1].length === zeilen[k].length) { k--; ohneKopf = false; }
+  }
+  if (ohneKopf) {
+    daten = zeilen.slice(k);
+    kopf = zeilen[k].map(function () { return ""; });
+    // Ohne Namen bleibt die Spaltenzahl: Derselbe Export hat beim nächsten Mal dieselbe.
+    signatur = "ohne kopf|" + kopf.length;
+  } else {
+    kopf = zeilen[k].map(function (h) { return String(h).trim(); });
+    daten = zeilen.slice(k + 1);
+    signatur = kopfSignatur(kopf);
+  }
   var gemerkt = zuordnungGemerkt(signatur);
 
   var a = {
-    kopf: kopf, daten: daten, signatur: signatur,
-    profil: profilErkennen(kopf),
-    felder: gemerkt ? gemerkt.felder : spaltenZuordnen(kopf),
+    kopf: kopf, daten: daten, signatur: signatur, ohneKopf: ohneKopf,
+    profil: ohneKopf ? null : profilErkennen(kopf),
+    felder: gemerkt ? gemerkt.felder : ohneKopf ? spaltenNachInhalt(daten) : spaltenZuordnen(kopf),
     reihenfolge: null, gemerkt: !!gemerkt, gruende: []
   };
   a.reihenfolge = gemerkt && gemerkt.reihenfolge ? gemerkt.reihenfolge
     : (a.felder.datum !== -1 ? datumsReihenfolge(daten.map(function (z) { return z[a.felder.datum]; })) : "tm");
 
   if (!gemerkt) a.gruende = zuordnungPruefen(a);
+  // Nach Inhalt geraten ist nie sicher: einmal ansehen, dann ist die Zuordnung gemerkt.
+  if (ohneKopf && !gemerkt) a.gruende.unshift("Die Datei hat keine Kopfzeile. Die Spalten sind nach ihrem Inhalt vorgeschlagen, bitte kurz prüfen.");
   a.sicher = !a.gruende.length;
   return a;
 }
@@ -268,9 +328,9 @@ function tageAusBuchungen(buchungen) {
       if (b[0].von == null) return -1;
       return a[0].von - b[0].von || a[1] - b[1];
     }).map(function (x) { return x[0]; });
-    t.text = rohtext(t.posten);
+    t.art = feiertagAn(tag, $("f-land").value) || (schultagAusBuchungen(tag, t.posten) ? "Berufsschule" : "");
+    t.text = tagesEntwurf(t);
     t.entwurf = t.text;          // erkennt später "noch unverändert"
-    t.art = feiertagAn(tag, $("f-land").value) || "";
   });
   return neu;
 }

@@ -148,6 +148,122 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
   pruefe('Excel-Datei: Hinweis auf CSV statt Fehler', (await excelSeite.locator('#notiz').textContent()).includes('CSV UTF-8'));
   await excelSeite.close();
 
+  /* ---------- Berufsschule in der Zeiterfassung ---------- */
+  const faecher = await page.evaluate(() => ({
+    komma: window.__faecherListe('AEUP: Datenbanken, Normalisierung, FUIT: IPv4'),
+    zeilen: window.__faecherListe('LF4: Subnetting\nWiSo: Tarifvertrag\nDeutsch: Erörterung'),
+    betrieb: window.__faecherListe('Support: Drucker, Netzwerk: Switch'),
+    satz: window.__faecherListe('Drucker im Empfang neu eingebunden'),
+    zwei: window.__schultagAusBuchungen('2026-10-01', [{ projekt: 'Intern', beschreibung: 'AD: Benutzer angelegt, PC: aufgesetzt' }]),
+    stichwort: window.__schultagAusBuchungen('2026-10-01', [{ projekt: 'Berufsschule', beschreibung: 'Subnetting' }]),
+    kunde: window.__schultagAusBuchungen('2026-10-01', [{ projekt: 'Schule Musterstadt', beschreibung: 'WLAN ausgeleuchtet' }]),
+  }));
+  pruefe('Fächer: Komma trennt nur vor einem neuen Fach, Zeilen, Kürzel und ausgeschriebene Fächer',
+    JSON.stringify(faecher.komma) === '["AEUP: Datenbanken, Normalisierung","FUIT: IPv4"]' &&
+    JSON.stringify(faecher.zeilen) === '["LF4: Subnetting","WiSo: Tarifvertrag","Deutsch: Erörterung"]', JSON.stringify(faecher));
+  pruefe('Keine Fächer: „Support: …, Netzwerk: …“ und ein ganzer Satz', faecher.betrieb === null && faecher.satz === null);
+  pruefe('Schultag nur mit zweitem Zeichen: zwei Kürzel allein nicht, Projekt „Berufsschule“ ja, Kunde „Schule …“ nicht',
+    !faecher.zwei && faecher.stichwort && !faecher.kunde, JSON.stringify(faecher));
+
+  const gespeichert = (seite) => seite.evaluate((sp) => JSON.parse(localStorage.getItem(sp)), h.SPEICHER);
+  const schulSeite = async (vorher) => {
+    const s = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await h.ohneRundgang(s);
+    await h.oeffnen(s);
+    if (vorher) await s.evaluate(vorher);
+    return s;
+  };
+
+  const schule = await schulSeite();
+  const schulFehler = h.fehlerSammeln(schule);
+  await schule.setInputFiles('#datei', format('kimai-schule.csv'));
+  await schule.waitForTimeout(600);
+  let st = await gespeichert(schule);
+  const art = (k) => st.tage[k] && st.tage[k].art;
+  pruefe('Kimai mit Fächern: Dienstag (Zeilen) und Mittwoch (Komma) sind Berufsschule',
+    art('2026-09-29') === 'Berufsschule' && art('2026-09-30') === 'Berufsschule', JSON.stringify(st.tage['2026-09-29']));
+  const themen = 'AEUP: Datenbanken, Normalisierung\nFUIT: IPv4, Subnetting\nITT: ESP32\nE: Compiler and Interpreter\nDeutsch: Bewerbungsschreiben';
+  pruefe('Wöchentlicher Vordruck: die Fächer beider Tage in den Themen der Woche, gleiche Fächer in einer Zeile',
+    st.wochen['2026-09-28'] && st.wochen['2026-09-28'].schule === themen &&
+    st.tage['2026-09-29'].text === '' && st.tage['2026-09-30'].text === '', JSON.stringify(st.wochen['2026-09-28']));
+  pruefe('Die Tage zählen unter den Themen, die Stunden bleiben',
+    (await schule.evaluate(() => window.__tagLage('2026-09-29'))) === 'voll' && st.tage['2026-09-29'].stunden === 7.85);
+  pruefe('Nicht zu gierig: zwei Kürzel, ein gemischter Tag und ein Fach ohne Schulplan bleiben Arbeitstage',
+    art('2026-09-28') === '' && art('2026-10-01') === '' && art('2026-10-02') === '' && art('2026-10-07') === '' &&
+    st.tage['2026-10-01'].text.includes('AD: Benutzer'), [art('2026-10-01'), art('2026-10-02'), art('2026-10-07')].join('|'));
+  pruefe('Ein einzelner Schultag in der Woche behält seinen Text, je Fach eine Zeile, ohne Projekt davor',
+    art('2026-10-06') === 'Berufsschule' && st.tage['2026-10-06'].text === 'WiSo: Tarifvertrag\nLF5: Schleifen und Arrays\nITT: Sensoren',
+    JSON.stringify(st.tage['2026-10-06'].text));
+  pruefe('Meldung nennt die Schultage', (await schule.locator('#notiz').textContent()).includes('davon 3 Berufsschule'),
+    await schule.locator('#notiz').textContent());
+  const kiTage = await schule.evaluate(() => window.__kiTageDerWoche('2026-10-05'));
+  pruefe('Die KI lässt eine Fächerliste aus, kürzt aber den Arbeitstag daneben',
+    !kiTage.includes('2026-10-06') && kiTage.includes('2026-10-07'), kiTage.join(' '));
+
+  // Erneut einlesen: Übernommene Themen bleiben übernommen, eigene Themen bleiben stehen.
+  await schule.evaluate(() => window.__wocheSetzen('2026-09-28', { schuleGeprueft: true }));
+  await schule.setInputFiles('#datei', format('kimai-schule.csv'));
+  await schule.waitForTimeout(600);
+  st = await gespeichert(schule);
+  pruefe('Derselbe Export noch einmal: Themen unverändert und weiter übernommen',
+    st.wochen['2026-09-28'].schule === themen && st.wochen['2026-09-28'].schuleGeprueft === true, JSON.stringify(st.wochen['2026-09-28']));
+  await schule.evaluate(() => window.__wocheSetzen('2026-09-28', { schule: 'Eigene Themen', schuleGeprueft: false }));
+  await schule.setInputFiles('#datei', format('kimai-schule.csv'));
+  await schule.waitForTimeout(600);
+  st = await gespeichert(schule);
+  pruefe('Selbst geschriebene Themen der Woche überschreibt der Import nicht', st.wochen['2026-09-28'].schule === 'Eigene Themen');
+  await schule.evaluate(() => window.__tagSetzen('2026-10-06', { art: '', artVonHand: true }));
+  await schule.setInputFiles('#datei', format('kimai-schule.csv'));
+  await schule.waitForTimeout(600);
+  st = await gespeichert(schule);
+  pruefe('Von Hand zum Arbeitstag gemacht: bleibt einer, mit den Buchungen als Entwurf',
+    art('2026-10-06') === '' && st.tage['2026-10-06'].text.includes('WiSo: Tarifvertrag'), JSON.stringify(st.tage['2026-10-06']));
+  pruefe('Schultage ohne JavaScript-Fehler', schulFehler.length === 0, schulFehler.join(' | '));
+  await schule.close();
+
+  const taeglich = await schulSeite(() => { document.getElementById('f-vordruck').value = 'taeglich'; });
+  await taeglich.setInputFiles('#datei', format('kimai-schule.csv'));
+  await taeglich.waitForTimeout(600);
+  st = await gespeichert(taeglich);
+  pruefe('Tägliche Notierung: jeder Schultag behält seine Fächer, nichts in den Themen der Woche',
+    st.tage['2026-09-29'].text === 'AEUP: Datenbanken\nFUIT: IPv4\nITT: ESP32\nE: Compiler and Interpreter' &&
+    st.tage['2026-09-30'].text === 'AEUP: Normalisierung\nFUIT: Subnetting\nDeutsch: Bewerbungsschreiben\nE: Compiler and Interpreter' &&
+    !(st.wochen['2026-09-28'] && st.wochen['2026-09-28'].schule), JSON.stringify(st.tage['2026-09-30'].text));
+  await taeglich.close();
+
+  const plan = await schulSeite(() => { document.getElementById('f-schultage').value = 'Mi'; });
+  await plan.setInputFiles('#datei', format('kimai-schule.csv'));
+  await plan.waitForTimeout(600);
+  st = await gespeichert(plan);
+  pruefe('Mit Schulplan reicht ein Fach: Mittwoch 7.10. ist Berufsschule, mit Dienstag zusammengeführt',
+    art('2026-10-07') === 'Berufsschule' && st.wochen['2026-10-05'] &&
+    st.wochen['2026-10-05'].schule === 'WiSo: Tarifvertrag\nLF5: Schleifen und Arrays\nITT: Sensoren\nLF4: VLANs',
+    JSON.stringify(st.wochen['2026-10-05']));
+  await plan.close();
+
+  /* ---------- Ohne Kopfzeile ---------- */
+  const ohne = await analyse(lies('kimai-ohne-kopf.csv'));
+  pruefe('Ohne Kopfzeile: beide Zeilen sind Buchungen, Spalten nach Inhalt, trotzdem eine Rückfrage',
+    !ohne.sicher && ohne.buchungen.length === 2 && ohne.gruende[0].includes('keine Kopfzeile') &&
+    ohne.felder.datum === 0 && ohne.felder.von === 1 && ohne.felder.bis === 2 && ohne.felder.dauer === 3 && ohne.felder.beschreibung === 11,
+    JSON.stringify(ohne.felder) + ' ' + JSON.stringify(ohne.gruende));
+  const kopflos = await schulSeite();
+  await kopflos.setInputFiles('#datei', format('kimai-ohne-kopf.csv'));
+  await kopflos.waitForSelector('#dlg-zuordnung[open]', { timeout: 3000 }).catch(() => {});
+  pruefe('Ohne Kopfzeile: Dialog mit Hinweis und vorgeschlagenen Spalten',
+    (await kopflos.locator('#zu-gruende').textContent()).includes('keine Kopfzeile') &&
+    (await kopflos.locator('#zu-beschreibung').inputValue()) === '11' && !(await kopflos.locator('#zu-ja').isDisabled()));
+  await kopflos.click('#zu-ja');
+  await kopflos.waitForTimeout(500);
+  st = await gespeichert(kopflos);
+  pruefe('Ohne Kopfzeile: beide Tage eingelesen, als Berufsschule erkannt', art('2026-09-29') === 'Berufsschule' && art('2026-09-30') === 'Berufsschule',
+    Object.keys((st && st.tage) || {}).join(' '));
+  await kopflos.setInputFiles('#datei', format('kimai-ohne-kopf.csv'));
+  await kopflos.waitForTimeout(600);
+  pruefe('Ohne Kopfzeile, zweites Mal: keine Rückfrage mehr',
+    !(await kopflos.locator('#dlg-zuordnung').isVisible()) && (await kopflos.locator('#notiz').textContent()).includes('geladen'));
+  await kopflos.close();
+
   /* ---------- Beispiel ---------- */
   const beispiel = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await h.ohneRundgang(beispiel);
