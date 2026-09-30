@@ -16,8 +16,13 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   darunter. Der Name eines Tages öffnet weiter den ganzen Tag. Auch übernommene Themen einer
   Blockwoche bleiben im Blatt beschreibbar, wer schreibt, hebt die Übernahme auf.
 - **Am Handy das Blatt statt Karten:** Auch am Handy steht die Woche als Blatt da. Ein Feld
-  antippen öffnet es groß zum Schreiben, oben im Bild, mit „Fertig“ und „Ganzer Tag ›“. „Donnerstag
-  ohne Text ›“ öffnet den Tag ebenso, am Rechner wie am Handy.
+  antippen, und von unten fährt ein großes Schreibfeld hoch, über der Tastatur: oben der Titel mit
+  „Fertig“, darunter, wohin der Text im Blatt kommt. „Fertig“ übernimmt einen offenen Tag und
+  schließt; nach unten wischen oder daneben tippen schließt nur. „Donnerstag ohne Text ›“ öffnet den
+  Tag ebenso, am Rechner wie am Handy.
+- **Hinweise am Handy kurz:** Der Tipp fürs iPhone, „Sicherung fällig“, „Noch offen“ und das
+  Ergebnis eines Imports stehen am Handy in ein, zwei Zeilen mit einem Knopf; „Wie?“ oder „Mehr“
+  zeigt den ganzen Text. Vorher nahm allein der Tipp sechs Zeilen und zwei Knöpfe.
 - **Ruhigere Felder:** Statt gelber, gestrichelter Flächen tragen die Felder der Woche einen feinen
   grauen Rahmen, die Tage zeigen ihn erst beim Drüberfahren.
 - **Reiter am Handy in einer Zeile:** Mo bis So und „Woche“ stehen nebeneinander, ein leeres

@@ -81,7 +81,7 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
    hinein, in jedes Feld: Abteilung, Unterweisungen, in einer Blockwoche die Themen der
    Berufsschule und den Text jedes Tages. Solange ein Tag offen ist, steht beim Schreiben **Fertig**
    darunter. Ein Klick auf den Namen eines Tages im Blatt („Montag“, „Dienstag“ …) öffnet den ganzen
-   Tag. Am Handy tippst du ein Feld an, dann öffnet es sich groß zum Schreiben. Was über alle Wochen
+   Tag. Am Handy tippst du ein Feld an, dann fährt von unten ein großes Schreibfeld hoch. Was über alle Wochen
    noch fehlt, zeigt **⋯ → Übersicht aller Wochen**.
 
    ![Wochenansicht: das Blatt zum Hineinschreiben](bilder/woche.png)

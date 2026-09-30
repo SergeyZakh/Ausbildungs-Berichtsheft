@@ -240,7 +240,7 @@ async function durchgang(browser, breite) {
     await page.locator('.blattfeld.feld-unterweisung').isVisible());
   await nichtsRaus('Woche');
   await nichtsDarunter('Woche');
-  // Im verkleinerten Blatt tippt man nicht: Ein Tipp öffnet das Feld groß, oben, über der Tastatur.
+  // Im verkleinerten Blatt tippt man nicht: Ein Tipp öffnet das Feld groß, von unten.
   await page.locator('.blattfeld.feld-unterweisung').tap();
   await page.waitForTimeout(300);
   const gross = await page.evaluate(() => {
@@ -249,12 +249,12 @@ async function durchgang(browser, breite) {
       titel: document.getElementById('schreiben-titel').textContent,
       fokus: document.activeElement && document.activeElement.id };
   });
-  pruefe('Woche: ein Tipp aufs Feld öffnet es groß, oben im Bild' + bei,
-    gross.offen && gross.oben <= 20 && gross.unten <= gross.bild && gross.fokus === 'schreiben-text' &&
-    /Unterweisungen/.test(gross.titel), JSON.stringify(gross));
+  pruefe('Woche: ein Tipp aufs Feld öffnet es groß, von unten' + bei,
+    gross.offen && Math.abs(gross.unten - gross.bild) <= 1 && gross.oben > gross.bild / 3 && gross.fokus === 'schreiben-text' &&
+    gross.titel === 'Unterweisungen und Schulungen', JSON.stringify(gross));
   await nichtsRaus('Schreibfeld');
   await page.fill('#schreiben-text', 'Unterweisung Arbeitssicherheit');
-  await page.click('#schreiben-zu');
+  await page.click('#schreiben-fertig');
   await page.waitForTimeout(500);
   const danach = await page.evaluate(() => ({
     offen: document.getElementById('dlg-schreiben').open,
@@ -270,6 +270,17 @@ async function durchgang(browser, breite) {
   pruefe('Nach dem Import: Karte oben mit „Spalten prüfen“, keine schwebende Meldung darüber' + bei,
     (await page.locator('#hinweise .hinweis').isVisible()) && !(await page.locator('.fussleiste').isVisible()) &&
     (await page.locator('#hinweise button', { hasText: 'Spalten prüfen' }).count()) === 1);
+  // Kurz: eine Zeile Text, die Tage zum Abhaken, eine Zeile Knöpfe. Vorher fast der halbe Bildschirm.
+  const karte = await page.evaluate(() => {
+    const k = document.querySelector('#hinweise .hinweis');
+    const kn = [...k.querySelectorAll('.hinweisknoepfe > *')].map((b) => { const r = b.getBoundingClientRect(); return Math.round((r.top + r.bottom) / 2); });
+    return { kurz: k.classList.contains('kurz'), hoehe: Math.round(k.getBoundingClientRect().height),
+      tage: k.querySelectorAll('.schulwahl-zeile').length, knopfZeilen: new Set(kn).size };
+  });
+  // Bei 320 px rutscht „Spalten prüfen“ unter die beiden Knöpfe.
+  pruefe('Nach dem Import: die Karte kurz, Knöpfe in einer Zeile' + bei,
+    karte.kurz && karte.knopfZeilen <= (breite < 360 ? 2 : 1) && karte.hoehe < 90 + karte.tage * 26 + (breite < 360 ? 30 : 0),
+    JSON.stringify(karte));
   await nichtsRaus('Mit Import-Karte');
 
   pruefe('Keine JavaScript-Fehler' + bei, jsFehler.length === 0, jsFehler.join(' | '));

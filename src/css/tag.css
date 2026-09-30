@@ -285,7 +285,7 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 .blattfeld.feld-abteilung { outline-offset: 1px; }
 .blattfeld.feld-abteilung .blattleer { font-size: var(--schrift-fein); }
 .blattfeld.feld-abteilung .blattstift { top: -1px; right: 1px; font-size: 10px; }
-.blatthinweis .schmal { display: none; }
+.blatthinweis .schmal, .blattleer .schmal { display: none; }
 
 /* Ein Klick auf den Kopf eines Tages öffnet ihn ganz; ein offener trägt eine Marke, die dazu
    einlädt, jeder andere zeigt es beim Drüberfahren. */
@@ -471,7 +471,7 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 .hinweistext { flex: 1 1 320px; margin: 0; font-size: var(--schrift-text); line-height: 1.5; color: var(--schiefer); }
 .hinweistext b { color: var(--text); font-weight: 600; margin-right: 2px; }
 .hinweis.warn .hinweistext b { color: var(--acht); }
-.hinweisknoepfe { flex: none; display: flex; gap: var(--luft-2); flex-wrap: wrap; }
+.hinweisknoepfe { flex: none; display: flex; align-items: center; gap: var(--luft-2); flex-wrap: wrap; }
 .hinweiszu {
   position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; padding: 0;
   display: inline-flex; align-items: center; justify-content: center;
@@ -479,6 +479,13 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   background: transparent; border: 0; border-radius: 50%;
 }
 .hinweiszu:hover { background: var(--band); color: var(--text); }
+.hinweisknoepfe:empty { display: none; }
+/* „Wie?“, „Mehr“, „Spalten prüfen“ in der kurzen Fassung am Handy: ein Verweis im Satz. */
+.hinweislink {
+  padding: 0; border: 0; background: none; font: inherit; font-weight: 600; color: var(--text);
+  text-decoration: underline; text-underline-offset: 2px; white-space: nowrap;
+}
+.hinweisknoepfe .hinweislink { margin-left: var(--luft-2); font-size: var(--schrift-klein); color: var(--schiefer); }
 /* Vorgeschlagene Schultage nach einem Import: Text, darunter die Tage zum Abhaken, darunter die
    Knöpfe. Erst „Als Berufsschule übernehmen“ macht sie zu Schultagen. */
 .hinweis.schulwahl .hinweistext { flex: 1 1 100%; }

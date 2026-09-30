@@ -56,11 +56,13 @@ function zeichneWochenblatt(bereich) {
 
   if (imBlatt) {
     vorschau.felder([
-      { feld: "abteilung", el: abt, leer: "Abteilung", titel: "Ausbildungsabteilung" },
+      { feld: "abteilung", el: abt, leer: "Abteilung", titel: "Ausbildungsabteilung",
+        unter: "Steht oben im Blatt und gilt für die ganze Woche" },
       { feld: "unterweisung", el: ta, leer: "Hier schreiben: Unterweisungen, Lehrgespräche, Schulungen dieser Woche",
-        titel: "Unterweisungen, Lehrgespräche, Schulungen" },
+        titel: "Unterweisungen und Schulungen", unter: "Kommt ins Blatt unter „Unterweisungen, Lehrgespräche …“" },
       themen ? { feld: "schule", el: themen.ta, leer: "Hier schreiben: die Themen des Unterrichts",
-        titel: "Berufsschule (Unterrichtsthemen)", knoepfe: themen.gruppe } : null
+        titel: "Themen der Berufsschule", unter: "Kommt ins Blatt unter „Berufsschule (Unterrichtsthemen)“",
+        knoepfe: themen.gruppe } : null
     ]);
   } else {
     var spalte = document.createElement("div");
@@ -136,7 +138,7 @@ function blattVorschau(imBlatt) {
     schreiben.innerHTML = '<span class="stift" aria-hidden="true">✎</span> ' +
       '<span class="breit">Ins Blatt klicken und schreiben</span><span class="schmal">Ins Blatt tippen und schreiben</span>';
     tagHinweis = document.createElement("span");
-    tagHinweis.className = "blatthinweis";
+    tagHinweis.className = "blatthinweis tage";
     tagHinweis.innerHTML = "<b>Montag</b>, <b>Dienstag</b> …: der ganze Tag";
     fehlt = document.createElement("button");
     fehlt.type = "button";
@@ -402,9 +404,14 @@ function blattVorschau(imBlatt) {
     ta.addEventListener("input", function () { tagSchreiben(d, ta.value); knoepfe.stand(); });
     // Danach das Blatt nachziehen: Ein geleerter Tag verliert dort seinen Platz und sein Feld.
     ta.addEventListener("blur", spaeter);
-    var f = feldAuflegen({ feld: "tag", datum: d, el: ta, leer: "", titel: name, knoepfe: knoepfe });
+    var f = feldAuflegen({ feld: "tag", datum: d, el: ta, leer: "", titel: name, unter: tagUnter(d), knoepfe: knoepfe });
     tagFeld[d] = f;
     return f;
+  }
+
+  /** Wohin der Text eines Tages im Blatt kommt, für die Zeile unter dem Titel des großen Felds. */
+  function tagUnter(d) {
+    return "Kommt ins Blatt unter „" + (istSchultag(tagArt(d)) ? "Berufsschule" : "Betriebliche Tätigkeit") + "“";
   }
 
   /** Ein Tag ohne Text steht nicht im Blatt: Sein Text entsteht im großen Feld, dann steht er dort. */
@@ -412,7 +419,7 @@ function blattVorschau(imBlatt) {
     var datum = vonIso(d), knoepfe = fertigKnopf(d);
     schreibblattOeffnen({
       titel: WOCHENTAGE[datum.getDay()] + ", " + dmy(datum),
-      unter: istSchultag(tagArt(d)) ? "Berufsschule (Unterrichtsthemen)" : "Betriebliche Tätigkeit",
+      unter: tagUnter(d),
       wert: (tage[d] && tage[d].text) || "",
       platzhalter: "Was hast du an diesem Tag gemacht?",
       schreiben: function (v) { tagSchreiben(d, v); knoepfe.stand(); },
@@ -433,7 +440,9 @@ function blattVorschau(imBlatt) {
     if (o.datum) huelle.setAttribute("data-datum", o.datum);
     var leer = document.createElement("span");
     leer.className = "blattleer";
-    leer.textContent = o.leer;
+    // Am Handy steht der Kasten dreimal kleiner da; dort reicht, was zu tun ist.
+    leer.innerHTML = o.feld === "abteilung" ? sicher(o.leer)
+      : '<span class="breit">' + sicher(o.leer) + '</span><span class="schmal">✎ antippen und schreiben</span>';
     var stift = document.createElement("span");
     stift.className = "blattstift";
     stift.setAttribute("aria-hidden", "true");
@@ -453,7 +462,8 @@ function blattVorschau(imBlatt) {
       if (!meldungSchwebt() || (e.target.closest && e.target.closest(".blattknoepfe"))) return;
       e.preventDefault();
       schreibblattOeffnen({
-        titel: o.titel, wert: o.el.value, platzhalter: o.el.placeholder, feld: f,
+        titel: o.titel, unter: o.unter, wert: o.el.value, platzhalter: o.el.placeholder, feld: f,
+        einzeilig: o.el.tagName === "INPUT",
         schreiben: function (v) { o.el.value = v; o.el.dispatchEvent(new Event("input")); },
         knoepfe: o.knoepfe, datum: o.datum, zu: jetzt
       });
@@ -478,15 +488,19 @@ var schreibblatt = null;
 
 /**
  * Ein Feld aus dem Blatt groß zum Schreiben. Am Handy ist das Blatt auf ein Drittel verkleinert;
- * darin zu schreiben hieße, in Fünf-Pixel-Schrift zu tippen. Geschrieben wird trotzdem ins Feld im
- * Blatt (`schreiben`), das speichert und das Blatt nachzieht; seine Knöpfe („Fertig“) wandern für
- * die Zeit mit. Ein Tag ohne Text öffnet sich so auch am Rechner: Im Blatt hat er noch kein Feld.
+ * darin zu schreiben hieße, in Fünf-Pixel-Schrift zu tippen. Dort fährt das Feld von unten hoch,
+ * über der Tastatur: oben sein Titel mit „Fertig“, darunter, wohin der Text im Blatt kommt.
+ * Geschrieben wird trotzdem ins Feld im Blatt (`schreiben`), das speichert und das Blatt nachzieht.
+ * „Fertig“ schließt; ist der Tag oder sind die Themen noch offen, übernimmt es sie auch, wie
+ * „Fertig“ überall sonst (der Knopf dafür bleibt am Feld, `knoepfe`). Wer nur nachsehen will,
+ * wischt das Feld nach unten oder tippt daneben. Ein Tag ohne Text öffnet sich so auch am Rechner:
+ * Im Blatt hat er noch kein Feld.
  *
- * o: { titel, unter, wert, platzhalter, schreiben(text), knoepfe, datum (ein Tag: „Ganzer Tag“), zu() }
+ * o: { titel, unter, wert, platzhalter, einzeilig, schreiben(text), knoepfe, datum (ein Tag), zu() }
  */
 function schreibblattOeffnen(o) {
   var dlg = $("dlg-schreiben"), ta = $("schreiben-text"), offen = dlg.open;
-  // Schon offen: das alte Feld gleich zurückgeben. Über close ginge es nicht, das Ereignis kommt
+  // Schon offen: das alte Feld gleich abschließen. Über close ginge es nicht, das Ereignis kommt
   // erst später und träfe dann das neue.
   if (offen) schreibblattAufraeumen();
   $("schreiben-titel").textContent = o.titel;
@@ -494,37 +508,85 @@ function schreibblattOeffnen(o) {
   $("schreiben-unter").hidden = !o.unter;
   ta.value = o.wert || "";
   ta.placeholder = o.platzhalter || "";
-  schreibblatt = { o: o, feld: o.feld || null, heim: o.knoepfe ? o.knoepfe.parentNode : null };
-  if (o.knoepfe) $("schreiben-knoepfe").appendChild(o.knoepfe);
+  ta.classList.toggle("einzeilig", !!o.einzeilig);
+  schreibblatt = { o: o, feld: o.feld || null };
   $("schreiben-tag").hidden = !o.datum;
+  dlg.style.transform = "";
   if (!offen) dlg.showModal();
+  tastaturAbstand();
   ta.focus();
   try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {}
 }
 
-$("schreiben-text").addEventListener("input", function (e) {
-  if (schreibblatt) schreibblatt.o.schreiben(e.target.value);
-});
-// Ein Knopf („Fertig“) erledigt das Feld: Danach ist es zu.
-$("schreiben-knoepfe").addEventListener("click", function (e) {
-  if (e.target.closest && e.target.closest("button")) setTimeout(function () { $("dlg-schreiben").close(); }, 0);
-});
-$("schreiben-tag").addEventListener("click", function () {
-  var d = schreibblatt && schreibblatt.o.datum;
-  $("dlg-schreiben").close();
-  if (d) stelleZeigen(d);
-});
-$("schreiben-zu").addEventListener("click", function () { $("dlg-schreiben").close(); });
-/** Die Knöpfe zurück an ihr Feld, das Blatt nachziehen. */
+function schreibblattZu() { if ($("dlg-schreiben").open) $("dlg-schreiben").close(); }
+
+/** Das Blatt nachziehen; ein Tag ohne Feld im Blatt gibt seinen „Fertig“-Knopf wieder ab. */
 function schreibblattAufraeumen() {
   var sb = schreibblatt;
   schreibblatt = null;
   if (!sb) return;
   var k = sb.o.knoepfe;
-  if (k) { if (sb.heim) sb.heim.appendChild(k); else if (k.parentNode) k.parentNode.removeChild(k); }
+  if (k && !sb.feld && k.parentNode) k.parentNode.removeChild(k);
   if (sb.o.zu) sb.o.zu();
 }
+
+/* Am Handy schiebt die Tastatur sich über die Seite, ohne sie kleiner zu machen: Das Feld unten
+   läge dahinter. visualViewport sagt, wie viel sie verdeckt; um so viel rückt das Feld hoch. */
+function tastaturAbstand() {
+  var vv = window.visualViewport, dlg = $("dlg-schreiben");
+  if (!vv || !dlg.open) return;
+  dlg.style.setProperty("--tastatur", Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) + "px");
+  dlg.style.setProperty("--sichtbar", Math.round(vv.height) + "px");
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", tastaturAbstand);
+  window.visualViewport.addEventListener("scroll", tastaturAbstand);
+}
+
+$("schreiben-text").addEventListener("input", function (e) {
+  if (schreibblatt) schreibblatt.o.schreiben(e.target.value);
+});
+// Die Abteilung ist eine Zeile: Enter heißt dort fertig.
+$("schreiben-text").addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && schreibblatt && schreibblatt.o.einzeilig) { e.preventDefault(); schreibblattZu(); }
+});
+$("schreiben-fertig").addEventListener("click", function () {
+  var k = schreibblatt && schreibblatt.o.knoepfe;
+  var fertig = k && k.querySelector(".uebernehmen:not([hidden])");
+  schreibblattZu();
+  if (fertig) fertig.click();
+});
+$("schreiben-tag").addEventListener("click", function () {
+  var d = schreibblatt && schreibblatt.o.datum;
+  schreibblattZu();
+  if (d) stelleZeigen(d);
+});
 $("dlg-schreiben").addEventListener("close", schreibblattAufraeumen);
+// Daneben tippen schließt, ohne etwas zu übernehmen. Das Feld selbst reicht bis an seine Kanten,
+// ein Klick auf den Dialog selbst kommt deshalb nur vom Hintergrund.
+$("dlg-schreiben").addEventListener("click", function (e) { if (e.target === this) schreibblattZu(); });
+
+/* Nach unten wischen schließt, wie bei jedem Blatt, das von unten kommt. Gegriffen wird oben, am
+   Griff und am Titel; im Textfeld scrollt ein Wischen den Text. */
+(function () {
+  var dlg = $("dlg-schreiben"), start = null, weg = 0;
+  dlg.addEventListener("touchstart", function (e) {
+    start = e.target.closest && e.target.closest(".schreiben-griff, .dkopf") && !e.target.closest("button")
+      ? e.touches[0].clientY : null;
+    weg = 0;
+  }, { passive: true });
+  dlg.addEventListener("touchmove", function (e) {
+    if (start == null) return;
+    weg = Math.max(0, e.touches[0].clientY - start);
+    dlg.style.transform = weg ? "translateY(" + weg + "px)" : "";
+  }, { passive: true });
+  dlg.addEventListener("touchend", function () {
+    if (start == null) return;
+    start = null;
+    if (weg > 70) schreibblattZu();
+    dlg.style.transform = "";
+  });
+})();
 
 /**
  * Rechte Spalte neben dem Wochenblatt: ob es aufs Blatt passt und die KI für die

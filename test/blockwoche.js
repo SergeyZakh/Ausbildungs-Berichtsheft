@@ -296,27 +296,32 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     reiter: document.getElementById('reiter-block').getBoundingClientRect().width,
   }));
   pruefe('Handy: ein breiter Reiter, nichts ragt über den Rand', breit.seite <= 390 && breit.reiter > 300, JSON.stringify(breit));
-  // Auch am Handy liegen die Themen im Blatt; ein Tipp öffnet sie groß, „Fertig“ kommt mit.
+  // Auch am Handy liegen die Themen im Blatt; ein Tipp öffnet sie groß.
   await handy.click('.blattfeld.feld-schule');
   await handy.waitForTimeout(300);
   const handyThemen = await handy.evaluate(() => ({
     offen: document.getElementById('dlg-schreiben').open, titel: document.getElementById('schreiben-titel').textContent,
-    wert: document.getElementById('schreiben-text').value, knoepfe: !!document.querySelector('#schreiben-knoepfe .schulwoche'),
+    unter: document.getElementById('schreiben-unter').textContent,
   }));
-  pruefe('Handy: die Themen im Blatt, ein Tipp öffnet sie groß mit ihren Knöpfen',
-    handyThemen.offen && handyThemen.titel === 'Berufsschule (Unterrichtsthemen)' && handyThemen.knoepfe,
+  pruefe('Handy: die Themen im Blatt, ein Tipp öffnet sie groß',
+    handyThemen.offen && handyThemen.titel === 'Themen der Berufsschule' && /Berufsschule \(Unterrichtsthemen\)/.test(handyThemen.unter),
     JSON.stringify(handyThemen));
   await handy.fill('#schreiben-text', 'LF7: Datensicherung');
   await handy.keyboard.press('Escape');
   await handy.waitForTimeout(500);
   const handyDanach = await handy.evaluate(() => ({
-    offen: document.getElementById('dlg-schreiben').open, themen: window.__wochendaten()['2026-09-14'].schule,
-    zurueck: !!document.querySelector('.blattfeld.feld-schule .schulwoche'),
+    offen: document.getElementById('dlg-schreiben').open, w: window.__wochendaten()['2026-09-14'],
     blatt: [...document.querySelectorAll('.vorschaubuehne [data-feld="schule"] .kasten')].pop().textContent,
   }));
-  pruefe('Handy: geschrieben, gespeichert, im Blatt; die Knöpfe wieder am Feld',
-    !handyDanach.offen && handyDanach.themen === 'LF7: Datensicherung' && handyDanach.zurueck &&
+  pruefe('Handy: geschrieben, gespeichert, im Blatt; Escape schließt, ohne zu übernehmen',
+    !handyDanach.offen && handyDanach.w.schule === 'LF7: Datensicherung' && !handyDanach.w.schuleGeprueft &&
     handyDanach.blatt.includes('LF7: Datensicherung'), JSON.stringify(handyDanach));
+  await handy.click('.blattfeld.feld-schule');
+  await handy.waitForTimeout(300);
+  await handy.click('#schreiben-fertig');
+  await handy.waitForTimeout(400);
+  pruefe('Handy: „Fertig“ im großen Feld übernimmt die Themen', await handy.evaluate(() =>
+    !document.getElementById('dlg-schreiben').open && window.__wochendaten()['2026-09-14'].schuleGeprueft === true));
   pruefe('Handy ohne JavaScript-Fehler', handyFehler.length === 0, handyFehler.join(' | '));
 
   pruefe('Keine JavaScript-Fehler', jsFehler.length === 0, jsFehler.join(' | '));

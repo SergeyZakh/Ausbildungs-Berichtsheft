@@ -598,19 +598,41 @@
 .er-fehlt { flex: 1 1 auto; margin: 0; font-size: var(--schrift-klein); line-height: 1.35; color: var(--acht); text-align: center; }
 
 /* ---------- Ein Feld aus dem Wochenblatt groß (schreibblattOeffnen() in wochenblatt.js) ----------
-   Oben statt mittig: Am Handy schiebt die Tastatur von unten herein und hätte das Feld verdeckt. */
+   Am Rechner ein Fenster wie jedes andere. Am Handy fährt es von unten hoch, über der Tastatur
+   (--tastatur aus visualViewport); oben ein Griff zum Wegwischen. */
 #dlg-schreiben { max-width: 620px; }
+#dlg-schreiben .dkopf { border-bottom: 0; padding-bottom: var(--luft-2); }
 #dlg-schreiben .dkopf h2 { margin: 0; }
-.schreiben-unter { margin: 2px 0 0; font-size: var(--schrift-klein); color: var(--schiefer); }
+.schreiben-unter { margin: 0 0 var(--luft-3); font-size: var(--schrift-klein); color: var(--schiefer); }
+#dlg-schreiben .dkoerper { padding-top: 0; }
 #schreiben-text {
-  display: block; width: 100%; min-height: 240px; resize: vertical;
-  font: inherit; font-size: var(--schrift-gross); line-height: 1.6;
+  display: block; width: 100%; min-height: 200px; resize: vertical; padding: var(--luft-3) var(--luft-4);
+  border: 1px solid var(--linie-fest); border-radius: var(--rund); background: var(--flaeche); color: var(--text);
+  font: inherit; font-size: var(--schrift-gross); line-height: 1.55;
 }
-#schreiben-tag { margin-right: auto; }
-#schreiben-knoepfe { display: contents; }
-#schreiben-knoepfe .blattknoepfe { position: static; display: flex; gap: var(--luft-2); }
-#schreiben-knoepfe .blattknoepfe .sektionsknopf { box-shadow: none; }
+#schreiben-text.einzeilig { min-height: 0; height: 52px; resize: none; }
+#schreiben-text:focus, #schreiben-text:focus-visible { outline: none; box-shadow: none; border-color: var(--schiefer); }
+.schreiben-tag {
+  display: inline-block; margin-top: var(--luft-2); padding: var(--luft-1) 0; border: 0; background: none;
+  font-size: var(--schrift-klein); color: var(--schiefer);
+}
+@media (hover: hover) { .schreiben-tag:hover { color: var(--text); text-decoration: underline; } }
+.schreiben-griff { display: none; }
 @media (max-width: 820px) {
-  #dlg-schreiben[open] { margin-top: 10px; }
-  #schreiben-text { min-height: 30dvh; }
+  #dlg-schreiben[open] {
+    width: 100%; max-width: none; margin: auto 0 var(--tastatur, 0px);
+    max-height: calc(var(--sichtbar, 100dvh) - 24px);
+    border-width: 1px 0 0; border-radius: 16px 16px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    animation: vonunten .22s ease-out; transition: transform .15s;
+  }
+  #dlg-schreiben::backdrop { background: rgba(0, 0, 0, .35); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .schreiben-griff { display: block; width: 40px; height: 5px; margin: var(--luft-2) auto 0; border-radius: 3px; background: var(--linie-fest); }
+  #dlg-schreiben .dkopf { padding: var(--luft-2) var(--luft-4) var(--luft-1); }
+  #dlg-schreiben .dkopf h2 { font-size: var(--schrift-gross); }
+  #schreiben-fertig { padding: 6px var(--luft-4); }
+  #dlg-schreiben .dkoerper { padding: var(--luft-2) var(--luft-4) var(--luft-4); }
+  #schreiben-text { min-height: 140px; max-height: 42dvh; }
+  #schreiben-text.einzeilig { min-height: 0; }
 }
+@keyframes vonunten { from { transform: translateY(100%); } }

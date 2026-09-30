@@ -96,7 +96,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
 | `rundgang.js` | Rundgang der Ausbilder beim ersten Start und über **?**; Azubis bekommen stattdessen die Einrichtung |
 | `einrichtung.js` | Einrichtung beim ersten Start: die Angaben fürs Wochenblatt in sechs Schritten, jede Eingabe geht sofort in das Feld von „Deine Daten“ (`data-feld`) |
-| `hinweise.js` | Hinweis über den Reitern: Ergebnis des letzten Imports mit „Spalten prüfen“ (`importKarte`, bleibt bis „Passt“ oder ×), Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
+| `hinweise.js` | Hinweis über den Reitern: Ergebnis des letzten Imports mit „Spalten prüfen“ (`importKarte`, bleibt bis „Passt“ oder ×), Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`); am Handy jeweils die kurze Fassung (`kurz`) |
 | `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Raster der Werktage wie bei GitHub (`jahresRaster()`) und die Tage je Art (`uebersichtDaten()`) |
 
 **`ausgabe/`**
@@ -364,13 +364,20 @@ noch etwas braucht, trägt nur in der Vorschau „● noch gegenlesen · öffnen
 Am Handy (unter 820 px, dieselbe Grenze wie `handy.css`) ist das Blatt auf ein Drittel
 verkleinert; darin zu tippen hieße, in Fünf-Pixel-Schrift zu schreiben. Die Felder nehmen dort
 keinen Tipp an (`pointer-events: none`), ein Tipp auf die Hülle öffnet das Feld groß
-(`schreibblattOeffnen()`, `#dlg-schreiben`, oben im Bild, damit die Tastatur es nicht verdeckt).
-Geschrieben wird trotzdem ins Feld im Blatt, dessen Eingabe speichert und neu zeichnet; seine
-Knöpfe („Fertig“) wandern für die Zeit mit und danach zurück. Ein Knopf darin schließt das Feld,
-„Ganzer Tag ›“ öffnet den Tag. Auch „Donnerstag ohne Text ›“ öffnet den Tag so, am Rechner wie am
-Handy: Im Blatt hat er noch kein Feld; sobald er Text hat, steht er dort. Früher standen am Handy
-Karten über dem Blatt, man sah das Blatt erst nach dem Scrollen. Weil die Anordnung nicht mehr von
-der Breite abhängt, baut die Woche beim Drucken (Seite so breit wie A4) auch nichts mehr um.
+(`schreibblattOeffnen()`, `#dlg-schreiben`). Es fährt von unten hoch, über der Tastatur: Wie viel
+sie verdeckt, sagt `visualViewport` (`tastaturAbstand()`, `--tastatur`). Oben stehen der Titel und
+„Fertig“, darunter, wohin der Text im Blatt kommt („Kommt ins Blatt unter …“). Geschrieben wird
+trotzdem ins Feld im Blatt, dessen Eingabe speichert und neu zeichnet. „Fertig“ schließt; ist der
+Tag oder sind die Themen noch offen, übernimmt es sie auch, über den Knopf am Feld im Blatt. Wer
+nur nachsehen will, wischt das Feld am Griff nach unten, tippt daneben oder drückt Escape; das
+übernimmt nichts. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
+Text ›“ öffnet sich so, am Rechner wie am Handy: Im Blatt hat der Tag noch kein Feld; sobald er
+Text hat, steht er dort. Früher standen am Handy Karten über dem Blatt, man sah das Blatt erst
+nach dem Scrollen; ein erster Versuch mit einem Fenster oben und einer Knopfleiste darunter sah
+nicht aus wie die Vorschau, auf die man sich geeinigt hatte. Weil die Anordnung nicht mehr von der
+Breite abhängt, baut die Woche beim Drucken (Seite so breit wie A4) auch nichts mehr um. Über dem
+Blatt steht am Handy nur „✎ Ins Blatt tippen und schreiben“, leere Felder sagen „✎ antippen und
+schreiben“.
 
 Nur die tägliche Notierung hat keine festen Kästen für Abteilung und Unterweisungen: Dort stehen
 sie als Karten über dem Blatt, die KI und „passt nicht“ darunter.
@@ -391,6 +398,13 @@ nichts mehr offen“ und bietet den frühesten offenen Tag als Knopf an (`erster
 Über den Reitern steht höchstens ein Hinweis, der wichtigste zuerst; wer einen wegklickt, hat für die
 Sitzung Ruhe. `hinweiseZeigen()` läuft bei jedem `zeichnen()` und blendet einen unveränderten Hinweis
 nicht neu ein.
+
+Am Handy steht jeder Hinweis in seiner kurzen Fassung (`kurz` im Hinweis, `.hinweis.kurz`): eine,
+höchstens zwei Zeilen und ein Knopf, etwa „Tipp: Über Teilen → „Zum Home-Bildschirm“, sonst löscht
+Safari nach 7 Tagen. Wie?“. Die langen nahmen dort den halben Bildschirm, der Tipp fürs iPhone
+allein sechs Zeilen und zwei Knöpfe. „Wie?“ oder „Mehr“ zeigt die lange Fassung (`hinweisGross`);
+nach einem Import stehen „Übernehmen“, „Alles Betrieb“ und „Spalten prüfen“ in einer Zeile unter
+den Tagen.
 
 1. **Tipp fürs iPhone** (Safari, nicht als App, ohne Konto, über http): Safari löscht Seitendaten
    nach sieben Tagen Safari-Nutzung ohne Besuch der Seite, vom Home-Bildschirm aus nicht. Dort hat die
@@ -695,9 +709,9 @@ npm test
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
-| `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), die Tage als Menü hinter dem Reiter, Themen schreiben und mit „Fertig“ am Feld übernehmen, übernommen im Blatt weiter beschreibbar, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy die Themen im Blatt, groß zum Schreiben |
-| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, keine Leiste darüber, Marke am offenen Tag, ins Blatt schreiben, jeder Tag ein Feld über seinen Zeilen, darin schreiben und „Fertig“, Tageskopf öffnet den Tag, Tag ohne Text über dem Blatt öffnet sich groß, schmales Fenster bleibt Blatt, Blatt scrollt bis unter die Reiter; am Handy öffnet ein Tag im Blatt sich groß mit „Fertig“ |
-| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Reiter in einer Zeile, Woche als Blatt in voller Breite mit den Feldern darin, ohne Leiste und Karten, ein Tipp öffnet das Feld groß oben im Bild, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
+| `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), die Tage als Menü hinter dem Reiter, Themen schreiben und mit „Fertig“ am Feld übernehmen, übernommen im Blatt weiter beschreibbar, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy die Themen im Blatt, groß zum Schreiben, Escape schließt ohne, „Fertig“ mit Übernahme |
+| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone, am Handy kurz, „Wie?“ zeigt alles), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, keine Leiste darüber, Marke am offenen Tag, ins Blatt schreiben, jeder Tag ein Feld über seinen Zeilen, darin schreiben und „Fertig“, Tageskopf öffnet den Tag, Tag ohne Text über dem Blatt öffnet sich groß, schmales Fenster bleibt Blatt, Blatt scrollt bis unter die Reiter; am Handy öffnet ein Tag im Blatt sich groß von unten, daneben tippen schließt nur, „Fertig“ übernimmt |
+| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Reiter in einer Zeile, Woche als Blatt in voller Breite mit den Feldern darin, ohne Leiste und Karten, ein Tipp öffnet das Feld groß von unten, Import-Karte kurz mit Knöpfen in einer Zeile, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
 mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).

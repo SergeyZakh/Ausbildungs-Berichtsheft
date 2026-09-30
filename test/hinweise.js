@@ -280,7 +280,18 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.waitForTimeout(800);
     const text = await page.locator('#hinweise').innerText().catch(() => '');
     pruefe('iPhone in Safari: Tipp zum Home-Bildschirm', await page.locator('#hinweise .hinweis.home').isVisible(), text);
-    pruefe('Er warnt, dass die App dort leer beginnt', text.includes('Zum Home-Bildschirm') && text.includes('Sicherung'), text);
+    // Am Handy erst die kurze Fassung: sechs Zeilen und zwei Knöpfe nahmen dort den halben Bildschirm.
+    const kurz = await page.evaluate(() => {
+      const k = document.querySelector('#hinweise .hinweis.home');
+      return { kurz: k.classList.contains('kurz'), hoehe: Math.round(k.getBoundingClientRect().height), knoepfe: k.querySelectorAll('.knopf').length };
+    });
+    pruefe('Am Handy kurz: höchstens zwei Zeilen, ohne Knöpfe', kurz.kurz && kurz.hoehe < 80 && kurz.knoepfe === 0 &&
+      text.includes('Zum Home-Bildschirm') && text.includes('7 Tagen'), JSON.stringify(kurz) + ' ' + text);
+    await page.click('#hinweise .hinweis.home .hinweislink');
+    await page.waitForTimeout(200);
+    const lang = await page.locator('#hinweise').innerText();
+    pruefe('„Wie?“ zeigt alles: dass die App dort leer beginnt, mit Sicherung', lang.includes('beginnt das Heft leer') &&
+      lang.includes('Sicherung') && await page.locator('#hinweise .hinweis.home .knopf').isVisible(), lang);
     pruefe('Die Seite kann als App auf den Home-Bildschirm', await page.evaluate(() =>
       !!document.querySelector('meta[name="apple-mobile-web-app-capable"][content="yes"]') &&
       /^data:image\/png;base64,/.test(document.querySelector('link[rel="apple-touch-icon"]').href)));
@@ -476,7 +487,7 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     const grossSchmal = await page.evaluate(() => ({
       offen: document.getElementById('dlg-schreiben').open, wert: document.getElementById('schreiben-text').value,
     }));
-    await page.click('#dlg-schreiben .dlg-x');
+    await page.click('#schreiben-fertig');
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.waitForTimeout(400);
     pruefe('Schmales Fenster: bleibt das Blatt, ein Klick öffnet das Feld groß',
@@ -626,22 +637,33 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.waitForTimeout(900);
     await page.click('.blattfeld.feld-tag[data-datum="2026-09-09"]');
     await page.waitForTimeout(300);
-    const handyTag = await page.evaluate(() => ({
-      offen: document.getElementById('dlg-schreiben').open, titel: document.getElementById('schreiben-titel').textContent,
-      wert: document.getElementById('schreiben-text').value, text: window.__tage()['2026-09-09'].text,
-      fertig: !!document.querySelector('#schreiben-knoepfe .uebernehmen:not([hidden])'),
-    }));
-    pruefe('Am Handy: ein Tag im Blatt öffnet sich groß, mit seinem Text und „Fertig“',
-      handyTag.offen && handyTag.titel === 'Mittwoch, 09.09.2026' && handyTag.wert === handyTag.text && handyTag.fertig,
+    const handyTag = await page.evaluate(() => {
+      const d = document.getElementById('dlg-schreiben').getBoundingClientRect();
+      return {
+        offen: document.getElementById('dlg-schreiben').open, titel: document.getElementById('schreiben-titel').textContent,
+        unter: document.getElementById('schreiben-unter').textContent,
+        wert: document.getElementById('schreiben-text').value, text: window.__tage()['2026-09-09'].text,
+        unten: Math.round(innerHeight - d.bottom), breit: Math.round(d.width) === innerWidth,
+      };
+    });
+    pruefe('Am Handy: ein Tag im Blatt öffnet sich groß von unten, mit seinem Text und wohin er kommt',
+      handyTag.offen && handyTag.titel === 'Mittwoch, 09.09.2026' && handyTag.wert === handyTag.text &&
+      handyTag.unter === 'Kommt ins Blatt unter „Betriebliche Tätigkeit“' && Math.abs(handyTag.unten) <= 1 && handyTag.breit,
       JSON.stringify(handyTag));
-    await page.click('#schreiben-knoepfe .uebernehmen');
+    // Daneben tippen schließt nur; übernommen wird erst mit „Fertig“.
+    await page.mouse.click(200, 60);
+    await page.waitForTimeout(300);
+    pruefe('… daneben tippen schließt, ohne den Tag zu übernehmen', await page.evaluate(() =>
+      !document.getElementById('dlg-schreiben').open && !window.__tage()['2026-09-09'].geprueft));
+    await page.click('.blattfeld.feld-tag[data-datum="2026-09-09"]');
+    await page.waitForTimeout(300);
+    await page.click('#schreiben-fertig');
     await page.waitForTimeout(400);
     const handyFertig = await page.evaluate(() => ({
       offen: document.getElementById('dlg-schreiben').open, geprueft: window.__tage()['2026-09-09'].geprueft,
-      knoepfeZurueck: !!document.querySelector('.blattfeld.feld-tag[data-datum="2026-09-09"] .blattknoepfe'),
     }));
-    pruefe('… „Fertig“ dort übernimmt den Tag und schließt das Feld',
-      !handyFertig.offen && handyFertig.geprueft === true && handyFertig.knoepfeZurueck, JSON.stringify(handyFertig));
+    pruefe('… „Fertig“ übernimmt den Tag und schließt das Feld',
+      !handyFertig.offen && handyFertig.geprueft === true, JSON.stringify(handyFertig));
     await ctx.close();
   }
 

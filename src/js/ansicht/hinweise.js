@@ -3,6 +3,10 @@
  *
  * Höchstens einer steht da, der wichtigste zuerst. Wer einen wegklickt, hat für diese Sitzung
  * Ruhe: Drei Hinweise nacheinander wären eine Kette, die man abarbeiten muss, bevor man schreibt.
+ *
+ * Am Handy steht jeder Hinweis in seiner kurzen Fassung (`kurz`): eine, höchstens zwei Zeilen und
+ * ein Knopf. Die langen nahmen dort den halben Bildschirm, bevor man die Woche sah; der Tipp fürs
+ * iPhone allein sechs Zeilen und zwei Knöpfe. „Wie?“ oder „Mehr“ zeigt die lange Fassung.
  * ========================================================== */
 
 /* Safari löscht, was eine Seite gespeichert hat, nach sieben Tagen Safari-Nutzung ohne Besuch
@@ -71,6 +75,9 @@ function bilanzText(b) {
    Hinspringen ist ganz Ruhe. */
 var hinweisRuhe = false, fehltZeigen = false;
 
+/* Welcher Hinweis am Handy aufgeklappt ist („Wie?“, „Mehr“): seine Art. */
+var hinweisGross = "";
+
 /* Nach einem Import steht das Ergebnis als Karte oben, mit „Spalten prüfen“. Sie bleibt, bis man
    sie schließt: Als Knopf in der Meldung war die Korrektur am Handy nach Sekunden verschwunden. */
 var importKarte = null;
@@ -99,6 +106,12 @@ function importHinweis(k) {
       liste: schulVorschlagListe(k.vorschlag),
       knoepfe: [["Als Berufsschule übernehmen", function () { entscheiden(true); }, true],
         ["Alles Betrieb", function () { entscheiden(false); }], ["Spalten prüfen", importKorrigieren]],
+      kurz: {
+        titel: mehrzahl(k.neue, " Tag", " Tage") + " importiert.",
+        text: "Nach Berufsschule " + (k.vorschlag.length === 1 ? "sieht" : "sehen") + " aus:",
+        link: ["Spalten prüfen", importKorrigieren],
+        knoepfe: [["Übernehmen", function () { entscheiden(true); }, true], ["Alles Betrieb", function () { entscheiden(false); }]]
+      },
       zu: importKarteWeg
     };
   }
@@ -109,6 +122,11 @@ function importHinweis(k) {
       (k.gesamt > k.neue ? " — " + k.gesamt + " Tage im Heft" : "") +
       ". Stimmt etwas nicht, ordne die Spalten neu zu.",
     knoepfe: [["Spalten prüfen", importKorrigieren], ["Passt", importKarteWeg, true]],
+    kurz: {
+      titel: mehrzahl(k.neue, " Tag", " Tage") + " importiert" + (k.schule ? ", " + k.schule + " Berufsschule." : "."),
+      link: ["Spalten prüfen", importKorrigieren],
+      knoepfe: [["Passt", importKarteWeg, true]]
+    },
     zu: importKarteWeg
   };
 }
@@ -162,6 +180,7 @@ function hinweisWaehlen() {
         "deinen Stand nimmst du mit einer Sicherung mit.",
       knoepfe: (Object.keys(tage).length ? [["Sicherung speichern", sicherungSpeichern, true]] : [])
         .concat([["Verstanden", function () { browserHinweise.homeBildschirm = true; merkenJetzt(); hinweisWeg(); }]]),
+      kurz: { titel: "Tipp:", text: "Über Teilen → „Zum Home-Bildschirm“, sonst löscht Safari nach 7 Tagen.", mehr: "Wie?" },
       zu: function () { browserHinweise.homeBildschirm = true; merkenJetzt(); hinweisWeg(); }
     };
   }
@@ -177,6 +196,10 @@ function hinweisWaehlen() {
         ["Sicherung speichern", function () { sicherungSpeichern(); hinweisWeg(); }, true],
         ["Später", function () { browserHinweise.sicherungSpaeter = new Date().toISOString(); merkenJetzt(); hinweisWeg(); }]
       ],
+      kurz: {
+        titel: "Sicherung fällig:", text: alt ? "die letzte ist " + alt + " Tage alt." : "noch keine gespeichert.", mehr: "Mehr",
+        knoepfe: [["Sichern", function () { sicherungSpeichern(); hinweisWeg(); }, true]]
+      },
       zu: hinweisWeg
     };
   }
@@ -197,16 +220,24 @@ function hinweisWaehlen() {
           " (" + kurzSpanne(vonIso(frueheste.montag)) + " " + vonIso(frueheste.montag).getFullYear() + ")" : "") + ".");
     }
     var ziel = letzte || frueheste;
+    var oeffnen = function () {
+      hinweisRuhe = true;
+      wocheZeigen(ziel.montag, Math.max(0, ziel.bilanz.erster));   // zeichnet, auch die Hinweise
+    };
     return {
       art: "fehlt warn", titel: "Noch offen",
       text: saetze.join(" "),
       knoepfe: [
-        [letzte ? "Letzte Woche öffnen" : "Früheste öffnen", function () {
-          hinweisRuhe = true;
-          wocheZeigen(ziel.montag, Math.max(0, ziel.bilanz.erster));   // zeichnet, auch die Hinweise
-        }, true],
+        [letzte ? "Letzte Woche öffnen" : "Früheste öffnen", oeffnen, true],
         ["Übersicht", function () { hinweisRuhe = true; hinweiseZeigen(); uebersichtOeffnen(); }]
       ],
+      kurz: {
+        titel: "Noch offen:",
+        text: letzte ? "KW " + kalenderwoche(vonIso(letzte.montag)) + ", " + bilanzText(letzte.bilanz) +
+          (aeltere ? " · " + mehrzahl(aeltere, " ältere Woche", " ältere Wochen") : "")
+          : mehrzahl(aeltere, " Woche", " Wochen") + ", ab KW " + kalenderwoche(vonIso(frueheste.montag)),
+        knoepfe: [["Öffnen", oeffnen, true]]
+      },
       zu: hinweisWeg
     };
   }
@@ -219,7 +250,8 @@ function hinweiseZeigen() {
   var feld = $("hinweise");
   if (!feld) return;
   var h = importKarte ? importHinweis(importKarte) : hinweisRuhe ? null : hinweisWaehlen();
-  var inhalt = h ? h.art + "|" + h.text + "|" + h.knoepfe.length : "";
+  var kurz = h && h.kurz && meldungSchwebt() && hinweisGross !== h.art ? h.kurz : null;
+  var inhalt = h ? h.art + "|" + h.text + "|" + h.knoepfe.length + (kurz ? "|kurz" : "") : "";
   if (feld.getAttribute("data-inhalt") === inhalt && feld.hidden === !h) return;
   feld.setAttribute("data-inhalt", inhalt);
   feld.innerHTML = "";
@@ -227,20 +259,35 @@ function hinweiseZeigen() {
   if (!h) return;
 
   var karte = document.createElement("div");
-  karte.className = "hinweis " + h.art;
+  karte.className = "hinweis " + h.art + (kurz ? " kurz" : "") + (h.liste ? " mitliste" : "");
   karte.setAttribute("role", "status");
   var text = document.createElement("p");
   text.className = "hinweistext";
   var titel = document.createElement("b");
-  titel.textContent = h.titel;
+  titel.textContent = kurz ? kurz.titel : h.titel;
   text.appendChild(titel);
-  text.appendChild(document.createTextNode(" " + h.text));
+  if (kurz ? kurz.text : h.text) text.appendChild(document.createTextNode(" " + (kurz ? kurz.text : h.text)));
+  // In der kurzen Fassung: ein Verweis im Text, auf die lange Fassung oder auf „Spalten prüfen“.
+  // Mit einer Liste darunter steht er hinter den Knöpfen: Nach „… sehen aus:“ läse er sich wie ein Tag.
+  var verweis = kurz && (kurz.mehr ? [kurz.mehr, function () { hinweisGross = h.art; hinweiseZeigen(); }] : kurz.link);
+  var link = null;
+  if (verweis) {
+    link = document.createElement("button");
+    link.type = "button";
+    link.className = "hinweislink";
+    link.textContent = verweis[0];
+    link.addEventListener("click", verweis[1]);
+    if (!h.liste) {
+      text.appendChild(document.createTextNode(" "));
+      text.appendChild(link);
+    }
+  }
   karte.appendChild(text);
   if (h.liste) karte.appendChild(h.liste);
 
   var knoepfe = document.createElement("div");
   knoepfe.className = "hinweisknoepfe";
-  h.knoepfe.forEach(function (k) {
+  (kurz ? kurz.knoepfe || [] : h.knoepfe).forEach(function (k) {
     var b = document.createElement("button");
     b.type = "button";
     b.className = "knopf" + (k[2] ? " voll" : "");
@@ -248,6 +295,7 @@ function hinweiseZeigen() {
     b.addEventListener("click", k[1]);
     knoepfe.appendChild(b);
   });
+  if (link && h.liste) knoepfe.appendChild(link);
   karte.appendChild(knoepfe);
 
   var zu = document.createElement("button");
@@ -255,7 +303,7 @@ function hinweiseZeigen() {
   zu.className = "hinweiszu";
   zu.setAttribute("aria-label", "Hinweis schließen");
   zu.textContent = "×";
-  zu.addEventListener("click", h.zu);
+  zu.addEventListener("click", function () { hinweisGross = ""; h.zu(); });
   karte.appendChild(zu);
   feld.appendChild(karte);
 }
