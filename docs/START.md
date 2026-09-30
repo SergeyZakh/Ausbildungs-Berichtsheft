@@ -111,14 +111,18 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
   `npm start` oder Docker tritt es gar nicht auf.
 - **Im Dokument stehen keine Uhrzeiten.**
 - **Schultage** aus *Deine Daten → Schule* setzen nur leere Tage auf „Berufsschule“, in den dort
-  eingetragenen Schulferien nicht. Tage mit Buchungen bleiben, wie der Import sie liefert. Am Tag
-  selbst lässt sich die Art jederzeit umstellen.
+  eingetragenen Schulferien nicht. Tage mit Buchungen bleiben, wie der Import sie liefert; bucht
+  deine Zeiterfassung den Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), erkennt der
+  Import ihn als Berufsschule. Am Tag selbst lässt sich die Art jederzeit umstellen.
 - **Blockwoche:** Ist jeder Werktag einer Woche Berufsschule oder frei, schreibst du die Themen
   einmal für die ganze Woche statt an fünf Tagen – so wie der Vordruck ein Feld je Woche hat. Wer
   an einem Tag krank war, stellt es in der Liste darunter um. Beim täglichen Vordruck bleibt es bei
   einem Text je Tag.
 - **Nach „Fertig“** geht es gleich zum nächsten Tag, der noch etwas braucht, auch in der nächsten
   Woche. „Zurück“ hinter der Meldung führt wieder hin.
+- **Meldungen am Handy** schweben kurz unten über dem Text und gehen nach ein paar Sekunden von
+  selbst; antippen, × oder wegwischen geht schneller. Eine rote Warnung bleibt stehen, bis du sie
+  schließt. Gespeichert wird ohnehin bei jedem Tippen.
 - **Eine Buchung übernehmen:** Das Plus neben einer Buchung hängt sie als bereinigte Zeile an den
   Text des Tages.
 - **Feiertage** werden bundesweit erkannt, mit deinem Bundesland auch die des Landes. Was nur in

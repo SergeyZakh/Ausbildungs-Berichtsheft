@@ -44,9 +44,9 @@ function ueberstand() {
 }
 
 /**
- * Nichts läuft unter den Leisten durch: Die Seite selbst scrollt nicht, Kopfleiste und
- * Fußleiste liegen außerhalb des einzigen Scrollbereichs .mitte, und kein Textfeld schneidet
- * seinen Text ab.
+ * Nichts läuft unter der Kopfleiste durch: Die Seite selbst scrollt nicht, die Kopfleiste liegt
+ * außerhalb des einzigen Scrollbereichs .mitte, und kein Textfeld schneidet seinen Text ab. Eine
+ * Fußleiste gibt es am Handy nicht: .mitte reicht bis unten, eine Meldung schwebt darüber.
  */
 function aufbau() {
   const r = (s) => document.querySelector(s).getBoundingClientRect();
@@ -57,8 +57,9 @@ function aufbau() {
   return {
     seiteScrollt: document.scrollingElement.scrollHeight > innerHeight + 1,
     kopfUeberMitte: kopf.bottom <= mitte.top + 1,
-    fussUnterMitte: fuss.top >= mitte.bottom - 1,
-    fussImBild: fuss.bottom <= innerHeight + 1,
+    // Am Handy weicht innerHeight in der Wochenansicht um bis zu zwei Pixel ab; eine Leiste wäre 28 px hoch.
+    mitteBisUnten: mitte.bottom >= innerHeight - 3,
+    meldungImBild: fuss.height === 0 || (fuss.top >= 0 && fuss.bottom <= innerHeight + 1),
     abgeschnitten: felder.filter((d) => d > 2),
   };
 }
@@ -76,8 +77,8 @@ async function durchgang(browser, breite) {
   };
   const nichtsDarunter = async (wo) => {
     const a = await page.evaluate(aufbau);
-    pruefe(wo + ': nichts läuft unter den Leisten durch' + bei,
-      !a.seiteScrollt && a.kopfUeberMitte && a.fussUnterMitte && a.fussImBild, JSON.stringify(a));
+    pruefe(wo + ': nichts läuft unter der Kopfleiste durch, der Inhalt reicht bis unten' + bei,
+      !a.seiteScrollt && a.kopfUeberMitte && a.mitteBisUnten && a.meldungImBild, JSON.stringify(a));
     pruefe(wo + ': kein Textfeld schneidet Text ab' + bei, a.abgeschnitten.length === 0, JSON.stringify(a.abgeschnitten));
   };
   await h.oeffnen(page);
@@ -169,17 +170,21 @@ async function durchgang(browser, breite) {
   await page.evaluate(() => document.getElementById('mitte').scrollTo(0, 99999));
   await page.waitForTimeout(200);
   await nichtsDarunter('Tag ganz unten');
-  // Eine lange Meldung, wie nach einem Import; unten klebend darf sie höchstens zwei Zeilen belegen.
-  const notiz = await page.evaluate(() => {
-    const n = document.getElementById('notiz');
-    n.textContent = 'Import fertig: 23 Tage mit 118 Buchungen übernommen, 4 Tage mit eigenem Text ' +
-      'blieben unverändert. Neue Tage stehen als Entwurf da und brauchen noch „Fertig“.';
-    return { hoehe: n.getBoundingClientRect().height, zeile: parseFloat(getComputedStyle(n).lineHeight) };
+  // Eine lange Meldung, wie nach einem Import: Sie schwebt ganz lesbar über dem Inhalt, statt
+  // unten eine Leiste zu belegen.
+  await page.evaluate(() => window.__sage('Import fertig: 23 Tage mit 118 Buchungen übernommen, 4 Tage mit ' +
+    'eigenem Text blieben unverändert. Neue Tage stehen als Entwurf da und brauchen noch „Fertig“.', 'gut'));
+  const schwebt = await page.evaluate(() => {
+    const f = document.querySelector('.fussleiste'), n = document.getElementById('notiz'), r = f.getBoundingClientRect();
+    return { lage: getComputedStyle(f).position, oben: r.top, unten: r.bottom, links: r.left, rechts: r.right,
+      ganz: n.scrollHeight <= n.clientHeight + 1, mitte: document.getElementById('mitte').getBoundingClientRect().bottom };
   });
-  pruefe('Meldung unten höchstens zwei Zeilen' + bei, notiz.hoehe <= notiz.zeile * 2 + 2, JSON.stringify(notiz));
-  await page.click('#notiz');
-  const offen = await page.evaluate(() => document.getElementById('notiz').getBoundingClientRect().height);
-  pruefe('Ein Tippen zeigt die ganze Meldung' + bei, offen > notiz.hoehe, offen + ' statt ' + notiz.hoehe);
+  pruefe('Meldung schwebt ganz lesbar über dem Inhalt, der bis unten reicht' + bei,
+    schwebt.lage === 'fixed' && schwebt.ganz && schwebt.unten <= 780 && schwebt.links >= 8 &&
+    schwebt.rechts <= breite - 8 && schwebt.mitte >= 779, JSON.stringify(schwebt));
+  await nichtsRaus('Mit Meldung');
+  await page.click('#notiz-zu');
+  pruefe('× schließt die Meldung' + bei, !(await page.locator('.fussleiste').isVisible()));
 
   // Safari am iPhone zoomt beim Tippen in Felder unter 16 px; danach ließ sich „Deine Daten“
   // seitlich verschieben. Chromium zoomt nicht, deshalb wird die Ursache geprüft.

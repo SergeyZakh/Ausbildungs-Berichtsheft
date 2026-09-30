@@ -55,7 +55,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | Datei | Inhalt |
 | --- | --- |
 | `grundlagen.js` | Zustand (`tage`, `wochen`, `aktiveWoche` …), Konstanten, Datums- und Texthelfer, Feiertage je Bundesland (dieselben Regeln in `server/feiertage.js`) |
-| `zustand.js` | Stand je Tag/Woche (`wochenBilanz()`: was eine Woche noch braucht), Schulplan (`tagArt()`), Blockwoche (`blockwoche()`, `tagImWochenfeld()`), nächster offener Tag (`naechsterOffenerTag()`), Stammdaten, Speichern, Zeitstempel für den Abgleich, Fußleistenmeldung `sage()` (bei offenem Dialog auch im Dialog, am Handy nach acht Sekunden leise) |
+| `zustand.js` | Stand je Tag/Woche (`wochenBilanz()`: was eine Woche noch braucht), Schulplan (`tagArt()`), Blockwoche (`blockwoche()`, `tagImWochenfeld()`), nächster offener Tag (`naechsterOffenerTag()`), Stammdaten, Speichern, Zeitstempel für den Abgleich, Meldung `sage()`: am Rechner in der Fußleiste, nach acht Sekunden leise; am Handy schwebend über dem Inhalt, nach vier Sekunden weg (mit Knopf nach acht, eine Warnung erst mit ×, Tippen oder Wischen, `notizSchliessen()`); bei offenem Dialog auch im Dialog |
 | `sicherung.js` | Sicherung als JSON speichern und laden, Rückfrage `frage()` |
 | `bedienung.js` | Menüs und Tastatur; die Taste jedes Reiters steht am Rechner in seiner Ecke (`tasteZeigen()` in `reiter.js`) |
 | `start.js` | Testzugänge (`window.__…`), Wiederherstellen des letzten Stands, beim ersten Start die Einrichtung (Azubis) oder der Rundgang (Ausbilder, am Handy nicht, `amHandy`) |
@@ -123,7 +123,7 @@ Ausbilder als Knopf mit `kurzSpanne()`; Wochenbalken, Reiter), `tag.css` (Tagber
 Eingaben, Meldungen), `dialoge.css` (Monatsraster, „Deine Daten“, Zuordnung, Rundgang),
 `handy.css` (alle `@media`-Regeln für Handy und Tablet; dort stehen die Tagesreiter in einer Zeile
 mit der Woche breit darunter, und im Kopf der Tageskarte `.tagkarte` steht das Datum allein, darunter Art, Stunden und „Fertig“ in einer Zeile, damit das Schreibfeld auch mit
-offener Tastatur Platz hat; die Regeln greifen auch beim Drucken, denn A4 ist schmaler als 820 px,
+offener Tastatur Platz hat; eine Fußleiste gibt es dort nicht, die Meldung schwebt als Karte über dem Inhalt, ohne Speicherstand und Signatur; die Regeln greifen auch beim Drucken, denn A4 ist schmaler als 820 px,
 also dort keine Klassen aus dem Blatt wie `.tagkopf`, `.kasten` oder `.tagestabelle` verwenden),
 `ausbilder.css` (Konto und Ausbilderansicht),
 `blatt.css` (der Drucksatz des Vordrucks).
@@ -631,8 +631,8 @@ npm test
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
 | `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), Themen schreiben und übernehmen, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy |
-| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), leise Meldung und kurzer Titel am Handy |
-| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Meldung höchstens zwei Zeilen, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
+| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel |
+| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
 mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).

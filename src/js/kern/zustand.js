@@ -594,9 +594,16 @@ function geladen() {
 
 /* ---------- Meldungen in der Fußleiste ---------- */
 
-/* Am Handy wird die Meldung nach NOTIZ_STILL_MS leise: eine Zeile, ohne Farbe (handy.css). Sie
-   bleibt lesbar und lässt sich antippen, nimmt dem Schreibfeld aber keinen Platz mehr. */
-var NOTIZ_STILL_MS = 8000, notizUhr = null;
+/* Am Rechner wird die Meldung nach NOTIZ_STILL_MS leise (grau statt grün oder rot). Am Handy gibt
+   es keine Leiste: Die Meldung schwebt über dem Inhalt (handy.css) und ist nach NOTIZ_HANDY_MS
+   weg, mit einem Knopf daran erst nach NOTIZ_KNOPF_MS. Eine Warnung bleibt dort, bis man sie
+   schließt; sonst ginge ein Fehler unbemerkt vorbei. */
+var NOTIZ_STILL_MS = 8000, NOTIZ_HANDY_MS = 4000, NOTIZ_KNOPF_MS = 8000, notizUhr = null;
+
+/** Schwebt die Meldung (schmales Fenster, handy.css) statt in der Fußleiste zu stehen? */
+function meldungSchwebt() {
+  try { return window.matchMedia("(max-width: 820px)").matches; } catch (e) { return false; }
+}
 
 /** art: "" (neutral), "gut" oder "warn" */
 function sage(text, art) {
@@ -607,18 +614,48 @@ function sage(text, art) {
   var leiste = m.closest ? m.closest(".fussleiste") : null;
   if (leiste) leiste.className = "fussleiste" + (art ? " " + art : "");
   clearTimeout(notizUhr);
-  notizUhr = setTimeout(function () {
-    if (m.classList.contains("ganz")) return;
-    m.classList.add("still");
-    if (leiste) leiste.classList.add("still");
-  }, NOTIZ_STILL_MS);
+  if (!meldungSchwebt()) notizStillNach(NOTIZ_STILL_MS);
+  else if (art !== "warn") notizStillNach(NOTIZ_HANDY_MS);
   // Ein modaler Dialog liegt über der Fußleiste; die Meldung erscheint dann zusätzlich in ihm.
   var dlg = offenerDialog();
   if (dlg && text) dialogNotiz(dlg, text, art);
 }
-// Am Handy kürzt handy.css die Meldung auf zwei Zeilen; ein Tippen zeigt sie ganz. Die nächste
-// Meldung setzt className neu und ist damit wieder gekürzt.
-if ($("notiz")) $("notiz").addEventListener("click", function () { this.classList.toggle("ganz"); });
+
+/** Die Meldung nach `ms` leise stellen, am Handy heißt das: ausblenden. */
+function notizStillNach(ms) {
+  var m = $("notiz"), leiste = m && m.closest(".fussleiste");
+  clearTimeout(notizUhr);
+  notizUhr = setTimeout(function () {
+    m.classList.add("still");
+    if (leiste) leiste.classList.add("still");
+  }, ms);
+}
+
+/** Die schwebende Meldung sofort schließen; die nächste Meldung zeigt sich wieder. */
+function notizSchliessen() {
+  clearTimeout(notizUhr);
+  var leiste = $("notiz") && $("notiz").closest(".fussleiste");
+  if (leiste) leiste.classList.add("zu");
+}
+
+if ($("notiz")) {
+  // Am Handy schließt ein Tippen auf die Meldung sie, ein Knopf darin tut, was er sagt.
+  $("notiz").addEventListener("click", function (e) {
+    if (meldungSchwebt() && !e.target.closest(".notizknopf")) notizSchliessen();
+  });
+  $("notiz-zu").addEventListener("click", notizSchliessen);
+  // Wegwischen nach unten oder zur Seite, wie man es von Meldungen am Handy kennt.
+  var notizWisch = null, notizLeiste = $("notiz").closest(".fussleiste");
+  notizLeiste.addEventListener("touchstart", function (e) {
+    notizWisch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+  notizLeiste.addEventListener("touchend", function (e) {
+    if (!notizWisch) return;
+    var t = e.changedTouches[0], dx = t.clientX - notizWisch.x, dy = t.clientY - notizWisch.y;
+    notizWisch = null;
+    if (dy > 30 || Math.abs(dx) > 60) notizSchliessen();
+  }, { passive: true });
+}
 
 /** Der oberste offene modale Dialog, sonst null. */
 function offenerDialog() {

@@ -139,19 +139,34 @@
 
   .fortschritt { margin: 0 var(--luft-3) var(--luft-3); gap: var(--luft-2); padding-left: var(--luft-3); }
   .fortschritt .ftext { font-size: var(--schrift-fein); }
-  /* Am Handy bleibt Platz für Meldung und Speicherstand, sonst für nichts. */
-  .signatur { display: none; }
-  .fussleiste { padding: var(--luft-1) var(--luft-3) var(--luft-2); gap: var(--luft-3); flex: none; }
-  /* Höchstens zwei Zeilen: Die Meldung klebt unten und verdeckte mit drei Zeilen ein Sechstel
-     des Bildschirms. Ein Tippen zeigt sie ganz (zustand.js). */
-  .fussleiste #notiz {
-    font-size: var(--schrift-klein); line-height: 1.35;
-    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  /* Keine Leiste am Handy: Sie stand immer da, erst grün in zwei Zeilen, dann grau, und nahm dem
+     Text dauerhaft Platz. Eine Meldung schwebt jetzt kurz über dem Inhalt und geht nach ein paar
+     Sekunden von selbst, mit × oder Wischen früher; eine Warnung bleibt, bis man sie wegtippt
+     (sage() in zustand.js). Gespeichert wird bei jedem Tippen; Stand und Signatur zeigt der Rechner. */
+  .fussleiste, .fussleiste.gut, .fussleiste.warn {
+    position: fixed; left: var(--luft-3); right: var(--luft-3); z-index: 30;
+    bottom: calc(var(--luft-3) + env(safe-area-inset-bottom));
+    align-items: flex-start; gap: var(--luft-2); min-height: 0;
+    padding: var(--luft-3) var(--luft-2) var(--luft-3) var(--luft-4);
+    background: var(--text); color: var(--flaeche); border: none; border-radius: var(--rund);
+    box-shadow: var(--schatten-hoch); animation: auftauchen .18s ease-out;
   }
-  /* Nach ein paar Sekunden eine Zeile ohne Farbe (sage() in zustand.js); Tippen zeigt sie ganz. */
-  .fussleiste #notiz.still { -webkit-line-clamp: 1; color: var(--schiefer); font-weight: 400; }
-  .fussleiste.still { background: var(--flaeche); border-top-color: var(--linie); }
-  .fussleiste #notiz.ganz { display: block; -webkit-line-clamp: unset; opacity: 1; }
+  .fussleiste.warn { background: var(--acht); color: #fff; }
+  .fussleiste:has(#notiz:empty), .fussleiste.still, .fussleiste.zu { display: none; }
+  .signatur, .speicherstand { display: none; }
+  .fussleiste #notiz { color: inherit; font-size: var(--schrift-text); line-height: 1.4; font-weight: 400; }
+  .fussleiste #notiz.warn { font-weight: 600; }
+  /* Ein grüner Punkt statt einer grünen Fläche: Die Nachricht ist gut, aber kein Alarm. */
+  .fussleiste #notiz.gut::before {
+    content: ""; display: inline-block; width: 8px; height: 8px; margin-right: var(--luft-2);
+    border-radius: 50%; background: var(--gut); vertical-align: 1px;
+  }
+  .fussleiste .notizknopf { margin-left: var(--luft-2); padding: 2px var(--luft-3); }
+  .notizzu {
+    flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -3px 0;
+    padding: 0; border: none; border-radius: 50%; background: transparent; color: inherit;
+    font: inherit; font-size: 18px; line-height: 1; opacity: .7; cursor: pointer;
+  }
   .sektionskopf .lang:has(+ .kurz) { display: none; }
   .sektionskopf .kurz { display: inline; }
   body.ohnewoche .leerbild { margin: var(--luft-3); }

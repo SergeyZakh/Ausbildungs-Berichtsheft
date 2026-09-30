@@ -6,6 +6,16 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
+## Unveröffentlicht
+
+### Geändert
+
+- **Keine Fußleiste mehr am Handy:** Sie stand immer da, erst grün in zwei Zeilen, dann grau mit
+  „gespeichert“, und nahm dem Text Platz. Eine Meldung schwebt jetzt als Karte kurz über dem
+  Inhalt und geht nach vier Sekunden von selbst, mit Knopf wie „Spalten prüfen“ nach acht;
+  antippen, × oder wegwischen schließt sie früher. Eine Warnung bleibt rot stehen, bis man sie
+  schließt. Am Rechner bleibt die Fußleiste, wie sie war.
+
 ## [0.3.0] – 2026-09-30
 
 ### Neu
