@@ -101,7 +101,10 @@ function importAnwenden(a, name) {
     sage((a.profil ? a.profil + ": " : "") + name + " geladen, " + mehrzahl(neue, " Tag", " Tage") +
       (schule ? ", davon " + schule + " Berufsschule" : "") +
       (gesamt > neue ? " — " + gesamt + " Tage im Heft" : "") + ".", "gut");
-    notizKnopf("Spalten prüfen", importKorrigieren);
+    // Das Ergebnis steht mit „Spalten prüfen“ als Karte oben (hinweise.js); am Handy schwebte
+    // dieselbe Nachricht sonst noch einmal darüber.
+    importKarteZeigen({ profil: a.profil, name: name, neue: neue, schule: schule, gesamt: gesamt });
+    if (meldungSchwebt()) notizSchliessen();
   } catch (e) {
     // tageAusBuchungen() hat die Kundenliste schon geleert; ohne sie ginge
     // ungefilterter Text ans Modell.

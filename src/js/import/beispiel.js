@@ -21,6 +21,8 @@ function beispielLaden() {
   });
   // Den Donnerstag erkennt der Import als Berufsschule, an der Tätigkeit und am Schulplan.
   importAnwenden(csvAnalysieren(BEISPIEL_CSV), "Beispiel");
+  // Am Beispiel gibt es keine Spalten zu prüfen.
+  importKarteWeg();
   wocheZeigen("2026-09-07", 0);
   sage("Beispiel geladen: zwei ausgedachte Wochen. Wieder weg: ⋯ → Deine Daten → Löschen.", "gut");
 }

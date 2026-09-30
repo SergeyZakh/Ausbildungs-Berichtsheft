@@ -12,9 +12,12 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 - **Keine Fußleiste mehr am Handy:** Sie stand immer da, erst grün in zwei Zeilen, dann grau mit
   „gespeichert“, und nahm dem Text Platz. Eine Meldung schwebt jetzt als Karte kurz über dem
-  Inhalt und geht nach vier Sekunden von selbst, mit Knopf wie „Spalten prüfen“ nach acht;
-  antippen, × oder wegwischen schließt sie früher. Eine Warnung bleibt rot stehen, bis man sie
-  schließt. Am Rechner bleibt die Fußleiste, wie sie war.
+  Inhalt und geht nach vier Sekunden von selbst, mit Knopf wie „Zurück“ nach acht; antippen, ×
+  oder wegwischen schließt sie früher. Eine Warnung bleibt rot stehen, bis man sie schließt. Am
+  Rechner bleibt die Fußleiste, wie sie war. „Zurück“ nach „Fertig“ steht rechts neben dem Text.
+- **Ergebnis des Imports als Karte oben:** „Kimai-Import fertig. 7 Tage aus …, davon 3
+  Berufsschule“ mit „Spalten prüfen“ und „Passt“. Sie bleibt, bis man sie schließt; vorher stand
+  „Spalten prüfen“ als Knopf in der Meldung und war am Handy nach Sekunden weg.
 
 ## [0.3.0] – 2026-09-30
 

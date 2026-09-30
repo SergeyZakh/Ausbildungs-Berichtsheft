@@ -96,7 +96,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
 | `rundgang.js` | Rundgang der Ausbilder beim ersten Start und über **?**; Azubis bekommen stattdessen die Einrichtung |
 | `einrichtung.js` | Einrichtung beim ersten Start: die Angaben fürs Wochenblatt in sechs Schritten, jede Eingabe geht sofort in das Feld von „Deine Daten“ (`data-feld`) |
-| `hinweise.js` | Hinweis über den Reitern: Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
+| `hinweise.js` | Hinweis über den Reitern: Ergebnis des letzten Imports mit „Spalten prüfen“ (`importKarte`, bleibt bis „Passt“ oder ×), Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
 | `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Raster der Werktage wie bei GitHub (`jahresRaster()`) und die Tage je Art (`uebersichtDaten()`) |
 
 **`ausgabe/`**
@@ -391,7 +391,7 @@ vom gespeicherten Stand bleibt nur, was jemand selbst geschrieben hat – also
 Text, der weder dem alten Entwurf noch der alten Modellausgabe entspricht.
 Sonst gingen neu hinzugekommene Buchungen verloren.
 
-Der Stand vor dem Import wird gemerkt: **Spalten prüfen** in der Fußleiste stellt
+Der Stand vor dem Import wird gemerkt: **Spalten prüfen** in der Karte über den Reitern stellt
 ihn wieder her und importiert mit der geänderten Zuordnung neu.
 
 ### Berufsschule aus der Zeiterfassung (`schule.js`)

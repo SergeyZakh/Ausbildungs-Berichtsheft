@@ -236,6 +236,13 @@ async function durchgang(browser, breite) {
   await nichtsRaus('Woche');
   await nichtsDarunter('Woche');
 
+  await page.setInputFiles('#datei', path.join(__dirname, 'daten', 'formate', 'kimai-schule.csv'));
+  await page.waitForTimeout(700);
+  pruefe('Nach dem Import: Karte oben mit „Spalten prüfen“, keine schwebende Meldung darüber' + bei,
+    (await page.locator('#hinweise .hinweis').isVisible()) && !(await page.locator('.fussleiste').isVisible()) &&
+    (await page.locator('#hinweise button', { hasText: 'Spalten prüfen' }).count()) === 1);
+  await nichtsRaus('Mit Import-Karte');
+
   pruefe('Keine JavaScript-Fehler' + bei, jsFehler.length === 0, jsFehler.join(' | '));
   await ctx.close();
 }

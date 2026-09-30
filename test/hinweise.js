@@ -111,10 +111,15 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       !(await page.locator('#dlg-uebersicht').isVisible()) &&
         (await page.evaluate((s) => JSON.parse(localStorage.getItem(s)).stand.woche, h.SPEICHER)) === letzte);
 
-    // Nach einem Import erscheint er nicht: Er gehört zum Öffnen, nicht zu jeder Änderung.
+    // Nach einem Import erscheint er nicht: Er gehört zum Öffnen, nicht zu jeder Änderung. Oben
+    // steht dann nur das Ergebnis des Imports; ist es weg, bleibt es ruhig.
     await page.setInputFiles('#datei', h.testdatei('kimai-test.csv'));
     await page.waitForTimeout(900);
-    pruefe('Nach einem Import kein neuer Hinweis', !(await page.locator('#hinweise').isVisible()));
+    const nachImport = await page.locator('#hinweise').textContent();
+    pruefe('Nach einem Import nur die Karte zum Import, kein neuer Hinweis',
+      nachImport.includes('Import fertig') && !nachImport.includes('Noch offen'), nachImport);
+    await page.locator('#hinweise button', { hasText: 'Passt' }).click();
+    pruefe('Nach „Passt“ ist oben Ruhe', !(await page.locator('#hinweise').isVisible()));
     pruefe('Keine JavaScript-Fehler (Was fehlt, Übersicht)', fehler.length === 0, fehler.join(' | '));
     await ctx.close();
   }
@@ -466,6 +471,18 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       f.dispatchEvent(new TouchEvent('touchend', { touches: [], changedTouches: [t(y + 60)], bubbles: true }));
     }, [wisch.x + 40, wisch.y + 10]);
     pruefe('Nach unten wischen schließt sie auch', !(await leiste.isVisible()));
+    // „Zurück“ nach „Fertig“ steht rechts neben dem Text, nicht in einer eigenen Zeile darunter.
+    await page.click('.tagpanel .uebernehmen');
+    await page.waitForTimeout(300);
+    const zurueck = await page.evaluate(() => {
+      const f = document.querySelector('.fussleiste').getBoundingClientRect();
+      const k = document.querySelector('#notiz .notizknopf').getBoundingClientRect();
+      return { text: document.querySelector('#notiz .notizknopf').textContent, rechts: f.right - k.right,
+        mitte: Math.abs((k.top + k.bottom) / 2 - (f.top + f.bottom) / 2) };
+    });
+    pruefe('„Zurück“ steht rechts in der Meldung', zurueck.text === 'Zurück' && zurueck.rechts < 60 && zurueck.mitte < 6,
+      JSON.stringify(zurueck));
+    await page.click('#notiz-zu');
 
     await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
     await page.waitForTimeout(900);
