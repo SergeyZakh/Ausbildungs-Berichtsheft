@@ -453,6 +453,8 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   0%   { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent); transform: scale(1.35); }
   100% { box-shadow: 0 0 0 8px color-mix(in srgb, currentColor 0%, transparent); transform: scale(1); }
 }
+/* Nur am Handy, wo die Meldung schwebt (handy.css). */
+.notizzu { display: none; }
 .fussleiste.gut .speicherstand  { color: var(--gut); }
 .fussleiste.warn .speicherstand { color: var(--acht); }
 

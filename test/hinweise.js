@@ -429,27 +429,43 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await ruhig.close();
   }
 
-  /* ---------- Am Handy: kurze Überschrift, Meldung wird leise ---------- */
+  /* ---------- Am Handy: kurze Überschrift, Meldung schwebt und geht ---------- */
   {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 780 }, isMobile: true, hasTouch: true });
     const page = await ctx.newPage();
     await h.ohneRundgang(page);
     await h.oeffnen(page);
     await page.waitForTimeout(600);
+    const leiste = page.locator('.fussleiste');
+    const leer = await page.evaluate(() => ({
+      mitte: document.getElementById('mitte').getBoundingClientRect().bottom, hoehe: innerHeight }));
+    pruefe('Am Handy ohne Meldung keine Leiste: der Inhalt reicht bis unten',
+      !(await leiste.isVisible()) && leer.mitte >= leer.hoehe - 1, JSON.stringify(leer));
     await page.click('#btn-beispiel');
-    const zeile = await page.evaluate(() => parseFloat(getComputedStyle(document.getElementById('notiz')).lineHeight));
-    await page.waitForTimeout(8600);
-    const still = await page.evaluate(() => {
-      const n = document.getElementById('notiz');
-      return { klasse: n.className, hoehe: n.getBoundingClientRect().height,
-        leiste: getComputedStyle(n.closest('.fussleiste')).backgroundColor,
-        flaeche: getComputedStyle(document.getElementById('btn-mehr')).backgroundColor };
+    await page.waitForTimeout(300);
+    const frisch = await page.evaluate(() => {
+      const f = document.querySelector('.fussleiste');
+      return { lage: getComputedStyle(f).position, stand: getComputedStyle(document.getElementById('speicherstand')).display };
     });
-    pruefe('Nach acht Sekunden: Meldung auf einer Zeile', still.klasse.includes('still') && still.hoehe <= zeile + 2, JSON.stringify(still));
-    pruefe('… und ohne farbige Leiste', still.leiste === still.flaeche, JSON.stringify(still));
+    pruefe('Die Meldung schwebt über dem Inhalt, ohne „gespeichert“',
+      (await leiste.isVisible()) && frisch.lage === 'fixed' && frisch.stand === 'none', JSON.stringify(frisch));
+    await page.waitForTimeout(4400);
+    pruefe('Nach vier Sekunden ist sie von selbst weg', !(await leiste.isVisible()));
+    await page.evaluate(() => window.__sage('Das hat nicht geklappt.', 'warn'));
+    await page.waitForTimeout(4600);
+    pruefe('Eine Warnung bleibt stehen', await leiste.isVisible());
     await page.click('#notiz');
-    const ganz = await page.evaluate(() => document.getElementById('notiz').getBoundingClientRect().height);
-    pruefe('Tippen zeigt sie wieder ganz', ganz > still.hoehe, ganz + ' statt ' + still.hoehe);
+    pruefe('Antippen schließt sie', !(await leiste.isVisible()));
+    await page.evaluate(() => window.__sage('Neue Meldung.', ''));
+    pruefe('Die nächste Meldung zeigt sich wieder', await leiste.isVisible());
+    const wisch = await leiste.boundingBox();
+    await page.evaluate(([x, y]) => {
+      const f = document.querySelector('.fussleiste');
+      const t = (yy) => new Touch({ identifier: 1, target: f, clientX: x, clientY: yy });
+      f.dispatchEvent(new TouchEvent('touchstart', { touches: [t(y)], changedTouches: [t(y)], bubbles: true }));
+      f.dispatchEvent(new TouchEvent('touchend', { touches: [], changedTouches: [t(y + 60)], bubbles: true }));
+    }, [wisch.x + 40, wisch.y + 10]);
+    pruefe('Nach unten wischen schließt sie auch', !(await leiste.isVisible()));
 
     await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
     await page.waitForTimeout(900);

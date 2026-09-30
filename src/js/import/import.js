@@ -134,6 +134,8 @@ function notizKnopf(text, aktion) {
   knopf.textContent = text;
   knopf.addEventListener("click", aktion);
   $("notiz").appendChild(knopf);
+  // Am Handy bleibt eine Meldung mit Knopf länger stehen, damit man ihn noch erreicht.
+  if (meldungSchwebt() && !$("notiz").classList.contains("warn")) notizStillNach(NOTIZ_KNOPF_MS);
 }
 
 $("datei").addEventListener("change", function (e) {
