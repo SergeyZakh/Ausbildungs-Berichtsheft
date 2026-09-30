@@ -242,6 +242,10 @@ function blattVorschau(imBlatt) {
     var montag = vonIso(aktiveWoche), st = stammdaten();
     var html = druckBlattSicher(wochenNummer(montag, startMontag(st)), montag, st);
     var bloecke = html.match(/<article[\s\S]*?<\/article>/g) || [];
+    // Neu gezeichnet ist das Blatt einen Augenblick ohne Höhe: Die Rahmen bekommen sie erst in
+    // einpassen(). Der Bereich, in dem man scrollt, sprang dabei nach oben, bei jedem Tastendruck
+    // im Blatt. Die alte Höhe bleibt stehen, bis die neue gemessen ist.
+    blaetter.style.minHeight = blaetter.offsetHeight + "px";
     blaetter.innerHTML = bloecke.map(function (b) {
       return '<div class="bogenrahmen"><div class="bogen">' + b + "</div></div>";
     }).join("");
@@ -251,6 +255,7 @@ function blattVorschau(imBlatt) {
       : "passt auf ein Blatt";
     if (imBlatt) tageMarkieren();
     einpassen();
+    blaetter.style.minHeight = "";
     danach.forEach(function (fn) { fn(); });
   }
 
