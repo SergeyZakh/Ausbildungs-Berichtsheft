@@ -19,8 +19,10 @@ function beispielLaden() {
     var feld = stammFeld(k);
     if (feld && !feld.value.trim()) feld.value = BEISPIEL_STAMM[k];
   });
-  // Den Donnerstag erkennt der Import als Berufsschule, an der Tätigkeit und am Schulplan.
+  // Den Donnerstag schlägt der Import als Berufsschule vor, an der Tätigkeit und am Schulplan; im
+  // Beispiel gilt er gleich als bestätigt.
   importAnwenden(csvAnalysieren(BEISPIEL_CSV), "Beispiel");
+  if (importKarte && importKarte.vorschlag) schultageUebernehmen(importKarte.vorschlag.map(function (v) { return v.tag; }));
   // Am Beispiel gibt es keine Spalten zu prüfen.
   importKarteWeg();
   wocheZeigen("2026-09-07", 0);

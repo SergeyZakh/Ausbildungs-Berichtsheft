@@ -157,6 +157,46 @@ function schulwochenZusammenfuehren(montage, vorher) {
   });
 }
 
+/**
+ * Vorgeschlagene Schultage übernehmen (Karte nach dem Import, hinweise.js). Die Art gilt dann als
+ * von Hand gewählt: Derselbe Export fragt beim nächsten Mal nicht wieder. Ein unveränderter Entwurf
+ * wird zur Fächerliste; im wöchentlichen Vordruck kommen mehrere Schultage einer Woche in die
+ * Themen der Woche (schulwochenZusammenfuehren()).
+ */
+function schultageUebernehmen(liste) {
+  var montage = [];
+  liste.forEach(function (k) {
+    var t = tage[k];
+    if (!t) return;
+    var unberuehrt = !(t.text || "").trim() || t.text === t.entwurf;
+    t.art = "Berufsschule";
+    t.artVonHand = true;
+    if (unberuehrt) {
+      t.text = tagesEntwurf(t);
+      t.entwurf = t.text;
+      delete t.geprueft;
+    }
+    var montag = iso(montagVon(vonIso(k)));
+    if (montage.indexOf(montag) === -1) montage.push(montag);
+  });
+  schulwochenZusammenfuehren(montage, null);
+  wochenNeu();
+  merkenJetzt();
+  zeichnen();
+}
+
+/** Vorgeschlagene Schultage ablehnen: Sie bleiben Arbeitstage, und derselbe Export fragt nicht wieder. */
+function schultageAblehnen(liste) {
+  liste.forEach(function (k) { if (tage[k]) tage[k].artVonHand = true; });
+  merkenJetzt();
+}
+
+/** Kurz, was an einem vorgeschlagenen Tag gebucht ist: die Fächer, sonst die Beschreibung. */
+function schulVorschauText(k) {
+  var t = tage[k];
+  return schulZeilen((t && t.posten) || []).join(", ");
+}
+
 /** Eine Fächerliste, wie der Import sie gebaut hat: Die KI hätte daran nichts zu kürzen. */
 function schulEntwurf(t) {
   if (!t || t.art !== "Berufsschule" || t.entwurf == null || t.text !== t.entwurf) return false;

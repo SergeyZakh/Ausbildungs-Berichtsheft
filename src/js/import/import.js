@@ -66,15 +66,15 @@ function importAnwenden(a, name) {
         var g = gespeicherte[k], t = tage[k];
         if (!g || !t) return;
         var erkannt = t.art;
-        // Eine von Hand gewählte Art bleibt, auch „Arbeitstag“ an einem Feiertag.
-        if (g.art || g.artVonHand) t.art = g.art || "";
+        // Eine von Hand gewählte Art bleibt, auch „Arbeitstag“ an einem Feiertag. „Berufsschule“ ohne
+        // Hand setzten 0.3 und 0.4 beim Import selbst, manchmal falsch: Solche Tage werden wieder
+        // Vorschläge, die man bestätigt.
+        if (g.artVonHand || (g.art && g.art !== "Berufsschule")) t.art = g.art || "";
         if (g.artVonHand) t.artVonHand = true;
         var warEntwurf = g.entwurf != null && g.text === g.entwurf;
         // Ältere Stände ohne kiText: gesetztes vorKi heißt Modellausgabe.
         var warKi = g.kiText != null ? g.text === g.kiText : g.vorKi != null;
         var eigen = g.text && !warEntwurf && !warKi;
-        // Wer den Tag als Arbeitstag beschrieben hat, bekommt ihn nicht als Schultag zurück.
-        if (eigen && !g.art && t.art === "Berufsschule") t.art = "";
         if (t.art !== erkannt) { t.text = tagesEntwurf(t); t.entwurf = t.text; }
         if (eigen) {
           t.text = g.text;
@@ -98,12 +98,21 @@ function importAnwenden(a, name) {
     var neue = Object.keys(frisch).length;
     var gesamt = Object.keys(tage).length;
     var schule = Object.keys(frisch).filter(function (k) { return tage[k].art === "Berufsschule"; }).length;
+    // Schultage schlägt der Import nur vor. Ein falscher Treffer machte aus einem Arbeitstag Schule,
+    // mit anderem Feld im Vordruck; wer den Import nicht genau ansah, merkte es nicht. Erst die
+    // Bestätigung in der Karte oben setzt die Art (schultageUebernehmen()).
+    var vorschlag = Object.keys(frisch).sort().filter(function (k) {
+      var t = tage[k];
+      return !t.art && !t.artVonHand && schultagAusBuchungen(k, t.posten);
+    });
     sage((a.profil ? a.profil + ": " : "") + name + " geladen, " + mehrzahl(neue, " Tag", " Tage") +
-      (schule ? ", davon " + schule + " Berufsschule" : "") +
+      (vorschlag.length ? ", " + mehrzahl(vorschlag.length, " sieht", " sehen") + " nach Berufsschule aus"
+        : schule ? ", davon " + schule + " Berufsschule" : "") +
       (gesamt > neue ? " — " + gesamt + " Tage im Heft" : "") + ".", "gut");
     // Das Ergebnis steht mit „Spalten prüfen“ als Karte oben (hinweise.js); am Handy schwebte
     // dieselbe Nachricht sonst noch einmal darüber.
-    importKarteZeigen({ profil: a.profil, name: name, neue: neue, schule: schule, gesamt: gesamt });
+    importKarteZeigen({ profil: a.profil, name: name, neue: neue, schule: schule, gesamt: gesamt,
+      vorschlag: vorschlag.map(function (k) { return { tag: k, an: true }; }) });
     if (meldungSchwebt()) notizSchliessen();
   } catch (e) {
     // tageAusBuchungen() hat die Kundenliste schon geleert; ohne sie ginge

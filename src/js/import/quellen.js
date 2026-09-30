@@ -328,7 +328,8 @@ function tageAusBuchungen(buchungen) {
       if (b[0].von == null) return -1;
       return a[0].von - b[0].von || a[1] - b[1];
     }).map(function (x) { return x[0]; });
-    t.art = feiertagAn(tag, $("f-land").value) || (schultagAusBuchungen(tag, t.posten) ? "Berufsschule" : "");
+    // Berufsschule setzt der Import nicht selbst: Er schlägt Schultage nur vor (importAnwenden()).
+    t.art = feiertagAn(tag, $("f-land").value) || "";
     t.text = tagesEntwurf(t);
     t.entwurf = t.text;          // erkennt später "noch unverändert"
   });

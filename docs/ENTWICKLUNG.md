@@ -68,7 +68,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `bereinigung.js` | `saeubern()`: Regeln für Tickets, Geräte, Personen, Kunden, Notizsprache |
 | `quellen.js` | Spalten erkennen (`FELDER`, `spaltenZuordnen()`), Kopfzeile finden, `csvAnalysieren()`, `buchungenLesen()`, `tageAusBuchungen()` |
 | `entwurf.js` | `rohtext()`: aus Buchungen wird der Tagesentwurf |
-| `schule.js` | Berufsschultag in der Zeiterfassung erkennen (`schultagAusBuchungen()`, `faecherListe()`), Fächer je Zeile (`schulZeilen()`), Themen mehrerer Schultage einer Woche zusammenführen (`schulwochenZusammenfuehren()`) |
+| `schule.js` | Berufsschultag in der Zeiterfassung erkennen und erst nach Bestätigung setzen (`schultagAusBuchungen()`, `faecherListe()`, `schultageUebernehmen()`), Fächer je Zeile (`schulZeilen()`), Themen mehrerer Schultage einer Woche zusammenführen (`schulwochenZusammenfuehren()`) |
 | `import.js` | Datei laden, Zusammenführen mit dem Stand (`importAnwenden()`), „Spalten prüfen“, Ziehen und Ablegen |
 | `zuordnung.js` | Dialog „Spalten zuordnen“ mit Vorschau |
 | `beispiel.js` | „Beispiel ansehen“: ausgedachtes Heft aus `src/beispiel.csv` (Stammdaten in `BEISPIEL_STAMM`) |
@@ -427,8 +427,8 @@ ihn wieder her und importiert mit der geänderten Zuordnung neu.
 ### Berufsschule aus der Zeiterfassung (`schule.js`)
 
 Manche Betriebe lassen den Schultag wie jeden anderen buchen, die Fächer in der Beschreibung.
-`tageAusBuchungen()` macht einen Tag zur Berufsschule, wenn **jede** seiner Buchungen schulisch
-ist (Projekt oder Tätigkeit heißt „Berufsschule“, „Schule“, „Berufskolleg“, „BS“, „Unterricht“,
+Der Import **schlägt** einen Tag als Berufsschule vor (`importAnwenden()`), wenn **jede** seiner
+Buchungen schulisch ist (Projekt oder Tätigkeit heißt „Berufsschule“, „Schule“, „Berufskolleg“, „BS“, „Unterricht“,
 oder die Beschreibung ist eine Fächerliste) **und** ein zweites Zeichen dazukommt: das Stichwort,
 mindestens drei Fächer oder der Schulplan (`schultagLautPlan()`).
 
@@ -437,6 +437,16 @@ Zeilenumbrüche oder durch Komma und Semikolon vor einem neuen Etikett. Das Etik
 (`AEUP`, `LF4`, `WiSo`), „Lernfeld 4“ oder ein ausgeschriebenes Fach aus `SCHUL_FAECHER`. So bleibt
 „Support: Drucker, Netzwerk: Switch“ ein Arbeitstag, und „AD: …, PC: …“ mit nur zwei Kürzeln auch.
 Ein Feiertag geht vor, ein Tag mit Schule und Betrieb bleibt Arbeitstag.
+
+Gesetzt wird nichts von selbst: Ein falscher Treffer machte aus einem Arbeitstag Schule, mit anderem
+Feld im Vordruck, und wer den Import nicht genau ansah, merkte es nicht (0.3 und 0.4 taten das).
+Die Vorschläge stehen in der Karte nach dem Import (`importHinweis()` in `hinweise.js`) mit Haken,
+Tag und Fächern. „Als Berufsschule übernehmen“ (`schultageUebernehmen()`) setzt die angehakten Tage
+auf Berufsschule, „Alles Betrieb“ und abgewählte Tage bleiben Arbeitstage (`schultageAblehnen()`).
+Beides gilt als von Hand gewählt (`artVonHand`): Derselbe Export fragt beim nächsten Mal nicht
+wieder. Schließt man die Karte ohne Wahl, bleiben die Tage Arbeitstage und der nächste Import fragt
+erneut. Das Beispiel übernimmt seinen Donnerstag gleich. `artVonHand` geht nicht ins Konto: Auf
+einem zweiten Gerät fragt derselbe Export deshalb noch einmal, ein falscher Treffer entsteht nicht.
 
 Der Entwurf eines Schultags (`tagesEntwurf()`, `schulZeilen()`) hat je Fach eine Zeile, ohne
 Projekt davor und ohne ein „Berufsschule:“ am Anfang. Im **wöchentlichen Vordruck** hat die
@@ -447,8 +457,9 @@ Blockwoche. Ersetzt werden nur leere Themen oder solche, die noch genau so daste
 Import sie gebaut hätte; `schuleGeprueft` fällt nur weg, wenn sich etwas ändert. Ein einzelner
 Schultag und jeder Tag der täglichen Notierung behalten ihren Text.
 
-Beim erneuten Import gewinnt die gespeicherte Art (von Hand oder schon Berufsschule). Wer einen
-erkannten Tag selbst als Arbeitstag beschrieben hat, bekommt ihn nicht als Schultag zurück. Die KI
+Beim erneuten Import gewinnt die von Hand gewählte Art, auch eine übernommene Berufsschule.
+„Berufsschule“ ohne `artVonHand` stammt aus 0.3 oder 0.4, die sie beim Import selbst setzten: Solche
+Tage fallen auf die erkannte Art zurück und werden, falls sie passen, wieder Vorschläge. Die KI
 lässt eine Fächerliste aus (`schulEntwurf()` in `kiTageDerWoche()`).
 
 ## Entwurf und Bereinigung
@@ -653,7 +664,7 @@ npm test
 | Datei | Prüft |
 | --- | --- |
 | `test/lokal.js` | Einzeldatei: offline, keine fremden Adressen, Bibliothek im Klartext; Import, Word, PDF, Sicherung und Beispiel ohne eine Anfrage nach draußen (mit Gegenprobe) |
-| `test/import.js` | Formate unter `test/daten/formate/`, Werte, Zeichensatz, Zuordnungsdialog, gemerkte Zuordnung, Berufsschultage aus Kimai (Komma, Zeilen, Schulplan, Zusammenführen, erneuter Import), CSV ohne Kopfzeile, Beispiel |
+| `test/import.js` | Formate unter `test/daten/formate/`, Werte, Zeichensatz, Zuordnungsdialog, gemerkte Zuordnung, Berufsschultage aus Kimai als Vorschlag (Komma, Zeilen, Schulplan, übernehmen, abwählen, „Alles Betrieb“, Zusammenführen, erneuter Import, alte selbst gesetzte Schultage), CSV ohne Kopfzeile, Beispiel |
 | `test/vorbehandlung.js` | Bereinigung gegen `test/korpus.js`, Vorlage für das Modell |
 | `test/ki.js` | Anbindung gegen einen nachgebauten Ollama: Prompt, Warnungen, Fehler, Wochenlauf, Abbruch; Anfragen nur an das eigene Ollama |
 | `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start (Vor- und Nachname, Berufsliste und Fachrichtung), Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen |

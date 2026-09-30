@@ -468,6 +468,18 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   background: transparent; border: 0; border-radius: 50%;
 }
 .hinweiszu:hover { background: var(--band); color: var(--text); }
+/* Vorgeschlagene Schultage nach einem Import: Text, darunter die Tage zum Abhaken, darunter die
+   Knöpfe. Erst „Als Berufsschule übernehmen“ macht sie zu Schultagen. */
+.hinweis.schulwahl .hinweistext { flex: 1 1 100%; }
+.hinweis.schulwahl .hinweisknoepfe { flex: 1 1 100%; }
+.schulwahl-liste { flex: 1 1 100%; display: flex; flex-direction: column; gap: var(--luft-1); min-width: 0; }
+.schulwahl-zeile {
+  display: flex; align-items: center; gap: var(--luft-2); min-width: 0; cursor: pointer;
+  font-size: var(--schrift-text); color: var(--schiefer);
+}
+.schulwahl-zeile input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--acht); }
+.schulwahl-zeile b { flex: none; color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.schulwahl-zeile span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ---------- Fortschritt eines Modelllaufs ----------
    Kein Balken: Wie weit ein Sprachmodell ist, weiß niemand. Angezeigt
