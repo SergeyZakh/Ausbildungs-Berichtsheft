@@ -112,7 +112,11 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
   pruefe('Nach der Zuordnung ist importiert', (await page.locator('#notiz').textContent()).includes('unbekannt.csv geladen'));
   const tag = await page.evaluate((s) => JSON.parse(localStorage.getItem(s)).tage['2026-09-14'], h.SPEICHER);
   pruefe('Tag hat Text und Stunden aus der Zuordnung', !!tag && tag.text.includes('Kabel') && tag.stunden === 2.5, JSON.stringify(tag));
-  pruefe('Knopf „Spalten prüfen“ steht hinter der Meldung', (await page.locator('#notiz .notizknopf').count()) === 1);
+  const karte = page.locator('#hinweise .hinweis');
+  pruefe('Das Ergebnis steht als Karte oben, mit „Spalten prüfen“',
+    (await karte.isVisible()) && (await karte.textContent()).includes('2 Tage aus „unbekannt.csv“') &&
+    (await karte.locator('button', { hasText: 'Spalten prüfen' }).count()) === 1 &&
+    (await page.locator('#notiz .notizknopf').count()) === 0, await karte.textContent().catch(() => ''));
 
   await page.setInputFiles('#datei', format('unbekannt.csv'));
   await page.waitForTimeout(600);
@@ -120,13 +124,17 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
     !(await page.locator('#dlg-zuordnung').isVisible()) && (await page.locator('#notiz').textContent()).includes('geladen'));
 
   // Korrektur: Die Dauer gar nicht übernehmen, der Tag wird neu aufgebaut statt doppelt.
-  await page.click('#notiz .notizknopf');
+  await page.waitForTimeout(8500);
+  pruefe('Die Karte bleibt stehen, auch wenn die Meldung längst leise ist', await karte.isVisible());
+  await karte.locator('button', { hasText: 'Spalten prüfen' }).click();
   await page.waitForSelector('#dlg-zuordnung[open]', { timeout: 3000 }).catch(() => {});
   await page.selectOption('#zu-dauer', '-1');
   await page.click('#zu-ja');
   await page.waitForTimeout(500);
   const korrigiert = await page.evaluate((s) => JSON.parse(localStorage.getItem(s)).tage['2026-09-14'], h.SPEICHER);
   pruefe('„Spalten prüfen“ wiederholt den Import mit neuer Zuordnung', !!korrigiert && korrigiert.stunden === null, JSON.stringify(korrigiert));
+  await karte.locator('button', { hasText: 'Passt' }).click();
+  pruefe('„Passt“ schließt die Karte', !(await page.locator('#hinweise').isVisible()));
 
   const abbruch = await browser.newPage();
   await h.ohneRundgang(abbruch);
@@ -279,6 +287,7 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
     !/Sonnenschein|#48213|PC-LAGER02|Herr Weber/.test(JSON.stringify(Object.values(bsp.tage).map((t) => t.text))),
     bsp.tage['2026-09-07'].text);
   pruefe('Beispiel: Tagesansicht zeigt Montag, 7.9.', (await beispiel.locator('#tagbereich').textContent()).includes('07.09.2026'));
+  pruefe('Beispiel: keine Karte „Import fertig“', !((await beispiel.locator('#hinweise').textContent()) || '').includes('Import fertig'));
   pruefe('Beispiel ohne JavaScript-Fehler', beispielFehler.length === 0, beispielFehler.join(' | '));
   await beispiel.close();
 

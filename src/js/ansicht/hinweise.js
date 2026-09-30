@@ -71,6 +71,25 @@ function bilanzText(b) {
    Hinspringen ist ganz Ruhe. */
 var hinweisRuhe = false, fehltZeigen = false;
 
+/* Nach einem Import steht das Ergebnis als Karte oben, mit „Spalten prüfen“. Sie bleibt, bis man
+   sie schließt: Als Knopf in der Meldung war die Korrektur am Handy nach Sekunden verschwunden. */
+var importKarte = null;
+
+function importKarteZeigen(k) { importKarte = k; hinweiseZeigen(); }
+function importKarteWeg() { importKarte = null; hinweiseZeigen(); }
+
+function importHinweis(k) {
+  return {
+    art: "import", titel: (k.profil ? k.profil + "-Import" : "Import") + " fertig.",
+    text: mehrzahl(k.neue, " Tag", " Tage") + " aus „" + k.name + "“" +
+      (k.schule ? ", davon " + k.schule + " Berufsschule" : "") +
+      (k.gesamt > k.neue ? " — " + k.gesamt + " Tage im Heft" : "") +
+      ". Stimmt etwas nicht, ordne die Spalten neu zu.",
+    knoepfe: [["Spalten prüfen", importKorrigieren], ["Passt", importKarteWeg, true]],
+    zu: importKarteWeg
+  };
+}
+
 function hinweiseBeimOeffnen() {
   fehltZeigen = wochen.length > 0 && offeneWochen().length > 0;
   hinweiseZeigen();
@@ -152,7 +171,7 @@ function hinweisWaehlen() {
 function hinweiseZeigen() {
   var feld = $("hinweise");
   if (!feld) return;
-  var h = hinweisRuhe ? null : hinweisWaehlen();
+  var h = importKarte ? importHinweis(importKarte) : hinweisRuhe ? null : hinweisWaehlen();
   var inhalt = h ? h.art + "|" + h.text + "|" + h.knoepfe.length : "";
   if (feld.getAttribute("data-inhalt") === inhalt && feld.hidden === !h) return;
   feld.setAttribute("data-inhalt", inhalt);
