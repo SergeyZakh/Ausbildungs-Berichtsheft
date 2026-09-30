@@ -19,6 +19,12 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Berufsschule“ mit „Spalten prüfen“ und „Passt“. Sie bleibt, bis man sie schließt; vorher stand
   „Spalten prüfen“ als Knopf in der Meldung und war am Handy nach Sekunden weg.
 
+### Behoben
+
+- **Riesige Felder in der Übersicht:** Mit nur wenigen Wochen, etwa ohne Ausbildungszeit unter
+  *Deine Daten*, wurde jedes Feld so breit wie ein Viertel des Fensters. Die Felder sind jetzt
+  höchstens 16 px groß; ein ganzes Ausbildungsjahr füllt die Breite wie bisher.
+
 ## [0.3.0] – 2026-09-30
 
 ### Neu

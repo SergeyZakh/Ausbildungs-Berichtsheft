@@ -174,6 +174,24 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await ctx.close();
   }
   {
+    // Ohne Ausbildungszeit reicht die Übersicht vom ersten Eintrag bis heute, oft nur ein paar
+    // Wochen. Die Felder wuchsen dann auf die ganze Breite: bei zwei Wochen 456 px je Feld.
+    const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+    const page = await mitStand(ctx, {
+      stamm: {}, tage: { '2026-09-29': tag('Etwas'), '2026-09-30': tag('Noch etwas') }, wochen: {},
+      hinweise: { gesichert: vorTagen(0) },
+    });
+    await h.oeffnen(page);
+    await page.waitForTimeout(700);
+    const feld = await page.evaluate(() => {
+      document.getElementById('btn-uebersicht').click();
+      const r = document.querySelector('#dlg-uebersicht .utag').getBoundingClientRect();
+      return { breite: r.width, hoehe: r.height };
+    });
+    pruefe('Übersicht mit wenigen Wochen: Felder bleiben klein', feld.breite <= 16.5 && feld.hoehe <= 16.5, JSON.stringify(feld));
+    await ctx.close();
+  }
+  {
     // Das Ende fällt auf einen Samstag, dessen Montag noch im 1. Jahr liegt: Der Tag gehört ins 2. Jahr,
     // das dann keine eigene Woche hat. Früher brach die Übersicht daran ab.
     const ctx = await browser.newContext({ viewport: { width: 1300, height: 850 } });
