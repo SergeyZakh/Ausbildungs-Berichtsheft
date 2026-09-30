@@ -131,6 +131,12 @@ function stelleText(datumIso) {
     : WOCHENTAGE[datum.getDay()] + ", " + dm(datum);
 }
 
+/** Kurz für einen Knopf: "Mo 14.09." oder bei einer Blockwoche "Blockwoche 21.–27. Sep". */
+function stelleKurz(datumIso) {
+  var datum = vonIso(datumIso), montag = montagVon(datum);
+  return blockwoche(iso(montag)) ? "Blockwoche " + kurzSpanne(montag) : KURZ[datum.getDay()] + " " + dm(datum);
+}
+
 /** Einen Tag öffnen; in einer Blockwoche öffnet zeichneReiter() von selbst die Woche. */
 function stelleZeigen(datumIso) {
   var datum = vonIso(datumIso);
@@ -139,15 +145,29 @@ function stelleZeigen(datumIso) {
 }
 
 /**
- * Nach „Fertig“ gleich zum nächsten Tag, der noch etwas braucht, auch in eine andere Woche: Wer
- * einen Block oder eine liegengebliebene Woche nacharbeitet, muss sich nicht selbst durch die
- * Reiter klicken. „Zurück“ hinter der Meldung führt wieder her. Danach nichts mehr offen, aber
- * davor: kein Sprung zurück, nur ein Knopf dorthin. `datumIso` ist der letzte Tag dessen, was eben
- * fertig wurde (bei den Themen einer Woche ihr Sonntag).
+ * Nach „Fertig“ gleich zum nächsten Tag derselben Woche, der noch etwas braucht: Wer eine Woche
+ * nacharbeitet, muss sich nicht selbst durch die Reiter klicken. „Zurück“ hinter der Meldung
+ * führt wieder her. In eine andere Woche springt es nicht: Wer am Freitag „Fertig“ drückt, will
+ * die Woche noch ansehen, bevor die nächste kommt. Dafür steht ein Knopf zur nächsten offenen
+ * Stelle da, zu einem offenen Tag davor in derselben Woche oder, wenn danach nichts mehr offen
+ * ist, zum frühesten. `datumIso` ist der letzte Tag dessen, was eben fertig wurde (bei den
+ * Themen einer Woche ihr Sonntag).
  */
 function weiterNachFertig(datumIso, meldung) {
+  var montag = iso(montagVon(vonIso(datumIso))), sonntag = iso(plus(vonIso(montag), 6));
   var ziel = naechsterOffenerTag(datumIso);
-  if (!ziel) {
+  if (!ziel || ziel > sonntag) {
+    var davor = offenerTagAb(montag, sonntag);
+    if (davor) {
+      sage(meldung + " In dieser Woche ist noch " + stelleText(davor) + " offen.", "gut");
+      notizKnopf("Hin: " + stelleKurz(davor), function () { stelleZeigen(davor); });
+      return;
+    }
+    if (ziel) {
+      sage(meldung + " Die Woche ist fertig.", "gut");
+      notizKnopf("Weiter: " + stelleKurz(ziel), function () { stelleZeigen(ziel); });
+      return;
+    }
     var frueher = ersterOffenerTag(datumIso);
     if (!frueher) { sage(meldung + " Alles bis heute ist fertig.", "gut"); return; }
     sage(meldung + " Danach ist nichts mehr offen.", "gut");

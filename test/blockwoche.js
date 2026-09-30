@@ -109,9 +109,9 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     notiz: document.getElementById('notiz').textContent,
   }));
   pruefe('„Fertig“ übernimmt die Themen der Woche', nachFertig.w.schuleGeprueft === true, JSON.stringify(nachFertig.w));
-  pruefe('… und springt zur nächsten offenen Stelle, hier die zweite Blockwoche',
-    nachFertig.woche.startsWith('21.–27. Sep') && nachFertig.notiz.includes('Weiter mit der Blockwoche 21.–27. Sep.'),
-    JSON.stringify(nachFertig));
+  pruefe('… bleibt in der Woche und bietet die nächste offene Stelle an, hier die zweite Blockwoche',
+    nachFertig.woche.startsWith('14.–20. Sep') && nachFertig.notiz.includes('Die Woche ist fertig') &&
+    nachFertig.notiz.includes('Weiter: Blockwoche 21.–27. Sep'), JSON.stringify(nachFertig));
   const fertig = await auf(page, () => ({
     stand: window.__wochenStand('2026-09-14'), anteil: window.__wochenAnteil('2026-09-14'), lage: window.__tagLage('2026-09-14'),
   }));
@@ -119,8 +119,12 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     fertig.stand === 'fertig' && fertig.anteil.fertig === 5 && fertig.anteil.von === 5 && fertig.lage === 'fertig', JSON.stringify(fertig));
   await page.click('#notiz .notizknopf');
   await page.waitForTimeout(200);
-  pruefe('„Zurück“ hinter der Meldung führt wieder zur Woche davor',
-    (await page.textContent('#wochenlabel')).startsWith('14.–20. Sep') && await page.locator('#reiter-block').isVisible());
+  pruefe('„Weiter“ hinter der Meldung öffnet sie', (await page.textContent('#wochenlabel')).startsWith('21.–27. Sep'),
+    await page.textContent('#wochenlabel'));
+  await page.click('#woche-zurueck');
+  await page.waitForTimeout(200);
+  pruefe('Zurück in der Blockwoche davor', (await page.textContent('#wochenlabel')).startsWith('14.–20. Sep') &&
+    await page.locator('#reiter-block').isVisible());
   pruefe('Übernommen ist schreibgeschützt', await page.locator('#feld-schulwoche').getAttribute('readonly') !== null);
 
   /* ---------- Tage der Blockwoche ---------- */
@@ -202,6 +206,17 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     (await page.textContent('#notiz')).includes('Weiter mit Freitag, 04.09.') &&
     await page.locator('#reiter button[aria-selected="true"]', { hasText: '04.09.' }).isVisible(),
     await page.textContent('#notiz'));
+  // Am Freitag „Fertig“: kein Sprung in die nächste Woche, die Woche bleibt stehen.
+  const wocheVorher = await page.textContent('#wochenlabel');
+  await page.fill('#feld-2026-09-04', 'Patchday vorbereitet');
+  await page.click('.sektion .uebernehmen');
+  await page.waitForTimeout(300);
+  const freitag = await page.textContent('#notiz');
+  pruefe('„Fertig“ am Freitag bleibt in der Woche und bietet an, was offen ist',
+    (await page.textContent('#wochenlabel')) === wocheVorher &&
+    await page.locator('#reiter button[aria-selected="true"]', { hasText: '04.09.' }).isVisible() &&
+    /In dieser Woche ist noch .* offen|Die Woche ist fertig/.test(freitag) &&
+    (await page.locator('#notiz .notizknopf').count()) === 1, wocheVorher + ' | ' + freitag);
   pruefe('Gesucht wird nur nach vorn; der früheste offene Tag liegt am Beginn der Ausbildung',
     await auf(page, () => window.__naechsterOffenerTag('2099-01-01') === null && window.__ersterOffenerTag() === '2025-09-01'));
   // Nach dem letzten offenen Tag kein Sprung zurück an den Anfang, nur ein Knopf dorthin. Alles

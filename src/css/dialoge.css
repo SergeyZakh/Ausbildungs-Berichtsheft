@@ -504,9 +504,11 @@
 .ujahr h3 span { margin-left: var(--luft-2); font-weight: 400; color: var(--schiefer); font-size: var(--schrift-klein); }
 .ustand { margin: 0; font-size: var(--schrift-klein); color: var(--schiefer); }
 /* Wie die Aktivität bei GitHub: Spalte 1 die Wochentage, danach eine Spalte je Woche, Zeile 1 die
-   Monate. Die Felder wachsen mit der Breite und bleiben quadratisch (jahresRaster()). */
+   Monate. Die Felder wachsen mit der Breite und bleiben quadratisch (jahresRaster()), aber höchstens
+   16 px: Mit wenigen Wochen, etwa ohne Ausbildungszeit in „Deine Daten“, war sonst jedes Feld so
+   breit wie ein Viertel des Fensters. Ein ganzes Jahr füllt die Breite weiter. */
 .uraster {
-  display: grid; grid-template-columns: 20px repeat(var(--wochen), minmax(0, 1fr));
+  display: grid; grid-template-columns: 20px repeat(var(--wochen), minmax(0, 16px));
   grid-template-rows: auto; gap: 3px;
 }
 .umonat { grid-row: 1; white-space: nowrap; font-size: var(--schrift-fein); color: var(--schiefer); line-height: 1.4; }

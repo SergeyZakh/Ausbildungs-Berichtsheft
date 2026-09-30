@@ -118,8 +118,9 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
   einmal für die ganze Woche statt an fünf Tagen – so wie der Vordruck ein Feld je Woche hat. Wer
   an einem Tag krank war, stellt es in der Liste darunter um. Beim täglichen Vordruck bleibt es bei
   einem Text je Tag.
-- **Nach „Fertig“** geht es gleich zum nächsten Tag, der noch etwas braucht, auch in der nächsten
-  Woche. „Zurück“ hinter der Meldung führt wieder hin.
+- **Nach „Fertig“** geht es gleich zum nächsten Tag der Woche, der noch etwas braucht. „Zurück“
+  hinter der Meldung führt wieder hin. Ist die Woche fertig, bleibst du in ihr; „Weiter“ hinter der
+  Meldung bringt dich zur nächsten offenen Woche.
 - **Meldungen am Handy** schweben kurz unten über dem Text und gehen nach ein paar Sekunden von
   selbst; antippen, × oder wegwischen geht schneller. Eine rote Warnung bleibt stehen, bis du sie
   schließt. Gespeichert wird ohnehin bei jedem Tippen.

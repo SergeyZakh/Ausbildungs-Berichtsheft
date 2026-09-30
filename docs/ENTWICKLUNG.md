@@ -325,12 +325,14 @@ gehört zu `wochen` (`wochenNeu()`), auch ohne einen Tageseintrag: Sonst fehlte 
 
 ### Weiter nach „Fertig“ (`naechsterOffenerTag()`)
 
-„Fertig“ am Tag und bei den Themen einer Blockwoche springt zum nächsten Tag, der noch etwas
-braucht (`tagBrauchtNoch()`, die Regeln von `wochenBilanz()`), auch in eine andere Woche. Gesucht
-wird bis heute oder bis zum letzten Eintrag (`offenerTagAb()`), und nur nach vorn: Wer den heutigen
-Tag fertig macht und ältere Lücken hat, soll nicht an den Anfang der Ausbildung geworfen werden.
-Dann nennt die Meldung „Danach ist nichts mehr offen“ und bietet den frühesten offenen Tag als
-Knopf an (`ersterOffenerTag()`). Nach einem Sprung führt „Zurück“ hinter der Meldung wieder her.
+„Fertig“ am Tag und bei den Themen einer Blockwoche springt zum nächsten Tag derselben Woche, der
+noch etwas braucht (`tagBrauchtNoch()`, die Regeln von `wochenBilanz()`); nach einem Sprung führt
+„Zurück“ hinter der Meldung wieder her. In eine andere Woche springt es nicht: Wer am Freitag
+„Fertig“ drückt, will die Woche noch ansehen. Stattdessen bietet die Meldung einen Knopf an
+(`stelleKurz()`): „Hin: Mi 09.09.“ zu einem offenen Tag davor in derselben Woche, sonst „Die Woche
+ist fertig“ mit „Weiter: Mo 14.09.“. Gesucht wird bis heute oder bis zum letzten Eintrag
+(`offenerTagAb()`), und nur nach vorn: Ist danach nichts mehr offen, nennt die Meldung „Danach ist
+nichts mehr offen“ und bietet den frühesten offenen Tag als Knopf an (`ersterOffenerTag()`).
 
 ### Hinweise und Übersicht (`hinweise.js`, `uebersicht.js`)
 
