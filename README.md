@@ -61,8 +61,8 @@ einfach selbst.
   „Server“, „einem Kollegen“ und „Kunde“. Was unsicher ist, bleibt lieber stehen.
 - **Berufsschule:** feste Schultage und Blockunterricht aus der Einrichtung; in einer Woche nur
   mit Schule schreibst du die Themen einmal für die ganze Woche. Bucht deine Zeiterfassung den
-  Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), wird er als Berufsschule erkannt,
-  je Fach eine Zeile.
+  Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), schlägt der Import ihn als
+  Berufsschule vor, je Fach eine Zeile. Übernommen wird erst, was du bestätigst.
 - **Ausgabe** als Word oder PDF, im Vordruck mit wöchentlicher oder täglicher Notierung. In der
   Wochenansicht schreibst du Abteilung und Unterweisungen direkt ins Blatt, wie es gedruckt wird.
 - **Übersicht aller Wochen** wie die Aktivität bei GitHub: jeder Werktag ein Feld, grün fertig,

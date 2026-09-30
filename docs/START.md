@@ -116,8 +116,10 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
 - **Im Dokument stehen keine Uhrzeiten.**
 - **Schultage** aus *Deine Daten → Schule* setzen nur leere Tage auf „Berufsschule“, in den dort
   eingetragenen Schulferien nicht. Tage mit Buchungen bleiben, wie der Import sie liefert; bucht
-  deine Zeiterfassung den Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), erkennt der
-  Import ihn als Berufsschule. Am Tag selbst lässt sich die Art jederzeit umstellen.
+  deine Zeiterfassung den Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), schlägt der
+  Import ihn oben als Berufsschule vor. Erst **Als Berufsschule übernehmen** macht ihn dazu; Haken
+  weg oder **Alles Betrieb**, und er bleibt Arbeitstag. Am Tag selbst lässt sich die Art jederzeit
+  umstellen.
 - **Blockwoche:** Ist jeder Werktag einer Woche Berufsschule oder frei, schreibst du die Themen
   einmal für die ganze Woche statt an fünf Tagen – so wie der Vordruck ein Feld je Woche hat. Wer
   an einem Tag krank war, klickt auf den Reiter **Blockwoche** („Tage ändern ▾“) und stellt den Tag

@@ -182,13 +182,26 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
     return s;
   };
 
+  // Schultage schlägt der Import nur vor; erst „Als Berufsschule übernehmen“ in der Karte setzt sie.
+  const uebernehmen = async (s) => {
+    await s.locator('#hinweise button', { hasText: 'Als Berufsschule übernehmen' }).click();
+    await s.waitForTimeout(300);
+  };
+  const vorgeschlagen = (s) => s.$$eval('#hinweise .schulwahl-liste input', (e) => e.map((x) => x.getAttribute('data-datum')));
   const schule = await schulSeite();
   const schulFehler = h.fehlerSammeln(schule);
   await schule.setInputFiles('#datei', format('kimai-schule.csv'));
   await schule.waitForTimeout(600);
   let st = await gespeichert(schule);
   const art = (k) => st.tage[k] && st.tage[k].art;
-  pruefe('Kimai mit Fächern: Dienstag (Zeilen) und Mittwoch (Komma) sind Berufsschule',
+  pruefe('Kimai mit Fächern: noch keine Berufsschule, die drei Schultage stehen zum Bestätigen oben',
+    !Object.values(st.tage).some((t) => t.art === 'Berufsschule') &&
+    (await vorgeschlagen(schule)).join() === '2026-09-29,2026-09-30,2026-10-06', (await vorgeschlagen(schule)).join());
+  pruefe('Meldung nennt die Vorschläge', (await schule.locator('#notiz').textContent()).includes('3 sehen nach Berufsschule aus'),
+    await schule.locator('#notiz').textContent());
+  await uebernehmen(schule);
+  st = await gespeichert(schule);
+  pruefe('Übernommen: Dienstag (Zeilen) und Mittwoch (Komma) sind Berufsschule',
     art('2026-09-29') === 'Berufsschule' && art('2026-09-30') === 'Berufsschule', JSON.stringify(st.tage['2026-09-29']));
   const themen = 'AEUP: Datenbanken, Normalisierung\nFUIT: IPv4, Subnetting\nITT: ESP32\nE: Compiler and Interpreter\nDeutsch: Bewerbungsschreiben';
   pruefe('Wöchentlicher Vordruck: die Fächer beider Tage in den Themen der Woche, gleiche Fächer in einer Zeile',
@@ -202,8 +215,8 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
   pruefe('Ein einzelner Schultag in der Woche behält seinen Text, je Fach eine Zeile, ohne Projekt davor',
     art('2026-10-06') === 'Berufsschule' && st.tage['2026-10-06'].text === 'WiSo: Tarifvertrag\nLF5: Schleifen und Arrays\nITT: Sensoren',
     JSON.stringify(st.tage['2026-10-06'].text));
-  pruefe('Meldung nennt die Schultage', (await schule.locator('#notiz').textContent()).includes('davon 3 Berufsschule'),
-    await schule.locator('#notiz').textContent());
+  pruefe('Danach nennt die Karte die Schultage, ohne Liste', !(await vorgeschlagen(schule)).length &&
+    (await schule.locator('#hinweise').textContent()).includes('davon 3 Berufsschule'), await schule.locator('#hinweise').textContent());
   const kiTage = await schule.evaluate(() => window.__kiTageDerWoche('2026-10-05'));
   pruefe('Die KI lässt eine Fächerliste aus, kürzt aber den Arbeitstag daneben',
     !kiTage.includes('2026-10-06') && kiTage.includes('2026-10-07'), kiTage.join(' '));
@@ -213,6 +226,8 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
   await schule.setInputFiles('#datei', format('kimai-schule.csv'));
   await schule.waitForTimeout(600);
   st = await gespeichert(schule);
+  pruefe('Derselbe Export noch einmal: keine neue Frage, die Schultage bleiben',
+    !(await vorgeschlagen(schule)).length && art('2026-09-29') === 'Berufsschule' && art('2026-10-06') === 'Berufsschule');
   pruefe('Derselbe Export noch einmal: Themen unverändert und weiter übernommen',
     st.wochen['2026-09-28'].schule === themen && st.wochen['2026-09-28'].schuleGeprueft === true, JSON.stringify(st.wochen['2026-09-28']));
   await schule.evaluate(() => window.__wocheSetzen('2026-09-28', { schule: 'Eigene Themen', schuleGeprueft: false }));
@@ -229,9 +244,45 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
   pruefe('Schultage ohne JavaScript-Fehler', schulFehler.length === 0, schulFehler.join(' | '));
   await schule.close();
 
+  // Abgewählt oder „Alles Betrieb“: bleibt Arbeitstag, und derselbe Export fragt nicht noch einmal.
+  const auswahl = await schulSeite();
+  await auswahl.setInputFiles('#datei', format('kimai-schule.csv'));
+  await auswahl.waitForTimeout(600);
+  await auswahl.uncheck('#hinweise input[data-datum="2026-10-06"]');
+  await uebernehmen(auswahl);
+  st = await gespeichert(auswahl);
+  pruefe('Ein Haken weg: dieser Tag bleibt Arbeitstag mit seinen Buchungen, die anderen werden Schule',
+    art('2026-09-29') === 'Berufsschule' && art('2026-09-30') === 'Berufsschule' && art('2026-10-06') === '' &&
+    st.tage['2026-10-06'].text.includes('WiSo: Tarifvertrag'), JSON.stringify(st.tage['2026-10-06']));
+  await auswahl.close();
+  const betrieb = await schulSeite();
+  await betrieb.setInputFiles('#datei', format('kimai-schule.csv'));
+  await betrieb.waitForTimeout(600);
+  await betrieb.locator('#hinweise button', { hasText: 'Alles Betrieb' }).click();
+  await betrieb.waitForTimeout(300);
+  st = await gespeichert(betrieb);
+  pruefe('„Alles Betrieb“: kein Tag wird Schule, keine Themen der Woche',
+    !Object.values(st.tage).some((t) => t.art === 'Berufsschule') && !(st.wochen['2026-09-28'] && st.wochen['2026-09-28'].schule));
+  await betrieb.setInputFiles('#datei', format('kimai-schule.csv'));
+  await betrieb.waitForTimeout(600);
+  pruefe('… und derselbe Export fragt nicht noch einmal', !(await vorgeschlagen(betrieb)).length);
+  await betrieb.close();
+
+  // Aus 0.3/0.4: Berufsschule, die der Import selbst gesetzt hat, wird beim nächsten Import wieder ein Vorschlag.
+  const alt = await schulSeite(() => {
+    window.__tagSetzen('2026-10-01', { art: 'Berufsschule', text: '', entwurf: '', posten: [] });
+  });
+  await alt.setInputFiles('#datei', format('kimai-schule.csv'));
+  await alt.waitForTimeout(600);
+  st = await gespeichert(alt);
+  pruefe('Früher selbst gesetzte Berufsschule an einem Arbeitstag ist nach dem Import wieder Arbeitstag',
+    art('2026-10-01') === '' && st.tage['2026-10-01'].text.includes('AD: Benutzer'), JSON.stringify(st.tage['2026-10-01']));
+  await alt.close();
+
   const taeglich = await schulSeite(() => { document.getElementById('f-vordruck').value = 'taeglich'; });
   await taeglich.setInputFiles('#datei', format('kimai-schule.csv'));
   await taeglich.waitForTimeout(600);
+  await uebernehmen(taeglich);
   st = await gespeichert(taeglich);
   pruefe('Tägliche Notierung: jeder Schultag behält seine Fächer, nichts in den Themen der Woche',
     st.tage['2026-09-29'].text === 'AEUP: Datenbanken\nFUIT: IPv4\nITT: ESP32\nE: Compiler and Interpreter' &&
@@ -242,6 +293,9 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
   const plan = await schulSeite(() => { document.getElementById('f-schultage').value = 'Mi'; });
   await plan.setInputFiles('#datei', format('kimai-schule.csv'));
   await plan.waitForTimeout(600);
+  pruefe('Mit Schulplan steht auch der Mittwoch mit einem Fach unter den Vorschlägen',
+    (await vorgeschlagen(plan)).includes('2026-10-07'), (await vorgeschlagen(plan)).join());
+  await uebernehmen(plan);
   st = await gespeichert(plan);
   pruefe('Mit Schulplan reicht ein Fach: Mittwoch 7.10. ist Berufsschule, mit Dienstag zusammengeführt',
     art('2026-10-07') === 'Berufsschule' && st.wochen['2026-10-05'] &&
@@ -263,8 +317,11 @@ const lies = (name) => fs.readFileSync(format(name), 'utf8');
     (await kopflos.locator('#zu-beschreibung').inputValue()) === '11' && !(await kopflos.locator('#zu-ja').isDisabled()));
   await kopflos.click('#zu-ja');
   await kopflos.waitForTimeout(500);
+  pruefe('Ohne Kopfzeile: beide Tage eingelesen und als Berufsschule vorgeschlagen',
+    (await vorgeschlagen(kopflos)).join() === '2026-09-29,2026-09-30', (await vorgeschlagen(kopflos)).join());
+  await uebernehmen(kopflos);
   st = await gespeichert(kopflos);
-  pruefe('Ohne Kopfzeile: beide Tage eingelesen, als Berufsschule erkannt', art('2026-09-29') === 'Berufsschule' && art('2026-09-30') === 'Berufsschule',
+  pruefe('Ohne Kopfzeile: nach dem Übernehmen Berufsschule', art('2026-09-29') === 'Berufsschule' && art('2026-09-30') === 'Berufsschule',
     Object.keys((st && st.tage) || {}).join(' '));
   await kopflos.setInputFiles('#datei', format('kimai-ohne-kopf.csv'));
   await kopflos.waitForTimeout(600);

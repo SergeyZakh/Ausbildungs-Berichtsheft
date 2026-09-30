@@ -79,6 +79,29 @@ function importKarteZeigen(k) { importKarte = k; hinweiseZeigen(); }
 function importKarteWeg() { importKarte = null; hinweiseZeigen(); }
 
 function importHinweis(k) {
+  var titel = (k.profil ? k.profil + "-Import" : "Import") + " fertig.";
+  // Vorgeschlagene Schultage zuerst: Nichts wird Berufsschule, bevor man es hier bestätigt.
+  if (k.vorschlag && k.vorschlag.length) {
+    var entscheiden = function (uebernehmen) {
+      var ja = uebernehmen ? k.vorschlag.filter(function (v) { return v.an; }).map(function (v) { return v.tag; }) : [];
+      var nein = k.vorschlag.map(function (v) { return v.tag; }).filter(function (d) { return ja.indexOf(d) === -1; });
+      schultageAblehnen(nein);
+      if (ja.length) schultageUebernehmen(ja);
+      k.vorschlag = null;
+      k.schule = (k.schule || 0) + ja.length;
+      hinweiseZeigen();
+      sage(ja.length ? mehrzahl(ja.length, " Tag", " Tage") + " als Berufsschule übernommen." : "Alle Tage bleiben Arbeitstage.", "gut");
+    };
+    return {
+      art: "import schulwahl", titel: titel,
+      text: mehrzahl(k.neue, " Tag", " Tage") + " aus „" + k.name + "“. " +
+        (k.vorschlag.length === 1 ? "Dieser Tag sieht" : "Diese Tage sehen") + " nach Berufsschule aus:",
+      liste: schulVorschlagListe(k.vorschlag),
+      knoepfe: [["Als Berufsschule übernehmen", function () { entscheiden(true); }, true],
+        ["Alles Betrieb", function () { entscheiden(false); }], ["Spalten prüfen", importKorrigieren]],
+      zu: importKarteWeg
+    };
+  }
   return {
     art: "import", titel: (k.profil ? k.profil + "-Import" : "Import") + " fertig.",
     text: mehrzahl(k.neue, " Tag", " Tage") + " aus „" + k.name + "“" +
@@ -88,6 +111,30 @@ function importHinweis(k) {
     knoepfe: [["Spalten prüfen", importKorrigieren], ["Passt", importKarteWeg, true]],
     zu: importKarteWeg
   };
+}
+
+/** Die vorgeschlagenen Schultage zum Abhaken: Tag, Datum und was gebucht ist. */
+function schulVorschlagListe(vorschlag) {
+  var liste = document.createElement("div");
+  liste.className = "schulwahl-liste";
+  vorschlag.forEach(function (v) {
+    var zeile = document.createElement("label");
+    zeile.className = "schulwahl-zeile";
+    var haken = document.createElement("input");
+    haken.type = "checkbox";
+    haken.checked = v.an;
+    haken.setAttribute("data-datum", v.tag);
+    haken.addEventListener("change", function () { v.an = haken.checked; });
+    var tag = document.createElement("b");
+    tag.textContent = KURZ[vonIso(v.tag).getDay()] + " " + dm(vonIso(v.tag));
+    var was = document.createElement("span");
+    was.textContent = schulVorschauText(v.tag);
+    zeile.appendChild(haken);
+    zeile.appendChild(tag);
+    zeile.appendChild(was);
+    liste.appendChild(zeile);
+  });
+  return liste;
 }
 
 function hinweiseBeimOeffnen() {
@@ -189,6 +236,7 @@ function hinweiseZeigen() {
   text.appendChild(titel);
   text.appendChild(document.createTextNode(" " + h.text));
   karte.appendChild(text);
+  if (h.liste) karte.appendChild(h.liste);
 
   var knoepfe = document.createElement("div");
   knoepfe.className = "hinweisknoepfe";

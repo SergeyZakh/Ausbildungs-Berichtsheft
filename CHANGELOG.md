@@ -6,6 +6,17 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
+## [0.4.1] – 2026-09-30
+
+### Geändert
+
+- **Berufsschultage nur noch nach Bestätigung:** Der Import setzt keinen Tag mehr selbst auf
+  Berufsschule. Sieht ein Tag danach aus (Fächer in der Beschreibung, Projekt „Berufsschule“ oder
+  der Schulplan), steht er in der Karte oben mit Haken, Datum und Fächern. „Als Berufsschule
+  übernehmen“ setzt die angehakten Tage, „Alles Betrieb“ oder ein abgewählter Haken lässt sie
+  Arbeitstage. Derselbe Export fragt danach nicht noch einmal. Tage, die 0.3 oder 0.4 beim Import
+  selbst zur Berufsschule gemacht haben, werden beim nächsten Import wieder zum Vorschlag.
+
 ## [0.4.0] – 2026-09-30
 
 ### Neu
@@ -247,6 +258,7 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
+[0.4.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.1.1...v0.2.0
