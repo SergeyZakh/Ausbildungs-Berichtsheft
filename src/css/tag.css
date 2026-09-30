@@ -202,6 +202,90 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   background: #fff; color: #000; pointer-events: none; user-select: none;
 }
 
+/* ---------- Reiter „Woche“: oben der Stand, darunter das Blatt (wochenblatt.js) ---------- */
+.tagflaeche.blattwoche { flex-direction: column; align-items: stretch; flex: 0 0 auto; gap: var(--luft-3); }
+.tagflaeche.blattwoche > * { flex: none; }
+.tagflaeche.blattwoche > .sektion.vorschau { width: 100%; max-width: 920px; align-self: center; overflow: clip; }
+.tagflaeche.blattwoche .vorschaubuehne { flex: none; overflow: visible; position: relative; }
+/* Ohne Blatt zum Hineinschreiben (tägliche Notierung): die Angaben als Karten nebeneinander. */
+.tagflaeche.blattwoche > .wochenspalte {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--luft-3); align-items: start;
+}
+.tagflaeche.blattwoche .sektion.wachsend textarea { min-height: 140px; }
+/* Die Tage einer Blockwoche in einer Zeile unter dem Stand, nicht als lange Liste. */
+.blattwoche .blocktage .sektionsleib { padding: var(--luft-3) var(--luft-4); }
+.blattwoche .blocktageliste { display: flex; flex-wrap: wrap; gap: var(--luft-2); }
+.blattwoche .blocktag {
+  flex: 1 1 170px; padding: var(--luft-2) var(--luft-3);
+  border: 1px solid var(--linie); border-radius: var(--rund-klein);
+}
+.blattwoche .blocktag:last-child { border-bottom: 1px solid var(--linie); }
+
+/* Die Leiste mit dem Stand der Woche klebt oben, während man im Blatt scrollt. */
+.tagflaeche > .sektion.wochenstand {
+  position: sticky; top: 0; z-index: 3;
+  display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; gap: var(--luft-2) var(--luft-4);
+  padding: var(--luft-3) var(--luft-4);
+}
+.wsring { display: inline-flex; color: var(--text); }
+.wssatz { font-size: var(--schrift-gross); font-weight: 600; color: var(--text); }
+.wsoffen { font-size: var(--schrift-text); color: var(--acht); }
+.wochenstand .sektionsknopf.wshin { border-color: var(--linie-fest); color: var(--text); background: var(--flaeche); }
+.themenstand { display: inline-flex; align-items: center; gap: var(--luft-2); }
+.themenwort { font-size: var(--schrift-text); color: var(--acht); }
+.themenstand.fertig .themenwort { color: var(--gut); }
+.wsrechts { margin-left: auto; display: flex; align-items: center; flex-wrap: wrap; gap: var(--luft-2) var(--luft-3); }
+.wsrechts .textfuss { padding: 0; border: 0; }
+
+/* Der Kopf über dem Blatt sagt, dass man hineinschreibt. */
+.blatthinweis { margin-left: auto; font-size: var(--schrift-klein); font-weight: 400; color: var(--schiefer); }
+.blatthinweis .stift { color: var(--stift); font-weight: 700; }
+
+/* Die Felder im Blatt: gestrichelt mit „✎“, solange man nicht schreibt; das Blatt scheint durch,
+   wie es gedruckt wird. Beim Schreiben ein weißes Feld mit dem Text, der gleich im Blatt steht. */
+.blattlage { position: absolute; inset: 0; pointer-events: none; }
+.blattfeld {
+  position: absolute; pointer-events: auto; cursor: text; border-radius: 2px;
+  outline: 1.5px dashed var(--stift); outline-offset: 3px;
+  background: color-mix(in srgb, var(--stift-hell) 30%, transparent);
+  transition: background-color .15s;
+}
+.blattfeld:hover { background: var(--stift-hell); }
+.blattfeld:focus-within {
+  z-index: 2; outline: 2px solid var(--stift); background: #fff; box-shadow: 0 8px 28px rgba(0, 0, 0, .14);
+}
+.blattfeld textarea, .blattfeld input {
+  display: block; width: 100%; height: 100%; min-height: 0; margin: 0; padding: .3em .5em;
+  border: 0; border-radius: 0; resize: none; background: transparent; color: #000;
+  font-family: Cambria, Georgia, "Times New Roman", serif; line-height: 1.4; opacity: 0;
+}
+.blattfeld:focus-within textarea, .blattfeld:focus-within input { opacity: 1; }
+.blattfeld textarea:focus, .blattfeld input:focus { border: 0; box-shadow: none; outline: none; }
+.blattleer {
+  position: absolute; inset: 0; display: none; align-items: center; justify-content: center; padding: var(--luft-1) var(--luft-2);
+  text-align: center; font-size: var(--schrift-klein); font-weight: 600; color: var(--stift); pointer-events: none;
+}
+.blattfeld.leer .blattleer { display: flex; }
+.blattfeld.leer:focus-within .blattleer { display: none; }
+.blattstift {
+  position: absolute; top: -12px; right: -12px; width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--stift); color: #fff; font-size: 12px; line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .2); pointer-events: none;
+}
+.blattfeld:focus-within .blattstift { display: none; }
+/* Die Abteilung ist nur eine Zeile im Kopf des Blatts. */
+.blattfeld.feld-abteilung { outline-offset: 1px; }
+.blattfeld.feld-abteilung .blattleer { font-size: var(--schrift-fein); }
+.blattfeld.feld-abteilung .blattstift { top: -10px; right: -10px; width: 18px; height: 18px; font-size: 10px; }
+
+/* Ein Tag im Blatt öffnet den Tag; ein offener trägt eine Marke. Nur in der Vorschau. */
+.blattwoche.imblatt .bogen .tagkopf[data-datum] { pointer-events: auto; cursor: pointer; }
+.blattwoche.imblatt .bogen .tagkopf[data-datum]:hover b { text-decoration: underline; }
+.blatt .kasten .tagkopf .vmarke {
+  margin-left: .8em; font-family: system-ui, sans-serif; font-size: .85em; font-weight: 600; color: #B42318;
+}
+.blatt .kasten .tagkopf .vmarke::before { content: "● "; }
+
 /* ---------- Eingaben im Tag ---------- */
 .feldpaar { display: flex; align-items: center; gap: var(--luft-2); }
 .feldetikett { font-size: var(--schrift-klein); color: var(--schiefer); white-space: nowrap; }

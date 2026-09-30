@@ -60,11 +60,15 @@ function passtAufEineSeite(html) {
 
 /* ---------- HTML der Blätter ---------- */
 
-/** Ein Feld des Vordrucks. Jede Zeile ein Stichpunkt, nichts fett – wie in stichpunkt(). */
-function druckAbschnitt(titel, liste, klasse) {
+/**
+ * Ein Feld des Vordrucks. Jede Zeile ein Stichpunkt, nichts fett – wie in stichpunkt().
+ * `feld` und das Datum am Tageskopf braucht nur die Vorschau im Reiter „Woche“: Dort schreibt man
+ * in die Felder, und ein Tag öffnet sich per Klick (wochenblatt.js). Gedruckt stört beides nicht.
+ */
+function druckAbschnitt(titel, liste, klasse, feld) {
   var inhalt = liste.map(function (e) {
     var kopf = (e.kopf && e.kopf.tag)
-      ? '<p class="tagkopf"><b>' + sicher(e.kopf.tag) + "</b>" +
+      ? '<p class="tagkopf"' + (e.kopf.datum ? ' data-datum="' + e.kopf.datum + '"' : "") + "><b>" + sicher(e.kopf.tag) + "</b>" +
         (e.kopf.rest ? "<span>" + sicher(e.kopf.rest) + "</span>" : "") + "</p>"
       : "";
     var text = zeilen(e.text).map(function (z) {
@@ -75,7 +79,7 @@ function druckAbschnitt(titel, liste, klasse) {
     }).join("");
     return kopf + text;
   }).join("");
-  return '<section class="feld ' + klasse + '">' +
+  return '<section class="feld ' + klasse + '"' + (feld ? ' data-feld="' + feld + '"' : "") + ">" +
          "<h2>" + sicher(titel) + "</h2>" +
          '<div class="kasten">' + inhalt + "</div></section>";
 }
@@ -90,15 +94,15 @@ function druckKopfleiste(nummer, montag, s) {
   var abteilung = wd.abteilung || s.abteilung || "";
   var jahr = ausbildungsjahr(s, montag) || s.jahr || "";
 
-  function kopfFeld(etikett, wert) {
-    return "<td><span>" + sicher(etikett) + "</span>" + sicher(wert || "") + "</td>";
+  function kopfFeld(etikett, wert, feld) {
+    return "<td" + (feld ? ' data-feld="' + feld + '"' : "") + "><span>" + sicher(etikett) + "</span>" + sicher(wert || "") + "</td>";
   }
   return '<table class="kopfleiste"><tr>' +
     // Zwei eigene Felder wie im Vordruck: "3 / 1" unter einem Etikett las niemand richtig.
     kopfFeld("Nr.", nummer) +
     kopfFeld("Ausbildungsjahr", jahr ? jahr + "." : "") +
     kopfFeld("Ausbildungswoche", dmy(montag) + " – " + dmy(plus(montag, 6))) +
-    kopfFeld("Ausbildungsabteilung", abteilung) +
+    kopfFeld("Ausbildungsabteilung", abteilung, "abteilung") +
     kopfFeld("Name", s.name) +
   "</tr></table>";
 }
@@ -113,11 +117,11 @@ function druckBlattSeite(nummer, montag, s, texte, fortsetzung, letzte) {
   return '<article class="blatt dicht-' + dichte(texte) + (fortsetzung ? " fortsetzung" : "") + '">' +
     "<h1>Ausbildungsnachweis" + (fortsetzung ? " – Fortsetzung" : "") + "</h1>" +
     druckKopfleiste(nummer, montag, s) +
-    druckAbschnitt("Betriebliche Tätigkeit", texte.betrieb, "gross") +
+    druckAbschnitt("Betriebliche Tätigkeit", texte.betrieb, "gross", "betrieb") +
     (letzte ?
       druckAbschnitt("Unterweisungen, Lehrgespräche, betrieblicher Unterricht, sonstige Schulungsveranstaltungen",
-                     texte.unterweisung, "klein") +
-      druckAbschnitt("Berufsschule (Unterrichtsthemen)", texte.schule, "klein") +
+                     texte.unterweisung, "klein", "unterweisung") +
+      druckAbschnitt("Berufsschule (Unterrichtsthemen)", texte.schule, "klein", "schule") +
       DRUCK_UNTERSCHRIFTEN : "") +
     "</article>";
 }

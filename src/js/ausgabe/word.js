@@ -218,7 +218,7 @@ function wochenTexte(montag) {
     // auch ohne Text stehen: Dort ist der Grund die Angabe.
     if (!text && (eigenesFeld || !art)) continue;
     var eintrag = {
-      kopf: { tag: WOCHENTAGE[datum.getDay()], rest: (art && !eigenesFeld) ? art : "" },
+      kopf: { tag: WOCHENTAGE[datum.getDay()], rest: (art && !eigenesFeld) ? art : "", datum: iso(datum) },
       text: text
     };
     if (art === "Berufsschule") schule.push(eintrag);

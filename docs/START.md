@@ -75,16 +75,18 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere
    ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig; was die Zeichen in den
    Reitern heißen, erklärt der Kalender unter der Woche oben; blassrot sind dort Werktage, an denen
-   noch gar nichts steht. Im Reiter **Woche** trägst du
-   Abteilung und Unterweisungen ein. Was über alle Wochen noch fehlt, zeigt **⋯ → Übersicht aller
-   Wochen**.
+   noch gar nichts steht. Im Reiter **Woche** steht dein Wochenblatt, und du schreibst direkt
+   hinein: Abteilung und Unterweisungen sind gestrichelte Felder im Blatt, in einer Blockwoche auch
+   die Themen der Berufsschule. Ein Tag im Blatt öffnet den Tag. Am Handy stehen dieselben Felder
+   über dem Blatt. Was über alle Wochen noch fehlt, zeigt **⋯ → Übersicht aller Wochen**.
 
-   ![Wochenansicht mit Vorschau des Wochenblatts](bilder/woche.png)
+   ![Wochenansicht: oben der Stand, darunter das Blatt zum Hineinschreiben](bilder/woche.png)
 
-   **1** Woche wählen, ein Klick öffnet den Kalender. **2** Ausbildungsabteilung, gilt für die ganze
-   Woche; ohne Eintrag zählt die aus „Deine Daten“. **3** Unterweisungen und Lehrgespräche, ein
-   eigenes Feld im Vordruck. **4** Vorschau des Wochenblatts. **5** Ob die Woche auf ein Blatt
-   passt, mit Sprachmodell auch „Ganze Woche mit KI kürzen“. **6** Exportieren.
+   **1** Woche wählen, ein Klick öffnet den Kalender. **2** Wie weit die Woche ist und was als
+   Erstes fehlt, mit „Ansehen“ zum Tag. **3** Ob sie auf ein Blatt passt, mit Sprachmodell auch
+   „Ganze Woche mit KI kürzen“, und die Woche als Word oder PDF. **4** Ausbildungsabteilung im
+   Blatt, gilt für die ganze Woche; ohne Eintrag zählt die aus „Deine Daten“. **5** In die
+   gestrichelten Felder schreibst du direkt. **6** Exportieren, auch das ganze Heft.
 
 6. **Exportieren.** Auf **Exportieren**, dann unter **Diese Woche** „Als Word-Datei“ oder „Als PDF
    drucken“. Für alle Wochen auf einmal dasselbe unter **Ganzes Heft mit Deckblatt**; was nur das

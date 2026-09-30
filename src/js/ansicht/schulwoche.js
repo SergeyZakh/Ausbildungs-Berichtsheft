@@ -9,8 +9,12 @@
 /**
  * Die Themen der Woche im Reiter „Woche“. Wie ein Tagestext: rot, bis „Fertig“ ihn übernimmt,
  * dann grün und schreibgeschützt. Jede Änderung hebt die Übernahme auf.
+ *
+ * Gibt das Feld und seine Knöpfe zurück. Am Rechner schreibt man ins Blatt (wochenblatt.js): Das
+ * Feld liegt dort auf dem Kasten „Berufsschule“, die Knöpfe stehen mit ihrem Stand in der Leiste
+ * oben (`gruppe`). Am Handy und bei der täglichen Notierung ist beides eine Karte (`sektion`).
  */
-function schulwocheSektion(vorschau) {
+function schulwocheFeld(vorschau, imBlatt) {
   var montagIso = aktiveWoche, block = blockwoche(montagIso);
   // Kurzer Titel: In der schmalen Spalte stießen „(Unterrichtsthemen)“ und „Fertig“ aneinander.
   var s = sektion("Berufsschule", "wachsend schulwoche");
@@ -30,7 +34,7 @@ function schulwocheSektion(vorschau) {
   ta.value = w.schule || "";
   ta.placeholder = "Welche Themen wurden diese Woche im Unterricht behandelt?";
   s.leib.appendChild(ta);
-  textfeldWachsen(ta);
+  if (!imBlatt) textfeldWachsen(ta);
 
   ta.addEventListener("input", function (e) {
     var d = wocheDaten(montagIso);
@@ -50,6 +54,7 @@ function schulwocheSektion(vorschau) {
     d.schuleGeprueft = true;
     merken();
     anzeigen();
+    vorschau.jetzt();
     zeichneWochenwahl(); zeichneReiter();
     weiterNachFertig(iso(plus(vonIso(montagIso), 6)), "Themen der Woche als fertig markiert.");
   });
@@ -63,24 +68,34 @@ function schulwocheSektion(vorschau) {
     delete d.schuleGeprueft;
     merken();
     anzeigen();
+    vorschau.jetzt();
     zeichneWochenwahl(); zeichneReiter();
     ta.focus();
     sage("Zum Bearbeiten geöffnet — danach wieder auf „Fertig“.", "warn");
   });
 
-  s.kopf.appendChild(uebernehmen);
-  s.kopf.appendChild(bearbeiten);
+  var gruppe = document.createElement("span");
+  gruppe.className = "schulwoche themenstand";
+  var wort = document.createElement("span");
+  wort.className = "themenwort";
+  gruppe.appendChild(wort);
+  var ort = imBlatt ? gruppe : s.kopf;
+  ort.appendChild(uebernehmen);
+  ort.appendChild(bearbeiten);
 
   function anzeigen() {
     var d = wochendaten[montagIso] || {};
     var voll = !!(d.schule || "").trim(), fertig = voll && !!d.schuleGeprueft;
-    s.wurzel.className = "sektion wachsend schulwoche" + (fertig ? " fertig" : voll ? " pruefen" : "");
+    var stand = fertig ? " fertig" : voll ? " pruefen" : "";
+    s.wurzel.className = "sektion wachsend schulwoche" + stand;
+    gruppe.className = "schulwoche themenstand" + stand;
+    wort.textContent = fertig ? "Themen der Woche fertig" : voll ? "Themen der Woche noch nicht fertig" : "Themen der Woche fehlen";
     uebernehmen.hidden = !voll || fertig;
     bearbeiten.hidden = !fertig;
     ta.readOnly = fertig;
   }
   anzeigen();
-  return s.wurzel;
+  return { sektion: s.wurzel, ta: ta, gruppe: gruppe };
 }
 
 /**

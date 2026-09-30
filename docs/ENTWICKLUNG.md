@@ -88,8 +88,8 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `ansicht-woche.js` | Wochenbalken, Monatsraster, Navigation durch jede Kalenderwoche, nach „Fertig“ weiter zum nächsten offenen Tag (`weiterNachFertig()`) |
 | `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“; in einer Blockwoche nur der Reiter „Blockwoche“ |
 | `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: eine Karte je Tag (`textSektion()`, im Kopf Datum, Art und Stunden aus `tagFelder()`, über dem Text das Feld des Vordrucks), Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche; ein freier Tag hat nur seinen Kopf (`artSektion()`) |
-| `wochenblatt.js` | Reiter „Woche“: Angaben, Blattvorschau (`blattVorschau()`), rechts `seitenspalte()` – eine Karte „Wochenblatt“ mit Umfang und KI; heruntergeladen wird über „Exportieren“ |
-| `schulwoche.js` | Themen einer Blockwoche (`schulwocheSektion()`) und die Tage der Blockwoche mit ihrer Art |
+| `wochenblatt.js` | Reiter „Woche“: oben der Stand der Woche (`wochenStandLeiste()`), darunter das Blatt (`blattVorschau()`), in das man am Rechner direkt schreibt; `seitenspalte()` nur noch beim Ausbilder |
+| `schulwoche.js` | Themen einer Blockwoche (`schulwocheFeld()`: Feld, Karte und die Knöpfe für die Leiste oben) und die Tage der Blockwoche mit ihrer Art |
 | `stammdaten.js` | Dialog „Deine Daten“ (Reiter Ausbildung, Schule, Vordruck, Deckblatt, KI, Löschen), Verbindungsprüfung, Löschen und Verwerfen |
 | `berufe.js` | Ausbildungsberuf: eigene Liste beim Tippen (nach Bereichen, `BERUFE`), danach die Fachrichtung zum Antippen; gespeichert in `f-beruf` als „Fachinformatiker/in – Systemintegration“ (`berufsfeld()`, `berufTeilen()`) |
 | `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
@@ -303,9 +303,11 @@ Eigenes hat (keine Art, kein Text, keine Buchungen, keine Stunden, nicht `artVon
 
 Der wöchentliche Vordruck hat für die Berufsschule ein Feld je Woche. Ist in einer Woche jeder
 Werktag Berufsschule oder frei, gibt es deshalb statt der sieben Tagesreiter nur den Reiter
-„Blockwoche“ und im Reiter „Woche“ oben ein Feld für die Themen der ganzen Woche, darunter die fünf
-Tage mit ihrer Art. Einmal schreiben, einmal „Fertig“: Die Woche ist dann 5/5. Über dem Feld
-steht nichts, weder Vorschläge noch Erklärungen; der Reiter sagt schon, dass es eine Blockwoche ist.
+„Blockwoche“. Im Reiter „Woche“ stehen die fünf Tage mit ihrer Art in einer Zeile unter dem Stand,
+und die Themen der ganzen Woche schreibt man am Rechner direkt in den Kasten „Berufsschule“ des
+Blatts; „Fertig“ steht oben im Stand. Einmal schreiben, einmal „Fertig“: Die Woche ist dann 5/5.
+Über dem Feld steht nichts, weder Vorschläge noch Erklärungen; der Reiter sagt schon, dass es eine
+Blockwoche ist.
 
 `blockwoche()` verlangt:
 
@@ -322,6 +324,29 @@ Tag sagt das in der Tagesansicht (`wochenfeldHinweis()`).
 Die Themen stehen in `wochen[montag].schule`, übernommen mit `schuleGeprueft`, und gehen mit
 Abteilung und Unterweisungen ins Konto (`wocheKennung()` enthält beide). Eine Woche mit Themen
 gehört zu `wochen` (`wochenNeu()`), auch ohne einen Tageseintrag: Sonst fehlte sie im Gesamtheft.
+
+### Reiter „Woche“ (`wochenblatt.js`)
+
+Oben steht der Stand der Woche (`wochenStandLeiste()`): Ring und „3 von 4 Tagen fertig“
+(`wochenAnteil()`), der erste Tag, der noch etwas braucht, mit „Ansehen“ (`tagBrauchtNoch()`),
+bei Themen der Woche ihr Stand mit „Fertig“, ob es auf ein Blatt passt, KI und „Woche als Word“ /
+„PDF“ (dieselben Wege wie unter „Exportieren“). Die Leiste klebt oben und rechnet nach jedem
+Neuzeichnen des Blatts neu (`vorschau.nachher()`).
+
+Darunter das Blatt aus demselben Drucksatz wie das PDF. Am Rechner mit dem wöchentlichen Vordruck
+(`imBlattSchreiben()`) schreibt man hinein: Die Felder für Abteilung, Unterweisungen und die Themen
+der Woche liegen als `.blattfeld` genau auf ihrem Kasten (`data-feld` im Drucksatz, `felderSetzen()`
+nach jedem Zeichnen und bei jeder Größenänderung), in der Schrift des Blatts mitskaliert. Solange
+man nicht schreibt, sind sie durchsichtig: Man sieht das Blatt, wie es gedruckt wird, mit
+gestricheltem Rahmen und „✎“, ein leeres Feld sagt „Hier schreiben …“. Beim Schreiben wird das
+Feld weiß und zeigt den Text; das Blatt dahinter zeichnet sich nach einer Pause neu. Übernommene
+Themen sind schreibgeschützt, ihr Feld verschwindet, „Bearbeiten“ oben öffnet es wieder. Ein
+Tageskopf im Blatt (`data-datum`) öffnet den Tag; ein Tag, der noch etwas braucht, trägt nur in der
+Vorschau „● noch gegenlesen“.
+
+Am Handy wäre das Blatt zum Schreiben zu klein, und die tägliche Notierung hat keine festen Kästen:
+Dort stehen dieselben Felder als Karten zwischen Stand und Blatt. Wer das Fenster über 820 px zieht,
+bekommt die andere Anordnung (`matchMedia`).
 
 ### Weiter nach „Fertig“ (`naechsterOffenerTag()`)
 
@@ -633,8 +658,8 @@ npm test
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
 | `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), Themen schreiben und übernehmen, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy |
-| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel |
-| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
+| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, Stand oben, ins Blatt schreiben, Tag im Blatt öffnen |
+| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Woche mit Stand, Karten und Blatt in voller Breite, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
 mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).

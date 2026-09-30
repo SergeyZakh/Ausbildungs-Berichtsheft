@@ -104,6 +104,13 @@
   .abteilungsfeld { min-width: 0; flex: 1 1 0; width: 0; }
   .wochenspalte .feldpaar { min-width: 0; }
   .seitenspalte > .sektion { flex: 1 1 100%; }
+  /* Die Leiste mit dem Stand der Woche: am Handy nicht klebend, Export in eigener Zeile. */
+  .tagflaeche > .sektion.wochenstand { position: static; padding: var(--luft-3); }
+  .wsrechts { margin-left: 0; flex: 1 1 100%; flex-wrap: wrap; }
+  .wsrechts .textfuss { flex: 1 1 100%; }
+  .wsrechts .knopf.voll { flex: 1 1 auto; justify-content: center; }
+  .tagflaeche.blattwoche > * { width: 100%; max-width: 100%; min-width: 0; }
+  .tagflaeche.blattwoche > .wochenspalte { display: flex; flex-direction: column; align-items: stretch; }
   /* Die klebende Titelzeile der Vorschau lag beim Scrollen über dem Blatt. */
   .tagflaeche.dreispaltig > .sektion.vorschau > .sektionskopf { position: static; }
   .seitenkarte .seitenblock { flex: 1 1 100%; }
