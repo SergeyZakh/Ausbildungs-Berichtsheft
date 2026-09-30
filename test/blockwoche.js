@@ -69,11 +69,15 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     await auf(page, () => window.__wochenBilanz('2026-09-14').ohneText === 5 && window.__wochenStand('2026-09-14') === ''));
 
   /* ---------- Schreiben ---------- */
-  pruefe('Blockwoche: das Feld steht gleich unter der Überschrift, ohne Knöpfe und Sätze darüber',
+  pruefe('Blockwoche: das Feld liegt im Blatt auf dem Kasten „Berufsschule“, ohne Sätze darüber',
     await auf(page, () => {
-      const leib = document.querySelector('.schulwoche .sektionsleib');
-      return leib.firstElementChild.id === 'feld-schulwoche' && !document.querySelector('.faecher, .fach, .schulhinweis');
+      const huelle = document.getElementById('feld-schulwoche').closest('.blattfeld.feld-schule');
+      const kasten = [...document.querySelectorAll('.vorschaubuehne [data-feld="schule"] .kasten')].pop();
+      return !!huelle && Math.abs(huelle.getBoundingClientRect().top - kasten.getBoundingClientRect().top) < 2 &&
+        !document.querySelector('.faecher, .fach, .schulhinweis');
     }));
+  pruefe('„Fertig“ für die Themen steht oben im Stand der Woche',
+    await page.locator('.wochenstand .schulwoche').isVisible());
   pruefe('Platzhalter ist eine schlichte Frage, ohne Beispiel',
     (await page.getAttribute('#feld-schulwoche', 'placeholder')) === 'Welche Themen wurden diese Woche im Unterricht behandelt?');
   await page.fill('#feld-schulwoche', 'LF5: Subnetting, VLANs\nDeutsch: Protokoll\nWiSo: Kündigungsschutz');
@@ -139,7 +143,10 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   pruefe('Ein Arbeitstag von Hand macht die Woche wieder tageweise, mit Hinweis',
     !(await auf(page, () => window.__blockwoche('2026-09-14'))) && (await reiter(page)).length === 8 &&
     (await page.textContent('#notiz')).includes('Keine Blockwoche mehr'));
-  pruefe('Die Themen bleiben im Reiter „Woche“ stehen', await page.locator('#feld-schulwoche').isVisible());
+  // Übernommen und damit schreibgeschützt: im Blatt als Text, „Bearbeiten“ oben im Stand.
+  pruefe('Die Themen bleiben im Reiter „Woche“ stehen',
+    (await auf(page, () => [...document.querySelectorAll('.vorschaubuehne [data-feld="schule"] .kasten')].pop().textContent))
+      .includes('LF5: Subnetting') && await page.locator('.wochenstand .schulwoche .bearbeiten').isVisible());
   // Zurück auf Berufsschule über den Tag selbst.
   await page.click('#reiter button >> nth=4');
   await page.selectOption('#feld-art', 'Berufsschule');

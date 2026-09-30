@@ -63,8 +63,8 @@ einfach selbst.
   mit Schule schreibst du die Themen einmal für die ganze Woche. Bucht deine Zeiterfassung den
   Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), wird er als Berufsschule erkannt,
   je Fach eine Zeile.
-- **Ausgabe** als Word oder PDF, im Vordruck mit wöchentlicher oder täglicher Notierung, mit
-  Vorschau des Blatts.
+- **Ausgabe** als Word oder PDF, im Vordruck mit wöchentlicher oder täglicher Notierung. In der
+  Wochenansicht schreibst du Abteilung und Unterweisungen direkt ins Blatt, wie es gedruckt wird.
 - **Übersicht aller Wochen** wie die Aktivität bei GitHub: jeder Werktag ein Feld, grün fertig,
   rot offen, dazu Schul-, Urlaubs- und Krankheitstage je Ausbildungsjahr.
 - **Optional mit eigenem Sprachmodell:** [Ollama](https://ollama.com) fasst den Tag in so vielen

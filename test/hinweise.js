@@ -359,9 +359,31 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       return getComputedStyle(b).backgroundColor;
     });
     pruefe('Dunkler Modus: das Blatt in der Vorschau bleibt weiß', blatt === 'rgb(255, 255, 255)', blatt);
-    pruefe('Am Rechner steht der lange Titel der Unterweisungen',
-      await page.locator('.wochenspalte .sektionskopf .lang').isVisible() &&
-        !(await page.locator('.wochenspalte .sektionskopf .kurz').isVisible()));
+    // Am Rechner schreibt man ins Blatt: Die Felder liegen auf ihren Kästen im Vordruck.
+    const imBlatt = await page.evaluate(() => {
+      const feld = document.querySelector('.blattfeld.feld-unterweisung').getBoundingClientRect();
+      const kasten = [...document.querySelectorAll('.vorschaubuehne [data-feld="unterweisung"] .kasten')].pop().getBoundingClientRect();
+      return { drauf: Math.abs(feld.top - kasten.top) < 2 && Math.abs(feld.width - kasten.width) < 2,
+        hinweis: !!document.querySelector('.blatthinweis'), karten: document.querySelectorAll('.wochenspalte').length,
+        stand: document.querySelector('.wochenstand').textContent };
+    });
+    pruefe('Am Rechner: Unterweisungen als Feld auf ihrem Kasten im Blatt, mit Hinweis, ohne Karten daneben',
+      imBlatt.drauf && imBlatt.hinweis && imBlatt.karten === 0, JSON.stringify(imBlatt));
+    pruefe('Oben steht, wie weit die Woche ist und was zuerst fehlt',
+      /0 von 5 Tagen fertig/.test(imBlatt.stand) && /Montag, 07\.09\. noch gegenlesen/.test(imBlatt.stand), imBlatt.stand);
+    await page.click('.blattfeld.feld-unterweisung');
+    await page.keyboard.type('Unterweisung Brandschutz');
+    await page.waitForTimeout(700);
+    const geschrieben = await page.evaluate(() => ({
+      blatt: [...document.querySelectorAll('.vorschaubuehne [data-feld="unterweisung"] .kasten')].pop().textContent,
+      gespeichert: window.__wochendaten()['2026-09-07'].unterweisungen,
+    }));
+    pruefe('Ins Blatt geschrieben: steht im Vordruck und ist gespeichert',
+      geschrieben.blatt.includes('Unterweisung Brandschutz') && geschrieben.gespeichert.includes('Unterweisung Brandschutz'),
+      JSON.stringify(geschrieben));
+    await page.click('.vorschaubuehne .tagkopf[data-datum="2026-09-09"]');
+    await page.waitForTimeout(300);
+    pruefe('Ein Tag im Blatt öffnet den Tag', await page.locator('#feld-2026-09-09').isVisible());
     pruefe('Keine JavaScript-Fehler (Rechner)', fehler.length === 0, fehler.join(' | '));
     await ctx.close();
   }

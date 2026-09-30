@@ -214,11 +214,11 @@ async function durchgang(browser, breite) {
 
   await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
   await page.waitForTimeout(1200);
-  const innen = await page.evaluate(() => document.querySelector('.tagflaeche.dreispaltig').clientWidth);
+  const innen = await page.evaluate(() => document.querySelector('.tagflaeche.blattwoche').clientWidth);
   const breiteVon = (sel) => page.evaluate((s) => document.querySelector(s).getBoundingClientRect().width, sel);
-  for (const [name, sel] of [['Angaben der Woche', '.tagflaeche.dreispaltig > .wochenspalte'],
-    ['Vorschau', '.tagflaeche.dreispaltig > .sektion.vorschau'],
-    ['Karte „Wochenblatt“', '.tagflaeche.dreispaltig > .seitenspalte']]) {
+  for (const [name, sel] of [['Stand der Woche', '.tagflaeche.blattwoche > .wochenstand'],
+    ['Angaben der Woche', '.tagflaeche.blattwoche > .wochenspalte'],
+    ['Vorschau', '.tagflaeche.blattwoche > .sektion.vorschau']]) {
     const b = await breiteVon(sel);
     pruefe('Woche: ' + name + ' genau so breit wie der Platz' + bei, Math.abs(b - innen) <= 1,
       Math.round(b) + ' von ' + innen + ' px');
@@ -226,13 +226,14 @@ async function durchgang(browser, breite) {
   // Die Bühne umschließt das verkleinerte Blatt; war sie so hoch wie die Desktop-Spalte breit,
   // blieb darunter eine große leere Fläche.
   const leer = await page.evaluate(() => {
-    const b = document.querySelector('.tagflaeche.dreispaltig .vorschaubuehne');
+    const b = document.querySelector('.tagflaeche.blattwoche .vorschaubuehne');
     const r = b.querySelector('.bogenrahmen:last-child');
     return b.getBoundingClientRect().bottom - r.getBoundingClientRect().bottom;
   });
   pruefe('Woche: unter dem Blatt keine leere Fläche' + bei, leer < 60, Math.round(leer) + ' px');
-  pruefe('Woche: der Umfang des Blatts steht neben der Vorschau' + bei,
-    await page.locator('.seitenspalte .textstand').first().isVisible());
+  pruefe('Woche: Umfang und Export stehen oben im Stand der Woche, die Felder als Karten, nicht im Blatt' + bei,
+    await page.locator('.wochenstand .textstand').first().isVisible() &&
+    await page.locator('.wochenstand .knopf.voll').isVisible() && !(await page.locator('.blattfeld').count()));
   await nichtsRaus('Woche');
   await nichtsDarunter('Woche');
 
