@@ -373,6 +373,14 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     pruefe('Über dem Blatt nur, was man darin tun kann: hineinschreiben, einen Tag anklicken',
       /Gestrichelt: hier direkt reinschreiben/.test(imBlatt.hinweis) && /anklicken: den Tag bearbeiten/.test(imBlatt.hinweis), imBlatt.hinweis);
     pruefe('Was ein Tag noch braucht, steht an ihm im Blatt', /noch gegenlesen · öffnen/.test(imBlatt.marke || ''), imBlatt.marke);
+    // Beim Scrollen läuft das Blatt bis unter die Reiter. Endete der Bereich 16 px darunter, stand
+    // dort ein grauer Streifen zwischen Reitern und Blatt.
+    const rand = await page.evaluate(() => {
+      const knopf = [...document.querySelectorAll('#reiter button')].pop().getBoundingClientRect();
+      const bereich = document.querySelector('#tagbereich > .tagpanel.woche').getBoundingClientRect();
+      return Math.round(bereich.top - knopf.bottom);
+    });
+    pruefe('Das Blatt scrollt bis unter die Reiter, ohne Streifen dazwischen', Math.abs(rand) <= 1, rand + ' px');
     // Das Blatt zeichnet sich beim Schreiben neu; die Stelle, an der man schreibt, bleibt stehen.
     await page.evaluate(() => document.querySelector('.blattfeld.feld-unterweisung').scrollIntoView({ block: 'center' }));
     const scrollVorher = await page.evaluate(() => document.querySelector('#tagbereich > .tagpanel.woche').scrollTop);
