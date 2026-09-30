@@ -212,34 +212,25 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--luft-3); align-items: start;
 }
 .tagflaeche.blattwoche .sektion.wachsend textarea { min-height: 140px; }
-/* Die Tage einer Blockwoche in einer Zeile unter dem Stand, nicht als lange Liste. */
-.blattwoche .blocktage .sektionsleib { padding: var(--luft-3) var(--luft-4); }
-.blattwoche .blocktageliste { display: flex; flex-wrap: wrap; gap: var(--luft-2); }
-.blattwoche .blocktag {
-  flex: 1 1 170px; padding: var(--luft-2) var(--luft-3);
-  border: 1px solid var(--linie); border-radius: var(--rund-klein);
+/* Am Rechner steht das Blatt ohne Karte darum, darüber nur eine ruhige Zeile (blattVorschau()). */
+.sektion.vorschau.ohnekarte { background: transparent; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+.sektion.vorschau.ohnekarte .sektionsleib { overflow: visible; }
+.sektion.vorschau.ohnekarte .vorschaubuehne { background: transparent; padding-top: var(--luft-2); }
+.blattzeile {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--luft-1) var(--luft-5);
+  padding: 0 var(--luft-4); font-size: var(--schrift-klein); color: var(--schiefer);
 }
-.blattwoche .blocktag:last-child { border-bottom: 1px solid var(--linie); }
-
-/* Die Leiste mit dem Stand der Woche klebt oben, während man im Blatt scrollt. */
-.tagflaeche > .sektion.wochenstand {
-  position: sticky; top: 0; z-index: 3;
-  display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; gap: var(--luft-2) var(--luft-4);
-  padding: var(--luft-3) var(--luft-4);
-}
-.wsring { display: inline-flex; color: var(--text); }
-.wssatz { font-size: var(--schrift-gross); font-weight: 600; color: var(--text); }
-.wsoffen { font-size: var(--schrift-text); color: var(--acht); }
-.wochenstand .sektionsknopf.wshin { border-color: var(--linie-fest); color: var(--text); background: var(--flaeche); }
-.themenstand { display: inline-flex; align-items: center; gap: var(--luft-2); }
-.themenwort { font-size: var(--schrift-text); color: var(--acht); }
-.themenstand.fertig .themenwort { color: var(--gut); }
-.wsrechts { margin-left: auto; display: flex; align-items: center; flex-wrap: wrap; gap: var(--luft-2) var(--luft-3); }
-.wsrechts .textfuss { padding: 0; border: 0; }
-
-/* Der Kopf über dem Blatt sagt, dass man hineinschreibt. */
-.blatthinweis { margin-left: auto; font-size: var(--schrift-klein); font-weight: 400; color: var(--schiefer); }
+.blatthinweis b { font-weight: 600; color: var(--text); }
 .blatthinweis .stift { color: var(--stift); font-weight: 700; }
+/* Ein Tag ohne Text steht nicht im Blatt; hier sagt er, dass er fehlt, und führt hin. */
+.blattfehlt {
+  padding: 2px var(--luft-3); border: 1px solid var(--acht-kante); border-radius: var(--rund-voll);
+  background: var(--acht-hell); color: var(--acht); font-size: var(--schrift-klein); font-weight: 600;
+}
+.blattfehlt::before { content: "● "; }
+.blattfehlt:hover { background: var(--acht); border-color: var(--acht); color: #fff; }
+.blattzeile .textfuss { padding: 0; border: 0; gap: var(--luft-3); }
+.blattzeile .textstand { margin-left: 0; }
 
 /* Die Felder im Blatt: gestrichelt mit „✎“, solange man nicht schreibt; das Blatt scheint durch,
    wie es gedruckt wird. Beim Schreiben ein weißes Feld mit dem Text, der gleich im Blatt steht. */
@@ -273,18 +264,35 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   box-shadow: 0 1px 3px rgba(0, 0, 0, .2); pointer-events: none;
 }
 .blattfeld:focus-within .blattstift { display: none; }
+/* Fertige Themen: kein Feld mehr, nur „Bearbeiten“ bleibt am Kasten stehen. */
+.blattfeld.fest { outline: 0; background: transparent; cursor: default; pointer-events: none; }
+.blattfeld.fest .blattstift { display: none; }
+.blattknoepfe {
+  position: absolute; right: var(--luft-2); bottom: var(--luft-2); z-index: 3;
+  display: flex; gap: var(--luft-2); pointer-events: auto;
+}
+.blattknoepfe .sektionsknopf { box-shadow: 0 2px 8px rgba(0, 0, 0, .15); }
 /* Die Abteilung ist nur eine Zeile im Kopf des Blatts. */
 .blattfeld.feld-abteilung { outline-offset: 1px; }
 .blattfeld.feld-abteilung .blattleer { font-size: var(--schrift-fein); }
 .blattfeld.feld-abteilung .blattstift { top: -10px; right: -10px; width: 18px; height: 18px; font-size: 10px; }
 
-/* Ein Tag im Blatt öffnet den Tag; ein offener trägt eine Marke. Nur in der Vorschau. */
+/* Ein Klick auf einen Tag im Blatt öffnet ihn; ein offener trägt eine Marke, die dazu einlädt,
+   jeder andere zeigt es beim Drüberfahren. Nur in der Vorschau: Das Blatt ist weiß, auch im Dunkeln,
+   deshalb feste Farben. */
 .blattwoche.imblatt .bogen .tagkopf[data-datum] { pointer-events: auto; cursor: pointer; }
-.blattwoche.imblatt .bogen .tagkopf[data-datum]:hover b { text-decoration: underline; }
+.blattwoche.imblatt .bogen .tagkopf[data-datum]:hover b { text-decoration: underline; text-decoration-color: #B7791F; text-underline-offset: 2px; }
+.blattwoche.imblatt .bogen .tagkopf[data-datum]:hover:not(:has(.vmarke))::after {
+  content: "\270E  bearbeiten \203A"; margin-left: 1em; font-family: system-ui, sans-serif; font-size: .85em; color: #B7791F;
+}
 .blatt .kasten .tagkopf .vmarke {
-  margin-left: .8em; font-family: system-ui, sans-serif; font-size: .85em; font-weight: 600; color: #B42318;
+  margin-left: .8em; padding: .05em .6em .05em .45em; border: 1px solid #F3B7B7; border-radius: 99px;
+  background: #FDECEC; font-family: system-ui, sans-serif; font-size: .85em; font-weight: 600; color: #B42318;
 }
 .blatt .kasten .tagkopf .vmarke::before { content: "● "; }
+.blatt .kasten .tagkopf .vmarke .vauf { font-weight: 400; color: #B42318; }
+.blatt .kasten .tagkopf:hover .vmarke { background: #B42318; border-color: #B42318; color: #fff; }
+.blatt .kasten .tagkopf:hover .vmarke .vauf { color: #fff; }
 
 /* ---------- Eingaben im Tag ---------- */
 .feldpaar { display: flex; align-items: center; gap: var(--luft-2); }
@@ -548,16 +556,19 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 .schulhinweis { flex: none; margin: 0; padding: var(--luft-3) var(--luft-4) 0; line-height: 1.5; }
 .sektion.fertig .schulhinweis { display: none; }
 
-/* Die Tage einer Blockwoche, je eine Zeile mit ihrer Art. */
-.blocktage .sektionsleib { display: block; padding: var(--luft-1) var(--luft-4) var(--luft-2); }
+/* Die Tage einer Blockwoche, je eine Zeile mit ihrer Art, als Menü unter ihrem Reiter. */
+.blocktagemenue { min-width: 290px; padding: var(--luft-2) var(--luft-3) var(--luft-3); }
 .blocktag {
   display: flex; align-items: center; justify-content: space-between; gap: var(--luft-3);
   padding: var(--luft-1) 0; border-bottom: 1px solid var(--linie);
 }
 .blocktag:last-child { border-bottom: none; }
-.blocktagname { font-size: var(--schrift-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.blocktagname { font-size: var(--schrift-text); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); }
 .blocktagfest { font-size: var(--schrift-text); color: var(--schiefer); padding: var(--luft-1) var(--luft-2); }
-.blocktag select { flex: 0 1 180px; min-width: 0; }
+.blocktag select {
+  flex: 0 1 170px; min-width: 0; font: inherit; font-size: var(--schrift-text); color: var(--text);
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund-klein); padding: var(--luft-1) var(--luft-2);
+}
 
 /* Ein Tag unter den Themen seiner Woche: sagt, wo die Themen stehen. */
 .wochenfeldhinweis {

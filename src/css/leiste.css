@@ -200,8 +200,16 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
 }
 @keyframes dreh { to { transform: rotate(360deg); } }
 
-/* Eine Blockwoche hat nur einen Reiter: breit, Beschriftung und Stand in einer Zeile. */
+/* Eine Blockwoche hat nur einen Reiter: breit, Beschriftung und Stand in einer Zeile. Er öffnet
+   die Tage der Woche als Menü darunter; die Zeile darf dafür nicht abschneiden. */
+.reiter.block { position: relative; overflow: visible; }
 .reiter.block button { flex: 1 1 100%; flex-direction: row; justify-content: center; gap: var(--luft-4); }
+.reiter .rtage {
+  padding: 1px var(--luft-3); border: 1px solid currentColor; border-radius: var(--rund-voll);
+  font-size: var(--schrift-fein); font-weight: 500; white-space: nowrap; opacity: .85;
+}
+/* Mittig unter dem Reiter, der sie öffnet: Er ist so breit wie die Zeile. */
+.reiter.block .blocktagemenue { top: calc(100% - var(--luft-4) + 6px); left: calc(50% - 160px); right: auto; width: 320px; }
 
 /* Der Reiter färbt mit dem Stand des Tages: grün durch, rot ungelesen. */
 .reiter button.fertig { background: var(--gut-hell); color: var(--gut); border-color: var(--gut-kante); }

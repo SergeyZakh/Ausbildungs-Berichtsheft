@@ -216,8 +216,7 @@ async function durchgang(browser, breite) {
   await page.waitForTimeout(1200);
   const innen = await page.evaluate(() => document.querySelector('.tagflaeche.blattwoche').clientWidth);
   const breiteVon = (sel) => page.evaluate((s) => document.querySelector(s).getBoundingClientRect().width, sel);
-  for (const [name, sel] of [['Stand der Woche', '.tagflaeche.blattwoche > .wochenstand'],
-    ['Angaben der Woche', '.tagflaeche.blattwoche > .wochenspalte'],
+  for (const [name, sel] of [['Angaben der Woche', '.tagflaeche.blattwoche > .wochenspalte'],
     ['Vorschau', '.tagflaeche.blattwoche > .sektion.vorschau']]) {
     const b = await breiteVon(sel);
     pruefe('Woche: ' + name + ' genau so breit wie der Platz' + bei, Math.abs(b - innen) <= 1,
@@ -231,9 +230,10 @@ async function durchgang(browser, breite) {
     return b.getBoundingClientRect().bottom - r.getBoundingClientRect().bottom;
   });
   pruefe('Woche: unter dem Blatt keine leere Fläche' + bei, leer < 60, Math.round(leer) + ' px');
-  pruefe('Woche: Umfang und Export stehen oben im Stand der Woche, die Felder als Karten, nicht im Blatt' + bei,
-    await page.locator('.wochenstand .textstand').first().isVisible() &&
-    await page.locator('.wochenstand .knopf.voll').isVisible() && !(await page.locator('.blattfeld').count()));
+  // Stand und Export stehen in der Kopfleiste; eine eigene Leiste darüber war doppelt.
+  pruefe('Woche: keine Leiste über den Karten, die Felder als Karten, nicht im Blatt' + bei,
+    !(await page.locator('.wochenstand').count()) && await page.locator('.wochenspalte').isVisible() &&
+    !(await page.locator('.blattfeld').count()));
   await nichtsRaus('Woche');
   await nichtsDarunter('Woche');
 

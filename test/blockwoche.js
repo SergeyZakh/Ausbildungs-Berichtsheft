@@ -61,10 +61,19 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     (await reiter(page)).join() === 'reiter-block', (await reiter(page)).join());
   pruefe('Der Reiter nennt die Woche und dass Mo–Fr Schule ist',
     (await page.locator('#reiter-block').innerText()).replace(/\s+/g, ' ').includes('Berufsschule Mo–Fr'));
-  pruefe('Themenfeld der Woche und die fünf Tage mit ihrer Art',
-    await page.locator('#feld-schulwoche').isVisible() &&
-    (await page.locator('.blocktag select').count()) === 5 &&
-    (await page.$$eval('.blocktag select', (s) => s.every((x) => x.value === 'Berufsschule'))));
+  // Die Tage stehen nicht mehr als Karte über dem Blatt, der Reiter öffnet sie als Menü.
+  pruefe('Themenfeld der Woche, die Tage erst hinter dem Reiter',
+    await page.locator('#feld-schulwoche').isVisible() && !(await page.locator('.blocktag select').first().isVisible()) &&
+    (await page.getAttribute('#reiter-block', 'aria-expanded')) === 'false' &&
+    (await page.locator('#reiter-block').innerText()).includes('Tage ändern'));
+  await page.click('#reiter-block');
+  pruefe('Ein Klick auf den Reiter: die fünf Tage mit ihrer Art',
+    (await page.locator('.blocktag select:visible').count()) === 5 &&
+    (await page.$$eval('.blocktag select', (s) => s.every((x) => x.value === 'Berufsschule'))) &&
+    (await page.getAttribute('#reiter-block', 'aria-expanded')) === 'true');
+  await page.keyboard.press('Escape');
+  pruefe('Escape schließt sie wieder', !(await page.locator('#menue-blocktage').isVisible()) &&
+    (await page.getAttribute('#reiter-block', 'aria-expanded')) === 'false');
   pruefe('Leere Blockwoche: fünf Tage ohne Text, wie fünf leere Schultage',
     await auf(page, () => window.__wochenBilanz('2026-09-14').ohneText === 5 && window.__wochenStand('2026-09-14') === ''));
 
@@ -76,12 +85,14 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
       return !!huelle && Math.abs(huelle.getBoundingClientRect().top - kasten.getBoundingClientRect().top) < 2 &&
         !document.querySelector('.faecher, .fach, .schulhinweis');
     }));
-  pruefe('„Fertig“ für die Themen steht oben im Stand der Woche',
-    await page.locator('.wochenstand .schulwoche').isVisible());
+  pruefe('„Fertig“ für die Themen sitzt am Feld im Blatt, keine Leiste darüber',
+    !(await page.locator('.wochenstand').count()) &&
+    (await page.locator('.blattfeld.feld-schule .blattknoepfe .uebernehmen').count()) === 1);
   pruefe('Platzhalter ist eine schlichte Frage, ohne Beispiel',
     (await page.getAttribute('#feld-schulwoche', 'placeholder')) === 'Welche Themen wurden diese Woche im Unterricht behandelt?');
   await page.fill('#feld-schulwoche', 'LF5: Subnetting, VLANs\nDeutsch: Protokoll\nWiSo: Kündigungsschutz');
   await page.waitForTimeout(500);
+  pruefe('Mit Themen zeigt sich „Fertig“ unten am Feld', await page.locator('.blattfeld.feld-schule .uebernehmen').isVisible());
 
   /* ---------- Stand ---------- */
   const offen = await auf(page, () => ({
@@ -132,21 +143,23 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   pruefe('Übernommen ist schreibgeschützt', await page.locator('#feld-schulwoche').getAttribute('readonly') !== null);
 
   /* ---------- Tage der Blockwoche ---------- */
+  await page.click('#reiter-block');
   await page.selectOption('.blocktag select[data-datum="2026-09-16"]', 'Krank');
   await page.waitForTimeout(200);
   pruefe('Krank an einem Tag: bleibt Blockwoche, der Reiter nennt den freien Tag',
     await auf(page, () => window.__blockwoche('2026-09-14')) &&
     (await page.locator('#reiter-block').innerText()).includes('frei: Mi'));
   pruefe('… und der kranke Tag zählt nicht mehr mit', await auf(page, () => window.__wochenAnteil('2026-09-14').von === 4));
+  pruefe('Die Tage bleiben offen, falls noch einer dazukommt', await page.locator('#menue-blocktage').isVisible());
   await page.selectOption('.blocktag select[data-datum="2026-09-18"]', '');
   await page.waitForTimeout(200);
   pruefe('Ein Arbeitstag von Hand macht die Woche wieder tageweise, mit Hinweis',
     !(await auf(page, () => window.__blockwoche('2026-09-14'))) && (await reiter(page)).length === 8 &&
     (await page.textContent('#notiz')).includes('Keine Blockwoche mehr'));
-  // Übernommen und damit schreibgeschützt: im Blatt als Text, „Bearbeiten“ oben im Stand.
+  // Übernommen und damit schreibgeschützt: im Blatt als Text, „Bearbeiten“ unten an seinem Kasten.
   pruefe('Die Themen bleiben im Reiter „Woche“ stehen',
     (await auf(page, () => [...document.querySelectorAll('.vorschaubuehne [data-feld="schule"] .kasten')].pop().textContent))
-      .includes('LF5: Subnetting') && await page.locator('.wochenstand .schulwoche .bearbeiten').isVisible());
+      .includes('LF5: Subnetting') && await page.locator('.blattfeld.feld-schule.fest .bearbeiten').isVisible());
   // Zurück auf Berufsschule über den Tag selbst.
   await page.click('#reiter button >> nth=4');
   await page.selectOption('#feld-art', 'Berufsschule');

@@ -9,6 +9,12 @@ function menueSchliessen() {
     $(m[1]).hidden = true;
     $(m[0]).setAttribute("aria-expanded", "false");
   });
+  // Die Tage einer Blockwoche entstehen mit ihrem Reiter neu (reiter.js), schließen aber genauso.
+  var blockTage = $("menue-blocktage");
+  if (blockTage) {
+    blockTage.hidden = true;
+    $("reiter-block").setAttribute("aria-expanded", "false");
+  }
 }
 
 MENUES.forEach(function (m) {
