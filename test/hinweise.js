@@ -371,9 +371,15 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       imBlatt.drauf && imBlatt.hinweis && imBlatt.karten === 0, JSON.stringify(imBlatt));
     pruefe('Oben steht, wie weit die Woche ist und was zuerst fehlt',
       /0 von 5 Tagen fertig/.test(imBlatt.stand) && /Montag, 07\.09\. noch gegenlesen/.test(imBlatt.stand), imBlatt.stand);
+    // Das Blatt zeichnet sich beim Schreiben neu; die Stelle, an der man schreibt, bleibt stehen.
+    await page.evaluate(() => document.querySelector('.blattfeld.feld-unterweisung').scrollIntoView({ block: 'center' }));
+    const scrollVorher = await page.evaluate(() => document.querySelector('#tagbereich > .tagpanel.woche').scrollTop);
     await page.click('.blattfeld.feld-unterweisung');
-    await page.keyboard.type('Unterweisung Brandschutz');
+    await page.keyboard.type('Unterweisung Brandschutz', { delay: 20 });
     await page.waitForTimeout(700);
+    const scrollNachher = await page.evaluate(() => document.querySelector('#tagbereich > .tagpanel.woche').scrollTop);
+    pruefe('Beim Schreiben ins Blatt springt die Ansicht nicht nach oben',
+      scrollVorher > 100 && Math.abs(scrollNachher - scrollVorher) < 5, scrollVorher + ' → ' + scrollNachher);
     const geschrieben = await page.evaluate(() => ({
       blatt: [...document.querySelectorAll('.vorschaubuehne [data-feld="unterweisung"] .kasten')].pop().textContent,
       gespeichert: window.__wochendaten()['2026-09-07'].unterweisungen,
