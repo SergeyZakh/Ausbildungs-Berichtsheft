@@ -132,6 +132,14 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
 .reiter {
   flex: none; display: flex; gap: var(--luft-2); overflow-x: auto; padding: 0 var(--luft-5) var(--luft-4);
 }
+/* Am Rechner scrollt die Woche unter den Reitern. Der Abstand darunter gehört deshalb zum
+   Scrollbereich: Sonst endete das Blatt beim Scrollen 16 px unter ihnen, und dazwischen stand ein
+   grauer Streifen. Die Reiter liegen oben drauf, ihr Schatten fällt aufs Blatt. */
+@media (min-width: 821px) {
+  .reiter { position: relative; z-index: 5; }
+  #tagbereich { margin-top: calc(-1 * var(--luft-4)); }
+  #tagbereich > .tagpanel { padding-top: var(--luft-4); }
+}
 .reiter button {
   flex: 1 1 0; min-width: 98px; margin: 0; padding: var(--luft-2) var(--luft-3);
   display: flex; flex-direction: column; align-items: center; gap: var(--luft-1);

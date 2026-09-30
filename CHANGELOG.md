@@ -42,6 +42,9 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Wochenansicht hinter dem Druckfenster:** Solange der Browser das PDF druckte, hat die Seite
   die Breite von A4, schmaler als ein Handy-Fenster. Die Wochenansicht baute deshalb auf Karten um
   und stand danach so da. Jetzt bleibt sie während des Drucks, wie sie war.
+- **Grauer Streifen beim Scrollen der Woche:** Am Rechner endete der Bereich, in dem das Blatt
+  scrollt, 16 px unter den Reitern; dazwischen stand ein grauer Streifen, an dem das Blatt
+  abgeschnitten wurde. Jetzt läuft es bis unter die Reiter.
 
 ## [0.3.0] – 2026-09-30
 
