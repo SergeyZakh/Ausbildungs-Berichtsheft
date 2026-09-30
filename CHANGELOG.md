@@ -6,33 +6,39 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
-## Unveröffentlicht
+## [0.4.0] – 2026-09-30
+
+### Neu
+
+- **Direkt ins Wochenblatt schreiben:** Am Rechner steht im Reiter „Woche“ das Blatt, wie es
+  gedruckt wird. Abteilung, Unterweisungen und die Themen der Berufsschule sind gestrichelte Felder
+  mit „✎“ im Blatt selbst, man schreibt, wo es gedruckt wird. Ein Klick auf einen Tag im Blatt
+  („Montag“, „Dienstag“ …) öffnet ihn. Ein Tag, der noch etwas braucht, trägt im Blatt „noch
+  gegenlesen · öffnen ›“; fehlt ihm der Text, steht er über dem Blatt. Am Handy und bei der
+  täglichen Notierung stehen die Felder als Karten über dem Blatt.
+- **Ergebnis des Imports als Karte oben:** „Kimai-Import fertig. 7 Tage aus …, davon 3
+  Berufsschule“ mit „Spalten prüfen“ und „Passt“. Sie bleibt, bis man sie schließt; vorher stand
+  „Spalten prüfen“ als Knopf in der Meldung und war am Handy nach Sekunden weg.
 
 ### Geändert
 
-- **Wochenansicht: direkt ins Blatt schreiben.** Statt drei Spalten (links Eingaben, in der Mitte
-  das Blatt, rechts ein kleiner Stand) steht nur noch das Blatt da: Abteilung, Unterweisungen und
-  die Themen einer Blockwoche sind gestrichelte Felder mit „✎“ im Blatt selbst, man schreibt, wo es
-  gedruckt wird. Darüber eine ruhige Zeile: „Gestrichelt: hier direkt reinschreiben“ und „Montag,
-  Dienstag … anklicken: den Tag bearbeiten“. Ein Tag, der noch etwas braucht, trägt im Blatt
-  „noch gegenlesen · öffnen ›“; fehlt ihm der Text, steht er über dem Blatt. Keine eigene Leiste
-  mehr für Stand und „Woche als Word · PDF“: Das steht schon oben und unter „Exportieren“. „Passt
-  auf ein Blatt“ erscheint nur noch, wenn es nicht passt. In der Blockwoche sitzt „Fertig“ unten am
-  Feld Berufsschule, die fünf Tage öffnet der Reiter „Blockwoche“ („Tage ändern ▾“). Am Handy und
-  bei der täglichen Notierung stehen die Felder als Karten über dem Blatt.
-
+- **Wochenansicht aufgeräumt:** Statt drei Spalten (links Eingaben, Mitte Blatt, rechts Stand) und
+  einer Leiste mit Stand, „Woche als Word · PDF“ und „passt auf ein Blatt“ steht nur noch das Blatt
+  da, darüber eine ruhige Zeile: „Gestrichelt: hier direkt reinschreiben“ und „Montag, Dienstag …
+  anklicken: den Tag bearbeiten“. Der Stand steht oben und in den Reitern, der Export unter
+  „Exportieren“; „passt nicht auf ein Blatt“ erscheint nur, wenn es so ist. In der Blockwoche
+  sitzt „Fertig“ unten am Feld Berufsschule, die fünf Tage öffnet der Reiter „Blockwoche“ („Tage
+  ändern ▾“) als Menü.
 - **Keine Fußleiste mehr am Handy:** Sie stand immer da, erst grün in zwei Zeilen, dann grau mit
   „gespeichert“, und nahm dem Text Platz. Eine Meldung schwebt jetzt als Karte kurz über dem
   Inhalt und geht nach vier Sekunden von selbst, mit Knopf wie „Zurück“ nach acht; antippen, ×
   oder wegwischen schließt sie früher. Eine Warnung bleibt rot stehen, bis man sie schließt. Am
   Rechner bleibt die Fußleiste, wie sie war. „Zurück“ nach „Fertig“ steht rechts neben dem Text.
-- **Ergebnis des Imports als Karte oben:** „Kimai-Import fertig. 7 Tage aus …, davon 3
-  Berufsschule“ mit „Spalten prüfen“ und „Passt“. Sie bleibt, bis man sie schließt; vorher stand
-  „Spalten prüfen“ als Knopf in der Meldung und war am Handy nach Sekunden weg.
 - **„Fertig“ bleibt in der Woche:** Nach dem letzten offenen Tag, etwa am Freitag, springt es nicht
   mehr in die nächste Woche. Die Meldung sagt „Die Woche ist fertig“, „Weiter: Mo 14.09.“ dahinter
   führt zur nächsten offenen Stelle. Ist davor in derselben Woche noch ein Tag offen, bietet sie
   ihn an.
+- **docx 9.8.1** für die Word-Datei (vorher 9.7.2).
 
 ### Behoben
 
@@ -241,6 +247,7 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
+[0.4.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.1.0...v0.1.1

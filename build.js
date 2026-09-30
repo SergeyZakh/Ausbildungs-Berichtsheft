@@ -148,6 +148,8 @@ const BIBLIOTHEK_HOSTS = [
   'docs.microsoft.com', 'learn.microsoft.com', 'answers.microsoft.com', 'stackoverflow.com',
   'bugzilla.mozilla.org', 'www.npmjs.com', 'github.com', 'raw.github.com', 'stuk.github.io',
   'feross.org', 'mths.be', 'stuartk.com', 'example.com',
+  // Seit docx 9.8: Kommentar mit Verweis auf die ECMA-376-Referenz zu VML-Formen.
+  'webapp.docx4java.org',
 ];
 
 function pruefeAdressen(text, erlaubt, wo) {
