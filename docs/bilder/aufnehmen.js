@@ -73,10 +73,10 @@ const ziel = (name) => path.join(__dirname, name);
   await page.waitForTimeout(900);
   await h.markieren(page, [
     ['#wochenlabel', 1, 'rechts'],             // Woche wählen: der Titel öffnet den Kalender
-    ['.wochenstand .wssatz', 2, 'unten-links'],  // wie weit die Woche ist, was fehlt
-    ['.wochenstand .wsrechts', 3, 'unten-links'],  // Umfang und die Woche als Word oder PDF
+    ['#wochensumme', 2, 'danach'],             // wie weit die Woche ist
+    ['.vorschaubuehne .tagkopf .vmarke', 3, 'danach'],  // ein Tag, der noch etwas braucht; Klick öffnet ihn
     ['.blattfeld.feld-abteilung', 4, 'rechts'],  // im Blatt: gilt für die ganze Woche
-    ['.sektion.vorschau .blatthinweis', 5, 'unten-links'],  // ins Blatt schreiben
+    ['.blattzeile .blatthinweis', 5, 'davor'],  // ins Blatt schreiben
     ['#btn-export', 6, 'unten-links'],   // Wochenblatt oder Gesamtheft
   ]);
   await page.screenshot({ path: ziel('woche.png') });

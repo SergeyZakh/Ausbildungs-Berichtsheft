@@ -11,12 +11,15 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 ### Geändert
 
 - **Wochenansicht: direkt ins Blatt schreiben.** Statt drei Spalten (links Eingaben, in der Mitte
-  das Blatt, rechts ein kleiner Stand) steht oben eine Leiste: „3 von 4 Tagen fertig“, der erste
-  Tag, der noch etwas braucht, mit „Ansehen“, ob es auf ein Blatt passt, und „Woche als Word“ /
-  „PDF“. Darunter das Blatt: Abteilung, Unterweisungen und die Themen einer Blockwoche sind
-  gestrichelte Felder mit „✎“ im Blatt selbst, man schreibt, wo es gedruckt wird. Ein Tag im Blatt
-  öffnet den Tag, ein offener trägt „noch gegenlesen“. In der Blockwoche stehen die fünf Tage in
-  einer Zeile. Am Handy und bei der täglichen Notierung stehen die Felder als Karten über dem Blatt.
+  das Blatt, rechts ein kleiner Stand) steht nur noch das Blatt da: Abteilung, Unterweisungen und
+  die Themen einer Blockwoche sind gestrichelte Felder mit „✎“ im Blatt selbst, man schreibt, wo es
+  gedruckt wird. Darüber eine ruhige Zeile: „Gestrichelt: hier direkt reinschreiben“ und „Montag,
+  Dienstag … anklicken: den Tag bearbeiten“. Ein Tag, der noch etwas braucht, trägt im Blatt
+  „noch gegenlesen · öffnen ›“; fehlt ihm der Text, steht er über dem Blatt. Keine eigene Leiste
+  mehr für Stand und „Woche als Word · PDF“: Das steht schon oben und unter „Exportieren“. „Passt
+  auf ein Blatt“ erscheint nur noch, wenn es nicht passt. In der Blockwoche sitzt „Fertig“ unten am
+  Feld Berufsschule, die fünf Tage öffnet der Reiter „Blockwoche“ („Tage ändern ▾“). Am Handy und
+  bei der täglichen Notierung stehen die Felder als Karten über dem Blatt.
 
 - **Keine Fußleiste mehr am Handy:** Sie stand immer da, erst grün in zwei Zeilen, dann grau mit
   „gespeichert“, und nahm dem Text Platz. Eine Meldung schwebt jetzt als Karte kurz über dem

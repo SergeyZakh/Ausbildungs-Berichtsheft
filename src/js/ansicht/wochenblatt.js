@@ -1,11 +1,15 @@
 /* ============================================================
- * Der Reiter „Woche“: oben der Stand der Woche, darunter das Blatt, in das man schreibt
+ * Der Reiter „Woche“: das Blatt, in das man schreibt
  *
  * Am Rechner mit dem wöchentlichen Vordruck sind Abteilung, Unterweisungen und die Themen einer
  * Blockwoche Felder im Blatt selbst: Man schreibt dorthin, wo es gedruckt wird. Drei Spalten
  * (links Eingaben, Mitte Blatt, rechts Stand) waren nicht zu durchschauen. Am Handy wäre das Blatt
  * zum Schreiben zu klein, und die tägliche Notierung hat keine festen Kästen dafür; dort stehen
  * dieselben Felder als Karten über dem Blatt.
+ *
+ * Eine Leiste über dem Blatt mit Stand, erstem offenem Tag und „Woche als Word · PDF“ gab es auch;
+ * alles davon stand schon anderswo (Kopfleiste, Reiter, „Exportieren“), und sie war zu viel. Was
+ * ein Tag noch braucht, steht jetzt an ihm im Blatt.
  * ========================================================== */
 
 /* ---------- Der Wochenreiter ---------- */
@@ -53,14 +57,11 @@ function zeichneWochenblatt(bereich) {
     merken(); vorschau.spaeter();
   });
 
-  flaeche.appendChild(wochenStandLeiste(vorschau, themen));
-  if (block) flaeche.appendChild(blockTageSektion());
-
   if (imBlatt) {
     vorschau.felder([
       { feld: "abteilung", el: abt, leer: "Abteilung" },
       { feld: "unterweisung", el: ta, leer: "Hier schreiben: Unterweisungen, Lehrgespräche, Schulungen dieser Woche" },
-      themen ? { feld: "schule", el: themen.ta, leer: "Hier schreiben: die Themen des Unterrichts" } : null
+      themen ? { feld: "schule", el: themen.ta, leer: "Hier schreiben: die Themen des Unterrichts", knoepfe: themen.gruppe } : null
     ]);
   } else {
     var spalte = document.createElement("div");
@@ -95,77 +96,6 @@ try {
 window.addEventListener("afterprint", function () { setTimeout(wochenAnordnungPruefen, 0); });
 
 /**
- * Die Leiste über dem Blatt: wie weit die Woche ist, was als Erstes fehlt (mit Sprung dorthin), die
- * Themen einer Blockwoche mit „Fertig“, ob es aufs Blatt passt, KI und der Export der Woche. Sie
- * rechnet nach jedem Neuzeichnen des Blatts neu (vorschau.nachher).
- */
-function wochenStandLeiste(vorschau, themen) {
-  var s = document.createElement("section");
-  s.className = "sektion wochenstand";
-  var montagIso = aktiveWoche;
-
-  var ring = document.createElement("span");
-  ring.className = "wsring";
-  var satz = document.createElement("span");
-  satz.className = "wssatz";
-  var offen = document.createElement("span");
-  offen.className = "wsoffen";
-  var hin = sektionsknopf("Ansehen", "wshin");
-  s.appendChild(ring);
-  s.appendChild(satz);
-  s.appendChild(offen);
-  s.appendChild(hin);
-  if (themen) s.appendChild(themen.gruppe);
-
-  var rechts = document.createElement("span");
-  rechts.className = "wsrechts";
-  rechts.appendChild(vorschau.fuss);
-  if (vorschau.slot) { rechts.appendChild(vorschau.slot); wochenKiKnoepfe(vorschau.slot); }
-  var word = document.createElement("button");
-  word.type = "button";
-  word.className = "knopf voll";
-  word.textContent = "Woche als Word";
-  word.addEventListener("click", function () { $("btn-wochenblatt").click(); });
-  var pdf = document.createElement("button");
-  pdf.type = "button";
-  pdf.className = "knopf";
-  pdf.textContent = "PDF";
-  pdf.title = "Wochenblatt als PDF drucken";
-  pdf.addEventListener("click", function () { $("btn-pdf-woche").click(); });
-  rechts.appendChild(word);
-  rechts.appendChild(pdf);
-  s.appendChild(rechts);
-
-  var ziel = null;
-  hin.addEventListener("click", function () { if (ziel) stelleZeigen(ziel); });
-
-  function aktualisieren() {
-    var a = wochenAnteil(montagIso), b = wochenBilanz(montagIso);
-    ring.innerHTML = ringHtml(a.fertig, a.von, a.fertig + " von " + a.von + " fertig");
-    satz.textContent = !a.von ? "Noch nichts einzutragen"
-      : a.fertig >= a.von ? "Woche fertig"
-      : a.fertig + " von " + a.von + (a.von === 1 ? " Tag" : " Tagen") + " fertig";
-    // Das Erste, was fehlt, mit Namen; die Themen einer Blockwoche nennt ihre eigene Gruppe.
-    ziel = null;
-    var montag = vonIso(montagIso), rest = b.ohneText + b.ungelesen;
-    for (var i = 0; i < TAGE_JE_WOCHE && !ziel; i++) {
-      var d = iso(plus(montag, i));
-      if (!tagImWochenfeld(d) && tagBrauchtNoch(d)) ziel = d;
-    }
-    if (ziel) {
-      var t = tage[ziel], ohne = !(t && (t.text || "").trim());
-      offen.textContent = WOCHENTAGE[vonIso(ziel).getDay()] + ", " + dm(vonIso(ziel)) +
-        (ohne ? " ohne Text" : " noch gegenlesen") + (rest > 1 ? " · noch " + (rest - 1) + " weitere" : "");
-    } else offen.textContent = "";
-    offen.hidden = hin.hidden = !ziel;
-    s.classList.toggle("fertig", !!a.von && a.fertig >= a.von);
-  }
-  vorschau.nachher(aktualisieren);
-  aktualisieren();
-  return s;
-}
-
-/**
  * Das Wochenblatt, wie es gedruckt wird. Es kommt aus demselben Drucksatz wie das PDF (druckBlatt),
  * also mit derselben Dichte und derselben Aufteilung auf mehrere Blätter. Jedes Blatt steht in
  * einem A4-Bogen, der auf die Breite skaliert wird.
@@ -173,16 +103,14 @@ function wochenStandLeiste(vorschau, themen) {
  * `imBlatt`: Auf dem Blatt liegen die Eingabefelder der Woche (`felder()`), genau über ihrem Kasten.
  * Solange man nicht darin schreibt, sind sie durchsichtig, man sieht das Blatt, wie es gedruckt
  * wird, mit einem gestrichelten Rahmen und „✎“. Wer hineinklickt, schreibt; das Blatt zeichnet
- * sich dahinter neu, und die Felder rücken mit. Ein Tag im Blatt öffnet den Tag.
+ * sich dahinter neu, und die Felder rücken mit. Ein Klick auf einen Tag im Blatt öffnet ihn; was ein
+ * Tag noch braucht, steht an seinem Kopf. Statt eines Titels steht darüber eine ruhige Zeile: was
+ * man im Blatt tun kann, ein Tag, der ohne Text gar nicht im Blatt steht, und die KI.
+ *
+ * Ob die Woche auf ein Blatt passt, sagt der Fuß nur, wenn sie es nicht tut.
  */
 function blattVorschau(imBlatt) {
-  var s = sektion(imBlatt ? "Dein Wochenblatt" : "Vorschau Wochenblatt", "vorschau");
-  if (imBlatt) {
-    var hinweis = document.createElement("span");
-    hinweis.className = "blatthinweis";
-    hinweis.innerHTML = '<span class="stift" aria-hidden="true">✎</span> In die gestrichelten Felder schreibst du direkt. Ein Tag öffnet sich per Klick.';
-    s.kopf.appendChild(hinweis);
-  }
+  var s = sektion("Vorschau Wochenblatt", "vorschau" + (imBlatt ? " ohnekarte" : ""));
   var buehne = document.createElement("div");
   buehne.className = "vorschaubuehne";
   var blaetter = document.createElement("div");
@@ -191,9 +119,8 @@ function blattVorschau(imBlatt) {
   lage.className = "blattlage";
   buehne.appendChild(blaetter);
   buehne.appendChild(lage);
-  s.leib.appendChild(buehne);
 
-  // Fuß wie am Tag: links die KI für die ganze Woche, rechts, ob es passt.
+  // Links die KI für die ganze Woche, rechts, falls nötig, dass es nicht auf ein Blatt passt.
   var fuss = document.createElement("div");
   fuss.className = "textfuss";
   var slot = null;
@@ -201,14 +128,42 @@ function blattVorschau(imBlatt) {
     slot = document.createElement("span");
     slot.className = "kislot";
     slot.setAttribute("data-woche", aktiveWoche);
+    wochenKiKnoepfe(slot);
     fuss.appendChild(slot);
   }
   var zahl = document.createElement("span");
   zahl.className = "textstand";
   fuss.appendChild(zahl);
-  s.leib.appendChild(fuss);
 
-  var felder = [], danach = [];
+  var tagHinweis = null, fehlt = null;
+  if (imBlatt) {
+    s.wurzel.removeChild(s.kopf);
+    s.wurzel.setAttribute("aria-label", "Dein Wochenblatt");
+    var leiste = document.createElement("div");
+    leiste.className = "blattzeile";
+    var schreiben = document.createElement("span");
+    schreiben.className = "blatthinweis";
+    schreiben.innerHTML = '<span class="stift" aria-hidden="true">✎</span> Gestrichelt: hier direkt reinschreiben';
+    tagHinweis = document.createElement("span");
+    tagHinweis.className = "blatthinweis";
+    tagHinweis.innerHTML = "<b>Montag</b>, <b>Dienstag</b> … anklicken: den Tag bearbeiten";
+    fehlt = document.createElement("button");
+    fehlt.type = "button";
+    fehlt.className = "blattfehlt";
+    fehlt.hidden = true;
+    leiste.appendChild(schreiben);
+    leiste.appendChild(tagHinweis);
+    leiste.appendChild(fehlt);
+    leiste.appendChild(fuss);
+    s.leib.appendChild(leiste);
+    s.leib.appendChild(buehne);
+  } else {
+    s.leib.appendChild(buehne);
+    s.leib.appendChild(fuss);
+  }
+
+  var felder = [], fehltAm = null;
+  if (fehlt) fehlt.addEventListener("click", function () { if (fehltAm) stelleZeigen(fehltAm); });
 
   function einpassen() {
     var breite = buehne.clientWidth - 2 * 16;
@@ -235,8 +190,12 @@ function blattVorschau(imBlatt) {
       // nur auf dem letzten.
       var ort = f.feld === "abteilung" ? alle[0] : alle[alle.length - 1];
       var kasten = ort && (f.feld === "abteilung" ? ort : ort.querySelector(".kasten"));
-      f.huelle.hidden = !kasten || f.el.readOnly;
+      // Fertige Themen sind schreibgeschützt: kein Feld mehr, nur ihr „Bearbeiten“ bleibt am Kasten.
+      var fest = f.el.readOnly;
+      f.huelle.hidden = !kasten || (fest && !f.knoepfe);
       if (f.huelle.hidden) return;
+      f.huelle.classList.toggle("fest", fest);
+      f.el.tabIndex = fest ? -1 : 0;
       var r = kasten.getBoundingClientRect(), oben = r.top;
       if (f.feld === "abteilung") oben = kasten.querySelector("span").getBoundingClientRect().bottom;
       var mass = r.width / kasten.offsetWidth;
@@ -261,28 +220,47 @@ function blattVorschau(imBlatt) {
     blaetter.innerHTML = bloecke.map(function (b) {
       return '<div class="bogenrahmen"><div class="bogen">' + b + "</div></div>";
     }).join("");
-    fuss.className = "textfuss " + (bloecke.length > 1 ? "eng" : "passt");
-    zahl.textContent = bloecke.length > 1
-      ? "braucht " + bloecke.length + " Blätter"
-      : "passt auf ein Blatt";
-    if (imBlatt) tageMarkieren();
+    var eng = bloecke.length > 1;
+    fuss.className = "textfuss" + (eng ? " eng" : "");
+    zahl.textContent = eng ? "passt nicht auf ein Blatt: " + bloecke.length + " Blätter" : "";
+    zahl.hidden = !eng;
+    // Unter dem Blatt wäre ein leerer Fuß nur ein Strich. In der Zeile darüber stört er nicht, und
+    // die KI tauscht dort ihre Knöpfe gegen den Fortschritt, ohne dass das Blatt neu gezeichnet wird.
+    fuss.hidden = !imBlatt && !eng && !(slot && slot.children.length);
+    if (imBlatt) { tageMarkieren(); fehltZeigen(); }
     einpassen();
     blaetter.style.minHeight = "";
-    danach.forEach(function (fn) { fn(); });
   }
 
   /** Tage, die noch etwas brauchen, im Blatt kennzeichnen. Nur hier, nie im Druck. */
   function tageMarkieren() {
-    blaetter.querySelectorAll(".tagkopf[data-datum]").forEach(function (k) {
-      var d = k.getAttribute("data-datum");
-      k.title = "Diesen Tag öffnen";
+    var koepfe = blaetter.querySelectorAll(".tagkopf[data-datum]");
+    koepfe.forEach(function (k) {
+      var d = k.getAttribute("data-datum"), t = tage[d];
+      k.title = "Diesen Tag bearbeiten";
       if (tagBrauchtNoch(d)) {
         var m = document.createElement("span");
         m.className = "vmarke";
-        m.textContent = "noch gegenlesen";
+        m.innerHTML = ((t && (t.text || "").trim()) ? "noch gegenlesen" : "Text fehlt") + '<span class="vauf"> · öffnen ›</span>';
         k.appendChild(m);
       }
     });
+    tagHinweis.hidden = !koepfe.length;
+  }
+
+  /** Ein Tag ohne Text steht nicht im Blatt, braucht aber noch etwas: Er steht über dem Blatt. */
+  function fehltZeigen() {
+    var montag = vonIso(aktiveWoche), offen = [];
+    for (var i = 0; i < TAGE_JE_WOCHE; i++) {
+      var d = iso(plus(montag, i));
+      if (tagBrauchtNoch(d) && !tagImWochenfeld(d) && !blaetter.querySelector('.tagkopf[data-datum="' + d + '"]')) offen.push(d);
+    }
+    fehltAm = offen[0] || null;
+    fehlt.hidden = !fehltAm;
+    if (fehltAm) {
+      fehlt.textContent = WOCHENTAGE[vonIso(fehltAm).getDay()] + " ohne Text" +
+        (offen.length > 1 ? " · noch " + (offen.length - 1) + " weitere" : "") + " ›";
+    }
   }
 
   var uhr = null;
@@ -293,7 +271,10 @@ function blattVorschau(imBlatt) {
     if (k) stelleZeigen(k.getAttribute("data-datum"));
   });
 
-  /** Die Felder aufs Blatt legen: je eine Hülle mit dem Feld, einem Hinweis, solange es leer ist, und „✎“. */
+  /**
+   * Die Felder aufs Blatt legen: je eine Hülle mit dem Feld, einem Hinweis, solange es leer ist, und „✎“.
+   * `knoepfe` sitzen unten rechts am Feld (die Themen der Woche: „Fertig“ und „Bearbeiten“).
+   */
   function felderAuflegen(liste) {
     liste.filter(Boolean).forEach(function (f) {
       var huelle = document.createElement("label");
@@ -308,19 +289,20 @@ function blattVorschau(imBlatt) {
       huelle.appendChild(f.el);
       huelle.appendChild(leer);
       huelle.appendChild(stift);
+      if (f.knoepfe) {
+        f.knoepfe.classList.add("blattknoepfe");
+        huelle.appendChild(f.knoepfe);
+      }
       f.el.addEventListener("input", function () { huelle.classList.toggle("leer", !f.el.value.trim()); });
       lage.appendChild(huelle);
-      felder.push({ feld: f.feld, el: f.el, huelle: huelle });
+      felder.push({ feld: f.feld, el: f.el, huelle: huelle, knoepfe: f.knoepfe });
     });
   }
 
   if (window.ResizeObserver) {
     new ResizeObserver(function () { if (buehne.isConnected) einpassen(); }).observe(buehne);
   }
-  return {
-    wurzel: s.wurzel, fuss: fuss, slot: slot, jetzt: jetzt, spaeter: spaeter,
-    felder: felderAuflegen, nachher: function (fn) { danach.push(fn); }
-  };
+  return { wurzel: s.wurzel, jetzt: jetzt, spaeter: spaeter, felder: felderAuflegen };
 }
 
 /**

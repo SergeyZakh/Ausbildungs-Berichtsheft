@@ -40,6 +40,8 @@ function zeichneReiter() {
   reiter.classList.toggle("block", block);
   if (block) {
     aktiverTag = 7;
+    // Das Menü vor dem Reiter: Am Handy gilt manches nur für den letzten Knopf der Zeile.
+    reiter.appendChild(blockTageMenue());
     reiter.appendChild(blockReiter(montag));
     return;
   }
@@ -47,13 +49,19 @@ function zeichneReiter() {
   reiter.appendChild(wochenReiter());
 }
 
-/** Der einzige Reiter einer Blockwoche: Stand der Themen und welche Tage frei sind. */
+/**
+ * Der einzige Reiter einer Blockwoche: Stand der Themen und welche Tage frei sind. Er öffnet die
+ * Tage der Woche (blockTageMenue() in schulwoche.js), etwa für einen Tag, an dem man krank war.
+ */
 function blockReiter(montag) {
   var b = document.createElement("button");
   b.type = "button";
   b.id = "reiter-block";
   b.setAttribute("role", "tab");
   b.setAttribute("aria-selected", "true");
+  b.setAttribute("aria-haspopup", "true");
+  b.setAttribute("aria-expanded", "false");
+  b.setAttribute("aria-controls", "menue-blocktage");
   var wstand = wochenStand(aktiveWoche);
   if (wstand) b.className = wstand;
 
@@ -68,8 +76,15 @@ function blockReiter(montag) {
   b.innerHTML =
     '<span class="rtag"><span class="rkurz">Blockwoche</span></span>' +
     '<span class="rlage">' + marke + '<span class="rtext">Berufsschule' +
-    (frei.length ? " · frei: " + frei.join(", ") : " Mo–Fr") + "</span></span>";
-  b.addEventListener("click", function () { zeichneTag(); });
+    (frei.length ? " · frei: " + frei.join(", ") : " Mo–Fr") + "</span></span>" +
+    '<span class="rtage">Tage ändern ▾</span>';
+  b.addEventListener("click", function (e) {
+    e.stopPropagation();
+    var offen = !$("menue-blocktage").hidden;
+    menueSchliessen();
+    wochenwahlSchliessen();
+    if (!offen) blockTageOeffnen();
+  });
   return b;
 }
 

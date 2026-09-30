@@ -55,6 +55,7 @@
     gap: var(--luft-3); padding: var(--luft-2) var(--luft-3);
   }
   .reiter .rdatum { display: none; }
+  .reiter.block .blocktagemenue { top: calc(100% - var(--luft-3) + 6px); left: var(--luft-3); right: var(--luft-3); width: auto; min-width: 0; }
   .reiter .rtag { font-size: var(--schrift-klein); letter-spacing: var(--sperrung); }
   .reiter .rlage { font-size: var(--schrift-fein); gap: var(--luft-1); max-width: 100%; min-height: 16px; overflow: hidden; }
   .reiter .rtext { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
@@ -104,11 +105,6 @@
   .abteilungsfeld { min-width: 0; flex: 1 1 0; width: 0; }
   .wochenspalte .feldpaar { min-width: 0; }
   .seitenspalte > .sektion { flex: 1 1 100%; }
-  /* Die Leiste mit dem Stand der Woche: am Handy nicht klebend, Export in eigener Zeile. */
-  .tagflaeche > .sektion.wochenstand { position: static; padding: var(--luft-3); }
-  .wsrechts { margin-left: 0; flex: 1 1 100%; flex-wrap: wrap; }
-  .wsrechts .textfuss { flex: 1 1 100%; }
-  .wsrechts .knopf.voll { flex: 1 1 auto; justify-content: center; }
   .tagflaeche.blattwoche > * { width: 100%; max-width: 100%; min-width: 0; }
   .tagflaeche.blattwoche > .wochenspalte { display: flex; flex-direction: column; align-items: stretch; }
   /* Die klebende Titelzeile der Vorschau lag beim Scrollen über dem Blatt. */

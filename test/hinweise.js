@@ -364,13 +364,15 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       const feld = document.querySelector('.blattfeld.feld-unterweisung').getBoundingClientRect();
       const kasten = [...document.querySelectorAll('.vorschaubuehne [data-feld="unterweisung"] .kasten')].pop().getBoundingClientRect();
       return { drauf: Math.abs(feld.top - kasten.top) < 2 && Math.abs(feld.width - kasten.width) < 2,
-        hinweis: !!document.querySelector('.blatthinweis'), karten: document.querySelectorAll('.wochenspalte').length,
-        stand: document.querySelector('.wochenstand').textContent };
+        hinweis: document.querySelector('.blattzeile').textContent, karten: document.querySelectorAll('.wochenspalte').length,
+        leiste: document.querySelectorAll('.wochenstand').length,
+        marke: (document.querySelector('.vorschaubuehne .tagkopf[data-datum="2026-09-07"] .vmarke') || {}).textContent };
     });
-    pruefe('Am Rechner: Unterweisungen als Feld auf ihrem Kasten im Blatt, mit Hinweis, ohne Karten daneben',
-      imBlatt.drauf && imBlatt.hinweis && imBlatt.karten === 0, JSON.stringify(imBlatt));
-    pruefe('Oben steht, wie weit die Woche ist und was zuerst fehlt',
-      /0 von 5 Tagen fertig/.test(imBlatt.stand) && /Montag, 07\.09\. noch gegenlesen/.test(imBlatt.stand), imBlatt.stand);
+    pruefe('Am Rechner: Unterweisungen als Feld auf ihrem Kasten im Blatt, ohne Karten und ohne Leiste darüber',
+      imBlatt.drauf && imBlatt.karten === 0 && imBlatt.leiste === 0, JSON.stringify(imBlatt));
+    pruefe('Über dem Blatt nur, was man darin tun kann: hineinschreiben, einen Tag anklicken',
+      /Gestrichelt: hier direkt reinschreiben/.test(imBlatt.hinweis) && /anklicken: den Tag bearbeiten/.test(imBlatt.hinweis), imBlatt.hinweis);
+    pruefe('Was ein Tag noch braucht, steht an ihm im Blatt', /noch gegenlesen · öffnen/.test(imBlatt.marke || ''), imBlatt.marke);
     // Das Blatt zeichnet sich beim Schreiben neu; die Stelle, an der man schreibt, bleibt stehen.
     await page.evaluate(() => document.querySelector('.blattfeld.feld-unterweisung').scrollIntoView({ block: 'center' }));
     const scrollVorher = await page.evaluate(() => document.querySelector('#tagbereich > .tagpanel.woche').scrollTop);
@@ -390,6 +392,17 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.click('.vorschaubuehne .tagkopf[data-datum="2026-09-09"]');
     await page.waitForTimeout(300);
     pruefe('Ein Tag im Blatt öffnet den Tag', await page.locator('#feld-2026-09-09').isVisible());
+
+    // Ohne Text steht ein Tag nicht im Blatt. Über dem Blatt steht dann, dass er fehlt, und führt hin.
+    await page.evaluate(() => window.__tagSetzen('2026-09-10', { text: '', stunden: 8 }));
+    await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
+    await page.waitForTimeout(600);
+    const fehlt = await page.locator('.blattfehlt').textContent();
+    pruefe('Ein Tag ohne Text steht über dem Blatt', /^Donnerstag ohne Text/.test(fehlt) &&
+      !(await page.locator('.vorschaubuehne .tagkopf[data-datum="2026-09-10"]').count()), fehlt);
+    await page.click('.blattfehlt');
+    await page.waitForTimeout(300);
+    pruefe('… und ein Klick öffnet ihn', await page.locator('#feld-2026-09-10').isVisible());
 
     // Beim Drucken ist die Seite so breit wie A4, schmaler als 820 px. Hinter dem Druckfenster
     // baute sich die Woche deshalb in die Anordnung fürs Handy um.

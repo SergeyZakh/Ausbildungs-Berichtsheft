@@ -11,8 +11,8 @@
  * dann grün und schreibgeschützt. Jede Änderung hebt die Übernahme auf.
  *
  * Gibt das Feld und seine Knöpfe zurück. Am Rechner schreibt man ins Blatt (wochenblatt.js): Das
- * Feld liegt dort auf dem Kasten „Berufsschule“, die Knöpfe stehen mit ihrem Stand in der Leiste
- * oben (`gruppe`). Am Handy und bei der täglichen Notierung ist beides eine Karte (`sektion`).
+ * Feld liegt dort auf dem Kasten „Berufsschule“, die Knöpfe (`gruppe`) unten rechts an ihm. Am
+ * Handy und bei der täglichen Notierung ist beides eine Karte (`sektion`).
  */
 function schulwocheFeld(vorschau, imBlatt) {
   var montagIso = aktiveWoche, block = blockwoche(montagIso);
@@ -75,10 +75,6 @@ function schulwocheFeld(vorschau, imBlatt) {
   });
 
   var gruppe = document.createElement("span");
-  gruppe.className = "schulwoche themenstand";
-  var wort = document.createElement("span");
-  wort.className = "themenwort";
-  gruppe.appendChild(wort);
   var ort = imBlatt ? gruppe : s.kopf;
   ort.appendChild(uebernehmen);
   ort.appendChild(bearbeiten);
@@ -88,8 +84,7 @@ function schulwocheFeld(vorschau, imBlatt) {
     var voll = !!(d.schule || "").trim(), fertig = voll && !!d.schuleGeprueft;
     var stand = fertig ? " fertig" : voll ? " pruefen" : "";
     s.wurzel.className = "sektion wachsend schulwoche" + stand;
-    gruppe.className = "schulwoche themenstand" + stand;
-    wort.textContent = fertig ? "Themen der Woche fertig" : voll ? "Themen der Woche noch nicht fertig" : "Themen der Woche fehlen";
+    gruppe.className = "schulwoche blattknoepfe" + stand;
     uebernehmen.hidden = !voll || fertig;
     bearbeiten.hidden = !fertig;
     ta.readOnly = fertig;
@@ -101,9 +96,21 @@ function schulwocheFeld(vorschau, imBlatt) {
 /**
  * Die Werktage einer Blockwoche mit ihrer Art: Wer an einem Tag krank war, trägt es hier ein, ohne
  * Tagesreiter. Ein Arbeitstag macht die Woche wieder tageweise; die Reiter kommen dann zurück.
+ *
+ * Das braucht man selten. Eine eigene Karte mit fünf Auswahllisten über dem Blatt war zu viel;
+ * jetzt öffnet der Reiter der Blockwoche die Tage als Menü (reiter.js).
  */
-function blockTageSektion() {
-  var s = sektion("Tage dieser Woche", "blocktage");
+function blockTageMenue() {
+  var menue = document.createElement("div");
+  menue.className = "menue blocktagemenue";
+  menue.id = "menue-blocktage";
+  menue.hidden = true;
+  // Ein Klick in die Liste ist kein Klick daneben; der schlösse sie (bedienung.js).
+  menue.addEventListener("click", function (e) { e.stopPropagation(); });
+  var titel = document.createElement("p");
+  titel.className = "menuetitel";
+  titel.textContent = "Tage dieser Woche";
+  menue.appendChild(titel);
   var montag = vonIso(aktiveWoche), land = $("f-land").value;
   var liste = document.createElement("div");
   liste.className = "blocktageliste";
@@ -137,13 +144,22 @@ function blockTageSektion() {
           tage[key].art = e.target.value;
           tage[key].artVonHand = true;
           merken(); zeichnen();
-          if (!blockwoche(aktiveWoche)) sage("Keine Blockwoche mehr: Die Tage stehen wieder einzeln in den Reitern.", "warn");
+          // Wer krank war, war es oft mehrere Tage: Die Liste bleibt offen, solange es eine Blockwoche ist.
+          if (blockwoche(aktiveWoche)) blockTageOeffnen();
+          else sage("Keine Blockwoche mehr: Die Tage stehen wieder einzeln in den Reitern.", "warn");
         });
         zeile.appendChild(wahl);
       }
       liste.appendChild(zeile);
     })(plus(montag, i));
   }
-  s.leib.appendChild(liste);
-  return s.wurzel;
+  menue.appendChild(liste);
+  return menue;
+}
+
+function blockTageOeffnen() {
+  var menue = $("menue-blocktage");
+  if (!menue) return;
+  menue.hidden = false;
+  $("reiter-block").setAttribute("aria-expanded", "true");
 }
