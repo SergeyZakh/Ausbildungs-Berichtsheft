@@ -36,8 +36,8 @@ einfach selbst.
    Bundesland, Berufsschule und Vordruck. Ändern lässt sich alles unter **⋯ → Deine Daten**.
 2. Zeiten als CSV exportieren und ins Fenster ziehen oder **Zeiterfassung laden (CSV)** klicken.
    Ohne Zeiterfassung: **Selbst schreiben**.
-3. Tag für Tag den Entwurf überarbeiten und auf **Fertig** drücken. Im Reiter **Woche** stehen
-   Abteilung und Unterweisungen.
+3. Tag für Tag den Entwurf überarbeiten und auf **Fertig** drücken. Im Reiter **Woche** schreibst
+   du Abteilung und Unterweisungen direkt ins Blatt.
 4. **Exportieren** → diese Woche oder das ganze Heft mit Deckblatt, als Word oder PDF.
 
 ![Tagesansicht: links der Entwurf aus den Buchungen, rechts die Buchungen selbst](docs/bilder/tag.png)

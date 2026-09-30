@@ -1,6 +1,6 @@
 {
   "name": "berichtsheft",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Ausbildungsnachweis (IHK-Berichtsheft) aus dem CSV-Export deiner Zeiterfassung – im Browser oder mit Server für Betriebe",
   "license": "MIT",
   "private": true,
@@ -22,7 +22,7 @@
     "docker:up": "docker compose -f docker-compose.lokal.yml up -d --build"
   },
   "dependencies": {
-    "docx": "9.7.2"
+    "docx": "9.8.1"
   },
   "devDependencies": {
     "jszip": "^3.10.2",

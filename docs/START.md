@@ -63,7 +63,9 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
 
 4. **Zeiterfassung laden.** Auf **Zeiterfassung laden (CSV)** klicken und die Datei wählen, oder
    sie einfach ins Browserfenster ziehen. Erkennt das Werkzeug die Spalten nicht sicher, fragt es
-   nach. Jede Spalte einmal zuordnen, beim nächsten Mal weiß es Bescheid.
+   nach. Jede Spalte einmal zuordnen, beim nächsten Mal weiß es Bescheid. Danach steht oben, was
+   geladen wurde („Kimai-Import fertig. 7 Tage …“); **Spalten prüfen** ordnet neu zu, **Passt**
+   schließt die Karte.
 
    ![Zuordnungsdialog mit Vorschau](bilder/zuordnung.png)
 
@@ -118,8 +120,8 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
   Import ihn als Berufsschule. Am Tag selbst lässt sich die Art jederzeit umstellen.
 - **Blockwoche:** Ist jeder Werktag einer Woche Berufsschule oder frei, schreibst du die Themen
   einmal für die ganze Woche statt an fünf Tagen – so wie der Vordruck ein Feld je Woche hat. Wer
-  an einem Tag krank war, klickt auf den Reiter **Blockwoche** und stellt den Tag dort um. Beim täglichen Vordruck bleibt es bei
-  einem Text je Tag.
+  an einem Tag krank war, klickt auf den Reiter **Blockwoche** („Tage ändern ▾“) und stellt den Tag
+  dort um. Beim täglichen Vordruck bleibt es bei einem Text je Tag.
 - **Nach „Fertig“** geht es gleich zum nächsten Tag der Woche, der noch etwas braucht. „Zurück“
   hinter der Meldung führt wieder hin. Ist die Woche fertig, bleibst du in ihr; „Weiter“ hinter der
   Meldung bringt dich zur nächsten offenen Woche.
