@@ -376,7 +376,9 @@ async function warteAuf(pruefung, was, versuche = 50) {
     }));
     await spaeter.p.evaluate(() => window.__tagSetzen('2026-09-14', { text: 'Nach Ablauf geschrieben' }));
     await spaeter.p.evaluate(() => window.__kontoAbgleichen());
-    await spaeter.p.waitForTimeout(300);
+    // Lief beim Umleiten noch der erste Abgleich nach dem Laden, kommt das 401 erst mit dem nächsten
+    // (spätestens drei Sekunden nach dem Speichern). Auf einem langsamen Runner waren 300 ms zu knapp.
+    await spaeter.p.locator('#dlg-anmelden').waitFor({ state: 'visible', timeout: 6000 }).catch(() => {});
     pruefe('Abgelaufene Sitzung: Hinweis statt Weiterleitung', spaeter.p.url() === ADRESSE + '/'
       && (await spaeter.p.locator('#dlg-anmelden').isVisible())
       && /abgelaufen/.test(await spaeter.p.locator('#anmelden-text').textContent()), spaeter.p.url());
