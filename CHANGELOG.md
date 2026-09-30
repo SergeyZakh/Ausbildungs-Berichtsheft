@@ -18,6 +18,10 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Ergebnis des Imports als Karte oben:** „Kimai-Import fertig. 7 Tage aus …, davon 3
   Berufsschule“ mit „Spalten prüfen“ und „Passt“. Sie bleibt, bis man sie schließt; vorher stand
   „Spalten prüfen“ als Knopf in der Meldung und war am Handy nach Sekunden weg.
+- **„Fertig“ bleibt in der Woche:** Nach dem letzten offenen Tag, etwa am Freitag, springt es nicht
+  mehr in die nächste Woche. Die Meldung sagt „Die Woche ist fertig“, „Weiter: Mo 14.09.“ dahinter
+  führt zur nächsten offenen Stelle. Ist davor in derselben Woche noch ein Tag offen, bietet sie
+  ihn an.
 
 ### Behoben
 
