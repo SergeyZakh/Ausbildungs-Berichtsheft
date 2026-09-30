@@ -12,6 +12,11 @@
 
 /** Schreibt man in dieser Ansicht ins Blatt, oder stehen die Felder als Karten darüber? */
 function imBlattSchreiben() {
+  // Während des Drucks bleibt es, wie es war: Die Breite ist dann die von A4, nicht die des Fensters.
+  if (druckLaeuft) {
+    var flaeche = document.querySelector(".tagflaeche.blattwoche");
+    if (flaeche) return flaeche.classList.contains("imblatt");
+  }
   return !meldungSchwebt() && $("f-vordruck").value !== "taeglich";
 }
 
@@ -78,12 +83,16 @@ function zeichneWochenblatt(bereich) {
   vorschau.jetzt();
 }
 
-/* Wer das Fenster über die Grenze zieht, bekommt die andere Anordnung. */
+/* Wer das Fenster über die Grenze zieht, bekommt die andere Anordnung. Nicht aber, während der
+   Druckdialog offen ist (druckLaeuft in druck.js): Dann ist die Seite nur so breit wie A4. */
+function wochenAnordnungPruefen() {
+  var flaeche = document.querySelector(".tagflaeche.blattwoche");
+  if (!druckLaeuft && flaeche && flaeche.classList.contains("imblatt") !== imBlattSchreiben()) zeichneTag();
+}
 try {
-  window.matchMedia("(max-width: 820px)").addEventListener("change", function () {
-    if (aktiveWoche && aktiverTag === 7) zeichneTag();
-  });
+  window.matchMedia("(max-width: 820px)").addEventListener("change", wochenAnordnungPruefen);
 } catch (e) { /* ältere Browser: bleibt bis zum nächsten Zeichnen */ }
+window.addEventListener("afterprint", function () { setTimeout(wochenAnordnungPruefen, 0); });
 
 /**
  * Die Leiste über dem Blatt: wie weit die Woche ist, was als Erstes fehlt (mit Sprung dorthin), die
@@ -203,6 +212,9 @@ function blattVorschau(imBlatt) {
 
   function einpassen() {
     var breite = buehne.clientWidth - 2 * 16;
+    // Unsichtbar (etwa beim Drucken, wo nur #druck steht) gibt es nichts einzupassen; ein negativer
+    // Maßstab hätte das Blatt gespiegelt, bis zum nächsten Zeichnen.
+    if (breite <= 0) return;
     blaetter.querySelectorAll(".bogenrahmen").forEach(function (rahmen) {
       var bogen = rahmen.firstElementChild;
       var mass = breite / bogen.offsetWidth;

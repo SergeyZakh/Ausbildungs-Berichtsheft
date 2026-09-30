@@ -329,6 +329,14 @@ function druckVorseiten(s) {
   return deck + gang;
 }
 
+/* Solange der Druckdialog offen ist, hat die Seite die Breite von A4, schmaler als 820 px. Was nach
+   der Breite umbaut (Reiter „Woche“, wochenblatt.js), wartet so lange; sonst stand hinter dem
+   Druckfenster plötzlich die Anordnung fürs Handy. Nur über das Paar beforeprint/afterprint: Von
+   Hand gesetzt bliebe es in einem Browser ohne afterprint für immer stehen. */
+var druckLaeuft = false;
+window.addEventListener("beforeprint", function () { druckLaeuft = true; });
+window.addEventListener("afterprint", function () { druckLaeuft = false; });
+
 /**
  * Druckansicht aufbauen und den Druckdialog öffnen. Messen braucht
  * Layout, und daran kann in einem fremden Browser mehr scheitern als an
