@@ -105,6 +105,8 @@ function tagReiter(montag, i) {
 
   var stand = tagStand(t);
   var klassen = [];
+  // Ein leeres Wochenende wird am Handy schmal (handy.css): Die ganze Woche passt so in eine Zeile.
+  if (i > 4 && !tagHatInhalt(t)) klassen.push("leerwe");
   if (laeuftHier) klassen.push("laeuft");
   if (!frei && stand === "fertig") klassen.push("fertig");
   else if (stand !== "fertig" && stand !== "leer") klassen.push("pruefen");
@@ -155,12 +157,13 @@ function wochenReiter() {
   w.type = "button";
   w.setAttribute("role", "tab");
   w.setAttribute("aria-selected", String(aktiverTag === 7));
+  w.id = "reiter-woche";
   tasteZeigen(w, "8");
   var wd = wocheDaten(aktiveWoche);
 
   var wstand = wochenStand(aktiveWoche);
   var wocheVoll = !!(wd.unterweisungen || "").trim();
-  if (wstand) w.className = wstand;
+  w.className = "wochenreiter" + (wstand ? " " + wstand : "");
   var anteil = wochenAnteil(aktiveWoche);
   var marke = wstand === "fertig"
     ? '<span class="haken" title="alle Tage gegengelesen">✓</span>'

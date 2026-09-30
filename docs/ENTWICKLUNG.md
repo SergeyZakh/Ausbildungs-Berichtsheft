@@ -86,9 +86,9 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | Datei | Inhalt |
 | --- | --- |
 | `ansicht-woche.js` | Wochenbalken, Monatsraster, Navigation durch jede Kalenderwoche, nach „Fertig“ weiter zum nächsten offenen Tag (`weiterNachFertig()`) |
-| `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“; in einer Blockwoche nur der Reiter „Blockwoche“, der die Tage der Woche als Menü öffnet |
+| `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“, am Handy alle in einer Zeile (ein leeres Wochenende schmal, `.leerwe`); in einer Blockwoche nur der Reiter „Blockwoche“, der die Tage der Woche als Menü öffnet |
 | `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: eine Karte je Tag (`textSektion()`, im Kopf Datum, Art und Stunden aus `tagFelder()`, über dem Text das Feld des Vordrucks), Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche; ein freier Tag hat nur seinen Kopf (`artSektion()`) |
-| `wochenblatt.js` | Reiter „Woche“: das Blatt (`blattVorschau()`), in das man am Rechner direkt schreibt, darüber eine ruhige Zeile; `seitenspalte()` nur noch beim Ausbilder |
+| `wochenblatt.js` | Reiter „Woche“: das Blatt (`blattVorschau()`), in dem jedes Feld beschreibbar ist, auch der Text jedes Tages, darüber eine ruhige Zeile; am Handy öffnet ein Tipp das Feld groß (`schreibblattOeffnen()`); `seitenspalte()` nur noch beim Ausbilder |
 | `schulwoche.js` | Themen einer Blockwoche (`schulwocheFeld()`: Feld, Karte und die Knöpfe am Feld im Blatt) und die Tage der Blockwoche mit ihrer Art (`blockTageMenue()`) |
 | `stammdaten.js` | Dialog „Deine Daten“ (Reiter Ausbildung, Schule, Vordruck, Deckblatt, KI, Löschen), Verbindungsprüfung, Löschen und Verwerfen |
 | `berufe.js` | Ausbildungsberuf: eigene Liste beim Tippen (nach Bereichen, `BERUFE`), danach die Fachrichtung zum Antippen; gespeichert in `f-beruf` als „Fachinformatiker/in – Systemintegration“ (`berufsfeld()`, `berufTeilen()`) |
@@ -96,7 +96,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
 | `rundgang.js` | Rundgang der Ausbilder beim ersten Start und über **?**; Azubis bekommen stattdessen die Einrichtung |
 | `einrichtung.js` | Einrichtung beim ersten Start: die Angaben fürs Wochenblatt in sechs Schritten, jede Eingabe geht sofort in das Feld von „Deine Daten“ (`data-feld`) |
-| `hinweise.js` | Hinweis über den Reitern: Ergebnis des letzten Imports mit „Spalten prüfen“ (`importKarte`, bleibt bis „Passt“ oder ×), Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`) |
+| `hinweise.js` | Hinweis über den Reitern: Ergebnis des letzten Imports mit „Spalten prüfen“ (`importKarte`, bleibt bis „Passt“ oder ×), Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`); am Handy jeweils die kurze Fassung (`kurz`) |
 | `uebersicht.js` | Dialog „Übersicht“: je Ausbildungsjahr ein Raster der Werktage wie bei GitHub (`jahresRaster()`) und die Tage je Art (`uebersichtDaten()`) |
 
 **`ausgabe/`**
@@ -331,25 +331,56 @@ gehört zu `wochen` (`wochenNeu()`), auch ohne einen Tageseintrag: Sonst fehlte 
 Im Reiter steht das Blatt aus demselben Drucksatz wie das PDF, ohne Karte darum. Eine Leiste
 darüber mit Stand, erstem offenem Tag, „passt auf ein Blatt“ und „Woche als Word · PDF“ gab es,
 sie war zu viel: Der Stand steht in der Kopfleiste und in den Reitern, der Export unter
-„Exportieren“. Über dem Blatt steht nur eine ruhige Zeile (`.blattzeile`): „✎ Gestrichelt: hier
-direkt reinschreiben“, „Montag, Dienstag … anklicken: den Tag bearbeiten“ (nur, wenn Tage im Blatt
+„Exportieren“. Über dem Blatt steht nur eine ruhige Zeile (`.blattzeile`): „✎ Ins Blatt klicken
+und schreiben“ (am Handy „tippen“), „Montag, Dienstag …: der ganze Tag“ (nur, wenn Tage im Blatt
 stehen), ein Tag, der noch etwas braucht, aber ohne Text gar nicht im Blatt steht („Donnerstag
 ohne Text ›“, `fehltZeigen()`), die KI für die Woche und, nur wenn es so ist, „passt nicht auf ein
-Blatt: 2 Blätter“. Am Rechner mit dem wöchentlichen Vordruck
-(`imBlattSchreiben()`) schreibt man hinein: Die Felder für Abteilung, Unterweisungen und die Themen
-der Woche liegen als `.blattfeld` genau auf ihrem Kasten (`data-feld` im Drucksatz, `felderSetzen()`
-nach jedem Zeichnen und bei jeder Größenänderung), in der Schrift des Blatts mitskaliert. Solange
-man nicht schreibt, sind sie durchsichtig: Man sieht das Blatt, wie es gedruckt wird, mit
-gestricheltem Rahmen und „✎“, ein leeres Feld sagt „Hier schreiben …“. Beim Schreiben wird das
-Feld weiß und zeigt den Text; das Blatt dahinter zeichnet sich nach einer Pause neu. Übernommene
-Themen sind schreibgeschützt: Das Feld verliert Rahmen und „✎“ (`.fest`), nur „Bearbeiten“ bleibt
-an seinem Kasten und öffnet es wieder. Ein Tageskopf im Blatt (`data-datum`) öffnet den Tag; beim
-Drüberfahren zeigt er „✎ bearbeiten ›“, und ein Tag, der noch etwas braucht, trägt nur in der
-Vorschau „● noch gegenlesen · öffnen ›“ (`tageMarkieren()`).
+Blatt: 2 Blätter“.
 
-Am Handy wäre das Blatt zum Schreiben zu klein, und die tägliche Notierung hat keine festen Kästen:
-Dort stehen dieselben Felder als Karten über dem Blatt, die KI und „passt nicht“ darunter. Wer das Fenster über 820 px zieht,
-bekommt die andere Anordnung (`matchMedia`).
+Mit dem wöchentlichen Vordruck (`imBlattSchreiben()`) ist jedes Feld im Blatt eines zum Schreiben,
+am Rechner wie am Handy. Die Felder für Abteilung, Unterweisungen und die Themen der Woche liegen
+als `.blattfeld` genau auf ihrem Kasten (`data-feld` im Drucksatz), dazu eines über den Zeilen
+jedes Tages mit Text (`.feld-tag`, `data-datum` an Kopf und Zeilen, `tageAuflegen()`). Gesetzt
+werden sie nach jedem Zeichnen und bei jeder Größenänderung (`felderSetzen()`, `feldOrt()`), in
+Schrift und Zeilenabstand des Blatts und mit dem Einzug hinter dem Punkt: Beim Schreiben liegt
+der Text auf den gedruckten Zeilen, nur die Punkte fehlen. Stehen in einem Kasten der Woche auch
+Tage (Berufsschule, Betriebsversammlung), endet sein Feld über dem ersten. Solange man nicht
+schreibt, sind die Felder durchsichtig: Man sieht das Blatt, wie es gedruckt wird. Die Felder der
+Woche tragen einen feinen grauen Rahmen, die Tage zeigen ihn erst beim Drüberfahren; ein leeres
+Feld sagt „Hier schreiben …“. Ein gelber Rahmen mit Fläche um jedes Feld war zu laut. Das Blatt
+ist auch im Dunkeln weiß, die Farben der Felder sind deshalb fest; die Regel `.tagpanel textarea`
+darf sie nicht erreichen (sonst wurde das Feld beim Schreiben im Dunkeln schwarz). Beim Schreiben
+wird das Feld weiß und wächst mit dem Text (`wachsen()`); das Blatt dahinter zeichnet sich nach
+einer Pause neu.
+
+Text im Tagesfeld geht über `tagTextSetzen()` wie im Tag selbst: Jede Änderung hebt „Fertig“ auf.
+Solange man darin schreibt, steht „Fertig“ unter dem Feld, wenn der Tag noch offen ist (der Knopf
+hält den Fokus, sonst verschwände er vor dem Klick). Auch übernommene Themen einer Blockwoche
+bleiben im Blatt beschreibbar, ohne „Bearbeiten“; wer schreibt, hebt die Übernahme auf. Nur die
+Karte (tägliche Notierung) ist nach „Fertig“ schreibgeschützt. Ein Tageskopf im Blatt öffnet den
+ganzen Tag (Art, Stunden, Buchungen); beim Drüberfahren zeigt er „ganzer Tag ›“, und ein Tag, der
+noch etwas braucht, trägt nur in der Vorschau „● noch gegenlesen · öffnen ›“ (`tageMarkieren()`).
+
+Am Handy (unter 820 px, dieselbe Grenze wie `handy.css`) ist das Blatt auf ein Drittel
+verkleinert; darin zu tippen hieße, in Fünf-Pixel-Schrift zu schreiben. Die Felder nehmen dort
+keinen Tipp an (`pointer-events: none`), ein Tipp auf die Hülle öffnet das Feld groß
+(`schreibblattOeffnen()`, `#dlg-schreiben`). Es fährt von unten hoch, über der Tastatur: Wie viel
+sie verdeckt, sagt `visualViewport` (`tastaturAbstand()`, `--tastatur`). Oben stehen der Titel und
+„Fertig“, darunter, wohin der Text im Blatt kommt („Kommt ins Blatt unter …“). Geschrieben wird
+trotzdem ins Feld im Blatt, dessen Eingabe speichert und neu zeichnet. „Fertig“ schließt; ist der
+Tag oder sind die Themen noch offen, übernimmt es sie auch, über den Knopf am Feld im Blatt. Wer
+nur nachsehen will, wischt das Feld am Griff nach unten, tippt daneben oder drückt Escape; das
+übernimmt nichts. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
+Text ›“ öffnet sich so, am Rechner wie am Handy: Im Blatt hat der Tag noch kein Feld; sobald er
+Text hat, steht er dort. Früher standen am Handy Karten über dem Blatt, man sah das Blatt erst
+nach dem Scrollen; ein erster Versuch mit einem Fenster oben und einer Knopfleiste darunter sah
+nicht aus wie die Vorschau, auf die man sich geeinigt hatte. Weil die Anordnung nicht mehr von der
+Breite abhängt, baut die Woche beim Drucken (Seite so breit wie A4) auch nichts mehr um. Über dem
+Blatt steht am Handy nur „✎ Ins Blatt tippen und schreiben“, leere Felder sagen „✎ antippen und
+schreiben“.
+
+Nur die tägliche Notierung hat keine festen Kästen für Abteilung und Unterweisungen: Dort stehen
+sie als Karten über dem Blatt, die KI und „passt nicht“ darunter.
 
 ### Weiter nach „Fertig“ (`naechsterOffenerTag()`)
 
@@ -367,6 +398,13 @@ nichts mehr offen“ und bietet den frühesten offenen Tag als Knopf an (`erster
 Über den Reitern steht höchstens ein Hinweis, der wichtigste zuerst; wer einen wegklickt, hat für die
 Sitzung Ruhe. `hinweiseZeigen()` läuft bei jedem `zeichnen()` und blendet einen unveränderten Hinweis
 nicht neu ein.
+
+Am Handy steht jeder Hinweis in seiner kurzen Fassung (`kurz` im Hinweis, `.hinweis.kurz`): eine,
+höchstens zwei Zeilen und ein Knopf, etwa „Tipp: Über Teilen → „Zum Home-Bildschirm“, sonst löscht
+Safari nach 7 Tagen. Wie?“. Die langen nahmen dort den halben Bildschirm, der Tipp fürs iPhone
+allein sechs Zeilen und zwei Knöpfe. „Wie?“ oder „Mehr“ zeigt die lange Fassung (`hinweisGross`);
+nach einem Import stehen „Übernehmen“, „Alles Betrieb“ und „Spalten prüfen“ in einer Zeile unter
+den Tagen.
 
 1. **Tipp fürs iPhone** (Safari, nicht als App, ohne Konto, über http): Safari löscht Seitendaten
    nach sieben Tagen Safari-Nutzung ohne Besuch der Seite, vom Home-Bildschirm aus nicht. Dort hat die
@@ -671,9 +709,9 @@ npm test
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
-| `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), die Tage als Menü hinter dem Reiter, Themen schreiben und mit „Fertig“ am Feld übernehmen, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy |
-| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, keine Leiste darüber, Marke am offenen Tag, ins Blatt schreiben, Tag im Blatt öffnen, Tag ohne Text über dem Blatt, Blatt scrollt bis unter die Reiter |
-| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Woche mit Karten und Blatt in voller Breite, ohne Leiste darüber, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
+| `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), die Tage als Menü hinter dem Reiter, Themen schreiben und mit „Fertig“ am Feld übernehmen, übernommen im Blatt weiter beschreibbar, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy die Themen im Blatt, groß zum Schreiben, Escape schließt ohne, „Fertig“ mit Übernahme |
+| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone, am Handy kurz, „Wie?“ zeigt alles), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, keine Leiste darüber, Marke am offenen Tag, ins Blatt schreiben, jeder Tag ein Feld über seinen Zeilen, darin schreiben und „Fertig“, Tageskopf öffnet den Tag, Tag ohne Text über dem Blatt öffnet sich groß, schmales Fenster bleibt Blatt, Blatt scrollt bis unter die Reiter; am Handy öffnet ein Tag im Blatt sich groß von unten, daneben tippen schließt nur, „Fertig“ übernimmt |
+| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Reiter in einer Zeile, Woche als Blatt in voller Breite mit den Feldern darin, ohne Leiste und Karten, ein Tipp öffnet das Feld groß von unten, Import-Karte kurz mit Knöpfen in einer Zeile, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
 mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).

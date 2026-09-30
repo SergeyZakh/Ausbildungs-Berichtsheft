@@ -78,17 +78,19 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
    ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig; was die Zeichen in den
    Reitern heißen, erklärt der Kalender unter der Woche oben; blassrot sind dort Werktage, an denen
    noch gar nichts steht. Im Reiter **Woche** steht dein Wochenblatt, und du schreibst direkt
-   hinein: Abteilung und Unterweisungen sind gestrichelte Felder im Blatt, in einer Blockwoche auch
-   die Themen der Berufsschule. Ein Klick auf einen Tag im Blatt („Montag“, „Dienstag“ …) öffnet
-   ihn zum Bearbeiten. Am Handy stehen dieselben Felder über dem Blatt. Was über alle Wochen noch
-   fehlt, zeigt **⋯ → Übersicht aller Wochen**.
+   hinein, in jedes Feld: Abteilung, Unterweisungen, in einer Blockwoche die Themen der
+   Berufsschule und den Text jedes Tages. Solange ein Tag offen ist, steht beim Schreiben **Fertig**
+   darunter. Ein Klick auf den Namen eines Tages im Blatt („Montag“, „Dienstag“ …) öffnet den ganzen
+   Tag. Am Handy tippst du ein Feld an, dann fährt von unten ein großes Schreibfeld hoch. Was über alle Wochen
+   noch fehlt, zeigt **⋯ → Übersicht aller Wochen**.
 
    ![Wochenansicht: das Blatt zum Hineinschreiben](bilder/woche.png)
 
    **1** Woche wählen, ein Klick öffnet den Kalender. **2** Wie weit die Woche ist. **3** Ein Tag,
-   der noch etwas braucht, sagt es im Blatt; ein Klick öffnet ihn. **4** Ausbildungsabteilung im
-   Blatt, gilt für die ganze Woche; ohne Eintrag zählt die aus „Deine Daten“. **5** In die
-   gestrichelten Felder schreibst du direkt. **6** Exportieren: die Woche oder das ganze Heft.
+   der noch etwas braucht, sagt es im Blatt; ein Klick auf seinen Namen öffnet ihn. **4**
+   Ausbildungsabteilung im Blatt, gilt für die ganze Woche; ohne Eintrag zählt die aus „Deine
+   Daten“. **5** In jedes Feld im Blatt schreibst du direkt, auch in die Tage. **6** Exportieren:
+   die Woche oder das ganze Heft.
 
 6. **Exportieren.** Auf **Exportieren**, dann unter **Diese Woche** „Als Word-Datei“ oder „Als PDF
    drucken“. Für alle Wochen auf einmal dasselbe unter **Ganzes Heft mit Deckblatt**; was nur das

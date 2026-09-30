@@ -62,8 +62,9 @@ function passtAufEineSeite(html) {
 
 /**
  * Ein Feld des Vordrucks. Jede Zeile ein Stichpunkt, nichts fett – wie in stichpunkt().
- * `feld` und das Datum am Tageskopf braucht nur die Vorschau im Reiter „Woche“: Dort schreibt man
- * in die Felder, und ein Tag öffnet sich per Klick (wochenblatt.js). Gedruckt stört beides nicht.
+ * `feld` und das Datum an Kopf und Zeilen eines Tages braucht nur die Vorschau im Reiter „Woche“:
+ * Dort schreibt man in die Felder, auch in die Zeilen eines Tages, und sein Kopf öffnet ihn
+ * (wochenblatt.js). Gedruckt stört beides nicht.
  */
 function druckAbschnitt(titel, liste, klasse, feld) {
   var inhalt = liste.map(function (e) {
@@ -71,11 +72,12 @@ function druckAbschnitt(titel, liste, klasse, feld) {
       ? '<p class="tagkopf"' + (e.kopf.datum ? ' data-datum="' + e.kopf.datum + '"' : "") + "><b>" + sicher(e.kopf.tag) + "</b>" +
         (e.kopf.rest ? "<span>" + sicher(e.kopf.rest) + "</span>" : "") + "</p>"
       : "";
+    var tag = (e.kopf && e.kopf.datum) ? ' data-datum="' + e.kopf.datum + '"' : "";
     var text = zeilen(e.text).map(function (z) {
       var roh = String(z).replace(/^\s*[-*•·]\s*/, "").trim();
       if (!roh) return "";
       // Das Zeichen steht im Markup, damit es beim Kopieren aus dem PDF mitkommt.
-      return '<p class="sp"><span class="pkt">•</span>' + sicher(roh) + "</p>";
+      return '<p class="sp"' + tag + '><span class="pkt">•</span>' + sicher(roh) + "</p>";
     }).join("");
     return kopf + text;
   }).join("");
@@ -328,14 +330,6 @@ function druckVorseiten(s) {
 
   return deck + gang;
 }
-
-/* Solange der Druckdialog offen ist, hat die Seite die Breite von A4, schmaler als 820 px. Was nach
-   der Breite umbaut (Reiter „Woche“, wochenblatt.js), wartet so lange; sonst stand hinter dem
-   Druckfenster plötzlich die Anordnung fürs Handy. Nur über das Paar beforeprint/afterprint: Von
-   Hand gesetzt bliebe es in einem Browser ohne afterprint für immer stehen. */
-var druckLaeuft = false;
-window.addEventListener("beforeprint", function () { druckLaeuft = true; });
-window.addEventListener("afterprint", function () { druckLaeuft = false; });
 
 /**
  * Druckansicht aufbauen und den Druckdialog öffnen. Messen braucht

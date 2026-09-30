@@ -26,5 +26,5 @@ function beispielLaden() {
   // Am Beispiel gibt es keine Spalten zu prüfen.
   importKarteWeg();
   wocheZeigen("2026-09-07", 0);
-  sage("Beispiel geladen: zwei ausgedachte Wochen. Wieder weg: ⋯ → Deine Daten → Löschen.", "gut");
+  sage("Beispiel geladen. Wieder weg: ⋯ → Deine Daten → Löschen.", "gut");
 }

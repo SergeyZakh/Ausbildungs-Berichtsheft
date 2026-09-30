@@ -86,8 +86,9 @@ function schulwocheFeld(vorschau, imBlatt) {
     s.wurzel.className = "sektion wachsend schulwoche" + stand;
     gruppe.className = "schulwoche blattknoepfe" + stand;
     uebernehmen.hidden = !voll || fertig;
-    bearbeiten.hidden = !fertig;
-    ta.readOnly = fertig;
+    // Im Blatt schreibt man einfach weiter, wie in jedem Feld dort; „Bearbeiten“ braucht nur die Karte.
+    bearbeiten.hidden = !fertig || imBlatt;
+    ta.readOnly = fertig && !imBlatt;
   }
   anzeigen();
   return { sektion: s.wurzel, ta: ta, gruppe: gruppe };

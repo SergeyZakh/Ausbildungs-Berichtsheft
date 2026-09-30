@@ -42,15 +42,20 @@
   .wsanteil { gap: var(--luft-1); }
   .wochensumme .ring { width: 18px; height: 18px; --dicke: 3px; }
 
-  /* Reihe 3: sieben Tage in einer Zeile, der Wochenreiter breit darunter. Neben der Marke eines
-     Tages steht kein Text, Art und Stunden nennt der Tageskopf darunter: Mit Stunden in den
-     Reitern lagen Reiter und Tageskopf zusammen rund 230 px über dem Schreibfeld, mit offener
-     Tastatur blieb davon kaum etwas zum Schreiben. Die breite Woche war dabei nie das Problem. */
+  /* Reihe 3: die ganze Woche in einer Zeile. Neben der Marke eines Tages steht kein Text, Art und
+     Stunden nennt der Tageskopf darunter: Mit Stunden in den Reitern lagen Reiter und Tageskopf
+     zusammen rund 230 px über dem Schreibfeld, mit offener Tastatur blieb davon kaum etwas zum
+     Schreiben. Die Woche stand lange breit in einer zweiten Reihe; die kostete nur Höhe. Ein leeres
+     Wochenende wird schmal und bleibt doch antippbar, wer samstags arbeitet, findet es. */
   /* Oben Abstand zur Kopfleiste: Ohne ihn saßen die Reiter auf deren Trennlinie, und ihr oberer
      Rand samt Rundung wurde abgeschnitten. */
-  .reiter { overflow: visible; flex-wrap: wrap; gap: var(--luft-1); padding: var(--luft-3); }
+  .reiter { overflow: visible; flex-wrap: nowrap; gap: var(--luft-1); padding: var(--luft-3); }
   .reiter button { flex: 1 1 0; min-width: 0; padding: var(--luft-2) 1px; gap: var(--luft-1); border-radius: var(--rund-klein); overflow: hidden; }
-  .reiter button:last-child {
+  .reiter button.leerwe:not([aria-selected="true"]) { flex-grow: .7; color: var(--blass); }
+  .reiter button.wochenreiter { flex-grow: 1.6; }
+  .reiter button.wochenreiter .rtag { letter-spacing: 0; }
+  /* Die Blockwoche hat nur ihren einen Reiter: Beschriftung und Stand in einer Zeile. */
+  .reiter.block button {
     flex: 1 1 100%; flex-direction: row; align-items: center; justify-content: center;
     gap: var(--luft-3); padding: var(--luft-2) var(--luft-3);
   }
@@ -59,7 +64,7 @@
   .reiter .rtag { font-size: var(--schrift-klein); letter-spacing: var(--sperrung); }
   .reiter .rlage { font-size: var(--schrift-fein); gap: var(--luft-1); max-width: 100%; min-height: 16px; overflow: hidden; }
   .reiter .rtext { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-  .reiter button:not(:last-child) .rlage:not(.ohnemarke) .rtext { display: none; }
+  .reiter:not(.block) button .rlage:not(.ohnemarke) .rtext { display: none; }
 
   /* Tageskopf in einer Zeile: Datum, Art, Stunden. Die Beschriftungen stehen nur noch für
      Vorleser da, Auswahl und Stundenzahl sprechen für sich. Reicht die Breite nicht, rutschen
@@ -106,6 +111,16 @@
   .wochenspalte .feldpaar { min-width: 0; }
   .seitenspalte > .sektion { flex: 1 1 100%; }
   .tagflaeche.blattwoche > * { width: 100%; max-width: 100%; min-width: 0; }
+  /* Im verkleinerten Blatt schreibt man nicht: Ein Tipp aufs Feld öffnet es groß
+     (schreibblattOeffnen() in wochenblatt.js). Die Felder selbst nehmen den Tipp deshalb nicht an,
+     sonst ginge die Tastatur für ein Feld in Fünf-Pixel-Schrift auf. */
+  .tagpanel .blattfeld textarea, .tagpanel .blattfeld input { pointer-events: none; }
+  .blattfeld.feld-tag .blattknoepfe { display: none; }
+  /* Die Abteilung ist im Blatt kaum fingerbreit; der Tipp darf etwas danebengehen. */
+  .blattfeld.feld-abteilung::before { content: ""; position: absolute; inset: -10px -4px; }
+  .blattleer { font-size: var(--schrift-fein); }
+  .blatthinweis .breit, .blatthinweis.tage, .blattleer .breit { display: none; }
+  .blatthinweis .schmal, .blattleer .schmal { display: inline; }
   .tagflaeche.blattwoche > .wochenspalte { display: flex; flex-direction: column; align-items: stretch; }
   /* Die klebende Titelzeile der Vorschau lag beim Scrollen über dem Blatt. */
   .tagflaeche.dreispaltig > .sektion.vorschau > .sektionskopf { position: static; }
@@ -130,6 +145,17 @@
   .hinweis { padding: var(--luft-3) var(--luft-8) var(--luft-3) var(--luft-4); gap: var(--luft-3); }
   .hinweistext { flex: 1 1 100%; font-size: var(--schrift-text); }
   .hinweiszu { width: 34px; height: 34px; top: 4px; right: 4px; }
+  /* Die kurze Fassung (hinweise.js): Text und Knopf in einer Zeile, das × daneben. */
+  .hinweis.kurz { flex-wrap: nowrap; gap: var(--luft-2) var(--luft-3); padding: var(--luft-2) 42px var(--luft-2) var(--luft-3); }
+  .hinweis.kurz .hinweistext { flex: 1 1 auto; min-width: 0; line-height: 1.4; }
+  .hinweis.kurz .hinweisknoepfe { flex: none; flex-wrap: nowrap; }
+  .hinweis.kurz .knopf { padding: 6px var(--luft-3); font-size: var(--schrift-klein); }
+  .hinweis.kurz .hinweiszu { top: 50%; transform: translateY(-50%); }
+  .hinweis.kurz.mitliste { flex-wrap: wrap; padding-right: var(--luft-3); }
+  .hinweis.kurz.mitliste .hinweistext { flex-basis: 100%; padding-right: 30px; }
+  .hinweis.kurz.mitliste .hinweisknoepfe { flex: 1 1 100%; min-width: 0; flex-wrap: wrap; }
+  .hinweis.kurz.mitliste .hinweiszu { top: 4px; transform: none; }
+  .hinweis.kurz .schulwahl-zeile { font-size: var(--schrift-klein); }
   /* Das Jahr passt nicht in die Breite: feste Felder, das Raster scrollt seitlich, wie bei GitHub. */
   .uraster { grid-template-columns: 20px repeat(var(--wochen), 12px); overflow-x: auto; padding-bottom: var(--luft-1); }
   /* Ein Monat im Kalender für Zeiträume, mit Tagen groß genug für den Finger. */

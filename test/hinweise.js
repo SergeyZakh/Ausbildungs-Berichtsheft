@@ -280,7 +280,18 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.waitForTimeout(800);
     const text = await page.locator('#hinweise').innerText().catch(() => '');
     pruefe('iPhone in Safari: Tipp zum Home-Bildschirm', await page.locator('#hinweise .hinweis.home').isVisible(), text);
-    pruefe('Er warnt, dass die App dort leer beginnt', text.includes('Zum Home-Bildschirm') && text.includes('Sicherung'), text);
+    // Am Handy erst die kurze Fassung: sechs Zeilen und zwei Knöpfe nahmen dort den halben Bildschirm.
+    const kurz = await page.evaluate(() => {
+      const k = document.querySelector('#hinweise .hinweis.home');
+      return { kurz: k.classList.contains('kurz'), hoehe: Math.round(k.getBoundingClientRect().height), knoepfe: k.querySelectorAll('.knopf').length };
+    });
+    pruefe('Am Handy kurz: höchstens zwei Zeilen, ohne Knöpfe', kurz.kurz && kurz.hoehe < 80 && kurz.knoepfe === 0 &&
+      text.includes('Zum Home-Bildschirm') && text.includes('7 Tagen'), JSON.stringify(kurz) + ' ' + text);
+    await page.click('#hinweise .hinweis.home .hinweislink');
+    await page.waitForTimeout(200);
+    const lang = await page.locator('#hinweise').innerText();
+    pruefe('„Wie?“ zeigt alles: dass die App dort leer beginnt, mit Sicherung', lang.includes('beginnt das Heft leer') &&
+      lang.includes('Sicherung') && await page.locator('#hinweise .hinweis.home .knopf').isVisible(), lang);
     pruefe('Die Seite kann als App auf den Home-Bildschirm', await page.evaluate(() =>
       !!document.querySelector('meta[name="apple-mobile-web-app-capable"][content="yes"]') &&
       /^data:image\/png;base64,/.test(document.querySelector('link[rel="apple-touch-icon"]').href)));
@@ -370,8 +381,8 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     });
     pruefe('Am Rechner: Unterweisungen als Feld auf ihrem Kasten im Blatt, ohne Karten und ohne Leiste darüber',
       imBlatt.drauf && imBlatt.karten === 0 && imBlatt.leiste === 0, JSON.stringify(imBlatt));
-    pruefe('Über dem Blatt nur, was man darin tun kann: hineinschreiben, einen Tag anklicken',
-      /Gestrichelt: hier direkt reinschreiben/.test(imBlatt.hinweis) && /anklicken: den Tag bearbeiten/.test(imBlatt.hinweis), imBlatt.hinweis);
+    pruefe('Über dem Blatt nur, was man darin tun kann: hineinschreiben, einen Tag ganz öffnen',
+      /Ins Blatt klicken und schreiben/.test(imBlatt.hinweis) && /der ganze Tag/.test(imBlatt.hinweis), imBlatt.hinweis);
     pruefe('Was ein Tag noch braucht, steht an ihm im Blatt', /noch gegenlesen · öffnen/.test(imBlatt.marke || ''), imBlatt.marke);
     // Beim Scrollen läuft das Blatt bis unter die Reiter. Endete der Bereich 16 px darunter, stand
     // dort ein grauer Streifen zwischen Reitern und Blatt.
@@ -397,11 +408,52 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     pruefe('Ins Blatt geschrieben: steht im Vordruck und ist gespeichert',
       geschrieben.blatt.includes('Unterweisung Brandschutz') && geschrieben.gespeichert.includes('Unterweisung Brandschutz'),
       JSON.stringify(geschrieben));
+    // Auch der Text eines Tages ist ein Feld im Blatt, genau über seinen Zeilen.
+    const tagfeld = await page.evaluate(() => {
+      const f = document.querySelector('.blattfeld.feld-tag[data-datum="2026-09-08"]').getBoundingClientRect();
+      const z = [...document.querySelectorAll('.vorschaubuehne .sp[data-datum="2026-09-08"]')].map((e) => e.getBoundingClientRect());
+      return { oben: Math.round(f.top - z[0].top), unten: Math.round(f.bottom - z[z.length - 1].bottom),
+        felder: document.querySelectorAll('.blattfeld.feld-tag').length };
+    });
+    pruefe('Jeder Tag mit Text ist ein Feld über seinen Zeilen im Blatt',
+      tagfeld.felder === 5 && Math.abs(tagfeld.oben) <= 1 && Math.abs(tagfeld.unten) <= 1, JSON.stringify(tagfeld));
+    await page.evaluate(() => document.querySelector('.blattfeld.feld-tag[data-datum="2026-09-08"]').scrollIntoView({ block: 'center' }));
+    pruefe('„Fertig“ am Tag erst, wenn man darin schreibt',
+      !(await page.locator('.blattfeld.feld-tag[data-datum="2026-09-08"] .uebernehmen').isVisible()));
+    await page.click('.blattfeld.feld-tag[data-datum="2026-09-08"]');
+    await page.keyboard.press('Control+End');
+    await page.keyboard.type('\nRouter im Lager getauscht', { delay: 10 });
+    await page.waitForTimeout(600);
+    const imTag = await page.evaluate(() => ({
+      text: window.__tage()['2026-09-08'].text, geprueft: !!window.__tage()['2026-09-08'].geprueft,
+      blatt: [...document.querySelectorAll('.vorschaubuehne .sp[data-datum="2026-09-08"]')].map((e) => e.textContent).join('|'),
+      fokus: document.activeElement.closest('.blattfeld') === document.querySelector('.blattfeld.feld-tag[data-datum="2026-09-08"]'),
+    }));
+    pruefe('Im Blatt geschrieben: steht im Tag und im Blatt, man schreibt weiter',
+      /\nRouter im Lager getauscht$/.test(imTag.text) && imTag.blatt.includes('Router im Lager getauscht') && imTag.fokus,
+      JSON.stringify(imTag));
+    await page.click('.blattfeld.feld-tag[data-datum="2026-09-08"] .uebernehmen');
+    await page.waitForTimeout(400);
+    const tagFertig = await page.evaluate(() => ({
+      geprueft: window.__tage()['2026-09-08'].geprueft,
+      marke: !!document.querySelector('.vorschaubuehne .tagkopf[data-datum="2026-09-08"] .vmarke'),
+      reiter: document.querySelectorAll('#reiter button')[1].className,
+    }));
+    pruefe('„Fertig“ am Tag im Blatt: übernommen, Marke weg, Reiter grün',
+      tagFertig.geprueft === true && !tagFertig.marke && /fertig/.test(tagFertig.reiter), JSON.stringify(tagFertig));
+    await page.click('.blattfeld.feld-tag[data-datum="2026-09-08"]');
+    await page.keyboard.type('x');
+    await page.waitForTimeout(100);
+    pruefe('Wer danach darin schreibt, hebt „Fertig“ wieder auf, wie im Tag',
+      await page.evaluate(() => !window.__tage()['2026-09-08'].geprueft));
+    await page.keyboard.press('Backspace');
+
     await page.click('.vorschaubuehne .tagkopf[data-datum="2026-09-09"]');
     await page.waitForTimeout(300);
-    pruefe('Ein Tag im Blatt öffnet den Tag', await page.locator('#feld-2026-09-09').isVisible());
+    pruefe('Der Kopf eines Tages im Blatt öffnet den Tag', await page.locator('#feld-2026-09-09').isVisible());
 
-    // Ohne Text steht ein Tag nicht im Blatt. Über dem Blatt steht dann, dass er fehlt, und führt hin.
+    // Ohne Text steht ein Tag nicht im Blatt. Über dem Blatt steht dann, dass er fehlt; ein Klick
+    // öffnet ihn als großes Feld, und was man schreibt, steht gleich im Blatt.
     await page.evaluate(() => window.__tagSetzen('2026-09-10', { text: '', stunden: 8 }));
     await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
     await page.waitForTimeout(600);
@@ -410,28 +462,36 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       !(await page.locator('.vorschaubuehne .tagkopf[data-datum="2026-09-10"]').count()), fehlt);
     await page.click('.blattfehlt');
     await page.waitForTimeout(300);
-    pruefe('… und ein Klick öffnet ihn', await page.locator('#feld-2026-09-10').isVisible());
+    pruefe('… ein Klick öffnet ihn zum Schreiben', await page.evaluate(() =>
+      document.getElementById('dlg-schreiben').open && document.getElementById('schreiben-titel').textContent === 'Donnerstag, 10.09.2026' &&
+      document.activeElement.id === 'schreiben-text'));
+    await page.keyboard.type('Drucker im Büro eingerichtet', { delay: 10 });
+    await page.waitForTimeout(600);
+    pruefe('… was man schreibt, steht gleich im Blatt', await page.evaluate(() =>
+      window.__tage()['2026-09-10'].text === 'Drucker im Büro eingerichtet' &&
+      [...document.querySelectorAll('.vorschaubuehne .sp[data-datum="2026-09-10"]')].some((e) => e.textContent.includes('Drucker im Büro'))));
+    await page.click('#schreiben-tag');
+    await page.waitForTimeout(300);
+    pruefe('… „Ganzer Tag“ öffnet ihn', !(await page.evaluate(() => document.getElementById('dlg-schreiben').open)) &&
+      await page.locator('#feld-2026-09-10').isVisible());
 
-    // Beim Drucken ist die Seite so breit wie A4, schmaler als 820 px. Hinter dem Druckfenster
-    // baute sich die Woche deshalb in die Anordnung fürs Handy um.
+    // Die Woche hängt nicht mehr an der Fensterbreite: Schmal (und hinter dem Druckfenster, das so
+    // breit ist wie A4) bleibt es das Blatt. Unter 820 px öffnet ein Klick das Feld groß.
     await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
     await page.waitForTimeout(600);
-    const anordnung = () => page.evaluate(() => document.querySelector('.tagflaeche.blattwoche').classList.contains('imblatt'));
-    await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
     await page.setViewportSize({ width: 700, height: 900 });
     await page.waitForTimeout(400);
-    const imDruck = await anordnung();
+    const schmal = await page.evaluate(() => document.querySelector('.tagflaeche.blattwoche').classList.contains('imblatt'));
+    await page.click('.blattfeld.feld-unterweisung');
+    await page.waitForTimeout(300);
+    const grossSchmal = await page.evaluate(() => ({
+      offen: document.getElementById('dlg-schreiben').open, wert: document.getElementById('schreiben-text').value,
+    }));
+    await page.click('#schreiben-fertig');
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
     await page.waitForTimeout(400);
-    const nachDruck = await anordnung();
-    await page.setViewportSize({ width: 700, height: 900 });
-    await page.waitForTimeout(400);
-    const schmal = await anordnung();
-    await page.setViewportSize({ width: 1280, height: 900 });
-    await page.waitForTimeout(400);
-    pruefe('Während des Drucks bleibt die Woche, wie sie war; ohne Druck baut sie für schmale Fenster um',
-      imDruck && nachDruck && !schmal && await anordnung(), JSON.stringify({ imDruck, nachDruck, schmal }));
+    pruefe('Schmales Fenster: bleibt das Blatt, ein Klick öffnet das Feld groß',
+      schmal && grossSchmal.offen && grossSchmal.wert.includes('Unterweisung Brandschutz'), JSON.stringify({ schmal, grossSchmal }));
     pruefe('Keine JavaScript-Fehler (Rechner)', fehler.length === 0, fehler.join(' | '));
     await ctx.close();
   }
@@ -572,14 +632,38 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
       JSON.stringify(zurueck));
     await page.click('#notiz-zu');
 
+    // Am Handy steht auch die Woche als Blatt da; ein Tipp auf einen Tag öffnet ihn groß, mit „Fertig“.
     await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
     await page.waitForTimeout(900);
-    const kopf = await page.evaluate(() => {
-      const k = document.querySelector('.wochenspalte .sektion.wachsend .sektionskopf');
-      return { text: k.innerText, hoehe: k.getBoundingClientRect().height };
+    await page.click('.blattfeld.feld-tag[data-datum="2026-09-09"]');
+    await page.waitForTimeout(300);
+    const handyTag = await page.evaluate(() => {
+      const d = document.getElementById('dlg-schreiben').getBoundingClientRect();
+      return {
+        offen: document.getElementById('dlg-schreiben').open, titel: document.getElementById('schreiben-titel').textContent,
+        unter: document.getElementById('schreiben-unter').textContent,
+        wert: document.getElementById('schreiben-text').value, text: window.__tage()['2026-09-09'].text,
+        unten: Math.round(innerHeight - d.bottom), breit: Math.round(d.width) === innerWidth,
+      };
     });
-    pruefe('Am Handy: kurzer Titel „Unterweisungen und Schulungen“ in einer Zeile',
-      kopf.text.trim() === 'Unterweisungen und Schulungen' && kopf.hoehe < 50, JSON.stringify(kopf));
+    pruefe('Am Handy: ein Tag im Blatt öffnet sich groß von unten, mit seinem Text und wohin er kommt',
+      handyTag.offen && handyTag.titel === 'Mittwoch, 09.09.2026' && handyTag.wert === handyTag.text &&
+      handyTag.unter === 'Kommt ins Blatt unter „Betriebliche Tätigkeit“' && Math.abs(handyTag.unten) <= 1 && handyTag.breit,
+      JSON.stringify(handyTag));
+    // Daneben tippen schließt nur; übernommen wird erst mit „Fertig“.
+    await page.mouse.click(200, 60);
+    await page.waitForTimeout(300);
+    pruefe('… daneben tippen schließt, ohne den Tag zu übernehmen', await page.evaluate(() =>
+      !document.getElementById('dlg-schreiben').open && !window.__tage()['2026-09-09'].geprueft));
+    await page.click('.blattfeld.feld-tag[data-datum="2026-09-09"]');
+    await page.waitForTimeout(300);
+    await page.click('#schreiben-fertig');
+    await page.waitForTimeout(400);
+    const handyFertig = await page.evaluate(() => ({
+      offen: document.getElementById('dlg-schreiben').open, geprueft: window.__tage()['2026-09-09'].geprueft,
+    }));
+    pruefe('… „Fertig“ übernimmt den Tag und schließt das Feld',
+      !handyFertig.offen && handyFertig.geprueft === true, JSON.stringify(handyFertig));
     await ctx.close();
   }
 

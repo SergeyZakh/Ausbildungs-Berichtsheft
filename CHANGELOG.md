@@ -6,6 +6,33 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
+## [Unveröffentlicht]
+
+### Geändert
+
+- **Jedes Feld im Wochenblatt beschreibbar:** Im Reiter „Woche“ schreibt man jetzt auch den Text
+  jedes Tages direkt ins Blatt, nicht nur Abteilung, Unterweisungen und Themen. Das Feld liegt
+  genau über den gedruckten Zeilen; solange der Tag offen ist, steht beim Schreiben „Fertig“
+  darunter. Der Name eines Tages öffnet weiter den ganzen Tag. Auch übernommene Themen einer
+  Blockwoche bleiben im Blatt beschreibbar, wer schreibt, hebt die Übernahme auf.
+- **Am Handy das Blatt statt Karten:** Auch am Handy steht die Woche als Blatt da. Ein Feld
+  antippen, und von unten fährt ein großes Schreibfeld hoch, über der Tastatur: oben der Titel mit
+  „Fertig“, darunter, wohin der Text im Blatt kommt. „Fertig“ übernimmt einen offenen Tag und
+  schließt; nach unten wischen oder daneben tippen schließt nur. „Donnerstag ohne Text ›“ öffnet den
+  Tag ebenso, am Rechner wie am Handy.
+- **Hinweise am Handy kurz:** Der Tipp fürs iPhone, „Sicherung fällig“, „Noch offen“ und das
+  Ergebnis eines Imports stehen am Handy in ein, zwei Zeilen mit einem Knopf; „Wie?“ oder „Mehr“
+  zeigt den ganzen Text. Vorher nahm allein der Tipp sechs Zeilen und zwei Knöpfe.
+- **Ruhigere Felder:** Statt gelber, gestrichelter Flächen tragen die Felder der Woche einen feinen
+  grauen Rahmen, die Tage zeigen ihn erst beim Drüberfahren.
+- **Reiter am Handy in einer Zeile:** Mo bis So und „Woche“ stehen nebeneinander, ein leeres
+  Wochenende schmal. Die Woche stand vorher breit in einer zweiten Reihe.
+
+### Behoben
+
+- **Dunkelmodus:** Beim Schreiben im Wochenblatt wurde das Feld schwarz mit heller Schrift, mitten
+  im weißen Blatt. Am Handy blieb ein angetippter Reiter im Dunkeln dunkler hängen.
+
 ## [0.4.1] – 2026-09-30
 
 ### Geändert
@@ -258,6 +285,7 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
+[Unveröffentlicht]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.1...HEAD
 [0.4.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.2.0...v0.3.0

@@ -509,6 +509,20 @@
   </div>
 </dialog>
 
+<!-- Ein Feld aus dem Wochenblatt groß zum Schreiben, am Handy von unten (wochenblatt.js) -->
+<dialog id="dlg-schreiben" aria-labelledby="schreiben-titel">
+  <div class="schreiben-griff" aria-hidden="true"></div>
+  <div class="dkopf">
+    <h2 id="schreiben-titel"></h2>
+    <button type="button" class="knopf voll" id="schreiben-fertig">Fertig</button>
+  </div>
+  <div class="dkoerper">
+    <p class="schreiben-unter" id="schreiben-unter"></p>
+    <textarea id="schreiben-text" aria-labelledby="schreiben-titel"></textarea>
+    <button type="button" class="schreiben-tag" id="schreiben-tag">Ganzen Tag öffnen ›</button>
+  </div>
+</dialog>
+
 <!-- Kontrolle vor dem Export -->
 <dialog id="dlg-pruefung">
   <div class="dkopf">
