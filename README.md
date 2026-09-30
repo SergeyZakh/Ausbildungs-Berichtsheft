@@ -37,7 +37,7 @@ einfach selbst.
 2. Zeiten als CSV exportieren und ins Fenster ziehen oder **Zeiterfassung laden (CSV)** klicken.
    Ohne Zeiterfassung: **Selbst schreiben**.
 3. Tag für Tag den Entwurf überarbeiten und auf **Fertig** drücken. Im Reiter **Woche** schreibst
-   du Abteilung und Unterweisungen direkt ins Blatt.
+   du direkt ins Blatt, in jedes Feld, auch in die Tage.
 4. **Exportieren** → diese Woche oder das ganze Heft mit Deckblatt, als Word oder PDF.
 
 ![Tagesansicht: links der Entwurf aus den Buchungen, rechts die Buchungen selbst](docs/bilder/tag.png)
@@ -64,7 +64,8 @@ einfach selbst.
   Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), schlägt der Import ihn als
   Berufsschule vor, je Fach eine Zeile. Übernommen wird erst, was du bestätigst.
 - **Ausgabe** als Word oder PDF, im Vordruck mit wöchentlicher oder täglicher Notierung. In der
-  Wochenansicht schreibst du Abteilung und Unterweisungen direkt ins Blatt, wie es gedruckt wird.
+  Wochenansicht schreibst du in jedes Feld direkt ins Blatt, wie es gedruckt wird; am Handy öffnet
+  ein Tipp das Feld groß.
 - **Übersicht aller Wochen** wie die Aktivität bei GitHub: jeder Werktag ein Feld, grün fertig,
   rot offen, dazu Schul-, Urlaubs- und Krankheitstage je Ausbildungsjahr.
 - **Optional mit eigenem Sprachmodell:** [Ollama](https://ollama.com) fasst den Tag in so vielen

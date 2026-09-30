@@ -51,8 +51,9 @@ function ueberstand() {
 function aufbau() {
   const r = (s) => document.querySelector(s).getBoundingClientRect();
   const kopf = r('.leiste'), mitte = r('#mitte'), fuss = r('.fussleiste');
+  // Die Felder im Wochenblatt sind am Handy durchsichtig; geschrieben wird dort im großen Feld.
   const felder = [...document.querySelectorAll('.tagpanel textarea')]
-    .filter((t) => t.offsetParent)
+    .filter((t) => t.offsetParent && !t.closest('.blattfeld'))
     .map((t) => t.scrollHeight - t.clientHeight);
   return {
     seiteScrollt: document.scrollingElement.scrollHeight > innerHeight + 1,
@@ -216,12 +217,15 @@ async function durchgang(browser, breite) {
   await page.waitForTimeout(1200);
   const innen = await page.evaluate(() => document.querySelector('.tagflaeche.blattwoche').clientWidth);
   const breiteVon = (sel) => page.evaluate((s) => document.querySelector(s).getBoundingClientRect().width, sel);
-  for (const [name, sel] of [['Angaben der Woche', '.tagflaeche.blattwoche > .wochenspalte'],
-    ['Vorschau', '.tagflaeche.blattwoche > .sektion.vorschau']]) {
-    const b = await breiteVon(sel);
-    pruefe('Woche: ' + name + ' genau so breit wie der Platz' + bei, Math.abs(b - innen) <= 1,
-      Math.round(b) + ' von ' + innen + ' px');
-  }
+  const b = await breiteVon('.tagflaeche.blattwoche > .sektion.vorschau');
+  pruefe('Woche: das Blatt genau so breit wie der Platz' + bei, Math.abs(b - innen) <= 1,
+    Math.round(b) + ' von ' + innen + ' px');
+  // Die ganze Woche in einer Zeile; die Woche stand vorher breit in einer zweiten.
+  const zeile = await page.evaluate(() => {
+    const k = [...document.querySelectorAll('#reiter button')].map((b) => b.getBoundingClientRect());
+    return { tops: [...new Set(k.map((r) => Math.round(r.top)))], hoehe: Math.round(Math.max(...k.map((r) => r.bottom)) - Math.min(...k.map((r) => r.top))) };
+  });
+  pruefe('Woche: alle Reiter in einer Zeile' + bei, zeile.tops.length === 1 && zeile.hoehe < 70, JSON.stringify(zeile));
   // Die Bühne umschließt das verkleinerte Blatt; war sie so hoch wie die Desktop-Spalte breit,
   // blieb darunter eine große leere Fläche.
   const leer = await page.evaluate(() => {
@@ -231,11 +235,35 @@ async function durchgang(browser, breite) {
   });
   pruefe('Woche: unter dem Blatt keine leere Fläche' + bei, leer < 60, Math.round(leer) + ' px');
   // Stand und Export stehen in der Kopfleiste; eine eigene Leiste darüber war doppelt.
-  pruefe('Woche: keine Leiste über den Karten, die Felder als Karten, nicht im Blatt' + bei,
-    !(await page.locator('.wochenstand').count()) && await page.locator('.wochenspalte').isVisible() &&
-    !(await page.locator('.blattfeld').count()));
+  pruefe('Woche: keine Leiste und keine Karten, die Felder liegen im Blatt' + bei,
+    !(await page.locator('.wochenstand').count()) && !(await page.locator('.wochenspalte').count()) &&
+    await page.locator('.blattfeld.feld-unterweisung').isVisible());
   await nichtsRaus('Woche');
   await nichtsDarunter('Woche');
+  // Im verkleinerten Blatt tippt man nicht: Ein Tipp öffnet das Feld groß, oben, über der Tastatur.
+  await page.locator('.blattfeld.feld-unterweisung').tap();
+  await page.waitForTimeout(300);
+  const gross = await page.evaluate(() => {
+    const d = document.getElementById('dlg-schreiben'), r = d.getBoundingClientRect();
+    return { offen: d.open, oben: Math.round(r.top), unten: Math.round(r.bottom), bild: innerHeight,
+      titel: document.getElementById('schreiben-titel').textContent,
+      fokus: document.activeElement && document.activeElement.id };
+  });
+  pruefe('Woche: ein Tipp aufs Feld öffnet es groß, oben im Bild' + bei,
+    gross.offen && gross.oben <= 20 && gross.unten <= gross.bild && gross.fokus === 'schreiben-text' &&
+    /Unterweisungen/.test(gross.titel), JSON.stringify(gross));
+  await nichtsRaus('Schreibfeld');
+  await page.fill('#schreiben-text', 'Unterweisung Arbeitssicherheit');
+  await page.click('#schreiben-zu');
+  await page.waitForTimeout(500);
+  const danach = await page.evaluate(() => ({
+    offen: document.getElementById('dlg-schreiben').open,
+    feld: document.getElementById('feld-unterweisungen').value,
+    blatt: [...document.querySelectorAll('.vorschaubuehne [data-feld="unterweisung"] .kasten')].pop().textContent,
+  }));
+  pruefe('Woche: Geschriebenes steht danach im Blatt' + bei,
+    !danach.offen && danach.feld === 'Unterweisung Arbeitssicherheit' && danach.blatt.includes('Unterweisung Arbeitssicherheit'),
+    JSON.stringify(danach));
 
   await page.setInputFiles('#datei', path.join(__dirname, 'daten', 'formate', 'kimai-schule.csv'));
   await page.waitForTimeout(700);

@@ -596,3 +596,21 @@
   padding: var(--luft-4) var(--luft-6) var(--luft-5); border-top: 1px solid var(--linie);
 }
 .er-fehlt { flex: 1 1 auto; margin: 0; font-size: var(--schrift-klein); line-height: 1.35; color: var(--acht); text-align: center; }
+
+/* ---------- Ein Feld aus dem Wochenblatt groß (schreibblattOeffnen() in wochenblatt.js) ----------
+   Oben statt mittig: Am Handy schiebt die Tastatur von unten herein und hätte das Feld verdeckt. */
+#dlg-schreiben { max-width: 620px; }
+#dlg-schreiben .dkopf h2 { margin: 0; }
+.schreiben-unter { margin: 2px 0 0; font-size: var(--schrift-klein); color: var(--schiefer); }
+#schreiben-text {
+  display: block; width: 100%; min-height: 240px; resize: vertical;
+  font: inherit; font-size: var(--schrift-gross); line-height: 1.6;
+}
+#schreiben-tag { margin-right: auto; }
+#schreiben-knoepfe { display: contents; }
+#schreiben-knoepfe .blattknoepfe { position: static; display: flex; gap: var(--luft-2); }
+#schreiben-knoepfe .blattknoepfe .sektionsknopf { box-shadow: none; }
+@media (max-width: 820px) {
+  #dlg-schreiben[open] { margin-top: 10px; }
+  #schreiben-text { min-height: 30dvh; }
+}

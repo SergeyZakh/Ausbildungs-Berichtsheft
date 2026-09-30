@@ -234,6 +234,18 @@ function tagFelder(datum, key, t, art, istFrei) {
 }
 
 /**
+ * Neuer Text eines Tages, hier und aus dem Wochenblatt. Jede Änderung hebt die Freigabe auf.
+ * `art` ist die des Tages laut tagArt().
+ */
+function tagTextSetzen(key, text, art) {
+  if (!tage[key]) tage[key] = { von: null, bis: null, pausen: [], stunden: null, art: art };
+  // Zeigt der Schulplan den leeren Tag als Berufsschule, wird er mit dem ersten Zeichen eine.
+  else if (art && !tage[key].art) tage[key].art = art;
+  tage[key].text = text;
+  delete tage[key].geprueft;
+}
+
+/**
  * Das Textfeld des Tages mit Herkunftsfahne, Fertig/Bearbeiten,
  * optionalem KI-Knopf und Zeilenstand.
  *
@@ -262,11 +274,7 @@ function textSektion(key, t, art, istSchule, datum) {
     ? "Welche Themen wurden im Unterricht behandelt?"
     : "Was hast du an diesem Tag gemacht?";
   ta.addEventListener("input", function (e) {
-    if (!tage[key]) tage[key] = { von: null, bis: null, pausen: [], stunden: null, art: art };
-    // Zeigt der Schulplan den leeren Tag als Berufsschule, wird er mit dem ersten Zeichen eine.
-    else if (art && !tage[key].art) tage[key].art = art;
-    tage[key].text = e.target.value;
-    delete tage[key].geprueft;
+    tagTextSetzen(key, e.target.value, art);
     standAnzeigen();
     pruefstandAnzeigen();
     // Reiter und Wochenknopf zeigen den neuen Stand gleich mit.

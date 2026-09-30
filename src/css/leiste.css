@@ -147,7 +147,11 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
   border: 1px solid var(--linie); border-radius: var(--rund);
   transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s, transform .15s;
 }
-.reiter button:hover { background: var(--band); border-color: var(--linie-fest); }
+/* Nur mit Maus: Am Handy bleibt :hover nach dem Antippen am Reiter hängen, und im Dunkeln wurde
+   der angetippte Reiter so dunkler statt heller. */
+@media (hover: hover) {
+  .reiter button:hover { background: var(--band); border-color: var(--linie-fest); }
+}
 /* Die Taste des Reiters als kleine Kappe in der Ecke (tasteZeigen()). Nur mit Maus und breitem
    Fenster: Am Handy gibt es keine Zifferntasten, dort wäre sie nur Unruhe. */
 @media (min-width: 821px) and (hover: hover) {
@@ -222,11 +226,11 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
 /* Der Reiter färbt mit dem Stand des Tages: grün durch, rot ungelesen. */
 .reiter button.fertig { background: var(--gut-hell); color: var(--gut); border-color: var(--gut-kante); }
 .reiter button.fertig .rlage { color: var(--gut); }
-.reiter button.fertig:hover { background: var(--gut-hover); }
+@media (hover: hover) { .reiter button.fertig:hover { background: var(--gut-hover); } }
 .reiter button.fertig[aria-selected="true"] { background: var(--gut); border-color: var(--gut); color: #fff; box-shadow: 0 6px 16px rgba(26, 127, 55, .25); }
 .reiter button.fertig[aria-selected="true"] .rlage { color: #fff; }
 .reiter button.pruefen { background: var(--acht-hell); color: var(--acht); border-color: var(--acht-kante); }
 .reiter button.pruefen .rlage { color: var(--acht); }
-.reiter button.pruefen:hover { background: var(--acht-hover); }
+@media (hover: hover) { .reiter button.pruefen:hover { background: var(--acht-hover); } }
 .reiter button.pruefen[aria-selected="true"] { background: var(--acht); border-color: var(--acht); color: #fff; box-shadow: 0 6px 16px rgba(180, 35, 24, .25); }
 .reiter button.pruefen[aria-selected="true"] .rlage { color: #fff; }

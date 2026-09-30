@@ -140,7 +140,20 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   await page.waitForTimeout(200);
   pruefe('Zurück in der Blockwoche davor', (await page.textContent('#wochenlabel')).startsWith('14.–20. Sep') &&
     await page.locator('#reiter-block').isVisible());
-  pruefe('Übernommen ist schreibgeschützt', await page.locator('#feld-schulwoche').getAttribute('readonly') !== null);
+  // Im Blatt bleibt jedes Feld beschreibbar, wie die Tage dort: Wer schreibt, hebt „übernommen“ auf.
+  pruefe('Übernommen bleibt im Blatt beschreibbar, ohne „Bearbeiten“',
+    (await page.locator('#feld-schulwoche').getAttribute('readonly')) === null &&
+    !(await page.locator('.blattfeld.feld-schule .bearbeiten').isVisible()));
+  await page.click('#feld-schulwoche');
+  await page.keyboard.press('Control+End');
+  await page.keyboard.type(', Übungen');
+  await page.waitForTimeout(200);
+  pruefe('… wer darin schreibt, hebt die Übernahme auf',
+    await auf(page, () => !window.__wochendaten()['2026-09-14'].schuleGeprueft &&
+      window.__wochendaten()['2026-09-14'].schule.endsWith('Kündigungsschutz, Übungen')));
+  await page.click('.blattfeld.feld-schule .uebernehmen');
+  await page.waitForTimeout(300);
+  pruefe('… „Fertig“ im Blatt übernimmt sie wieder', await auf(page, () => window.__wochendaten()['2026-09-14'].schuleGeprueft === true));
 
   /* ---------- Tage der Blockwoche ---------- */
   await page.click('#reiter-block');
@@ -156,10 +169,9 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   pruefe('Ein Arbeitstag von Hand macht die Woche wieder tageweise, mit Hinweis',
     !(await auf(page, () => window.__blockwoche('2026-09-14'))) && (await reiter(page)).length === 8 &&
     (await page.textContent('#notiz')).includes('Keine Blockwoche mehr'));
-  // Übernommen und damit schreibgeschützt: im Blatt als Text, „Bearbeiten“ unten an seinem Kasten.
-  pruefe('Die Themen bleiben im Reiter „Woche“ stehen',
+  pruefe('Die Themen bleiben im Reiter „Woche“ stehen, als Feld im Blatt',
     (await auf(page, () => [...document.querySelectorAll('.vorschaubuehne [data-feld="schule"] .kasten')].pop().textContent))
-      .includes('LF5: Subnetting') && await page.locator('.blattfeld.feld-schule.fest .bearbeiten').isVisible());
+      .includes('LF5: Subnetting') && await page.locator('.blattfeld.feld-schule').isVisible());
   // Zurück auf Berufsschule über den Tag selbst.
   await page.click('#reiter button >> nth=4');
   await page.selectOption('#feld-art', 'Berufsschule');
@@ -284,8 +296,27 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     reiter: document.getElementById('reiter-block').getBoundingClientRect().width,
   }));
   pruefe('Handy: ein breiter Reiter, nichts ragt über den Rand', breit.seite <= 390 && breit.reiter > 300, JSON.stringify(breit));
-  pruefe('Handy: das Themenfeld steht oben, gleich unter seiner Überschrift',
-    await handy.locator('.schulwoche .sektionsleib > textarea:first-child').isVisible());
+  // Auch am Handy liegen die Themen im Blatt; ein Tipp öffnet sie groß, „Fertig“ kommt mit.
+  await handy.click('.blattfeld.feld-schule');
+  await handy.waitForTimeout(300);
+  const handyThemen = await handy.evaluate(() => ({
+    offen: document.getElementById('dlg-schreiben').open, titel: document.getElementById('schreiben-titel').textContent,
+    wert: document.getElementById('schreiben-text').value, knoepfe: !!document.querySelector('#schreiben-knoepfe .schulwoche'),
+  }));
+  pruefe('Handy: die Themen im Blatt, ein Tipp öffnet sie groß mit ihren Knöpfen',
+    handyThemen.offen && handyThemen.titel === 'Berufsschule (Unterrichtsthemen)' && handyThemen.knoepfe,
+    JSON.stringify(handyThemen));
+  await handy.fill('#schreiben-text', 'LF7: Datensicherung');
+  await handy.keyboard.press('Escape');
+  await handy.waitForTimeout(500);
+  const handyDanach = await handy.evaluate(() => ({
+    offen: document.getElementById('dlg-schreiben').open, themen: window.__wochendaten()['2026-09-14'].schule,
+    zurueck: !!document.querySelector('.blattfeld.feld-schule .schulwoche'),
+    blatt: [...document.querySelectorAll('.vorschaubuehne [data-feld="schule"] .kasten')].pop().textContent,
+  }));
+  pruefe('Handy: geschrieben, gespeichert, im Blatt; die Knöpfe wieder am Feld',
+    !handyDanach.offen && handyDanach.themen === 'LF7: Datensicherung' && handyDanach.zurueck &&
+    handyDanach.blatt.includes('LF7: Datensicherung'), JSON.stringify(handyDanach));
   pruefe('Handy ohne JavaScript-Fehler', handyFehler.length === 0, handyFehler.join(' | '));
 
   pruefe('Keine JavaScript-Fehler', jsFehler.length === 0, jsFehler.join(' | '));
