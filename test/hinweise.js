@@ -390,6 +390,27 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.click('.vorschaubuehne .tagkopf[data-datum="2026-09-09"]');
     await page.waitForTimeout(300);
     pruefe('Ein Tag im Blatt öffnet den Tag', await page.locator('#feld-2026-09-09').isVisible());
+
+    // Beim Drucken ist die Seite so breit wie A4, schmaler als 820 px. Hinter dem Druckfenster
+    // baute sich die Woche deshalb in die Anordnung fürs Handy um.
+    await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
+    await page.waitForTimeout(600);
+    const anordnung = () => page.evaluate(() => document.querySelector('.tagflaeche.blattwoche').classList.contains('imblatt'));
+    await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
+    await page.setViewportSize({ width: 700, height: 900 });
+    await page.waitForTimeout(400);
+    const imDruck = await anordnung();
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    await page.waitForTimeout(400);
+    const nachDruck = await anordnung();
+    await page.setViewportSize({ width: 700, height: 900 });
+    await page.waitForTimeout(400);
+    const schmal = await anordnung();
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.waitForTimeout(400);
+    pruefe('Während des Drucks bleibt die Woche, wie sie war; ohne Druck baut sie für schmale Fenster um',
+      imDruck && nachDruck && !schmal && await anordnung(), JSON.stringify({ imDruck, nachDruck, schmal }));
     pruefe('Keine JavaScript-Fehler (Rechner)', fehler.length === 0, fehler.join(' | '));
     await ctx.close();
   }

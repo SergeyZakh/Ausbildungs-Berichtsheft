@@ -36,6 +36,9 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Riesige Felder in der Übersicht:** Mit nur wenigen Wochen, etwa ohne Ausbildungszeit unter
   *Deine Daten*, wurde jedes Feld so breit wie ein Viertel des Fensters. Die Felder sind jetzt
   höchstens 16 px groß; ein ganzes Ausbildungsjahr füllt die Breite wie bisher.
+- **Wochenansicht hinter dem Druckfenster:** Solange der Browser das PDF druckte, hat die Seite
+  die Breite von A4, schmaler als ein Handy-Fenster. Die Wochenansicht baute deshalb auf Karten um
+  und stand danach so da. Jetzt bleibt sie während des Drucks, wie sie war.
 
 ## [0.3.0] – 2026-09-30
 
