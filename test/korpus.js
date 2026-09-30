@@ -25,6 +25,13 @@ const RAUS = [
 
 /* Zeilen, die Wort für Wort so bleiben müssen */
 const BLEIBT_EXAKT = [
+  // Fächer eines Berufsschultags aus der Zeiterfassung (import/schule.js)
+  'AEUP: Datenbanken, Normalisierung',
+  'ITT: ESP32',
+  'FPP: Cisco Paket Tracer',
+  'E: Compiler and Interpreter',
+  'LF5: Schleifen und Arrays',
+  'WiSo: Tarifvertrag',
   'Ubuntu Server LTS installiert',
   'VLAN-Regeln geprüft',
   'Windows 11 ausgerollt',

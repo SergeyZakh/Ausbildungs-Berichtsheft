@@ -68,6 +68,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `bereinigung.js` | `saeubern()`: Regeln für Tickets, Geräte, Personen, Kunden, Notizsprache |
 | `quellen.js` | Spalten erkennen (`FELDER`, `spaltenZuordnen()`), Kopfzeile finden, `csvAnalysieren()`, `buchungenLesen()`, `tageAusBuchungen()` |
 | `entwurf.js` | `rohtext()`: aus Buchungen wird der Tagesentwurf |
+| `schule.js` | Berufsschultag in der Zeiterfassung erkennen (`schultagAusBuchungen()`, `faecherListe()`), Fächer je Zeile (`schulZeilen()`), Themen mehrerer Schultage einer Woche zusammenführen (`schulwochenZusammenfuehren()`) |
 | `import.js` | Datei laden, Zusammenführen mit dem Stand (`importAnwenden()`), „Spalten prüfen“, Ziehen und Ablegen |
 | `zuordnung.js` | Dialog „Spalten zuordnen“ mit Vorschau |
 | `beispiel.js` | „Beispiel ansehen“: ausgedachtes Heft aus `src/beispiel.csv` (Stammdaten in `BEISPIEL_STAMM`) |
@@ -364,7 +365,11 @@ Jahre ohne Scrollen auf 1366 × 768 (`test/hinweise.js`); am Handy scrollt das R
 1. **Zeichensatz:** UTF-16 an der Bytefolge, sonst streng UTF-8, bei Fehlern Windows-1252.
 2. **Trennzeichen:** das häufigste aus `;`, `,` und Tabulator in den ersten Zeilen.
 3. **Kopfzeile:** unter den ersten zehn Zeilen die, zu der die meisten Felder passen
-   (Titel- und Filterzeilen darüber fallen weg).
+   (Titel- und Filterzeilen darüber fallen weg). Steht in dieser Zeile ein Datum und eine Uhrzeit
+   oder Zahl, ist es eine Buchung (`siehtNachDatenAus()`): Hat die Zeile davor gleich viele
+   Spalten, ist sie die Kopfzeile, sonst hat die Datei keine. Dann zählt jede Zeile als Buchung,
+   `spaltenNachInhalt()` schlägt Datum, Beginn, Ende, Dauer und Beschreibung vor, und es wird
+   immer gefragt. Gemerkt wird unter `ohne kopf|<Spaltenzahl>`.
 4. **Felder:** Jedes Feld in `FELDER` hat Namen auf Deutsch und Englisch und
    Ausschlusswörter. Punkte: exakter Name > Namensanfang > einzelnes Wort; die
    besten Paare zuerst, jede Spalte einmal. So wird `Start Date` Datum statt
@@ -389,11 +394,39 @@ Sonst gingen neu hinzugekommene Buchungen verloren.
 Der Stand vor dem Import wird gemerkt: **Spalten prüfen** in der Fußleiste stellt
 ihn wieder her und importiert mit der geänderten Zuordnung neu.
 
+### Berufsschule aus der Zeiterfassung (`schule.js`)
+
+Manche Betriebe lassen den Schultag wie jeden anderen buchen, die Fächer in der Beschreibung.
+`tageAusBuchungen()` macht einen Tag zur Berufsschule, wenn **jede** seiner Buchungen schulisch
+ist (Projekt oder Tätigkeit heißt „Berufsschule“, „Schule“, „Berufskolleg“, „BS“, „Unterricht“,
+oder die Beschreibung ist eine Fächerliste) **und** ein zweites Zeichen dazukommt: das Stichwort,
+mindestens drei Fächer oder der Schulplan (`schultagLautPlan()`).
+
+Eine **Fächerliste** (`faecherListe()`) besteht nur aus Teilen „Etikett: Thema“, getrennt durch
+Zeilenumbrüche oder durch Komma und Semikolon vor einem neuen Etikett. Das Etikett ist ein Kürzel
+(`AEUP`, `LF4`, `WiSo`), „Lernfeld 4“ oder ein ausgeschriebenes Fach aus `SCHUL_FAECHER`. So bleibt
+„Support: Drucker, Netzwerk: Switch“ ein Arbeitstag, und „AD: …, PC: …“ mit nur zwei Kürzeln auch.
+Ein Feiertag geht vor, ein Tag mit Schule und Betrieb bleibt Arbeitstag.
+
+Der Entwurf eines Schultags (`tagesEntwurf()`, `schulZeilen()`) hat je Fach eine Zeile, ohne
+Projekt davor und ohne ein „Berufsschule:“ am Anfang. Im **wöchentlichen Vordruck** hat die
+Berufsschule ein Feld je Woche: Haben mindestens zwei importierte Schultage einer Woche noch ihren
+Entwurf, kommen ihre Fächer in `wochen[montag].schule` (gleiche Fächer in eine Zeile, gleiche
+Themen einmal), und die Tage bleiben ohne Text; sie zählen unter den Themen der Woche wie in einer
+Blockwoche. Ersetzt werden nur leere Themen oder solche, die noch genau so dastehen, wie der letzte
+Import sie gebaut hätte; `schuleGeprueft` fällt nur weg, wenn sich etwas ändert. Ein einzelner
+Schultag und jeder Tag der täglichen Notierung behalten ihren Text.
+
+Beim erneuten Import gewinnt die gespeicherte Art (von Hand oder schon Berufsschule). Wer einen
+erkannten Tag selbst als Arbeitstag beschrieben hat, bekommt ihn nicht als Schultag zurück. Die KI
+lässt eine Fächerliste aus (`schulEntwurf()` in `kiTageDerWoche()`).
+
 ## Entwurf und Bereinigung
 
 ### Vom Export zum Entwurf
 
 - Jede Buchung wird eine Zeile `Projekt: Beschreibung`, chronologisch, ohne Uhrzeit.
+  An einem erkannten Berufsschultag stattdessen je Fach eine Zeile (siehe oben, `schule.js`).
 - Das Projekt steht nur davor, wenn es etwas beiträgt: nicht bei Nummern
   (`LS KW37 32600222`), nicht bei Einträgen aus **Projektnamen nicht
   voranstellen** (Vorgabe `Ausbildung, intern`), nicht wenn es schon in der
@@ -590,7 +623,7 @@ npm test
 | Datei | Prüft |
 | --- | --- |
 | `test/lokal.js` | Einzeldatei: offline, keine fremden Adressen, Bibliothek im Klartext; Import, Word, PDF, Sicherung und Beispiel ohne eine Anfrage nach draußen (mit Gegenprobe) |
-| `test/import.js` | Formate unter `test/daten/formate/`, Werte, Zeichensatz, Zuordnungsdialog, gemerkte Zuordnung, Beispiel |
+| `test/import.js` | Formate unter `test/daten/formate/`, Werte, Zeichensatz, Zuordnungsdialog, gemerkte Zuordnung, Berufsschultage aus Kimai (Komma, Zeilen, Schulplan, Zusammenführen, erneuter Import), CSV ohne Kopfzeile, Beispiel |
 | `test/vorbehandlung.js` | Bereinigung gegen `test/korpus.js`, Vorlage für das Modell |
 | `test/ki.js` | Anbindung gegen einen nachgebauten Ollama: Prompt, Warnungen, Fehler, Wochenlauf, Abbruch; Anfragen nur an das eigene Ollama |
 | `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start (Vor- und Nachname, Berufsliste und Fachrichtung), Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen |

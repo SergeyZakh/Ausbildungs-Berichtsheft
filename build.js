@@ -29,6 +29,7 @@ const JS = [
   'import/bereinigung.js',
   'import/quellen.js',
   'import/entwurf.js',
+  'import/schule.js',
   'ki/ki-vorlage.js',
   'ki/ki.js',
   'ki/ki-lauf.js',

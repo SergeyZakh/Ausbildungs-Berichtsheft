@@ -33,6 +33,9 @@ window.__csvAnalysieren = function (text) {
   return { kopf: a.kopf, felder: a.felder, reihenfolge: a.reihenfolge, profil: a.profil,
            sicher: a.sicher, gruende: a.gruende, buchungen: buchungenLesen(a).buchungen };
 };
+window.__faecherListe = faecherListe;
+window.__schultagAusBuchungen = function (datumIso, posten) { return schultagAusBuchungen(datumIso, posten); };
+window.__kiTageDerWoche = function (montagIso) { return kiTageDerWoche(montagIso).map(function (x) { return x.key; }); };
 window.__csvDekodieren = function (bytes) { return csvDekodieren(new Uint8Array(bytes).buffer); };
 window.__minutenAusZeit = minutenAusZeit;
 window.__minutenAusDauer = minutenAusDauer;

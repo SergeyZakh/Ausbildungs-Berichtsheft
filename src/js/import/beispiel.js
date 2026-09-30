@@ -19,9 +19,8 @@ function beispielLaden() {
     var feld = stammFeld(k);
     if (feld && !feld.value.trim()) feld.value = BEISPIEL_STAMM[k];
   });
+  // Den Donnerstag erkennt der Import als Berufsschule, an der Tätigkeit und am Schulplan.
   importAnwenden(csvAnalysieren(BEISPIEL_CSV), "Beispiel");
-  var schule = tage["2026-09-10"];
-  if (schule && !schule.art) { schule.art = "Berufsschule"; merkenJetzt(); }
   wocheZeigen("2026-09-07", 0);
   sage("Beispiel geladen: zwei ausgedachte Wochen. Wieder weg: ⋯ → Deine Daten → Löschen.", "gut");
 }

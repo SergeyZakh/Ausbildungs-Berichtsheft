@@ -6,7 +6,23 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
-## Unveröffentlicht
+## [0.3.0] – 2026-09-30
+
+### Neu
+
+- **Berufsschultag aus der Zeiterfassung:** Bucht der Betrieb den Schultag mit den Fächern in der
+  Beschreibung („AEUP: Datenbanken, FUIT: IPv4“ oder je Fach eine Zeile), wird der Tag
+  Berufsschule, je Fach eine Zeile im Feld „Berufsschule (Unterrichtsthemen)“. Erkannt wird das an
+  mindestens drei Fächern, am Projekt oder an der Tätigkeit „Berufsschule“ oder am Schulplan. Zwei
+  Kürzel wie „AD: …, PC: …“ allein machen noch keinen Schultag, ein Tag mit Schule und Betrieb
+  bleibt Arbeitstag. Im wöchentlichen Vordruck kommen die Fächer mehrerer Schultage einer Woche
+  zusammen in die Themen der Woche, gleiche Fächer in eine Zeile („AEUP: Datenbanken,
+  Normalisierung“). Eigene Themen und eine von Hand gewählte Art bleiben beim nächsten Import. Die
+  KI lässt eine solche Fächerliste aus.
+- **CSV ohne Kopfzeile:** Beginnt der Export gleich mit der ersten Buchung, nimmt der Import sie
+  nicht mehr als Kopfzeile. Der Dialog „Spalten zuordnen“ sagt „Die Datei hat keine Kopfzeile“ und
+  schlägt die Spalten nach ihrem Inhalt vor: Datum, Uhrzeiten, Dauer und die längste Beschreibung.
+  Die Antwort gilt beim nächsten Export mit gleich vielen Spalten.
 
 ### Geändert
 
@@ -185,6 +201,7 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
+[0.3.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/releases/tag/v0.1.0
