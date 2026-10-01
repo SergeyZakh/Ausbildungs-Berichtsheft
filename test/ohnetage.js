@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Vordruck „wöchentlich, nur die Tätigkeiten“: dasselbe Wochenblatt ohne Überschrift je Tag, wie
- * es manche Ausbilder wollen (ohneTage() in src/js/ausgabe/word.js).
+ * Wochenblatt ohne Wochentage: dasselbe Blatt ohne Überschrift je Tag, nur die Tätigkeiten
+ * untereinander, wie es manche Ausbilder wollen (ohneTage() in src/js/ausgabe/word.js). Geschaltet
+ * über dem Blatt im Reiter „Woche“; die Auswahl des Vordrucks bleibt bei wöchentlich und täglich.
  *
  * Gleiche Zeilen stehen nur einmal, freie Tage als eine Zeile am Ende, die Berufsschule ohne
  * Wochentag. Geschrieben wird weiter je Tag, auch im Blatt. Geprüft am Beispiel, Mittwoch als
@@ -11,7 +12,7 @@
  */
 const h = require('./hilfen');
 
-const { pruefe, abschluss } = h.protokoll('Vordruck ohne Wochentage: nur die Tätigkeiten der Woche');
+const { pruefe, abschluss } = h.protokoll('Wochenblatt ohne Wochentage: nur die Tätigkeiten der Woche');
 
 const TAGE = /Montag|Dienstag|Donnerstag|Freitag/;
 
@@ -41,13 +42,18 @@ const TAGE = /Montag|Dienstag|Donnerstag|Freitag/;
   const vorher = await blatt();
   pruefe('Vorgabe: Wochentage als Überschrift', vorher.koepfe >= 4 && vorher.betrieb.some((p) => p.text.startsWith('Montag')),
     vorher.koepfe + ' Köpfe');
-  await h.stammdatenOeffnen(page);
-  await h.stammReiter(page, '#f-vordruck');
-  pruefe('„Deine Daten“ bietet die Wahl ohne Wochentage an',
-    (await page.locator('#f-vordruck option[value="ohnetage"]').textContent()).includes('ohne Wochentage'));
-  await page.selectOption('#f-vordruck', 'ohnetage');
-  await page.click('#dlg-fertig');
+  const optionen = await page.$$eval('#f-vordruck option', (o) => o.map((x) => x.value));
+  pruefe('Der Vordruck bleibt wöchentlich oder täglich, ohne dritte Wahl', JSON.stringify(optionen) === '["","taeglich"]',
+    JSON.stringify(optionen));
+  const schalter = page.locator('.tageschalter');
+  pruefe('Über dem Blatt steht der Schalter „Wochentage“, an',
+    (await schalter.isVisible()) && (await schalter.textContent()).includes('Wochentage') &&
+      (await schalter.getAttribute('role')) === 'switch' && (await schalter.getAttribute('aria-checked')) === 'true');
+  await schalter.click();
   await page.waitForTimeout(900);
+  pruefe('Ein Klick schaltet ihn aus und merkt es sich',
+    (await page.getAttribute('.tageschalter', 'aria-checked')) === 'false' &&
+      (await page.evaluate((k) => { window.__merkenJetzt(); return JSON.parse(localStorage.getItem(k)).stamm.ohneTage; }, h.SPEICHER)) === 'ja');
 
   const b = await blatt();
   const texte = b.betrieb.map((p) => p.text);
@@ -125,15 +131,39 @@ const TAGE = /Montag|Dienstag|Donnerstag|Freitag/;
   await page.waitForTimeout(900);
   await zurWoche();
   await page.waitForTimeout(900);
-  pruefe('Nach dem Neuladen bleibt die Wahl', (await blatt()).koepfe === 0);
-  await h.stammdatenOeffnen(page);
-  await h.stammReiter(page, '#f-vordruck');
-  await page.selectOption('#f-vordruck', '');
-  await page.click('#dlg-fertig');
+  pruefe('Nach dem Neuladen bleibt die Wahl', (await blatt()).koepfe === 0 &&
+    (await page.getAttribute('.tageschalter', 'aria-checked')) === 'false');
+  await page.click('.tageschalter');
   await page.waitForTimeout(900);
   const zurueck = await blatt();
-  pruefe('Zurück: wieder mit Wochentagen', zurueck.koepfe >= 3 && zurueck.betrieb.some((p) => p.text.startsWith('Montag')),
-    zurueck.koepfe + ' Köpfe');
+  pruefe('Wieder an: wieder mit Wochentagen', zurueck.koepfe >= 3 && zurueck.betrieb.some((p) => p.text.startsWith('Montag')) &&
+    (await page.getAttribute('.tageschalter', 'aria-checked')) === 'true', zurueck.koepfe + ' Köpfe');
+
+  // Für kurze Zeit stand „ohne Wochentage“ als dritter Vordruck in der Auswahl. Wer es so
+  // gespeichert hat, behält es: als wöchentlichen Vordruck mit ausgeschaltetem Schalter.
+  await page.evaluate((k) => {
+    window.__merkenJetzt();
+    const st = JSON.parse(localStorage.getItem(k));
+    st.stamm.vordruck = 'ohnetage'; st.stamm.ohneTage = '';
+    localStorage.setItem(k, JSON.stringify(st));
+  }, h.SPEICHER);
+  await page.reload();
+  await page.waitForTimeout(900);
+  await zurWoche();
+  await page.waitForTimeout(900);
+  pruefe('Ein alter Stand mit „ohnetage“ wird wöchentlich ohne Wochentage',
+    (await page.inputValue('#f-vordruck')) === '' && (await blatt()).koepfe === 0 &&
+      (await page.getAttribute('.tageschalter', 'aria-checked')) === 'false');
+
+  // Beim täglichen Vordruck gibt es keine Wochentage zum Weglassen, also auch keinen Schalter.
+  await h.stammdatenOeffnen(page);
+  await h.stammReiter(page, '#f-vordruck');
+  await page.selectOption('#f-vordruck', 'taeglich');
+  await page.click('#dlg-fertig');
+  await page.waitForTimeout(900);
+  pruefe('Täglicher Vordruck: kein Schalter, das Tagesblatt wie immer',
+    !(await page.locator('.tageschalter').count()) &&
+      (await page.evaluate(() => !!document.querySelector('.vorschaubuehne .tagestabelle'))));
 
   pruefe('Keine JavaScript-Fehler', jsFehler.length === 0, jsFehler.join(' | '));
   await browser.close();

@@ -81,6 +81,8 @@ if (alt && alt.stamm) {
     // soll nach dem Neuladen nicht wieder die Vorgabe sehen.
     if (feld && typeof alt.stamm[k] === "string") feld.value = alt.stamm[k];
   });
+  // Ohne Wochentage stand für kurze Zeit als dritter Vordruck in der Auswahl.
+  if (alt.stamm.vordruck === "ohnetage") { $("f-vordruck").value = ""; $("f-ohne-tage").value = "ja"; }
   // Bis Version 1.2 stand die Vertragslaufzeit als Freitext in `zeitraum`.
   if (!$("f-ende").value && alt.stamm.zeitraum) {
     var alteDaten = String(alt.stamm.zeitraum)

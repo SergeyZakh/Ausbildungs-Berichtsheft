@@ -157,8 +157,8 @@ pt und mm des Vordrucks und bleibt davon ausgenommen.
 ```text
 stamm   Stammdaten und Einstellungen; Schlüssel = Feld-ID ohne "f-"
         (kiAdresse ↔ f-ki-adresse); schultage "Di, Mi", schulbloecke und
-        schulferien als Text; vordruck "" (wöchentlich), "ohnetage" (wöchentlich ohne
-        Wochentage) oder "taeglich"
+        schulferien als Text; vordruck "" (wöchentlich) oder "taeglich"; ohneTage "ja":
+        Wochenblatt ohne Wochentage (Schalter über dem Blatt)
 tage    "JJJJ-MM-TT" → {
           text        was im Feld steht
           art         "", Berufsschule, Urlaub, Krank, Feiertag, Betriebsversammlung
@@ -752,8 +752,13 @@ Stammdaten des Azubis mitbringt. Im Druck teilt `druckAufteilen()` eine volle Wo
 wie beim wöchentlichen Blatt; in Word wiederholt sich die Kopfzeile der Tabelle auf jeder Seite.
 Das Deckblatt nennt den Vordruck (`notierungTitel()`).
 
-**Ohne Wochentage:** `stamm.vordruck = "ohnetage"` ist das wöchentliche Blatt ohne Überschrift je
-Tag, für Ausbilder, die nur die Tätigkeiten der Woche sehen wollen. `wochenTexte(montag, s)` gibt
+**Ohne Wochentage:** `stamm.ohneTage = "ja"` (verstecktes Feld `f-ohne-tage`) ist das wöchentliche
+Blatt ohne Überschrift je Tag, für Ausbilder, die nur die Tätigkeiten der Woche sehen wollen.
+Geschaltet wird über dem Blatt im Reiter „Woche“ (Schalter „Wochentage“, `tageSchalterBauen()` in
+`wochenblatt.js`), dort, wo man die Wirkung sieht. Für kurze Zeit war es ein dritter Eintrag in der
+Auswahl des Vordrucks (`vordruck = "ohnetage"`); dort stand es neben „Täglich“, einem ganz anderen
+Vordruck, und wurde verwechselt. Ein so gespeicherter Stand wird beim Laden wöchentlich mit
+ausgeschaltetem Schalter (`start.js`); `ohneWochentage()` versteht beide. `wochenTexte(montag, s)` gibt
 dann die Einträge aus `ohneTage()` zurück: jede Zeile nur einmal (`schluessel()`, die
 Teambesprechung an jedem Morgen stünde sonst fünfmal da), freie Tage als eine Zeile am Ende
 („Urlaub am Mittwoch und Donnerstag“, `frei`, im Blatt `.sp.frei` ohne Datum), die Berufsschule
@@ -761,8 +766,8 @@ ohne Wochentag. Die Zeilen behalten ihr Datum (`data-datum`), damit man im Reite
 je Tag ins Blatt schreibt: `feldOrt()` legt das Feld eines Tages über seine Zeilen, eine Zeile, die
 schon an einem früheren Tag steht, fehlt dort. Als „ohne Text“ über dem Blatt steht nur ein Tag
 ohne Text (`fehltZeigen()`). Word nimmt dieselben Einträge, ohne Abstand zwischen den Tagen
-(`eintraege()`). Alle anderen Stellen prüfen nur auf `"taeglich"` und behandeln den Wert wie das
-wöchentliche Blatt; ältere Stände kennen ihn nicht und bleiben unverändert.
+(`eintraege()`). Beim täglichen Vordruck gibt es keinen Schalter und keine Wirkung. Ältere
+Stände ohne das Feld haben die Wochentage, wie bisher.
 
 **Kontrolle vor dem Export:** Tage mit nicht übernommenem Text oder mehr als
 Stichpunkten je Tag werden aufgelistet, ebenso nicht übernommene Themen einer Blockwoche und ein fehlendes
@@ -786,7 +791,7 @@ npm test
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
-| `test/ohnetage.js` | Wochenblatt ohne Wochentage: Wahl unter „Deine Daten“, keine Tagesköpfe, gleiche Zeilen einmal, Reihenfolge der Tage, Urlaub als Zeile am Ende, Berufsschule ohne Wochentag, Felder je Tag im Blatt und darin schreiben, kein falsches „ohne Text“, Word, Druck, volle Woche auf mehreren Blättern, Neuladen, zurück |
+| `test/ohnetage.js` | Wochenblatt ohne Wochentage: Auswahl des Vordrucks nur wöchentlich und täglich, Schalter „Wochentage“ über dem Blatt und gemerkt, keine Tagesköpfe, gleiche Zeilen einmal, Reihenfolge der Tage, Urlaub als Zeile am Ende, Berufsschule ohne Wochentag, Felder je Tag im Blatt und darin schreiben, kein falsches „ohne Text“, Word, Druck, volle Woche auf mehreren Blättern, Neuladen, wieder an, alter Stand mit „ohnetage“, kein Schalter beim täglichen Vordruck |
 | `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), die Tage als Menü hinter dem Reiter, Themen schreiben und mit „Fertig“ am Feld übernehmen, übernommen im Blatt weiter beschreibbar, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy die Themen im Blatt, groß zum Schreiben, Escape schließt ohne, „Fertig“ mit Übernahme |
 | `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone, am Handy kurz, „Wie?“ zeigt alles), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, keine Leiste darüber, Marke am offenen Tag, ins Blatt schreiben, jeder Tag ein Feld über seinen Zeilen, darin schreiben und „Fertig“, Tageskopf öffnet den Tag, Tag ohne Text über dem Blatt öffnet sich groß, schmales Fenster bleibt Blatt, Blatt scrollt bis unter die Reiter; am Handy öffnet ein Tag im Blatt sich groß von unten, daneben tippen schließt nur, „Fertig“ übernimmt |
 | `test/herkunft.js` | Zuordnung (Zeile zur Buchung, Wort aus zwei Buchungen, Füllwörter, eigene Zeilen, Endungen, Rechnernamen, zusammengefasste Zeile, Farben bei vielen Buchungen), Spiegel deckungsgleich, gleich umbrochen und mitscrollend, Plus färbt, Zeigen und Cursor, Schalter übersteht Neuladen, fertiger Tag, nichts im Blatt, am Rechner kein Einklappen, Handy und dunkel |

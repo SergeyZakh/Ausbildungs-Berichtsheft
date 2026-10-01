@@ -145,9 +145,9 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
 - **Der Vordruck** folgt dem verbreiteten IHK-Muster „Ausbildungsnachweis – wöchentliche
   Notierung“, wahlweise der täglichen Notierung. Frag bei deiner IHK nach, welchen sie verlangt.
 - **Ohne Wochentage:** Will dein Ausbilder nur die Tätigkeiten der Woche sehen, ohne „Montag“,
-  „Dienstag“ davor, stell unter **Deine Daten → Vordruck** „Wöchentlich – nur die Tätigkeiten“
-  ein. Du schreibst weiter je Tag; im Blatt steht jede Zeile einmal, freie Tage als eine Zeile am
-  Ende („Urlaub am Mittwoch“). Zurückstellen geht jederzeit.
+  „Dienstag“ davor, schalte im Reiter **Woche** über dem Blatt **Wochentage** aus. Du schreibst
+  weiter je Tag; im Blatt steht jede Zeile einmal, freie Tage als eine Zeile am Ende („Urlaub am
+  Mittwoch“). Wieder einschalten geht jederzeit.
 - **Tastatur:** `1`–`7` wählt den Tag, `8` den Reiter **Woche** (die Ziffer steht klein in der Ecke
   jedes Reiters), `Alt` + `←` / `→` blättert eine Woche zurück oder vor, `Strg` + `S` speichert das
   Wochenblatt.

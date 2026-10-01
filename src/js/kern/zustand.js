@@ -411,6 +411,7 @@ function stammdaten() {
     ausbilder: $("f-ausbilder").value, schule: $("f-schule").value,
     schultage: $("f-schultage").value, schulbloecke: $("f-schulbloecke").value,
     schulferien: $("f-schulferien").value, vordruck: $("f-vordruck").value,
+    ohneTage: $("f-ohne-tage").value,
     beginn: $("f-beginn").value, ende: $("f-ende").value,
     jahr: ausbildungsjahr({ beginn: $("f-beginn").value }, berichtsdatum()),
     geburtsort: $("f-geburtsort").value, geburtsdatum: $("f-geburtsdatum").value,
