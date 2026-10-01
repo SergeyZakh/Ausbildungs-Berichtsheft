@@ -171,6 +171,16 @@ const ENTWURF = [
   const blatt = await page.evaluate(() => window.__druckBlatt(1, '2026-09-07', { name: 'Max Muster', vordruck: '' }));
   pruefe('Ins Blatt kommt nichts vom Spiegel', blatt.includes('Lagerdrucker') && !/herkunft|hkf\d|\u200b/.test(blatt));
 
+  // Einklappen und Zeitbalken gibt es nur am Handy; am Rechner steht die Liste immer offen daneben.
+  await page.click('.sektion.posten .sektionskopf > span');
+  const rechner = await page.evaluate(() => ({
+    liste: !!document.querySelector('.postenliste').offsetParent,
+    klapp: getComputedStyle(document.querySelector('.postenklapp')).display,
+    balken: document.querySelector('.zeitbalken') ? getComputedStyle(document.querySelector('.zeitbalken')).display : 'none',
+  }));
+  pruefe('Am Rechner bleibt die Liste offen, ohne Klappknopf und Zeitbalken',
+    rechner.liste && rechner.klapp === 'none' && rechner.balken === 'none', JSON.stringify(rechner));
+
   /* ---------- Dunkel und am Handy ---------- */
   const handy = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, colorScheme: 'dark' });
   const hp = await handy.newPage();
@@ -190,7 +200,9 @@ const ENTWURF = [
   });
   pruefe('Am Handy wächst der Spiegel mit dem Feld und bricht gleich um', hs.hoehe && Math.abs(hs.zeilen) <= 3 && hs.striche > 20, JSON.stringify(hs));
   pruefe('Dunkel: hinter dem Text bleibt die dunkle Fläche', hs.grund < 40, JSON.stringify(hs));
-  // Am Handy: Antippen klappt die Buchung auf und hebt ihre Wörter hervor.
+  // Am Handy: Antippen klappt die Buchung auf und hebt ihre Wörter hervor. Die Liste selbst ist
+  // eingeklappt, solange der Tag Text hat; erst der Kopf öffnet sie.
+  await hp.locator('.sektion.posten .sektionskopf > span').first().tap();
   await hp.locator('.postenliste p').nth(1).tap();
   await hp.waitForTimeout(100);
   const getippt = await hp.evaluate(() => [...new Set([...document.querySelectorAll('.herkunft .hk.an')].map((w) => w.getAttribute('data-p')))].join(','));

@@ -16,6 +16,9 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   einer Zeile, ist ihre Buchung markiert. Zugeordnet wird je Zeile, Füllwörter zählen nicht, eigene
   Zeilen bleiben ohne Strich. Der Schalter „Herkunft“ über den Buchungen blendet die Farben aus.
   Ins Blatt kommt davon nichts.
+- **Buchungen am Handy eingeklappt:** Hat der Tag Text, steht unter ihm nur noch „Buchungen · 5 ·
+  7,75 h ▸“ statt einer langen Liste. Antippen klappt sie auf; oben zeigt dann ein Balken, wohin die
+  Zeit ging, nach Projekt. Ohne Text stehen sie offen. Auf- oder Zuklappen gilt für die Sitzung.
 
 ## [0.4.3] – 2026-10-01
 

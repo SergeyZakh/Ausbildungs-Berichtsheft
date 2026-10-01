@@ -87,7 +87,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | --- | --- |
 | `ansicht-woche.js` | Wochenbalken, Monatsraster, Navigation durch jede Kalenderwoche, nach „Fertig“ weiter zum nächsten offenen Tag (`weiterNachFertig()`) |
 | `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“, am Handy alle in einer Zeile (ein leeres Wochenende schmal, `.leerwe`); in einer Blockwoche nur der Reiter „Blockwoche“, der die Tage der Woche als Menü öffnet |
-| `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: eine Karte je Tag (`textSektion()`, im Kopf Datum, Art und Stunden aus `tagFelder()`, über dem Text das Feld des Vordrucks), Buchungen mit Plus zum Übernehmen, KI-Knopf, Startkarte ohne Woche; ein freier Tag hat nur seinen Kopf (`artSektion()`) |
+| `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: eine Karte je Tag (`textSektion()`, im Kopf Datum, Art und Stunden aus `tagFelder()`, über dem Text das Feld des Vordrucks), Buchungen mit Plus zum Übernehmen (am Handy eingeklappt, sobald der Tag Text hat, aufgeklappt mit Balken nach Projekt, `zeitBalken()`), KI-Knopf, Startkarte ohne Woche; ein freier Tag hat nur seinen Kopf (`artSektion()`) |
 | `herkunft.js` | Farbige Striche unter Wörtern aus Buchungen: Zuordnung (`herkunftFinden()`), Spiegel hinter dem Tagestext und Farbstrich in der Buchungsliste (`herkunftAnlegen()`), Schalter „Herkunft“ |
 | `wochenblatt.js` | Reiter „Woche“: das Blatt (`blattVorschau()`), in dem jedes Feld beschreibbar ist, auch der Text jedes Tages, darüber eine ruhige Zeile; am Handy öffnet ein Tipp das Feld groß (`schreibblattOeffnen()`); `seitenspalte()` nur noch beim Ausbilder |
 | `schulwoche.js` | Themen einer Blockwoche (`schulwocheFeld()`: Feld, Karte und die Knöpfe am Feld im Blatt) und die Tage der Blockwoche mit ihrer Art (`blockTageMenue()`) |
@@ -437,6 +437,15 @@ kommt. Eine Buchung, von der nichts im Text steht, hat einen blassen Strich.
 Jede Buchung mit eigener Farbe Wort für Wort unterstrich schon bei fünf Buchungen fast alles;
 deshalb die Zuordnung je Zeile und die Füllwörter.
 
+**Am Handy** stehen die Buchungen unter dem Text und waren lang zu scrollen. Hat der Tag Text,
+sind sie eingeklappt; der Kopf zeigt „Buchungen · 5 · 7,75 h ▸“ in einer Zeile (unter 360 px hat
+der Schalter „Herkunft“ nur seine Punkte), ein Tipp auf den Kopf klappt sie auf. Ohne Text stehen
+sie offen, dann braucht man sie zum Schreiben. Wer auf- oder zuklappt, behält das für die Sitzung,
+auch an den anderen Tagen (`buchungenAuf`). Aufgeklappt zeigt oben ein Balken, wohin die Zeit ging
+(`zeitBalken()`): nach Projekt, sonst Tätigkeit, größter Anteil zuerst, ab dem vierten als
+„Sonstiges“, und nur bei mindestens zwei Anteilen. Der Balken ist grau, weil Farbe hier schon die
+einzelne Buchung heißt. Am Rechner bleibt die Liste offen daneben, ohne Balken.
+
 ### Weiter nach „Fertig“ (`naechsterOffenerTag()`)
 
 „Fertig“ am Tag und bei den Themen einer Blockwoche springt zum nächsten Tag derselben Woche, der
@@ -766,8 +775,8 @@ npm test
 | `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
 | `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), die Tage als Menü hinter dem Reiter, Themen schreiben und mit „Fertig“ am Feld übernehmen, übernommen im Blatt weiter beschreibbar, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy die Themen im Blatt, groß zum Schreiben, Escape schließt ohne, „Fertig“ mit Übernahme |
 | `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone, am Handy kurz, „Wie?“ zeigt alles), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, keine Leiste darüber, Marke am offenen Tag, ins Blatt schreiben, jeder Tag ein Feld über seinen Zeilen, darin schreiben und „Fertig“, Tageskopf öffnet den Tag, Tag ohne Text über dem Blatt öffnet sich groß, schmales Fenster bleibt Blatt, Blatt scrollt bis unter die Reiter; am Handy öffnet ein Tag im Blatt sich groß von unten, daneben tippen schließt nur, „Fertig“ übernimmt |
-| `test/herkunft.js` | Zuordnung (Zeile zur Buchung, Wort aus zwei Buchungen, Füllwörter, eigene Zeilen, Endungen, Rechnernamen, zusammengefasste Zeile, Farben bei vielen Buchungen), Spiegel deckungsgleich, gleich umbrochen und mitscrollend, Plus färbt, Zeigen und Cursor, Schalter übersteht Neuladen, fertiger Tag, nichts im Blatt, Handy und dunkel |
-| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Reiter in einer Zeile, Woche als Blatt in voller Breite mit den Feldern darin, ohne Leiste und Karten, ein Tipp öffnet das Feld groß von unten, Import-Karte kurz mit Knöpfen in einer Zeile, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
+| `test/herkunft.js` | Zuordnung (Zeile zur Buchung, Wort aus zwei Buchungen, Füllwörter, eigene Zeilen, Endungen, Rechnernamen, zusammengefasste Zeile, Farben bei vielen Buchungen), Spiegel deckungsgleich, gleich umbrochen und mitscrollend, Plus färbt, Zeigen und Cursor, Schalter übersteht Neuladen, fertiger Tag, nichts im Blatt, am Rechner kein Einklappen, Handy und dunkel |
+| `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Reiter in einer Zeile, Woche als Blatt in voller Breite mit den Feldern darin, ohne Leiste und Karten, ein Tipp öffnet das Feld groß von unten, Buchungen mit Text eingeklappt (Zahl und Stunden in einer Zeile), aufgeklappt mit Zeitbalken, Wahl gilt für die Sitzung, ohne Text offen, Import-Karte kurz mit Knöpfen in einer Zeile, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich |
 
 Die Tests der zweiten Betriebsart (`server/test/testen.sh` und `server/test/betrieb.sh`, beide
 mit Docker) stehen in [SERVER.md, Abschnitt Tests](SERVER.md#tests).

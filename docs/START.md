@@ -137,6 +137,8 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
 - **Woher kommt welches Wort?** Jede Buchung hat einen Farbstrich, und Wörter im Text aus ihr sind
   in derselben Farbe unterstrichen. Zeig auf eine Buchung (am Handy: antippen), dann leuchten ihre
   Wörter. Eigene Zeilen bleiben ohne Strich. „Herkunft“ über den Buchungen schaltet die Farben ab.
+- **Buchungen am Handy** sind eingeklappt, sobald der Tag Text hat; der Kopf zeigt Zahl und
+  Stunden. Antippen klappt sie auf, oben steht dann, wohin die Zeit ging.
 - **Feiertage** werden bundesweit erkannt, mit deinem Bundesland auch die des Landes. Was nur in
   einzelnen Gemeinden gilt, etwa Mariä Himmelfahrt in Teilen Bayerns, trägst du als Art des Tages
   ein. Ein Feiertag ohne Eintrag zählt nicht als Lücke.

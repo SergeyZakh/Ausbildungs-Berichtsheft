@@ -407,22 +407,52 @@ function kiKnopf(key, t) {
  * Kundennamen und Ticketnummern abzutippen. Steht die Zeile schon im Text, fällt das Plus weg:
  * Ein Haken an jeder Buchung sah nach „erledigt“ aus und machte die Liste unruhig.
  * Welche Wörter im Text aus welcher Buchung kommen, zeigen farbige Striche (herkunft.js).
+ *
+ * Am Handy steht die Liste unter dem Text und war lang zu scrollen. Dort ist sie eingeklappt, sobald
+ * der Tag Text hat, und zeigt im Kopf nur Zahl und Stunden; aufgeklappt steht oben ein Balken, wohin
+ * die Zeit ging (zeitBalken). Ist der Text leer, steht sie offen: Dann braucht man sie zum Schreiben.
+ * Wer auf- oder zuklappt, behält das für die Sitzung (buchungenAuf), auch an den anderen Tagen.
  */
 function postenSektion(posten, ta) {
   var s = sektion("Buchungen", "posten");
+  var minuten = posten.reduce(function (n, p) { return n + postenMinuten(p); }, 0);
   var zahl = document.createElement("span");
   zahl.className = "postenzahl";
-  zahl.textContent = posten.length === 1 ? "1 Posten" : posten.length + " Posten";
+  zahl.innerHTML = '<span class="lang">' + (posten.length === 1 ? "1 Posten" : posten.length + " Posten") +
+    '</span><span class="kurz">' + posten.length + "</span>" +
+    (minuten ? " · " + stundenText(minuten / 60) + "\u00a0h" : "");
   // Schaltet die farbigen Striche (herkunft.js) für diesen Browser an und aus.
   var schalter = null;
   if (ta) {
     schalter = document.createElement("button");
     schalter.type = "button";
     schalter.className = "herkunftknopf";
-    schalter.innerHTML = '<span class="hkpunkte" aria-hidden="true"><i></i><i></i><i></i></span>Herkunft';
+    schalter.innerHTML = '<span class="hkpunkte" aria-hidden="true"><i></i><i></i><i></i></span><span class="hktext">Herkunft</span>';
+    schalter.setAttribute("aria-label", "Herkunft");
     s.kopf.appendChild(schalter);
   }
   s.kopf.appendChild(zahl);
+
+  var klapp = document.createElement("button");
+  klapp.type = "button";
+  klapp.className = "postenklapp";
+  s.kopf.appendChild(klapp);
+  function zuklappen(zu) {
+    s.wurzel.classList.toggle("zu", zu);
+    klapp.setAttribute("aria-expanded", String(!zu));
+    klapp.setAttribute("aria-label", zu ? "Buchungen aufklappen" : "Buchungen einklappen");
+  }
+  zuklappen(buchungenAuf == null ? !!(ta && ta.value.trim()) : !buchungenAuf);
+  // Der ganze Kopf klappt, nur der Schalter „Herkunft“ nicht. Am Rechner ist der Knopf verborgen
+  // und die Klasse wirkungslos.
+  s.kopf.addEventListener("click", function (e) {
+    if (e.target.closest(".herkunftknopf") || getComputedStyle(klapp).display === "none") return;
+    buchungenAuf = s.wurzel.classList.contains("zu");
+    zuklappen(!buchungenAuf);
+  });
+
+  var balken = zeitBalken(posten);
+  if (balken) s.leib.appendChild(balken);
 
   var liste = document.createElement("div");
   liste.className = "postenliste";
@@ -483,6 +513,64 @@ function postenSektion(posten, ta) {
   postenAbgleichen();
   if (ta) herkunftAnlegen(ta, posten, liste, schalter);
   return s.wurzel;
+}
+
+/** Am Handy: Buchungen aufgeklappt (true), zugeklappt (false) oder nach dem Text des Tages (null). */
+var buchungenAuf = null;
+
+/** Minuten einer Buchung: die Dauer, sonst die Spanne. */
+function postenMinuten(p) {
+  if (p.dauer) return p.dauer;
+  if (p.von != null && p.bis != null) return p.bis >= p.von ? p.bis - p.von : p.bis + 1440 - p.von;
+  return 0;
+}
+
+/**
+ * Wohin die Zeit des Tages ging, nach Projekt (sonst Tätigkeit), größter Anteil zuerst: ein Balken
+ * in Grau mit Legende. Grau, weil Farbe hier schon die einzelne Buchung heißt (herkunft.js). Mehr
+ * als vier Anteile werden ab dem vierten zu „Sonstiges“. Nur bei mindestens zwei Anteilen.
+ */
+function zeitBalken(posten) {
+  var anteile = [], gesamt = 0;
+  posten.forEach(function (p) {
+    var min = postenMinuten(p);
+    if (!min) return;
+    var name = projektTaugt(p.projekt) ? String(p.projekt).trim()
+      : (p.taetigkeit && !istMuell(p.taetigkeit) ? String(p.taetigkeit).trim() : "Sonstiges");
+    var a = anteile.filter(function (x) { return schluessel(x.name) === schluessel(name); })[0];
+    if (!a) anteile.push(a = { name: name, min: 0 });
+    a.min += min;
+    gesamt += min;
+  });
+  if (anteile.length < 2) return null;
+  anteile.sort(function (a, b) { return b.min - a.min; });
+  if (anteile.length > 4) {
+    var rest = anteile.splice(3);
+    anteile.push({ name: "Sonstiges", min: rest.reduce(function (n, x) { return n + x.min; }, 0) });
+  }
+  var box = document.createElement("div");
+  box.className = "zeitbalken";
+  var leiste = document.createElement("div");
+  leiste.className = "zbleiste";
+  leiste.setAttribute("role", "img");
+  var legende = document.createElement("p");
+  legende.className = "zblegende";
+  anteile.forEach(function (a, i) {
+    var teil = document.createElement("span");
+    teil.className = "zb" + i;
+    teil.style.width = (a.min / gesamt * 100) + "%";
+    leiste.appendChild(teil);
+    var eintrag = document.createElement("span");
+    eintrag.className = "zb" + i;
+    eintrag.textContent = a.name + " " + stundenText(a.min / 60) + "\u00a0h";
+    legende.appendChild(eintrag);
+  });
+  leiste.setAttribute("aria-label", "Zeit nach Projekt: " + anteile.map(function (a) {
+    return a.name + " " + stundenText(a.min / 60) + " Stunden";
+  }).join(", "));
+  box.appendChild(leiste);
+  box.appendChild(legende);
+  return box;
 }
 
 /** Steht diese Zeile schon im Text? Groß- und Kleinschreibung und Satzzeichen zählen nicht. */
