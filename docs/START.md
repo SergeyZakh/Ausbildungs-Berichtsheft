@@ -81,7 +81,9 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
    hinein, in jedes Feld: Abteilung, Unterweisungen, in einer Blockwoche die Themen der
    Berufsschule und den Text jedes Tages. Solange ein Tag offen ist, steht beim Schreiben **Fertig**
    darunter. Ein Klick auf den Namen eines Tages im Blatt („Montag“, „Dienstag“ …) öffnet den ganzen
-   Tag. Am Handy tippst du ein Feld an, dann fährt von unten ein großes Schreibfeld hoch. Was über alle Wochen
+   Tag. Am Handy tippst du ein Feld an, dann fährt von unten ein großes Schreibfeld hoch. Die
+   Tage stehen dort als Kalenderleiste: Der Kreis um das Datum ist rot, solange du gegenlesen
+   musst, grün, wenn der Tag fertig ist, und ausgefüllt, wenn du ihn gerade offen hast. Was über alle Wochen
    noch fehlt, zeigt **⋯ → Übersicht aller Wochen**.
 
    ![Wochenansicht: das Blatt zum Hineinschreiben](bilder/woche.png)
@@ -148,9 +150,12 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
   „Dienstag“ davor, schalte im Reiter **Woche** über dem Blatt **Wochentage** aus. Du schreibst
   weiter je Tag; im Blatt steht jede Zeile einmal, freie Tage als eine Zeile am Ende („Urlaub am
   Mittwoch“). Wieder einschalten geht jederzeit.
+- **Zen-Modus:** Der Knopf mit den vier Ecken neben hell/dunkel blendet alles aus außer dem, woran
+  du schreibst: am Tag nur die Karte mit **Fertig**, in der Woche nur das Blatt. Beenden mit
+  demselben Knopf oben rechts oder mit `Esc`.
 - **Tastatur:** `1`–`7` wählt den Tag, `8` den Reiter **Woche** (die Ziffer steht klein in der Ecke
   jedes Reiters), `Alt` + `←` / `→` blättert eine Woche zurück oder vor, `Strg` + `S` speichert das
-  Wochenblatt.
+  Wochenblatt, `Esc` beendet den Zen-Modus. Die Tasten gehen auch im Zen-Modus.
 
 ### KI dazu (optional)
 

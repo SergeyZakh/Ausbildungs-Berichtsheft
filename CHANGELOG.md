@@ -15,6 +15,18 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   mehr, nur die Stichpunkte der Woche. Gleiche Zeilen stehen einmal da, freie Tage als eine
   Zeile am Ende („Urlaub am Mittwoch“), die Berufsschule ohne Wochentag. Geschrieben wird weiter je
   Tag, auch direkt im Blatt.
+- **Zen-Modus:** Ein Knopf neben hell/dunkel blendet alles aus außer dem, woran man schreibt: am
+  Tag nur die Karte mit „Fertig“, in der Woche nur das Blatt. Die Tasten 1–8 und Alt+←/→ gehen
+  weiter; Esc oder derselbe Knopf oben rechts beendet ihn.
+
+### Geändert
+
+- **Tage am Handy als Kalenderleiste:** Jeder Tag ist gleich breit, über dem Datum im Kreis steht
+  das Kürzel. Die Farbe des Kreises zeigt den Stand (rot gegenlesen, grün fertig), der gewählte Tag
+  ist ausgefüllt, „Woche“ steht als eigener Knopf daneben. Vorher war ein leeres Wochenende
+  schmaler und sprang angetippt auf volle Breite.
+- Am Handy heißt der Knopf „Exportieren“ jetzt „Export“, damit neben dem Zen-Knopf die Kopfleiste
+  in zwei Zeilen bleibt.
 
 ## [0.5.0] – 2026-10-01
 

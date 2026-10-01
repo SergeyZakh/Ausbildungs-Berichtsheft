@@ -43,7 +43,7 @@ einfach selbst.
 ![Tagesansicht: links der Entwurf aus den Buchungen, rechts die Buchungen selbst](docs/bilder/tag.png)
 
 1. **Die Woche als Reiter** – Montag bis Sonntag, die Farbe zeigt, was noch fehlt oder nicht
-   gegengelesen ist.
+   gegengelesen ist. Am Handy eine Kalenderleiste mit farbigem Kreis je Tag.
 2. **Art des Tages und Stunden** – Arbeitstag, Berufsschule, Urlaub, Krank, Feiertag.
 3. **Dein Text** – hier steht der Entwurf aus den Buchungen, den du überschreibst.
 4. **Fertig** – erst dann zählt der Tag als gegengelesen, rot wird grün.
@@ -68,6 +68,8 @@ einfach selbst.
   Schalter über dem Wochenblatt lässt die Wochentage weg, dann stehen nur die Tätigkeiten da. In der
   Wochenansicht schreibst du in jedes Feld direkt ins Blatt, wie es gedruckt wird; am Handy öffnet
   ein Tipp das Feld groß.
+- **Zen-Modus:** Ein Knopf neben hell/dunkel blendet alles aus außer der Karte, an der du
+  schreibst, oder dem Blatt; `Esc` holt alles zurück.
 - **Übersicht aller Wochen** wie die Aktivität bei GitHub: jeder Werktag ein Feld, grün fertig,
   rot offen, dazu Schul-, Urlaubs- und Krankheitstage je Ausbildungsjahr.
 - **Optional mit eigenem Sprachmodell:** [Ollama](https://ollama.com) fasst den Tag in so vielen

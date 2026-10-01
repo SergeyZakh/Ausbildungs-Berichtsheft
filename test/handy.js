@@ -198,12 +198,37 @@ async function durchgang(browser, breite) {
   // Und auch bei 320 px bleibt es bei zwei Zeilen: Summe und Knöpfe, darunter die Woche.
   const kopf = await page.evaluate(() => {
     const r = (s) => document.querySelector(s).getBoundingClientRect();
-    return { summeRechts: r('#wochensumme').right, knopfLinks: r('#btn-farbe').left,
-      summeOben: r('#wochensumme').top, knopfOben: r('#btn-farbe').top, hoehe: r('.leiste').height };
+    return { summeRechts: r('#wochensumme').right, knopfLinks: r('#btn-zen').left,
+      summeOben: r('#wochensumme').top, knopfOben: r('#btn-zen').top, hoehe: r('.leiste').height };
   });
   pruefe('Kopfleiste: keine Lücke zwischen Summe und Knöpfen' + bei,
     kopf.knopfLinks - kopf.summeRechts <= 10 && Math.abs(kopf.summeOben - kopf.knopfOben) < 2, JSON.stringify(kopf));
   pruefe('Kopfleiste: zwei Zeilen' + bei, kopf.hoehe < 110, kopf.hoehe + ' px');
+  // Kalenderleiste: Jeder Tag gleich breit, auch ein leeres Wochenende, und angetippt springt nichts.
+  // Vorher war es schmaler und wurde gewählt breit. Der Stand steht in der Farbe des Kreises.
+  const kalender = async () => page.evaluate(() => {
+    const tage = [...document.querySelectorAll('#reiter .tagreiter')];
+    const farbe = (k) => getComputedStyle(k.querySelector('.rzahl')).backgroundColor;
+    return { breiten: tage.map((k) => Math.round(k.getBoundingClientRect().width * 10) / 10),
+      kreise: tage.map((k) => Math.round(k.querySelector('.rzahl').getBoundingClientRect().width)),
+      zahlen: tage.map((k) => k.querySelector('.rzahl').textContent).join(' '),
+      leer: farbe(tage[6]), pruefen: farbe(tage[4]), gewaehlt: farbe(tage.find((k) => k.getAttribute('aria-selected') === 'true')),
+      name: tage[0].getAttribute('aria-label') };
+  });
+  const k1 = await kalender();
+  await page.locator('#reiter .tagreiter').nth(5).click();
+  await page.waitForTimeout(200);
+  const k2 = await kalender();
+  await page.locator('#reiter .tagreiter').nth(0).click();
+  await page.waitForTimeout(200);
+  pruefe('Kalenderleiste: alle Tage gleich breit, gewählt oder nicht' + bei,
+    new Set(k1.breiten.concat(k2.breiten)).size === 1 && new Set(k1.kreise).size === 1 && k1.zahlen === '7 8 9 10 11 12 13',
+    JSON.stringify([k1.breiten, k2.breiten, k1.zahlen]));
+  pruefe('Kalenderleiste: Kreis rot zum Gegenlesen, leer ohne Farbe, gewählt ausgefüllt' + bei,
+    k1.leer === 'rgba(0, 0, 0, 0)' && k1.pruefen !== k1.leer && k1.gewaehlt !== k1.pruefen && k2.gewaehlt !== k1.leer,
+    JSON.stringify(k1) + ' ' + k2.gewaehlt);
+  pruefe('Kalenderleiste: Vorleser hören Tag, Stand und Stunden' + bei,
+    k1.name === 'Montag, 07.09., Entwurf: noch unverändert aus dem Import, 7,75 h', k1.name);
   // Tippen lässt das Feld mitwachsen, statt den Text in einen Scrollbalken zu schieben.
   await page.locator('.tagpanel textarea').first().press('End');
   await page.keyboard.type('\nNoch eine Zeile\nUnd noch eine\nUnd eine dritte');
@@ -264,9 +289,10 @@ async function durchgang(browser, breite) {
   // Die ganze Woche in einer Zeile; die Woche stand vorher breit in einer zweiten.
   const zeile = await page.evaluate(() => {
     const k = [...document.querySelectorAll('#reiter button')].map((b) => b.getBoundingClientRect());
-    return { tops: [...new Set(k.map((r) => Math.round(r.top)))], hoehe: Math.round(Math.max(...k.map((r) => r.bottom)) - Math.min(...k.map((r) => r.top))) };
+    return { eineZeile: Math.max(...k.map((r) => r.top)) < Math.min(...k.map((r) => r.bottom)),
+      hoehe: Math.round(Math.max(...k.map((r) => r.bottom)) - Math.min(...k.map((r) => r.top))) };
   });
-  pruefe('Woche: alle Reiter in einer Zeile' + bei, zeile.tops.length === 1 && zeile.hoehe < 70, JSON.stringify(zeile));
+  pruefe('Woche: alle Reiter in einer Zeile' + bei, zeile.eineZeile && zeile.hoehe < 70, JSON.stringify(zeile));
   // Die Bühne umschließt das verkleinerte Blatt; war sie so hoch wie die Desktop-Spalte breit,
   // blieb darunter eine große leere Fläche.
   const leer = await page.evaluate(() => {

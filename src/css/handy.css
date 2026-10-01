@@ -39,32 +39,66 @@
   .wochenknopf { flex: 1 1 auto; padding: 0 var(--luft-3); height: 34px; line-height: 32px; font-size: var(--schrift-klein); }
   .wochensumme { height: 34px; padding: 0 var(--luft-3) 0 var(--luft-2); gap: var(--luft-2); font-size: var(--schrift-klein); }
   .leiste .schub .farbknopf { width: 34px; height: 34px; }
+  /* Zen-Modus: Der Knopf steht allein in einer Zeile über der Karte, nicht über ihr. */
+  body.zen .leiste { position: static; padding: var(--luft-3) var(--luft-3) 0; background: none; box-shadow: none; }
+  body.zen .zenknopf { box-shadow: none; }
+  body.zen #tagbereich > .tagpanel { padding: var(--luft-3) var(--luft-3) var(--luft-4); }
   .wsanteil { gap: var(--luft-1); }
   .wochensumme .ring { width: 18px; height: 18px; --dicke: 3px; }
 
-  /* Reihe 3: die ganze Woche in einer Zeile. Neben der Marke eines Tages steht kein Text, Art und
-     Stunden nennt der Tageskopf darunter: Mit Stunden in den Reitern lagen Reiter und Tageskopf
-     zusammen rund 230 px über dem Schreibfeld, mit offener Tastatur blieb davon kaum etwas zum
-     Schreiben. Die Woche stand lange breit in einer zweiten Reihe; die kostete nur Höhe. Ein leeres
-     Wochenende wird schmal und bleibt doch antippbar, wer samstags arbeitet, findet es. */
-  /* Oben Abstand zur Kopfleiste: Ohne ihn saßen die Reiter auf deren Trennlinie, und ihr oberer
-     Rand samt Rundung wurde abgeschnitten. */
+  /* Reihe 3: die Woche als Kalenderleiste. Jeder Tag gleich breit, oben das Kürzel, darunter der
+     Tag des Monats im Kreis; dessen Farbe ist der Stand: rot gegenlesen, grün fertig, ein Ring fehlt
+     noch Text, blass frei oder leeres Wochenende. Der gewählte Tag ist ausgefüllt. Vorher standen
+     die Tage als Kästchen mit Marken da, ein leeres Wochenende schmaler, und angetippt sprang es auf
+     volle Breite. Die Woche ist eine eigene Pille rechts. Art und Stunden nennt der Tageskopf.
+     Oben Abstand zur Kopfleiste: Ohne ihn saßen die Reiter auf deren Trennlinie. */
   .reiter { overflow: visible; flex-wrap: nowrap; gap: var(--luft-1); padding: var(--luft-3); }
-  .reiter button { flex: 1 1 0; min-width: 0; padding: var(--luft-2) 1px; gap: var(--luft-1); border-radius: var(--rund-klein); overflow: hidden; }
-  .reiter button.leerwe:not([aria-selected="true"]) { flex-grow: .7; color: var(--blass); }
-  .reiter button.wochenreiter { flex-grow: 1.6; }
-  .reiter button.wochenreiter .rtag { letter-spacing: 0; }
+  .reiter:not(.block) { gap: 0; padding: var(--luft-3) var(--luft-3) var(--luft-2); }
+  /* Mit der Kennung, damit die Farben der Kästchen am Rechner (leiste.css) hier nicht greifen. */
+  #reiter .tagreiter {
+    position: relative; flex: 1 1 0; min-width: 0; padding: 0 0 var(--luft-1); gap: 0;
+    background: none; border: 0; border-radius: var(--rund-klein); box-shadow: none; color: var(--schiefer);
+  }
+  #reiter .tagreiter .rtag { flex-direction: column; align-items: center; gap: var(--luft-1); font-size: var(--schrift-fein); }
+  #reiter .tagreiter[aria-selected="true"] .rkurz { color: var(--text); }
+  #reiter .tagreiter .rzahl {
+    position: relative; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+    font-size: var(--schrift-gross); font-weight: 600; letter-spacing: 0; color: var(--text);
+    transition: background-color .15s, color .15s, transform .1s;
+  }
+  #reiter .tagreiter:active .rzahl { transform: scale(.92); }
+  #reiter .tagreiter.leerwe .rzahl, #reiter .tagreiter.frei .rzahl { color: var(--blass); }
+  #reiter .tagreiter.fehlt .rzahl { box-shadow: inset 0 0 0 1.5px var(--linie-fest); }
+  #reiter .tagreiter.pruefen .rzahl { background: var(--acht-hell); color: var(--acht); }
+  #reiter .tagreiter.fertig .rzahl { background: var(--gut-hell); color: var(--gut); }
+  #reiter .tagreiter[aria-selected="true"] .rzahl { background: var(--gewaehlt-grau); color: #fff; box-shadow: none; }
+  #reiter .tagreiter.pruefen[aria-selected="true"] .rzahl { background: var(--acht); }
+  #reiter .tagreiter.fertig[aria-selected="true"] .rzahl { background: var(--gut); }
+  /* Das Sprachmodell kürzt diesen Tag: ein Ring dreht sich um den Kreis. */
+  #reiter .tagreiter.laeuft .rzahl::after {
+    content: ""; position: absolute; inset: -3px; border-radius: 50%;
+    border: 2px solid var(--schiefer); border-right-color: transparent; animation: dreh .8s linear infinite;
+  }
+  /* Marke und Stunden nennt hier der Name des Reiters (tagReiter() in reiter.js). */
+  #reiter .tagreiter .rlage { display: none; }
+  #reiter .wochenreiter {
+    flex: none; min-width: 0; flex-direction: row; align-items: center; align-self: flex-end; gap: var(--luft-2);
+    height: 34px; margin: 0 0 var(--luft-1) var(--luft-2); padding: 0 var(--luft-3);
+    border-radius: var(--rund-voll); box-shadow: none;
+  }
+  #reiter .wochenreiter .rtag { font-size: var(--schrift-fein); }
+  #reiter .wochenreiter .rlage { gap: var(--luft-1); }
+  #reiter .wochenreiter .rtext { display: none; }
   /* Die Blockwoche hat nur ihren einen Reiter: Beschriftung und Stand in einer Zeile. */
   .reiter.block button {
     flex: 1 1 100%; flex-direction: row; align-items: center; justify-content: center;
-    gap: var(--luft-3); padding: var(--luft-2) var(--luft-3);
+    gap: var(--luft-3); padding: var(--luft-2) var(--luft-3); min-width: 0; border-radius: var(--rund-klein); overflow: hidden;
   }
   .reiter .rdatum { display: none; }
   .reiter.block .blocktagemenue { top: calc(100% - var(--luft-3) + 6px); left: var(--luft-3); right: var(--luft-3); width: auto; min-width: 0; }
-  .reiter .rtag { font-size: var(--schrift-klein); letter-spacing: var(--sperrung); }
-  .reiter .rlage { font-size: var(--schrift-fein); gap: var(--luft-1); max-width: 100%; min-height: 16px; overflow: hidden; }
-  .reiter .rtext { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-  .reiter:not(.block) button .rlage:not(.ohnemarke) .rtext { display: none; }
+  .reiter.block .rtag { font-size: var(--schrift-klein); letter-spacing: var(--sperrung); }
+  .reiter.block .rlage { font-size: var(--schrift-fein); gap: var(--luft-1); max-width: 100%; overflow: hidden; }
+  .reiter.block .rtext { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
   /* Tageskopf in einer Zeile: Datum, Art, Stunden. Die Beschriftungen stehen nur noch für
      Vorleser da, Auswahl und Stundenzahl sprechen für sich. Reicht die Breite nicht, rutschen
@@ -282,12 +316,25 @@
   .blattleiste button { flex: 1 1 auto; min-width: 30%; padding: var(--luft-2); font-size: var(--schrift-klein); }
 }
 
-/* Ganz schmal (320 px) passen neben vier Knöpfe nur Ring und Anteil; die Stunden stehen im Tageskopf.
+/* Neben fünf Knöpfen (Zen, hell/dunkel, Export, Menü) reicht am Handy „Export“; mit „Exportieren“
+   brach die Kopfleiste auf drei Zeilen um. Vorleser hören dann ebenfalls „Export“. */
+@media (max-width: 440px) {
+  #btn-export .endung { display: none; }
+}
+@media (max-width: 380px) {
+  .wochensumme .wswort { display: none; }
+}
+
+/* Ganz schmal (320 px) passen neben fünf Knöpfe nur Ring und Anteil; die Stunden stehen im Tageskopf.
    Sonst brach die Kopfleiste auf drei Zeilen um. */
 @media (max-width: 360px) {
   .wochensumme .wswort, .wochensumme .wsstunden { display: none; }
   /* Sonst bricht der Kopf der Buchungen um; die Punkte allein sagen genug, aria-label bleibt. */
   .herkunftknopf .hktext { display: none; }
+  /* Sieben Kreise und die Woche in einer Zeile: Bei 320 px sind sie etwas kleiner. */
+  #reiter .tagreiter .rzahl { width: 28px; height: 28px; font-size: var(--schrift-text); }
+  #reiter .wochenreiter { height: 28px; gap: var(--luft-1); margin-left: var(--luft-1); padding: 0 var(--luft-2); }
+  #reiter .wochenreiter .rtag { letter-spacing: 0; }
 }
 
 @media (max-width: 620px) {

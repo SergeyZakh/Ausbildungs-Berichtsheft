@@ -485,7 +485,8 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   position: absolute; box-sizing: border-box; margin: 0; border: 0; overflow: hidden; pointer-events: none;
   white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; color: transparent;
 }
-.herkunftrahmen.aus .herkunft { display: none; }
+/* Im Zen-Modus fehlen die Buchungen, auf die die Farben zeigen; dann nur der Text. */
+.herkunftrahmen.aus .herkunft, body.zen .herkunft { display: none; }
 .herkunft .hk {
   text-decoration: underline 2px var(--hk); text-underline-offset: 4px; text-decoration-skip-ink: none;
   border-radius: 3px; transition: background-color .15s, text-decoration-color .15s;

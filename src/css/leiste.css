@@ -32,6 +32,28 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
   :root:not([data-farbe="hell"]) .farbknopf .sonne { display: block; }
 }
 
+/* ---------- Zen-Modus (zen.js) ----------
+   Übrig bleiben die Tageskarte oder das Blatt und dieser Knopf, oben rechts über allem. Nicht
+   ausgeblendet wird eine Warnung in der Fußleiste: Die muss man sehen. */
+.zenknopf { width: 34px; height: 34px; }
+.zenknopf svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.zenknopf .zen-aus, body.zen .zenknopf .zen-an { display: none; }
+body.zen .zenknopf .zen-aus { display: block; }
+body.ohnewoche .zenknopf { display: none; }
+body.zen .leiste {
+  position: fixed; top: var(--luft-4); right: var(--luft-5); z-index: 30;
+  padding: 0; background: none; box-shadow: none;
+}
+body.zen .leiste > :not(.schub), body.zen .leiste .schub > :not(.zenknopf) { display: none; }
+body.zen .zenknopf { box-shadow: var(--schatten); }
+body.zen .reiter, body.zen .hinweise, body.zen .sektion.posten, body.zen .blattzeile, body.zen .wochenfeldhinweis,
+body.zen .fussleiste:not(.warn), body.zen .fussleiste .signatur { display: none; }
+/* Die Karte mittig und lesbar breit; links und rechts Platz, damit der Knopf nichts verdeckt. */
+body.zen #tagbereich { margin-top: 0; }
+body.zen #tagbereich > .tagpanel { padding: var(--luft-5) 72px; }
+body.zen .tagflaeche:not(.blattwoche) { width: 100%; max-width: 880px; margin: 0 auto; }
+body.zen .tagpanel.frei { width: 100%; max-width: 880px; margin: 0 auto; }
+
 .menuehalter { position: relative; display: flex; }
 .menue {
   position: absolute; top: calc(100% + 6px); right: 0; z-index: 40;
@@ -182,6 +204,8 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
   display: flex; align-items: center; justify-content: center; gap: var(--luft-2);
   font-size: var(--schrift-klein); white-space: nowrap;
 }
+/* Der Tag des Monats im Kreis ist die Kalenderleiste am Handy (handy.css); hier steht das Datum. */
+.reiter .rzahl { display: none; }
 
 /* Marken im Reiter, alle rund:
    hohler Ring = kein Text, Buchstabe = ungelesen, Haken = fertig. */
