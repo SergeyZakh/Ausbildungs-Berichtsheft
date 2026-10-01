@@ -43,14 +43,17 @@ document.addEventListener("click", function () {
 });
 
 /* Tastatur:
-     Escape         Menü und Wochenwahl schließen
+     Escape         Menü und Wochenwahl schließen, sonst den Zen-Modus beenden
      Strg/Cmd+S     Wochenblatt speichern
      Alt+← / Alt+→  ältere / neuere Woche (auch aus dem Textfeld)
      1–7            Tag wählen, 8 oder W: Wochenreiter (nicht beim Tippen) */
 document.addEventListener("keydown", function (e) {
   if (e.key === "Escape") {
+    // Ein offenes Fenster schließt Esc selbst; erst danach beendet es den Zen-Modus (zen.js).
+    var zenAus = zenAn() && !wochenwahlOffen() && !document.querySelector("dialog[open]");
     menueSchliessen();
     if (wochenwahlOffen()) wochenwahlSchliessen();
+    if (zenAus) zenSetzen(false);
     return;
   }
   var imFeld = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || "").toUpperCase());

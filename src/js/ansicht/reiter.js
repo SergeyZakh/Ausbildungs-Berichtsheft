@@ -6,6 +6,7 @@ function zeichnen() {
   // Ohne Woche gibt es nichts zu blättern und nichts zu exportieren: Kopfleiste und Startkarte
   // werden ruhiger (tag.css, leiste.css).
   document.body.classList.toggle("ohnewoche", !aktiveWoche);
+  if (!aktiveWoche && zenAn()) zenSetzen(false);
   zeichneWochenwahl();
   zeichneReiter();
   zeichneTag();
@@ -104,29 +105,39 @@ function tagReiter(montag, i) {
   tasteZeigen(b, String(i + 1));
 
   var stand = tagStand(t);
-  var klassen = [];
-  // Ein leeres Wochenende wird am Handy schmal (handy.css): Die ganze Woche passt so in eine Zeile.
+  var klassen = ["tagreiter"];
+  // Am Handy steht ein leeres Wochenende und ein freier Tag nur blass in der Kalenderleiste (handy.css).
   if (i > 4 && !tagHatInhalt(t)) klassen.push("leerwe");
+  if (frei) klassen.push("frei");
   if (laeuftHier) klassen.push("laeuft");
   if (!frei && stand === "fertig") klassen.push("fertig");
   else if (stand !== "fertig" && stand !== "leer") klassen.push("pruefen");
+  else if (fehlt) klassen.push("fehlt");
   b.className = klassen.join(" ");
 
-  var marke = "";
-  if (laeuftHier) marke = '<span class="dreht" title="wird gekürzt"></span>';
-  else if (stand === "ki") marke = '<span class="marke" title="vom Sprachmodell formuliert — bitte gegenlesen">KI</span>';
-  else if (stand === "roh") marke = '<span class="marke" title="Entwurf: noch unverändert aus dem Import">E</span>';
-  else if (stand === "eigen") marke = '<span class="marke" title="selbst geschrieben, aber noch nicht als fertig markiert">!</span>';
-  else if (stand === "fertig" && !frei) marke = '<span class="haken" title="gegengelesen">✓</span>';
-  else if (fehlt) marke = '<span class="punkt" title="noch kein Text"></span>';
+  var standText = laeuftHier ? "wird gekürzt"
+    : stand === "ki" ? "vom Sprachmodell formuliert — bitte gegenlesen"
+    : stand === "roh" ? "Entwurf: noch unverändert aus dem Import"
+    : stand === "eigen" ? "selbst geschrieben, aber noch nicht als fertig markiert"
+    : stand === "fertig" && !frei ? "gegengelesen"
+    : fehlt ? "noch kein Text" : "";
+  var titel = ' title="' + standText + '"';
+  var marke = !standText ? ""
+    : laeuftHier ? '<span class="dreht"' + titel + "></span>"
+    : stand === "fertig" ? '<span class="haken"' + titel + ">✓</span>"
+    : fehlt ? '<span class="punkt"' + titel + "></span>"
+    : '<span class="marke"' + titel + ">" + { ki: "KI", roh: "E", eigen: "!" }[stand] + "</span>";
+  var lage = frei ? art : t && t.stunden ? stundenText(t.stunden) + "\u2009h" : schule ? "Schule" : "";
 
-  // Am Handy bleibt neben einer Marke kein Platz für den Text (handy.css); ohne Marke steht er da.
+  // Am Rechner Datum, Marke und Stunden; am Handy nur der Tag des Monats im Kreis, dessen Farbe den
+  // Stand zeigt (rzahl, handy.css). Was man dort nicht sieht, sagt Vorlesern der Name des Reiters.
+  b.setAttribute("aria-label", WOCHENTAGE[datum.getDay()] + ", " + dm(datum) +
+    (standText ? ", " + standText : "") + (lage ? ", " + lage.replace("\u2009", " ") : ""));
   b.innerHTML =
     '<span class="rtag"><span class="rkurz">' + KURZ[datum.getDay()].toUpperCase() +
-    '</span><span class="rdatum">' + dm(datum) + "</span></span>" +
+    '</span><span class="rdatum">' + dm(datum) + '</span><span class="rzahl" aria-hidden="true">' + datum.getDate() + "</span></span>" +
     '<span class="rlage' + (marke ? "" : " ohnemarke") + '">' + marke + '<span class="rtext">' +
-    (frei ? sicher(art) : t && t.stunden ? stundenText(t.stunden) + "\u2009h" : schule ? "Schule" : "—") +
-    "</span></span>";
+    (lage ? sicher(lage) : "—") + "</span></span>";
   b.addEventListener("click", function () {
     aktiverTag = i; zeichneReiter(); zeichneTag(); merken();
   });

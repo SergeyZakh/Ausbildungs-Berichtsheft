@@ -49,6 +49,7 @@ const JS = [
   'kern/sicherung.js',
   'kern/bedienung.js',
   'ansicht/farbe.js',
+  'ansicht/zen.js',
   'ansicht/stammdaten.js',
   'ansicht/berufe.js',
   'ansicht/zeitraum.js',
