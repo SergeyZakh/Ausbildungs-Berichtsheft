@@ -6,10 +6,16 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
-## [Unveröffentlicht]
+## [0.4.1] – 2026-10-01
 
 ### Geändert
 
+- **Berufsschultage nur noch nach Bestätigung:** Der Import setzt keinen Tag mehr selbst auf
+  Berufsschule. Sieht ein Tag danach aus (Fächer in der Beschreibung, Projekt „Berufsschule“ oder
+  der Schulplan), steht er in der Karte oben mit Haken, Datum und Fächern. „Als Berufsschule
+  übernehmen“ setzt die angehakten Tage, „Alles Betrieb“ oder ein abgewählter Haken lässt sie
+  Arbeitstage. Derselbe Export fragt danach nicht noch einmal. Tage, die 0.3 oder 0.4 beim Import
+  selbst zur Berufsschule gemacht haben, werden beim nächsten Import wieder zum Vorschlag.
 - **Jedes Feld im Wochenblatt beschreibbar:** Im Reiter „Woche“ schreibt man jetzt auch den Text
   jedes Tages direkt ins Blatt, nicht nur Abteilung, Unterweisungen und Themen. Das Feld liegt
   genau über den gedruckten Zeilen; solange der Tag offen ist, steht beim Schreiben „Fertig“
@@ -23,8 +29,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Hinweise am Handy kurz:** Der Tipp fürs iPhone, „Sicherung fällig“, „Noch offen“ und das
   Ergebnis eines Imports stehen am Handy in ein, zwei Zeilen mit einem Knopf; „Wie?“ oder „Mehr“
   zeigt den ganzen Text. Vorher nahm allein der Tipp sechs Zeilen und zwei Knöpfe.
-- **Ruhigere Felder:** Statt gelber, gestrichelter Flächen tragen die Felder der Woche einen feinen
-  grauen Rahmen, die Tage zeigen ihn erst beim Drüberfahren.
+- **Felder ohne Rahmen:** Statt gelber, gestrichelter Flächen sieht das Blatt aus wie gedruckt.
+  Beim Drüberfahren tönt ein Feld sich leicht grau, leere Felder sagen es in blassem Grau.
 - **Reiter am Handy in einer Zeile:** Mo bis So und „Woche“ stehen nebeneinander, ein leeres
   Wochenende schmal. Die Woche stand vorher breit in einer zweiten Reihe.
 
@@ -32,17 +38,6 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 - **Dunkelmodus:** Beim Schreiben im Wochenblatt wurde das Feld schwarz mit heller Schrift, mitten
   im weißen Blatt. Am Handy blieb ein angetippter Reiter im Dunkeln dunkler hängen.
-
-## [0.4.1] – 2026-09-30
-
-### Geändert
-
-- **Berufsschultage nur noch nach Bestätigung:** Der Import setzt keinen Tag mehr selbst auf
-  Berufsschule. Sieht ein Tag danach aus (Fächer in der Beschreibung, Projekt „Berufsschule“ oder
-  der Schulplan), steht er in der Karte oben mit Haken, Datum und Fächern. „Als Berufsschule
-  übernehmen“ setzt die angehakten Tage, „Alles Betrieb“ oder ein abgewählter Haken lässt sie
-  Arbeitstage. Derselbe Export fragt danach nicht noch einmal. Tage, die 0.3 oder 0.4 beim Import
-  selbst zur Berufsschule gemacht haben, werden beim nächsten Import wieder zum Vorschlag.
 
 ## [0.4.0] – 2026-09-30
 
@@ -285,7 +280,6 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
-[Unveröffentlicht]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.1...HEAD
 [0.4.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.2.0...v0.3.0

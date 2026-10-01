@@ -92,8 +92,8 @@ function zeichneWochenblatt(bereich) {
  *
  * `imBlatt`: Auf dem Blatt liegen Eingabefelder, genau über ihrem Kasten: die der Woche aus
  * `felder()`, dazu eines über den Zeilen jedes Tages. Solange man nicht darin schreibt, sind sie
- * durchsichtig, man sieht das Blatt, wie es gedruckt wird; die Felder der Woche mit einem feinen
- * grauen Rahmen, die Tage erst beim Drüberfahren. Ein gelber Rahmen um jedes Feld war zu laut.
+ * durchsichtig und ohne Rahmen, man sieht das Blatt, wie es gedruckt wird; beim Drüberfahren tönt
+ * ein Feld sich leicht grau. Gelbe, später graue Rahmen um jedes Feld waren zu laut.
  * Wer hineinklickt, schreibt; das Blatt zeichnet sich dahinter neu, und die Felder rücken mit. Der
  * Kopf eines Tages öffnet ihn ganz, was ein Tag noch braucht, steht dort. Statt eines Titels steht
  * darüber eine ruhige Zeile: was man im Blatt tun kann, ein Tag, der ohne Text gar nicht im Blatt
@@ -430,7 +430,7 @@ function blattVorschau(imBlatt) {
   /* ---------- Die Felder ---------- */
 
   /**
-   * Ein Feld aufs Blatt legen: eine Hülle mit dem Feld, einem Hinweis, solange es leer ist, und „✎“.
+   * Ein Feld aufs Blatt legen: eine Hülle mit dem Feld und einem Hinweis, solange es leer ist.
    * `knoepfe` sitzen am Feld („Fertig“). Am Handy schreibt man nicht im verkleinerten Blatt: Ein
    * Tipp öffnet das Feld groß (dieselbe Grenze wie in handy.css, wo das Feld selbst keinen Tipp nimmt).
    */
@@ -443,13 +443,8 @@ function blattVorschau(imBlatt) {
     // Am Handy steht der Kasten dreimal kleiner da; dort reicht, was zu tun ist.
     leer.innerHTML = o.feld === "abteilung" ? sicher(o.leer)
       : '<span class="breit">' + sicher(o.leer) + '</span><span class="schmal">✎ antippen und schreiben</span>';
-    var stift = document.createElement("span");
-    stift.className = "blattstift";
-    stift.setAttribute("aria-hidden", "true");
-    stift.textContent = "✎";
     huelle.appendChild(o.el);
     huelle.appendChild(leer);
-    huelle.appendChild(stift);
     if (o.knoepfe) {
       o.knoepfe.classList.add("blattknoepfe");
       huelle.appendChild(o.knoepfe);

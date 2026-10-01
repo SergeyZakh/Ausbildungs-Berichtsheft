@@ -345,9 +345,10 @@ werden sie nach jedem Zeichnen und bei jeder Größenänderung (`felderSetzen()`
 Schrift und Zeilenabstand des Blatts und mit dem Einzug hinter dem Punkt: Beim Schreiben liegt
 der Text auf den gedruckten Zeilen, nur die Punkte fehlen. Stehen in einem Kasten der Woche auch
 Tage (Berufsschule, Betriebsversammlung), endet sein Feld über dem ersten. Solange man nicht
-schreibt, sind die Felder durchsichtig: Man sieht das Blatt, wie es gedruckt wird. Die Felder der
-Woche tragen einen feinen grauen Rahmen, die Tage zeigen ihn erst beim Drüberfahren; ein leeres
-Feld sagt „Hier schreiben …“. Ein gelber Rahmen mit Fläche um jedes Feld war zu laut. Das Blatt
+schreibt, sind die Felder durchsichtig und ohne Rahmen: Man sieht das Blatt, wie es gedruckt wird.
+Beim Drüberfahren tönt ein Feld sich leicht grau, ein leeres sagt in blassem Grau „Hier schreiben
+…“. Wo man schreiben kann, sagt die Zeile darüber. Ein gelber Rahmen mit Fläche um jedes Feld war
+zu laut, ein feiner grauer gestrichelter danach immer noch Unruhe über dem Vordruck. Das Blatt
 ist auch im Dunkeln weiß, die Farben der Felder sind deshalb fest; die Regel `.tagpanel textarea`
 darf sie nicht erreichen (sonst wurde das Feld beim Schreiben im Dunkeln schwarz). Beim Schreiben
 wird das Feld weiß und wächst mit dem Text (`wachsen()`); das Blatt dahinter zeichnet sich nach
