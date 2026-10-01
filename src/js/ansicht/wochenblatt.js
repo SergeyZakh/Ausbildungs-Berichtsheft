@@ -618,11 +618,21 @@ function schreibblattLage() {
   dlg.style.top = vv.offsetTop + "px";
   dlg.style.height = vv.height + "px";
 }
+/* Am Handy scrollt allein .mitte (handy.css), das Fenster nie. iOS schiebt es trotzdem, um ein Feld
+   über die Tastatur zu heben. Blieb es danach verschoben, stand die Kopfleiste außerhalb, und wegen
+   overflow: hidden kam man von Hand nicht mehr zurück. Ohne offene Tastatur rückt es deshalb zurück. */
+function fensterZurueck() {
+  var vv = window.visualViewport;
+  if (!meldungSchwebt() || !window.scrollY) return;
+  if (vv && vv.height < window.innerHeight - 80) return;
+  window.scrollTo(0, 0);
+}
+
 if (window.visualViewport) {
   var schreibblattBild = 0;
   var schreibblattNachziehen = function () {
     cancelAnimationFrame(schreibblattBild);
-    schreibblattBild = requestAnimationFrame(schreibblattLage);
+    schreibblattBild = requestAnimationFrame(function () { schreibblattLage(); fensterZurueck(); });
   };
   window.visualViewport.addEventListener("resize", schreibblattNachziehen);
   window.visualViewport.addEventListener("scroll", schreibblattNachziehen);
@@ -654,6 +664,7 @@ $("dlg-schreiben").addEventListener("close", function () {
   dlg.style.height = "";
   schreibblattLoslassen();
   schreibblattAufraeumen();
+  requestAnimationFrame(fensterZurueck);
 });
 // Daneben tippen schließt, ohne etwas zu übernehmen: am Rechner der Hintergrund des Dialogs, am
 // Handy der Schleier über der Seite.

@@ -127,7 +127,9 @@
   .tagflaeche > .sektion.posten,
   .tagflaeche > .sektion.vorschau { flex: 0 0 auto; }
   .wochenspalte { flex: 0 0 auto; }
-  .vorschaubuehne { height: auto; max-height: 80vh; }
+  /* So hoch wie die Blätter. Eine Obergrenze (80vh) stammte aus der Zeit, als die Bühne selbst
+     scrollte; zuletzt schnitt sie das zweite Blatt einer langen Woche ab, und weiter scrollen ging nicht. */
+  .vorschaubuehne { height: auto; }
   /* Die drei Spalten der Woche untereinander, jede so breit wie der Bildschirm. Die Regeln für
      nebeneinander (feste Breiten, flex-start, sticky) sind spezifischer und müssen hier weichen:
      Sonst wurden aus 640 px Breite 640 px leere Höhe, und die Karten blieben halb so breit. */

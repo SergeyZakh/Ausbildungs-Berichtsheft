@@ -301,6 +301,27 @@ async function durchgang(browser, breite) {
     return b.getBoundingClientRect().bottom - r.getBoundingClientRect().bottom;
   });
   pruefe('Woche: unter dem Blatt keine leere Fläche' + bei, leer < 60, Math.round(leer) + ' px');
+  // Eine lange Woche braucht zwei Blätter. Die Bühne war am Handy auf 80vh begrenzt, die Karte
+  // darum schnitt ab: Das zweite Blatt war halb weg, und weiter scrollen ging nicht.
+  const vorherFreitag = await page.evaluate(() => window.__tage()['2026-09-11'].text);
+  await page.evaluate((t) => window.__tagSetzen('2026-09-11', { text: t + '\n' + Array(24).fill('Noch eine Zeile').join('\n') }), vorherFreitag);
+  await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
+  await page.waitForTimeout(1200);
+  const zwei = await page.evaluate(() => {
+    const m = document.getElementById('mitte');
+    m.scrollTo(0, 99999);
+    const karte = document.querySelector('.tagflaeche.blattwoche > .sektion.vorschau').getBoundingClientRect();
+    const boegen = [...document.querySelectorAll('.vorschaubuehne .bogenrahmen')].map((b) => b.getBoundingClientRect());
+    const letztes = boegen[boegen.length - 1];
+    return { blaetter: boegen.length, letztesUnten: Math.round(letztes.bottom), karteUnten: Math.round(karte.bottom),
+      sichtUnten: Math.round(m.getBoundingClientRect().bottom), fenster: window.scrollY };
+  });
+  pruefe('Woche mit zwei Blättern: beide ganz zu sehen und bis unten scrollbar' + bei,
+    zwei.blaetter === 2 && zwei.letztesUnten <= zwei.karteUnten && zwei.letztesUnten <= zwei.sichtUnten && zwei.fenster === 0,
+    JSON.stringify(zwei));
+  await page.evaluate((t) => window.__tagSetzen('2026-09-11', { text: t }), vorherFreitag);
+  await page.evaluate(() => { document.getElementById('mitte').scrollTo(0, 0); const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
+  await page.waitForTimeout(1200);
   // Stand und Export stehen in der Kopfleiste; eine eigene Leiste darüber war doppelt.
   pruefe('Woche: keine Leiste und keine Karten, die Felder liegen im Blatt' + bei,
     !(await page.locator('.wochenstand').count()) && !(await page.locator('.wochenspalte').count()) &&

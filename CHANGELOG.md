@@ -33,6 +33,13 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - Am Handy heißt der Knopf „Exportieren“ jetzt „Export“, damit neben dem Zen-Knopf die Kopfleiste
   in zwei Zeilen bleibt.
 
+### Behoben
+
+- **Lange Woche am Handy abgeschnitten:** Brauchte eine Woche zwei Blätter, war im Reiter „Woche“
+  das zweite halb verdeckt, und weiter scrollen ging nicht. Die Fläche mit den Blättern war noch auf
+  80 % der Bildschirmhöhe begrenzt. Hat iOS die Seite für die Tastatur verschoben, rückt sie danach
+  wieder zurück, damit die Kopfleiste nicht außer Reichweite bleibt.
+
 ## [0.5.0] – 2026-10-01
 
 ### Neu
