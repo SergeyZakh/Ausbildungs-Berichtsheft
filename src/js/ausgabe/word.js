@@ -200,8 +200,9 @@ function unterschriften() {
  *   unterweisung  Text aus dem Wochenreiter, Betriebsversammlungen
  *   schule        Berufsschultage
  * Ein Eintrag ist { kopf: { tag, rest }, text }. Wird auch vom Druck genutzt.
+ * Mit dem Vordruck „ohne Wochentage“ (`s`) stehen die Tage ohne Überschrift da (ohneTage()).
  */
-function wochenTexte(montag) {
+function wochenTexte(montag, s) {
   var betrieb = [], unterweisung = [], schule = [], summe = 0;
 
   for (var i = 0; i < TAGE_JE_WOCHE; i++) {
@@ -233,7 +234,42 @@ function wochenTexte(montag) {
   var themen = zeilen(wd.schule).map(ohneSchlusspunkt).join("\n");
   if (themen) schule.unshift({ kopf: "", text: themen });
 
+  if (ohneWochentage(s)) {
+    betrieb = ohneTage(betrieb);
+    unterweisung = ohneTage(unterweisung);
+    schule = ohneTage(schule);
+  }
   return { betrieb: betrieb, unterweisung: unterweisung, schule: schule, summe: summe };
+}
+
+/**
+ * Dieselben Einträge ohne Tagesüberschrift, für Hefte, in denen nur die Tätigkeiten der Woche
+ * stehen. Jede Zeile steht nur einmal: Die Teambesprechung an jedem Morgen stünde sonst fünfmal
+ * untereinander. Freie Tage verlören mit der Überschrift ihre einzige Angabe; sie werden eine
+ * Zeile am Ende („Urlaub am Mittwoch und Donnerstag“, `frei`). Die Zeilen behalten ihr Datum,
+ * damit man im Blatt weiter je Tag schreibt (wochenblatt.js).
+ */
+function ohneTage(liste) {
+  var gesehen = {}, frei = [], raus = [];
+  liste.forEach(function (e) {
+    var kopf = e.kopf || {};
+    if (kopf.rest) {
+      var f = frei.filter(function (x) { return x.art === kopf.rest; })[0];
+      if (!f) frei.push(f = { art: kopf.rest, tage: [] });
+      f.tage.push(kopf.tag);
+    }
+    var neu = zeilen(e.text).filter(function (z) {
+      var k = schluessel(z);
+      if (!k || gesehen[k]) return false;
+      gesehen[k] = true;
+      return true;
+    });
+    if (neu.length) raus.push({ kopf: kopf.datum ? { datum: kopf.datum } : "", text: neu.join("\n") });
+  });
+  frei.forEach(function (f) {
+    raus.push({ kopf: "", frei: true, text: f.art + " am " + aufzaehlen(f.tage) });
+  });
+  return raus;
 }
 
 /** Dichtestufe 0–2 nach der Textmenge der Woche. */
@@ -265,7 +301,8 @@ function eintraege(liste, m) {
       ], { groesse: m.tag, vor: i ? m.vorTag : 0, zeile: 230 }));
     }
     zeilen(e.text).forEach(function (z, j) {
-      var vor = j ? m.vorPos : ((e.kopf && e.kopf.tag) ? m.vorPos + 10 : (i ? m.vorTag : 0));
+      // Ohne Tagesüberschrift (ohneTage()) laufen die Zeilen durch, ohne Abstand zwischen den Tagen.
+      var vor = j ? m.vorPos : ((e.kopf && e.kopf.tag) ? m.vorPos + 10 : (i ? m.vorPos : 0));
       out.push(stichpunkt(z, m, vor));
     });
   });
@@ -274,7 +311,7 @@ function eintraege(liste, m) {
 
 function wochenSeite(nummer, montag, s) {
   if (taeglich(s)) return taeglicheSeite(nummer, montag, s);
-  var texte = wochenTexte(montag);
+  var texte = wochenTexte(montag, s);
   var wd = wochendaten[iso(montag)] || {};
   var abteilung = wd.abteilung || s.abteilung || "";
   var m = MASSE[dichte(texte)];
@@ -299,6 +336,8 @@ function wochenSeite(nummer, montag, s) {
 /* ---------- Tägliche Notierung ---------- */
 
 function taeglich(s) { return !!s && s.vordruck === "taeglich"; }
+/** Wöchentlich, aber nur die Tätigkeiten, ohne Überschrift je Tag (ohneTage()). */
+function ohneWochentage(s) { return !!s && s.vordruck === "ohnetage"; }
 
 /** Untertitel des Deckblatts, je nach Vordruck. */
 function notierungTitel(s) {

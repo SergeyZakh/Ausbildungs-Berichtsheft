@@ -198,10 +198,11 @@ function blattVorschau(imBlatt) {
       oben = f.feld === "abteilung" ? kasten.querySelector("span").getBoundingClientRect().bottom : r.top;
       unten = r.bottom;
       if (f.feld !== "abteilung") {
-        zeile = kasten.querySelector(".sp:not([data-datum])");
+        zeile = kasten.querySelector(".sp:not([data-datum]):not(.frei)");
         // Stehen im Kasten auch Tage (Berufsschule, Betriebsversammlung), gehören ihre Zeilen ihnen.
-        // Das Feld der Woche endet über dem ersten, bleibt aber mindestens zwei Zeilen hoch.
-        var tag = kasten.querySelector(".tagkopf");
+        // Das Feld der Woche endet über dem ersten, bleibt aber mindestens zwei Zeilen hoch. Ohne
+        // Wochentage im Blatt (ohneTage()) beginnt ein Tag mit seiner ersten Zeile.
+        var tag = kasten.querySelector(".tagkopf") || kasten.querySelector(".sp[data-datum]");
         if (tag) unten = Math.max(tag.getBoundingClientRect().top, oben + 2 * zeilenHoehe(kasten, r.width / kasten.offsetWidth));
       }
     }
@@ -315,12 +316,14 @@ function blattVorschau(imBlatt) {
     tagHinweis.hidden = !koepfe.length;
   }
 
-  /** Ein Tag ohne Text steht nicht im Blatt, braucht aber noch etwas: Er steht über dem Blatt. */
+  /** Ein Tag ohne Text steht nicht im Blatt, braucht aber noch etwas: Er steht über dem Blatt.
+   *  Ohne Wochentage im Blatt hat ein Tag keinen Kopf, nur Zeilen; und hat er Text, der schon an
+   *  einem anderen Tag steht (ohneTage()), fehlen auch die. Ohne Text ist er trotzdem nicht. */
   function fehltZeigen() {
     var montag = vonIso(aktiveWoche), offen = [];
     for (var i = 0; i < TAGE_JE_WOCHE; i++) {
-      var d = iso(plus(montag, i));
-      if (tagBrauchtNoch(d) && !tagImWochenfeld(d) && !blaetter.querySelector('.tagkopf[data-datum="' + d + '"]')) offen.push(d);
+      var d = iso(plus(montag, i)), text = ((tage[d] && tage[d].text) || "").trim();
+      if (tagBrauchtNoch(d) && !tagImWochenfeld(d) && !text && !blaetter.querySelector('[data-datum="' + d + '"]')) offen.push(d);
     }
     fehltAm = offen[0] || null;
     fehlt.hidden = !fehltAm;
