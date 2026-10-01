@@ -495,6 +495,11 @@ var schreibblatt = null;
  */
 function schreibblattOeffnen(o) {
   var dlg = $("dlg-schreiben"), ta = $("schreiben-text"), offen = dlg.open;
+  // Fährt es gerade hinaus, bleibt es: Wer schnell das nächste Feld antippt, sieht kein Zucken.
+  if (dlg.classList.contains("geht")) {
+    clearTimeout(schreibblattUhr);
+    dlg.classList.remove("geht");
+  }
   // Schon offen: das alte Feld gleich abschließen. Über close ginge es nicht, das Ereignis kommt
   // erst später und träfe dann das neue.
   if (offen) schreibblattAufraeumen();
@@ -506,6 +511,7 @@ function schreibblattOeffnen(o) {
   ta.classList.toggle("einzeilig", !!o.einzeilig);
   schreibblatt = { o: o, feld: o.feld || null };
   $("schreiben-tag").hidden = !o.datum;
+  dlg.style.transition = "";
   dlg.style.transform = "";
   if (!offen) dlg.showModal();
   tastaturAbstand();
@@ -513,7 +519,29 @@ function schreibblattOeffnen(o) {
   try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {}
 }
 
-function schreibblattZu() { if ($("dlg-schreiben").open) $("dlg-schreiben").close(); }
+/* Am Handy fährt das Feld hinaus, wie es gekommen ist, und der Hintergrund blendet aus; zu ist es
+   erst danach. Ohne das verschwand es von einem Bild aufs nächste. Die Kurve: schnell an, weich
+   aus, wie ein Blatt, das man loslässt. */
+var schreibblattUhr = null, SCHREIBBLATT_WEG_MS = 260;
+
+function schreibblattZu() {
+  var dlg = $("dlg-schreiben");
+  if (!dlg.open || dlg.classList.contains("geht")) return;
+  if (!meldungSchwebt() || bewegungAus()) { dlg.close(); return; }
+  dlg.classList.add("geht");
+  dlg.style.transition = "transform " + SCHREIBBLATT_WEG_MS + "ms cubic-bezier(.4, 0, 1, 1)";
+  dlg.style.transform = "translateY(100%)";
+  schreibblattUhr = setTimeout(function () {
+    dlg.classList.remove("geht");
+    dlg.style.transition = "";
+    dlg.style.transform = "";
+    if (dlg.open) dlg.close();
+  }, SCHREIBBLATT_WEG_MS + 20);
+}
+
+function bewegungAus() {
+  try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; }
+}
 
 /** Das Blatt nachziehen; ein Tag ohne Feld im Blatt gibt seinen „Fertig“-Knopf wieder ab. */
 function schreibblattAufraeumen() {
@@ -562,26 +590,37 @@ $("dlg-schreiben").addEventListener("close", schreibblattAufraeumen);
 $("dlg-schreiben").addEventListener("click", function (e) { if (e.target === this) schreibblattZu(); });
 
 /* Nach unten wischen schließt, wie bei jedem Blatt, das von unten kommt. Gegriffen wird oben, am
-   Griff und am Titel; im Textfeld scrollt ein Wischen den Text. */
+   Griff und am Titel; im Textfeld scrollt ein Wischen den Text. Das Feld folgt dem Finger; weit
+   genug oder schnell genug nach unten fährt es hinaus, sonst schnappt es weich zurück. */
 (function () {
-  var dlg = $("dlg-schreiben"), start = null, weg = 0;
+  var dlg = $("dlg-schreiben"), start = null, zeit = 0, weg = 0;
   dlg.addEventListener("touchstart", function (e) {
     start = e.target.closest && e.target.closest(".schreiben-griff, .dkopf") && !e.target.closest("button")
       ? e.touches[0].clientY : null;
+    zeit = Date.now();
     weg = 0;
+    if (start != null) dlg.style.transition = "none";
   }, { passive: true });
   dlg.addEventListener("touchmove", function (e) {
     if (start == null) return;
-    weg = Math.max(0, e.touches[0].clientY - start);
-    dlg.style.transform = weg ? "translateY(" + weg + "px)" : "";
+    var dy = e.touches[0].clientY - start;
+    // Nach oben gibt es nach, aber kaum: Das Feld steht schon, wo es hingehört.
+    weg = dy > 0 ? dy : dy / 6;
+    dlg.style.transform = "translateY(" + weg + "px)";
   }, { passive: true });
-  dlg.addEventListener("touchend", function () {
+  function los() {
     if (start == null) return;
     start = null;
-    if (weg > 70) schreibblattZu();
+    var schnell = weg > 20 && weg / Math.max(1, Date.now() - zeit) > 0.5;
+    if (weg > dlg.offsetHeight / 4 || schnell) { schreibblattZu(); return; }
+    dlg.style.transition = "transform .3s cubic-bezier(.32, .72, 0, 1)";
     dlg.style.transform = "";
-  });
+  }
+  dlg.addEventListener("touchend", los);
+  dlg.addEventListener("touchcancel", los);
 })();
+// Escape schließt wie Wischen, mit derselben Bewegung.
+$("dlg-schreiben").addEventListener("cancel", function (e) { e.preventDefault(); schreibblattZu(); });
 
 /**
  * Rechte Spalte neben dem Wochenblatt: ob es aufs Blatt passt und die KI für die

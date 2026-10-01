@@ -322,11 +322,22 @@ function sichtbarerText(xml) {
     .join(' ');
 }
 
+/**
+ * Warten, bis das große Schreibfeld steht: Es fährt mit einer Animation herein. Eine feste Pause
+ * reichte am Rechner, auf dem langsameren CI-Rechner stand es nach 300 ms noch 2 px zu tief.
+ */
+async function schreibfeldSteht(page) {
+  await page.waitForFunction(() => {
+    const d = document.getElementById('dlg-schreiben');
+    return d.open && d.getAnimations().every((a) => a.playState === 'finished');
+  }, null, { timeout: 3000 });
+}
+
 module.exports = {
   // Erst nach starteBrowser() gesetzt, deshalb als Getter.
   get SEITE() { return SEITE; },
   DATEI_SEITE, EINZELDATEI, SPEICHER, RUNDGANG, testdatei,
   protokoll, starteBrowser, oeffnen, ohneRundgang, fehlerSammeln, markieren,
   stammReiter, stammFuellen, stammdatenOeffnen, exportTrotzdem,
-  downloadsSammeln, warteAufDatei, docxLesen, sichtbarerText,
+  downloadsSammeln, warteAufDatei, docxLesen, sichtbarerText, schreibfeldSteht,
 };

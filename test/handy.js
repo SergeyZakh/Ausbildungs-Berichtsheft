@@ -242,7 +242,10 @@ async function durchgang(browser, breite) {
   await nichtsDarunter('Woche');
   // Im verkleinerten Blatt tippt man nicht: Ein Tipp öffnet das Feld groß, von unten.
   await page.locator('.blattfeld.feld-unterweisung').tap();
-  await page.waitForTimeout(300);
+  const kommt = await page.evaluate(() =>
+    document.getElementById('dlg-schreiben').getAnimations().some((a) => a.animationName === 'vonunten'));
+  pruefe('Woche: das große Feld fährt von unten herein' + bei, kommt);
+  await h.schreibfeldSteht(page);
   const gross = await page.evaluate(() => {
     const d = document.getElementById('dlg-schreiben'), r = d.getBoundingClientRect();
     return { offen: d.open, oben: Math.round(r.top), unten: Math.round(r.bottom), bild: innerHeight,
@@ -255,6 +258,13 @@ async function durchgang(browser, breite) {
   await nichtsRaus('Schreibfeld');
   await page.fill('#schreiben-text', 'Unterweisung Arbeitssicherheit');
   await page.click('#schreiben-fertig');
+  // Es fährt erst hinaus, dann ist es zu; vorher verschwand es von einem Bild aufs nächste.
+  const geht = await page.evaluate(() => {
+    const d = document.getElementById('dlg-schreiben');
+    return { offen: d.open, geht: d.classList.contains('geht'), transform: d.style.transform };
+  });
+  pruefe('Woche: „Fertig“ lässt das Feld nach unten hinausfahren' + bei,
+    geht.offen && geht.geht && geht.transform === 'translateY(100%)', JSON.stringify(geht));
   await page.waitForTimeout(500);
   const danach = await page.evaluate(() => ({
     offen: document.getElementById('dlg-schreiben').open,
