@@ -8,6 +8,14 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ## [Unveröffentlicht]
 
+### Neu
+
+- **Wochenblatt ohne Wochentage:** Unter „Deine Daten → Vordruck“ gibt es „Wöchentlich – nur die
+  Tätigkeiten, ohne Wochentage“. Im Blatt, in Word und im PDF stehen dann keine Überschriften wie
+  „Montag“ mehr, nur die Stichpunkte der Woche. Gleiche Zeilen stehen einmal da, freie Tage als eine
+  Zeile am Ende („Urlaub am Mittwoch“), die Berufsschule ohne Wochentag. Geschrieben wird weiter je
+  Tag, auch direkt im Blatt.
+
 ## [0.5.0] – 2026-10-01
 
 ### Neu

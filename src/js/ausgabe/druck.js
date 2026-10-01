@@ -77,7 +77,7 @@ function druckAbschnitt(titel, liste, klasse, feld) {
       var roh = String(z).replace(/^\s*[-*•·]\s*/, "").trim();
       if (!roh) return "";
       // Das Zeichen steht im Markup, damit es beim Kopieren aus dem PDF mitkommt.
-      return '<p class="sp"' + tag + '><span class="pkt">•</span>' + sicher(roh) + "</p>";
+      return '<p class="sp' + (e.frei ? " frei" : "") + '"' + tag + '><span class="pkt">•</span>' + sicher(roh) + "</p>";
     }).join("");
     return kopf + text;
   }).join("");
@@ -130,7 +130,7 @@ function druckBlattSeite(nummer, montag, s, texte, fortsetzung, letzte) {
 
 function druckBlattEinseitig(nummer, montag, s) {
   if (taeglich(s)) return druckTaeglichSeite(nummer, montag, s, tagesZeilen(montag), false, true);
-  return druckBlattSeite(nummer, montag, s, wochenTexte(montag), false, true);
+  return druckBlattSeite(nummer, montag, s, wochenTexte(montag, s), false, true);
 }
 
 /* ---------- Aufteilen einer vollen Woche ---------- */
@@ -161,7 +161,7 @@ function druckEinheiten(liste) {
       druckWortzeilen(z, 105).forEach(function (t) { teile.push(t); });
     });
     teile.forEach(function (z, i) {
-      out.push({ kopf: e.kopf, text: z, erste: i === 0 });
+      out.push({ kopf: e.kopf, text: z, erste: i === 0, frei: e.frei });
     });
   });
   return out;
@@ -173,8 +173,8 @@ function druckBuendeln(einheiten) {
   var out = [];
   einheiten.forEach(function (e) {
     var letzte = out[out.length - 1];
-    if (letzte && letzte.kopf === e.kopf) letzte.text += "\n" + e.text;
-    else out.push({ kopf: e.kopf, text: e.text });
+    if (letzte && letzte.kopf === e.kopf && letzte.frei === e.frei) letzte.text += "\n" + e.text;
+    else out.push({ kopf: e.kopf, text: e.text, frei: e.frei });
   });
   return out;
 }
@@ -205,7 +205,7 @@ function druckBlatt(nummer, montag, s) {
     });
   }
 
-  var texte = wochenTexte(montag);
+  var texte = wochenTexte(montag, s);
   return druckAufteilen(druckEinheiten(texte.betrieb), function (teil, fortsetzung, letzte) {
     return druckBlattSeite(nummer, montag, s, {
       betrieb: druckBuendeln(teil),

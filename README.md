@@ -64,7 +64,8 @@ einfach selbst.
   mit Schule schreibst du die Themen einmal für die ganze Woche. Bucht deine Zeiterfassung den
   Schultag mit den Fächern („AEUP: Datenbanken, FUIT: IPv4“), schlägt der Import ihn als
   Berufsschule vor, je Fach eine Zeile. Übernommen wird erst, was du bestätigst.
-- **Ausgabe** als Word oder PDF, im Vordruck mit wöchentlicher oder täglicher Notierung. In der
+- **Ausgabe** als Word oder PDF, im Vordruck mit wöchentlicher oder täglicher Notierung, wöchentlich
+  auf Wunsch ohne Wochentage, nur mit den Tätigkeiten. In der
   Wochenansicht schreibst du in jedes Feld direkt ins Blatt, wie es gedruckt wird; am Handy öffnet
   ein Tipp das Feld groß.
 - **Übersicht aller Wochen** wie die Aktivität bei GitHub: jeder Werktag ein Feld, grün fertig,
