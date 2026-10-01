@@ -49,6 +49,16 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
 .zenknopf[aria-pressed="true"]:hover:not(:disabled) { background: var(--voll-hover); border-color: var(--voll-hover); }
 body.ohnewoche .zenknopf { display: none; }
 body.zen .leiste > :not(.schub), body.zen .leiste .schub > :not(.zenknopf) { visibility: hidden; }
+/* Tag zurück und weiter, links in der Leiste, wo sonst die Woche steht. Darüber gelegt statt
+   eingereiht: Die Leiste behält ihre Anordnung, und der Zen-Knopf bleibt, wo er war. */
+.zennav { display: none; }
+body.zen .leiste { position: relative; }
+body.zen .leiste > .zennav {
+  visibility: visible; position: absolute; left: var(--luft-5); top: 50%; transform: translateY(-50%);
+  display: flex; align-items: center; gap: var(--luft-2);
+}
+.zennav svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.zenstelle { padding: 0 var(--luft-1); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 body.zen .reiter, body.zen .hinweise, body.zen .sektion.posten, body.zen .blattzeile, body.zen .wochenfeldhinweis,
 body.zen .fussleiste:not(.warn), body.zen .fussleiste .signatur { display: none; }
 /* Die Karte mittig und lesbar breit. */

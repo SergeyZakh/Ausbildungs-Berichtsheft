@@ -19,7 +19,12 @@
   .leiste {
     position: relative; z-index: 30; flex: none; flex-wrap: wrap;
     padding: var(--luft-3); gap: var(--luft-2);
-    background: var(--grund); box-shadow: 0 1px 0 var(--linie);
+    background: var(--grund);
+  }
+  /* Keine Linie unter der Kopfleiste: Was darunter wegscrollt, blendet aus (bedienung.js). */
+  .mitte.gescrollt {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24px);
+    mask-image: linear-gradient(to bottom, transparent, #000 24px);
   }
   /* Die Summe füllt die Zeile bis zu den Knöpfen: Anteil links, Stunden rechts. Vorher stand
      zwischen ihr und „Exportieren“ eine leere Lücke. */
@@ -40,6 +45,7 @@
   /* Zen-Modus: Die erste Zeile bleibt mit dem Knopf an seiner Stelle, die Woche darunter geht. */
   body.zen .leiste { background: none; box-shadow: none; }
   body.zen .leiste .wochenbalken { display: none; }
+  body.zen .leiste > .zennav { left: var(--luft-3); gap: var(--luft-1); }
   .wsanteil { gap: var(--luft-1); }
   .wochensumme .ring { width: 18px; height: 18px; --dicke: 3px; }
 
@@ -334,6 +340,8 @@
   #reiter .tagreiter .rzahl { width: 28px; height: 28px; font-size: var(--schrift-text); }
   #reiter .wochenreiter { height: 28px; gap: var(--luft-1); margin-left: var(--luft-1); padding: 0 var(--luft-2); }
   #reiter .wochenreiter .rtag { letter-spacing: 0; }
+  /* Links bis zum Zen-Knopf reicht es nur für die Pfeile; den Tag nennt die Karte darunter. */
+  .zenstelle { display: none; }
 }
 
 @media (max-width: 620px) {

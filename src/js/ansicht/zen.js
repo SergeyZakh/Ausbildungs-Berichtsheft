@@ -35,3 +35,44 @@ $("btn-zen").addEventListener("click", function () {
   menueSchliessen();
   zenUmschalten(!zenAn());
 });
+
+/* ---------- Tag zurück und weiter ----------
+   Ohne Reiter braucht der Zen-Modus einen Weg zum nächsten Tag, ohne ihn zu verlassen. Er geht die
+   Stellen der Woche ab wie die Reiter: Werktage, das Wochenende nur mit Inhalt, dann die Woche; in
+   einer Blockwoche nur sie. Am Ende einer Woche geht es in die nächste, am Anfang in die vorige. */
+
+function zenStellen(montagIso) {
+  if (blockwoche(montagIso)) return [7];
+  var montag = vonIso(montagIso), liste = [];
+  for (var i = 0; i < TAGE_JE_WOCHE; i++) {
+    if (i < 5 || tagHatInhalt(tage[iso(plus(montag, i))])) liste.push(i);
+  }
+  liste.push(7);
+  return liste;
+}
+
+function zenBlaettern(schritt) {
+  if (!aktiveWoche) return;
+  var nachbarn = zenStellen(aktiveWoche).filter(function (s) { return schritt > 0 ? s > aktiverTag : s < aktiverTag; });
+  if (nachbarn.length) {
+    aktiverTag = schritt > 0 ? nachbarn[0] : nachbarn[nachbarn.length - 1];
+    zeichneReiter(); zeichneTag(); merken();
+  } else {
+    aktiveWoche = iso(plus(vonIso(aktiveWoche), 7 * schritt));
+    var stellen = zenStellen(aktiveWoche);
+    aktiverTag = schritt > 0 ? stellen[0] : stellen[stellen.length - 1];
+    zeichnen(); merken();
+  }
+  $("mitte").scrollTop = 0;
+}
+
+/** Zwischen den Pfeilen der offene Tag, wie sein Reiter ihn nennt. */
+function zenStelleZeigen() {
+  if (!aktiveWoche) return;
+  var tag = plus(vonIso(aktiveWoche), aktiverTag);
+  $("zen-stelle").textContent = aktiverTag === 7 ? (blockwoche(aktiveWoche) ? "Blockwoche" : "Woche")
+    : KURZ[tag.getDay()] + " " + dm(tag);
+}
+
+$("zen-zurueck").addEventListener("click", function () { zenBlaettern(-1); });
+$("zen-weiter").addEventListener("click", function () { zenBlaettern(1); });

@@ -4,7 +4,8 @@
  * Arbeitsbereich. Am Tag bleibt die Textkarte mit „Fertig“, mittig; in der Woche das Blatt.
  * Die Tasten 1–8 und Alt+←/→ wirken weiter. Esc oder derselbe Knopf beendet ihn; ein offenes
  * Fenster schließt Esc zuerst. Gemerkt wird er nicht. Der Knopf bleibt dabei, wo er ist, und der
- * Wechsel läuft als View Transition.
+ * Wechsel läuft als View Transition. Statt der Reiter blättern ‹ › links oben von Tag zu Tag, über
+ * das leere Wochenende hinweg und in die nächste Woche.
  *
  *   node test/zen.js
  */
@@ -82,12 +83,30 @@ const kartenDatum = (page) => page.evaluate(() => {
   pruefe('Im Zen geschrieben landet im Tag',
     (await page.evaluate(() => window.__tage()['2026-09-07'].text)).endsWith('Im Zen geschrieben'));
 
+  /* ---------- Tag zurück und weiter ---------- */
+  const stelle = () => page.evaluate(() => document.getElementById('zen-stelle').textContent);
+  pruefe('Links oben ‹ Mo 07.09. ›, ohne Zen nicht da', await sichtbar(page, '#zen-weiter') && (await stelle()) === 'Mo 07.09.' &&
+    await page.evaluate(() => { document.body.classList.remove('zen'); const weg = !document.getElementById('zennav').offsetWidth;
+      document.body.classList.add('zen'); return weg; }), await stelle());
+  const schritte = [];
+  for (let i = 0; i < 6; i++) { await page.click('#zen-weiter'); schritte.push(await stelle()); }
+  pruefe('› geht Tag für Tag, über das leere Wochenende zur Woche und in die nächste',
+    schritte.join(' ') === 'Di 08.09. Mi 09.09. Do 10.09. Fr 11.09. Woche Mo 14.09.' && await zen(page) &&
+      (await knopfLage()) === vorher, schritte.join(' '));
+  await page.click('#zen-zurueck');
+  const zurueck = await stelle();
+  await page.click('#zen-zurueck');
+  pruefe('‹ geht zurück, auch in die vorige Woche, und die Karte zeigt den Tag',
+    zurueck === 'Woche' && (await stelle()) === 'Fr 11.09.' && (await kartenDatum(page)).includes('11.09.2026'), zurueck + ' ' + await stelle());
+  for (let i = 0; i < 4; i++) await page.click('#zen-zurueck');
+  await page.waitForTimeout(200);
+
   /* ---------- Tasten ---------- */
   await page.evaluate(() => document.activeElement.blur());
   await page.keyboard.press('2');
   await page.waitForTimeout(300);
-  pruefe('Taste 2 wählt Dienstag, Zen bleibt', (await zen(page)) && (await kartenDatum(page)).includes('08.09.2026'),
-    await kartenDatum(page));
+  pruefe('Taste 2 wählt Dienstag, Zen bleibt', (await zen(page)) && (await kartenDatum(page)).includes('08.09.2026') &&
+    (await stelle()) === 'Di 08.09.', await kartenDatum(page));
   await page.keyboard.press('8');
   await page.waitForTimeout(900);
   pruefe('Taste 8: in der Woche nur das Blatt', (await zen(page)) && await sichtbar(page, '.vorschaubuehne .bogen') &&
@@ -155,8 +174,12 @@ const kartenDatum = (page) => page.evaluate(() => {
     const handy = await hp.evaluate(() => {
       const z = document.getElementById('btn-zen').getBoundingClientRect();
       const k = document.querySelector('.tagkarte').getBoundingClientRect();
-      return { knopfUnten: Math.round(z.bottom), karteOben: Math.round(k.top), kartenBreite: Math.round(k.width) };
+      const n = document.getElementById('zennav').getBoundingClientRect();
+      return { knopfUnten: Math.round(z.bottom), karteOben: Math.round(k.top), kartenBreite: Math.round(k.width),
+        navRechts: Math.round(n.right), knopfLinks: Math.round(z.left), navBreite: Math.round(n.width) };
     });
+    pruefe(`Handy ${w} px: ‹ › links neben dem Zen-Knopf, ohne ihn zu berühren`,
+      handy.navBreite > 60 && handy.navRechts + 4 <= handy.knopfLinks, JSON.stringify(handy));
     pruefe(`Handy ${w} px: Knopf an seiner Stelle über der Karte, Karte so breit wie der Platz`,
       (await knopf()) === hVorher && handy.knopfUnten <= handy.karteOben && handy.kartenBreite >= w - 30 &&
         !(await sichtbar(hp, '.reiter')) && !(await sichtbar(hp, '.sektion.posten')), hVorher + ' ' + JSON.stringify(handy));

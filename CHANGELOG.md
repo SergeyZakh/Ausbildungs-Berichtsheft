@@ -18,7 +18,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 - **Zen-Modus:** Ein Knopf neben hell/dunkel blendet alles aus außer dem, woran man schreibt: am
   Tag nur die Karte mit „Fertig“, in der Woche nur das Blatt. Die Tasten 1–8 und Alt+←/→ gehen
   weiter; Esc oder derselbe Knopf beendet ihn. Der Knopf bleibt dabei an seiner Stelle, die Karte
-  gleitet an ihren Platz, der Rest blendet weich aus.
+  gleitet an ihren Platz, der Rest blendet weich aus. Links oben blättern ‹ › von Tag zu Tag, über
+  ein leeres Wochenende hinweg zur Woche und weiter in die nächste.
 
 ### Geändert
 
@@ -32,6 +33,9 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Zeilen bündig übereinander.
 - Am Handy heißt der Knopf „Exportieren“ jetzt „Export“, damit neben dem Zen-Knopf die Kopfleiste
   in zwei Zeilen bleibt.
+- **Weicher Rand beim Scrollen:** Was nach oben wegscrollt, blendet unter den Reitern (am Handy
+  unter der Kopfleiste) aus, statt an einer harten Kante abzureißen. Die Linie unter der
+  Kopfleiste am Handy ist weg.
 
 ### Behoben
 

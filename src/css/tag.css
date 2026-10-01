@@ -118,6 +118,13 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
    Panel zählt dazu und hätte es beim Ausbilder verhindert, deshalb dort visible. */
 .tagpanel.woche { overflow: visible; }
 #tagbereich > .tagpanel.woche { overflow-y: auto; }
+/* Was nach oben wegscrollt, blendet unter den Reitern (am Handy unter der Kopfleiste) weich aus,
+   statt an einer harten Kante abzureißen. Nur gescrollt (bedienung.js): Oben steht das Blatt sonst
+   ganz da. Die Reiter ragen 16 px in die Fläche, deshalb beginnt der Verlauf erst darunter. */
+#tagbereich > .tagpanel.woche.gescrollt {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 12px, #000 44px);
+  mask-image: linear-gradient(to bottom, transparent 12px, #000 44px);
+}
 /* So hoch wie der Inhalt: Sticky klebt nur innerhalb seines Elternkastens. War der auf Fensterhöhe
    begrenzt, schob seine Unterkante die Spalten beim Scrollen mit nach oben. */
 .tagflaeche.dreispaltig { align-items: flex-start; flex: 0 0 auto; }

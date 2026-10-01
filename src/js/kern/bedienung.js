@@ -87,3 +87,11 @@ document.addEventListener("keydown", function (e) {
     zeichneReiter(); zeichneTag();
   }
 });
+
+/* Gescrollt oder nicht: Daran hängt der weiche Rand oben (tag.css, handy.css). Scroll-Ereignisse
+   steigen nicht auf, deshalb in der Einfangphase; gemeint sind nur die beiden Scrollflächen. */
+document.addEventListener("scroll", function (e) {
+  var el = e.target;
+  if (!el || !el.classList || !(el.id === "mitte" || el.classList.contains("tagpanel"))) return;
+  el.classList.toggle("gescrollt", el.scrollTop > 2);
+}, true);
