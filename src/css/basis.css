@@ -28,7 +28,9 @@
    (Stand eines Tages, Fortschritt, runde Symbolknöpfe), Glas nur dort,
    wo Inhalt dahinter liegt: Menüs, Wochenwahl, Dialoggrund, Modelllauf.
    Die einzigen Farben sind Grün ("passt") und Rot ("sieh hin"); sie
-   stehen nie allein, daneben steht immer ein Wort oder eine Zahl. */
+   stehen nie allein, daneben steht immer ein Wort oder eine Zahl.
+   Ausnahme sind die Striche unter Wörtern aus Buchungen (--hk-*, herkunft.js):
+   gedämpft und ohne Rot und Grün, damit sie nicht wie ein Stand aussehen. */
 :root {
   --text:      #16161A;
   --linie:     #DEDCD6;   /* Kanten von Karten und Feldern */
@@ -79,6 +81,8 @@
   --popover:   rgba(255, 255, 255, .84);
   --posten-grund: #FBFBF9;
   --buehne:    #ECEBE6;   /* hinter der Blattvorschau */
+  /* Herkunft: Blau, Violett, Ocker, Petrol, Rosa, Graublau */
+  --hk-0: #3D6FD1; --hk-1: #8B5CC9; --hk-2: #B5832A; --hk-3: #1F8A99; --hk-4: #C2508E; --hk-5: #6B7789;
 }
 
 /* Dunkler Modus: wenn das Gerät ihn wünscht oder der Knopf in der Kopfleiste ihn gewählt hat
@@ -116,6 +120,7 @@
     --popover:   rgba(30, 30, 35, .9);
     --posten-grund: #18181C;
     --buehne:    #26262C;
+    --hk-0: #7FA4EE; --hk-1: #B796EA; --hk-2: #D8AE5E; --hk-3: #4FBFCC; --hk-4: #E58BBE; --hk-5: #9CA8BA;
   }
   :root:not([data-farbe="hell"]) dialog::backdrop { background: rgba(0, 0, 0, .5); }
 }
@@ -148,6 +153,7 @@
   --popover:   rgba(30, 30, 35, .9);
   --posten-grund: #18181C;
   --buehne:    #26262C;
+  --hk-0: #7FA4EE; --hk-1: #B796EA; --hk-2: #D8AE5E; --hk-3: #4FBFCC; --hk-4: #E58BBE; --hk-5: #9CA8BA;
   color-scheme: dark;
 }
 :root[data-farbe="dunkel"] dialog::backdrop { background: rgba(0, 0, 0, .5); }

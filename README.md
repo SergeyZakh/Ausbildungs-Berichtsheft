@@ -47,7 +47,8 @@ einfach selbst.
 2. **Art des Tages und Stunden** – Arbeitstag, Berufsschule, Urlaub, Krank, Feiertag.
 3. **Dein Text** – hier steht der Entwurf aus den Buchungen, den du überschreibst.
 4. **Fertig** – erst dann zählt der Tag als gegengelesen, rot wird grün.
-5. **Die Buchungen aus dem Export** – bleiben sichtbar, gehen aber nie ins Dokument.
+5. **Die Buchungen aus dem Export** – bleiben sichtbar, gehen aber nie ins Dokument. Wörter im
+   Text, die aus einer Buchung kommen, sind in ihrer Farbe unterstrichen.
 6. **Arbeitsstunden der Woche** und wie viele Tage schon fertig sind.
 
 > [!IMPORTANT]

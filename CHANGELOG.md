@@ -8,6 +8,15 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ## [Unveröffentlicht]
 
+### Neu
+
+- **Woher kommt welches Wort?** Neben dem Text eines Tages hat jede Buchung einen Farbstrich, und
+  die Wörter im Text, die aus ihr kommen, sind in derselben Farbe unterstrichen. Zeigt man auf
+  eine Buchung (am Handy: antippen), leuchten ihre Wörter wie mit Textmarker; steht der Cursor in
+  einer Zeile, ist ihre Buchung markiert. Zugeordnet wird je Zeile, Füllwörter zählen nicht, eigene
+  Zeilen bleiben ohne Strich. Der Schalter „Herkunft“ über den Buchungen blendet die Farben aus.
+  Ins Blatt kommt davon nichts.
+
 ## [0.4.3] – 2026-10-01
 
 ### Behoben
