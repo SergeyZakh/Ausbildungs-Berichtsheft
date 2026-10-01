@@ -624,16 +624,18 @@
   /* Der Dialog selbst ist durchsichtig und so groß wie das, was man sieht. Wischen darauf schiebt
      die Seite dahinter nicht (touch-action): Sonst rutschte sie mit, und unter dem Blatt blieb
      eine Lücke. Nur im Textfeld scrollt der Text. overflow: clip statt hidden: So ist er kein
-     Scrollbereich, den ein Fokus ins Bild schieben könnte, während das Blatt noch hereinfährt. */
+     Scrollbereich, den ein Fokus ins Bild schieben könnte, während das Blatt noch hereinfährt.
+     Nach unten schneidet er nicht ab: Safari ab iOS 26 zeigt die Seite auch unter seiner Leiste,
+     und dort sollen Schürze und Schleier weitergehen, nicht die helle Seite durchscheinen. */
   #dlg-schreiben[open] {
     position: fixed; inset: 0 0 auto 0; width: 100%; max-width: none; height: 100%; max-height: none;
     margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none;
-    display: flex; flex-direction: column; justify-content: flex-end; overflow: clip;
+    display: flex; flex-direction: column; justify-content: flex-end; overflow: clip visible;
     touch-action: none; overscroll-behavior: none; animation: none;
   }
   #dlg-schreiben::backdrop { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; animation: none; }
   .schreiben-schleier {
-    display: block; position: absolute; inset: 0; background: rgba(0, 0, 0, .35);
+    display: block; position: absolute; inset: 0 0 -100vh; background: rgba(0, 0, 0, .35);
     opacity: 0; transition: opacity .38s ease-out;
   }
   /* Herein und hinaus mit derselben Bewegung, nur umgekehrt: herein schnell an und lang

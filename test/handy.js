@@ -281,6 +281,20 @@ async function durchgang(browser, breite) {
   pruefe('Woche: hochgezogen gibt das Feld kaum nach, und darunter ist keine Lücke' + bei,
     hoch.hoch > 0 && hoch.hoch <= 40 && hoch.darunter, JSON.stringify(hoch));
   await h.schreibfeldSteht(page);
+  // Safari ab iOS 26 meldet als sichtbar nur, was über seiner Leiste liegt, zeigt die Seite aber auch
+  // darunter. Dort soll Blatt sein, nicht die helle Seite: hier nachgestellt mit einem kürzeren Dialog.
+  const leiste = await page.evaluate(async () => {
+    const d = document.getElementById('dlg-schreiben'), blatt = d.querySelector('.schreiben-blatt'), vorher = d.style.height;
+    d.style.height = (innerHeight - 60) + 'px';
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const r = { unten: Math.round(blatt.getBoundingClientRect().bottom), bild: innerHeight,
+      mitte: blatt.contains(document.elementFromPoint(innerWidth / 2, innerHeight - 4)),
+      rand: blatt.contains(document.elementFromPoint(2, innerHeight - 30)) };
+    d.style.height = vorher;
+    return r;
+  });
+  pruefe('Woche: unter einer Browserleiste geht das Feld bis ganz nach unten weiter' + bei,
+    leiste.unten === leiste.bild - 60 && leiste.mitte && leiste.rand, JSON.stringify(leiste));
   await page.fill('#schreiben-text', 'Unterweisung Arbeitssicherheit');
   await page.click('#schreiben-fertig');
   // Es fährt erst hinaus, dann ist es zu; vorher verschwand es von einem Bild aufs nächste.
