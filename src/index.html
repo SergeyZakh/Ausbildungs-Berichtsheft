@@ -34,10 +34,9 @@
   <div class="schub">
     <!-- Nur mit Berichtsheft-Server: Anmelden bzw. angemeldete Person (src/js/konto/konto.js). -->
     <div class="konto" id="konto" hidden></div>
-    <!-- Zen-Modus (zen.js): nur der Arbeitsbereich. Im Modus bleibt allein dieser Knopf oben rechts. -->
+    <!-- Zen-Modus (zen.js): nur der Arbeitsbereich. Im Modus bleibt allein dieser Knopf oben rechts, ausgefüllt. -->
     <button type="button" class="rundknopf zenknopf" id="btn-zen" aria-label="Zen-Modus" aria-pressed="false" title="Zen-Modus: nur schreiben">
-      <svg class="zen-an" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
-      <svg class="zen-aus" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="translate(0 1)"><path d="M12 4.6c2 1.9 3 4.2 3 6.9s-1 4.6-3 6.1c-2-1.5-3-3.4-3-6.1s1-5 3-6.9z"/><path d="M12 17.6c-.7-2.9-3.4-6-7.6-6.2.3 3.8 3.3 6.2 7.6 6.2zM12 17.6c.7-2.9 3.4-6 7.6-6.2-.3 3.8-3.3 6.2-7.6 6.2z"/></g></svg>
     </button>
     <!-- Hell oder dunkel (farbe.js). Gezeigt wird, wohin der Knopf schaltet: Mond im Hellen, Sonne im Dunkeln. -->
     <button type="button" class="rundknopf farbknopf" id="btn-farbe" aria-label="Dunkler Modus" aria-pressed="false">
@@ -58,7 +57,7 @@
       </div>
     </div>
     <div class="menuehalter">
-      <button type="button" class="rundknopf" id="btn-mehr" aria-label="Menü" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <button type="button" class="rundknopf" id="btn-mehr" aria-label="Menü" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg></button>
       <!-- Nach Zweck gruppiert: dein Heft, Daten hinein, Sicherung, Hilfe. -->
       <div class="menue" id="menue-mehr" hidden role="menu">
         <button type="button" role="menuitem" id="btn-stamm">Deine Daten</button>

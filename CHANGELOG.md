@@ -25,6 +25,10 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   das Kürzel. Die Farbe des Kreises zeigt den Stand (rot gegenlesen, grün fertig), der gewählte Tag
   ist ausgefüllt, „Woche“ steht als eigener Knopf daneben. Vorher war ein leeres Wochenende
   schmaler und sprang angetippt auf volle Breite.
+- **Kopfleiste aus einem Guss:** Alle Knöpfe oben sind 34 px hoch, weiß mit Rand und stehen 8 px
+  auseinander. Die Pfeile zum Blättern sehen aus wie die Knöpfe rechts, „Exportieren“ ist nicht mehr
+  höher als der Rest, das Menü ⋯ ist ein Zeichen statt eines Schriftzeichens. Am Handy stehen beide
+  Zeilen bündig übereinander.
 - Am Handy heißt der Knopf „Exportieren“ jetzt „Export“, damit neben dem Zen-Knopf die Kopfleiste
   in zwei Zeilen bleibt.
 

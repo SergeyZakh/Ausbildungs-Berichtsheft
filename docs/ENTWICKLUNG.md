@@ -95,7 +95,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | `berufe.js` | Ausbildungsberuf: eigene Liste beim Tippen (nach Bereichen, `BERUFE`), danach die Fachrichtung zum Antippen; gespeichert in `f-beruf` als „Fachinformatiker/in – Systemintegration“ (`berufsfeld()`, `berufTeilen()`) |
 | `zeitraum.js` | Blockunterricht und Schulferien als Marken, Kalender zum Wählen (`zeitraumOeffnen()`), Zusammenlegen überlappender Zeiträume |
 | `farbe.js` | Knopf hell/dunkel in der Kopfleiste; der Wechsel als Kreisblende vom Knopf aus (View Transitions), ohne die Übergänge einzelner Elemente |
-| `zen.js` | Zen-Modus: Der Knopf links neben hell/dunkel setzt `body.zen`; `leiste.css` blendet dann alles außer Tageskarte oder Blatt aus (auch Buchungen, Herkunftsfarben, die Zeile über dem Blatt und die Fußleiste, außer einer Warnung). Esc beendet ihn (`bedienung.js`, erst nach einem offenen Fenster), ohne Woche endet er von selbst. Nicht gespeichert |
+| `zen.js` | Zen-Modus: Der Knopf mit der Lotusblüte links neben hell/dunkel setzt `body.zen` und ist dann ausgefüllt (`aria-pressed`); `leiste.css` blendet dann alles außer Tageskarte oder Blatt aus (auch Buchungen, Herkunftsfarben, die Zeile über dem Blatt und die Fußleiste, außer einer Warnung). Esc beendet ihn (`bedienung.js`, erst nach einem offenen Fenster), ohne Woche endet er von selbst. Nicht gespeichert |
 | `rundgang.js` | Rundgang der Ausbilder beim ersten Start und über **?**; Azubis bekommen stattdessen die Einrichtung |
 | `einrichtung.js` | Einrichtung beim ersten Start: die Angaben fürs Wochenblatt in sechs Schritten, jede Eingabe geht sofort in das Feld von „Deine Daten“ (`data-feld`) |
 | `hinweise.js` | Hinweis über den Reitern: Ergebnis des letzten Imports mit „Spalten prüfen“ (`importKarte`, bleibt bis „Passt“ oder ×), Tipp fürs iPhone, fällige Sicherung, was beim Öffnen fehlt (`offeneWochen()`); am Handy jeweils die kurze Fassung (`kurz`) |
@@ -121,10 +121,11 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 Reihenfolge wie in der Liste `CSS` in `build.js`: `basis.css` (Farben als Variablen, der dunkle
 Modus tauscht sie unter `prefers-color-scheme: dark`; Schrift, Grundgerüst),
 `leiste.css` (Kopfleiste: am Rechner die Woche als Titel mit `langSpanne()`, am Handy und beim
-Ausbilder als Knopf mit `kurzSpanne()`; Wochenbalken, Reiter), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
+Ausbilder als Knopf mit `kurzSpanne()`; alle Knöpfe darin 34 px hoch, weiß mit Rand, 8 px Abstand,
+die Pfeile wie die Knöpfe rechts; Wochenbalken, Reiter, Zen-Modus), `tag.css` (Tagbereich, Sektionen, Wochenansicht,
 Eingaben, Meldungen), `dialoge.css` (Monatsraster, „Deine Daten“, Zuordnung, Rundgang),
-`handy.css` (alle `@media`-Regeln für Handy und Tablet; dort stehen die Tagesreiter in einer Zeile
-mit der Woche breit darunter, und im Kopf der Tageskarte `.tagkarte` steht das Datum allein, darunter Art, Stunden und „Fertig“ in einer Zeile, damit das Schreibfeld auch mit
+`handy.css` (alle `@media`-Regeln für Handy und Tablet; dort stehen die Tage als Kalenderleiste in einer
+Zeile, die Woche als Pille daneben, und im Kopf der Tageskarte `.tagkarte` steht das Datum allein, darunter Art, Stunden und „Fertig“ in einer Zeile, damit das Schreibfeld auch mit
 offener Tastatur Platz hat; eine Fußleiste gibt es dort nicht, die Meldung schwebt als Karte über dem Inhalt, ohne Speicherstand und Signatur; die Regeln greifen auch beim Drucken, denn A4 ist schmaler als 820 px,
 also dort keine Klassen aus dem Blatt wie `.tagkopf`, `.kasten` oder `.tagestabelle` verwenden),
 `ausbilder.css` (Konto und Ausbilderansicht),

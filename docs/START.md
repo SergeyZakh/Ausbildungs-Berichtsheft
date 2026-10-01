@@ -150,7 +150,7 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
   „Dienstag“ davor, schalte im Reiter **Woche** über dem Blatt **Wochentage** aus. Du schreibst
   weiter je Tag; im Blatt steht jede Zeile einmal, freie Tage als eine Zeile am Ende („Urlaub am
   Mittwoch“). Wieder einschalten geht jederzeit.
-- **Zen-Modus:** Der Knopf mit den vier Ecken neben hell/dunkel blendet alles aus außer dem, woran
+- **Zen-Modus:** Der Knopf mit der Lotusblüte neben hell/dunkel blendet alles aus außer dem, woran
   du schreibst: am Tag nur die Karte mit **Fertig**, in der Woche nur das Blatt. Beenden mit
   demselben Knopf oben rechts oder mit `Esc`.
 - **Tastatur:** `1`–`7` wählt den Tag, `8` den Reiter **Woche** (die Ziffer steht klein in der Ecke

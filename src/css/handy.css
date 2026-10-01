@@ -26,19 +26,17 @@
   .wochensumme { order: 1; flex: 1 1 auto; min-width: 0; justify-content: space-between; }
   .leiste .schub { order: 2; margin-left: auto; gap: var(--luft-2); }
   .wochenbalken { order: 3; flex: 1 1 100%; }
-  .leiste .schub .knopf { min-width: 0; padding: var(--luft-2) var(--luft-3); font-size: var(--schrift-klein); }
+  .leiste .schub .knopf { min-width: 0; padding: 0 var(--luft-3); font-size: var(--schrift-klein); }
   /* Fast deckend: Über den roten Tagesreitern war das Glas sonst kaum lesbar. */
   .menue { min-width: 210px; background: var(--menue); }
   .menue button { padding: var(--luft-3); font-size: var(--schrift-text); }
 
   .wochenschalter { gap: var(--luft-2); }
-  .wochenschalter .rundknopf { width: 34px; height: 34px; }
   /* Im Quelltext stehen beide Pfeile vor der Woche (für den Titel am Rechner); hier ‹ Woche ›. */
   .wochenschalter #wochenlabel { order: 1; }
   .wochenschalter #woche-vor { order: 2; }
   .wochenknopf { flex: 1 1 auto; padding: 0 var(--luft-3); height: 34px; line-height: 32px; font-size: var(--schrift-klein); }
   .wochensumme { height: 34px; padding: 0 var(--luft-3) 0 var(--luft-2); gap: var(--luft-2); font-size: var(--schrift-klein); }
-  .leiste .schub .farbknopf { width: 34px; height: 34px; }
   /* Zen-Modus: Der Knopf steht allein in einer Zeile über der Karte, nicht über ihr. */
   body.zen .leiste { position: static; padding: var(--luft-3) var(--luft-3) 0; background: none; box-shadow: none; }
   body.zen .zenknopf { box-shadow: none; }

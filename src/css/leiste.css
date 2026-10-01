@@ -15,10 +15,17 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
 /* Pfeil am Exportknopf: Er öffnet ein Menü. */
 #btn-export { display: inline-flex; align-items: center; gap: var(--luft-2); }
 #btn-export::after { content: "\25BE"; font-size: var(--schrift-fein); opacity: .7; }
-#btn-mehr { width: 34px; height: 34px; font-size: var(--schrift-gross); }
+/* Alle Knöpfe der Kopfleiste aus einem Guss: 34 px hoch, weiße Fläche mit Rand, 8 px Abstand, links
+   die Pfeile wie rechts die runden Knöpfe. Vorher waren die Pfeile graue Flächen mit 32 px, die
+   anderen umrandet mit 34 px, „Exportieren“ 36 px hoch, und das Menü war ein Schriftzeichen. */
+.leiste .rundknopf { width: 34px; height: 34px; }
+.leiste .rundknopf svg { width: 18px; height: 18px; }
+#btn-mehr svg { fill: currentColor; }
+.leiste #btn-export { height: 34px; padding-top: 0; padding-bottom: 0; }
 /* Hell/dunkel (farbe.js): Mond im Hellen, Sonne im Dunkeln – gezeigt wird, wohin der Knopf schaltet. */
-.farbknopf { width: 34px; height: 34px; color: var(--text); }
-.farbknopf svg { width: 16px; height: 16px; }
+.farbknopf { color: var(--text); }
+/* Der Mond ist voll, die anderen Zeichen Linien: kleiner gesetzt wirkt er gleich groß. */
+.leiste .farbknopf svg { width: 16px; height: 16px; }
 .farbknopf .sonne { display: none; }
 /* Beim Wechsel keine Übergänge einzelner Elemente (farbeOhneUebergaenge() in farbe.js), und die
    Kreisblende statt der eingebauten Überblendung: Beide Bilder liegen fest übereinander, nur das
@@ -35,10 +42,10 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
 /* ---------- Zen-Modus (zen.js) ----------
    Übrig bleiben die Tageskarte oder das Blatt und dieser Knopf, oben rechts über allem. Nicht
    ausgeblendet wird eine Warnung in der Fußleiste: Die muss man sehen. */
-.zenknopf { width: 34px; height: 34px; }
-.zenknopf svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.zenknopf .zen-aus, body.zen .zenknopf .zen-an { display: none; }
-body.zen .zenknopf .zen-aus { display: block; }
+/* Eine Lotusblüte; im Modus ist der Knopf ausgefüllt wie ein gedrückter Schalter. */
+.zenknopf svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+.zenknopf[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--flaeche); }
+.zenknopf[aria-pressed="true"]:hover:not(:disabled) { background: var(--voll-hover); border-color: var(--voll-hover); }
 body.ohnewoche .zenknopf { display: none; }
 body.zen .leiste {
   position: fixed; top: var(--luft-4); right: var(--luft-5); z-index: 30;
@@ -77,8 +84,8 @@ body.zen .tagpanel.frei { width: 100%; max-width: 880px; margin: 0 auto; }
 }
 
 /* ---------- Wochenbalken: Blättern, Woche, Stand ----------
-   Am Rechner ist die Woche der Titel der Seite: groß und ohne Rahmen, davor die Pfeile als leise
-   Kreise, dahinter der Stand in Grau. Vorher standen vier umrandete Formen nebeneinander, und die
+   Am Rechner ist die Woche der Titel der Seite: groß und ohne Rahmen, davor die Pfeile in denselben
+   runden Knöpfen wie rechts die Aktionen, dahinter der Stand in Grau. Vorher standen vier umrandete Formen nebeneinander, und die
    Summe sah aus wie ein Knopf. Am Handy und beim Ausbilder bleibt die Woche ein Knopf (handy.css). */
 .wochenbalken { flex: 0 1 auto; min-width: 0; display: flex; align-items: center; }
 .wochenschalter { display: flex; align-items: center; gap: var(--luft-1); flex: 1 1 auto; min-width: 0; }
@@ -86,6 +93,10 @@ body.zen .tagpanel.frei { width: 100%; max-width: 880px; margin: 0 auto; }
    Pfeile als Knöpfe erkennbar sind, ohne sich vorzudrängen. */
 .wochenschalter .rundknopf, .monatszeile .rundknopf { width: 32px; height: 32px; border: none; background: var(--hauch); }
 .wochenschalter .rundknopf:hover:not(:disabled), .monatszeile .rundknopf:hover:not(:disabled) { background: var(--band); }
+/* In der Kopfleiste wie die Knöpfe rechts (oben); die Fläche bleibt dem Kalender und dem Ausbilder. */
+.leiste .wochenschalter { gap: var(--luft-2); }
+.leiste .wochenschalter .rundknopf { width: 34px; height: 34px; border: 1px solid var(--linie); background: var(--flaeche); }
+.leiste .wochenschalter .rundknopf:hover:not(:disabled) { background: var(--band); border-color: var(--linie-fest); }
 .wochenschalter .rundknopf svg, .monatszeile .rundknopf svg {
   width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2;
   stroke-linecap: round; stroke-linejoin: round;
