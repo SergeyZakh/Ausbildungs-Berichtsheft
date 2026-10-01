@@ -242,29 +242,40 @@ async function durchgang(browser, breite) {
   await nichtsDarunter('Woche');
   // Im verkleinerten Blatt tippt man nicht: Ein Tipp öffnet das Feld groß, von unten.
   await page.locator('.blattfeld.feld-unterweisung').tap();
-  const kommt = await page.evaluate(() =>
-    document.getElementById('dlg-schreiben').getAnimations().some((a) => a.animationName === 'vonunten'));
-  pruefe('Woche: das große Feld fährt von unten herein' + bei, kommt);
+  // Gleich nach dem Tipp steht das Blatt noch unten und fährt herein; der Fokus hatte es früher
+  // sofort ins Bild geschoben, das Hereinfahren war nicht zu sehen.
+  const kommt = await page.evaluate(() => {
+    const b = document.querySelector('#dlg-schreiben .schreiben-blatt');
+    return { unten: Math.round(b.getBoundingClientRect().top) > innerHeight * 0.8,
+      faehrt: b.getAnimations().some((a) => a.transitionProperty === 'transform' && a.playState === 'running') };
+  });
+  pruefe('Woche: das große Feld fährt von unten herein' + bei, kommt.unten && kommt.faehrt, JSON.stringify(kommt));
   await h.schreibfeldSteht(page);
   const gross = await page.evaluate(() => {
-    const d = document.getElementById('dlg-schreiben'), r = d.getBoundingClientRect();
+    const d = document.getElementById('dlg-schreiben'), r = d.querySelector('.schreiben-blatt').getBoundingClientRect();
     return { offen: d.open, oben: Math.round(r.top), unten: Math.round(r.bottom), bild: innerHeight,
       titel: document.getElementById('schreiben-titel').textContent,
       fokus: document.activeElement && document.activeElement.id };
   });
-  pruefe('Woche: ein Tipp aufs Feld öffnet es groß, von unten' + bei,
-    gross.offen && Math.abs(gross.unten - gross.bild) <= 1 && gross.oben > gross.bild / 3 && gross.fokus === 'schreiben-text' &&
+  // Am Touchgerät holt erst ein Tipp ins Textfeld die Tastatur: Kämen beide zugleich, sprang das Feld.
+  pruefe('Woche: ein Tipp aufs Feld öffnet es groß, unten im Bild, noch ohne Tastatur' + bei,
+    gross.offen && Math.abs(gross.unten - gross.bild) <= 1 && gross.oben > gross.bild / 3 && gross.fokus === 'dlg-schreiben' &&
     gross.titel === 'Unterweisungen und Schulungen', JSON.stringify(gross));
+  // Wischen daneben schiebt die Seite dahinter nicht mit; sonst blieb unten eine Lücke.
+  const gesperrt = await page.evaluate(() => getComputedStyle(document.getElementById('dlg-schreiben')).touchAction === 'none' &&
+    getComputedStyle(document.getElementById('schreiben-text')).touchAction === 'pan-y');
+  pruefe('Woche: hinter dem Feld scrollt nichts mit, im Textfeld schon' + bei, gesperrt);
   await nichtsRaus('Schreibfeld');
   await page.fill('#schreiben-text', 'Unterweisung Arbeitssicherheit');
   await page.click('#schreiben-fertig');
   // Es fährt erst hinaus, dann ist es zu; vorher verschwand es von einem Bild aufs nächste.
   const geht = await page.evaluate(() => {
-    const d = document.getElementById('dlg-schreiben');
-    return { offen: d.open, geht: d.classList.contains('geht'), transform: d.style.transform };
+    const d = document.getElementById('dlg-schreiben'), b = d.querySelector('.schreiben-blatt');
+    return { offen: d.open, geht: d.classList.contains('geht'),
+      faehrt: b.getAnimations().some((a) => a.transitionProperty === 'transform') };
   });
   pruefe('Woche: „Fertig“ lässt das Feld nach unten hinausfahren' + bei,
-    geht.offen && geht.geht && geht.transform === 'translateY(100%)', JSON.stringify(geht));
+    geht.offen && geht.geht && geht.faehrt, JSON.stringify(geht));
   await page.waitForTimeout(500);
   const danach = await page.evaluate(() => ({
     offen: document.getElementById('dlg-schreiben').open,

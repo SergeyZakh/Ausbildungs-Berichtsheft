@@ -6,6 +6,18 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
+## [Unveröffentlicht]
+
+### Behoben
+
+- **Schreibfeld am Handy öffnet weich:** Es sprang beim Öffnen ruckartig auf, weil der Browser den
+  Knopf „Fertig“ sofort ins Bild schob, während das Feld noch hereinfuhr. Jetzt fährt es mit
+  derselben Bewegung hoch, mit der es geht. Die Tastatur kommt am Handy erst, wenn man ins
+  Textfeld tippt; so bewegen sich Tastatur und Feld nicht gleichzeitig.
+- **Keine Lücke unter dem Schreibfeld:** Beim Scrollen mit offenem Feld rutschte die Seite dahinter
+  mit, und unter dem Feld blieb eine Lücke. Das Feld sitzt jetzt fest über der Tastatur, die Seite
+  dahinter scrollt nicht mehr mit.
+
 ## [0.4.2] – 2026-10-01
 
 ### Geändert
@@ -289,6 +301,7 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
+[Unveröffentlicht]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.2...HEAD
 [0.4.2]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.3.0...v0.4.0

@@ -365,17 +365,28 @@ noch etwas braucht, trägt nur in der Vorschau „● noch gegenlesen · öffnen
 Am Handy (unter 820 px, dieselbe Grenze wie `handy.css`) ist das Blatt auf ein Drittel
 verkleinert; darin zu tippen hieße, in Fünf-Pixel-Schrift zu schreiben. Die Felder nehmen dort
 keinen Tipp an (`pointer-events: none`), ein Tipp auf die Hülle öffnet das Feld groß
-(`schreibblattOeffnen()`, `#dlg-schreiben`). Es fährt von unten hoch, über der Tastatur: Wie viel
-sie verdeckt, sagt `visualViewport` (`tastaturAbstand()`, `--tastatur`). Oben stehen der Titel und
-„Fertig“, darunter, wohin der Text im Blatt kommt („Kommt ins Blatt unter …“). Geschrieben wird
-trotzdem ins Feld im Blatt, dessen Eingabe speichert und neu zeichnet. „Fertig“ schließt; ist der
-Tag oder sind die Themen noch offen, übernimmt es sie auch, über den Knopf am Feld im Blatt. Wer
-nur nachsehen will, wischt das Feld am Griff nach unten, tippt daneben oder drückt Escape; das
-übernimmt nichts. Es kommt und geht mit Bewegung: herein mit einer Kurve, die schnell anläuft und
-lang ausläuft (`vonunten`, .38 s), hinaus nach unten, während der Hintergrund ausblendet
-(`schreibblattZu()`, Klasse `.geht`, zu ist es erst danach). Beim Wischen folgt es dem Finger;
-weit oder schnell genug nach unten fährt es hinaus, sonst schnappt es weich zurück. Vorher
-verschwand es von einem Bild aufs nächste. Mit „Bewegung reduzieren“ geht es sofort zu. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
+(`schreibblattOeffnen()`, `#dlg-schreiben`). Am Handy liegt der Dialog durchsichtig über dem ganzen
+sichtbaren Bereich (`schreibblattLage()`: Lage und Höhe aus `visualViewport`, ohne Übergang
+nachgezogen); darin ein Schleier und unten das Blatt. Mit offener Tastatur ist der sichtbare Bereich
+kleiner, das Blatt sitzt damit immer direkt darüber. Wischen auf Dialog und Schleier schiebt die
+Seite dahinter nicht (`touch-action: none`, nur im Textfeld `pan-y`): Vorher hing das Blatt an
+einem weich nachgezogenen Abstand zur Tastatur, iOS schob die Seite mit, und unten blieb eine
+Lücke. Oben stehen der Titel und „Fertig“, darunter, wohin der Text im Blatt kommt („Kommt ins
+Blatt unter …“). Geschrieben wird trotzdem ins Feld im Blatt, dessen Eingabe speichert und neu
+zeichnet. „Fertig“ schließt; ist der Tag oder sind die Themen noch offen, übernimmt es sie auch,
+über den Knopf am Feld im Blatt. Wer nur nachsehen will, wischt das Feld am Griff nach unten,
+tippt daneben oder drückt Escape; das übernimmt nichts.
+
+Herein und hinaus ist dieselbe Bewegung, nur umgekehrt: Klasse `.da` (Blatt von unten, schnell an
+und lang auslaufend, .42 s; Schleier blendet ein), Klasse `.geht` (sanft an, schnell weg, .28 s),
+zu ist es erst danach (`schreibblattZu()`). Damit der Browser einen Anfang sieht, wird der Zustand
+„unten“ nach `showModal()` einmal berechnet, bevor `.da` kommt. Der Fokus geht dabei an den Dialog
+selbst (`autofocus`, `preventScroll`), und der Dialog ist kein Scrollbereich (`overflow: clip`):
+Ging der Fokus an „Fertig“, schob der Browser den Knopf sofort ins Bild, und das Hereinfahren war
+weg; so sprang das Feld ruckartig auf. Am Touchgerät holt das Öffnen auch nicht die Tastatur, erst
+ein Tipp ins Textfeld: Sonst fuhren Tastatur, Seite und Feld gleichzeitig los. Beim Wischen folgt
+das Blatt dem Finger, der Schleier wird heller; weit oder schnell genug nach unten fährt es hinaus,
+sonst schnappt es zurück. Mit „Bewegung reduzieren“ geht es sofort zu. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
 Text ›“ öffnet sich so, am Rechner wie am Handy: Im Blatt hat der Tag noch kein Feld; sobald er
 Text hat, steht er dort. Früher standen am Handy Karten über dem Blatt, man sah das Blatt erst
 nach dem Scrollen; ein erster Versuch mit einem Fenster oben und einer Knopfleiste darunter sah
