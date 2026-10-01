@@ -8,6 +8,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ## [Unveröffentlicht]
 
+## [0.5.0] – 2026-10-01
+
 ### Neu
 
 - **Woher kommt welches Wort?** Neben dem Text eines Tages hat jede Buchung einen Farbstrich, und
@@ -317,7 +319,8 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
-[Unveröffentlicht]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.3...HEAD
+[Unveröffentlicht]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.3...v0.5.0
 [0.4.3]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.0...v0.4.1

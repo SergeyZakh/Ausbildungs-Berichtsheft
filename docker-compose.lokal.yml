@@ -10,7 +10,7 @@
 services:
   berichtsheft:
     build: .
-    image: berichtsheft:0.4.3
+    image: berichtsheft:0.5.0
     container_name: berichtsheft
     restart: unless-stopped
     ports:
