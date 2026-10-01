@@ -53,7 +53,7 @@ document.addEventListener("keydown", function (e) {
     var zenAus = zenAn() && !wochenwahlOffen() && !document.querySelector("dialog[open]");
     menueSchliessen();
     if (wochenwahlOffen()) wochenwahlSchliessen();
-    if (zenAus) zenSetzen(false);
+    if (zenAus) zenUmschalten(false);
     return;
   }
   var imFeld = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || "").toUpperCase());

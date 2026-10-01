@@ -17,7 +17,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Tag, auch direkt im Blatt.
 - **Zen-Modus:** Ein Knopf neben hell/dunkel blendet alles aus außer dem, woran man schreibt: am
   Tag nur die Karte mit „Fertig“, in der Woche nur das Blatt. Die Tasten 1–8 und Alt+←/→ gehen
-  weiter; Esc oder derselbe Knopf oben rechts beendet ihn.
+  weiter; Esc oder derselbe Knopf beendet ihn. Der Knopf bleibt dabei an seiner Stelle, die Karte
+  gleitet an ihren Platz, der Rest blendet weich aus.
 
 ### Geändert
 

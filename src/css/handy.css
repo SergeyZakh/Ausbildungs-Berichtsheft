@@ -37,10 +37,9 @@
   .wochenschalter #woche-vor { order: 2; }
   .wochenknopf { flex: 1 1 auto; padding: 0 var(--luft-3); height: 34px; line-height: 32px; font-size: var(--schrift-klein); }
   .wochensumme { height: 34px; padding: 0 var(--luft-3) 0 var(--luft-2); gap: var(--luft-2); font-size: var(--schrift-klein); }
-  /* Zen-Modus: Der Knopf steht allein in einer Zeile über der Karte, nicht über ihr. */
-  body.zen .leiste { position: static; padding: var(--luft-3) var(--luft-3) 0; background: none; box-shadow: none; }
-  body.zen .zenknopf { box-shadow: none; }
-  body.zen #tagbereich > .tagpanel { padding: var(--luft-3) var(--luft-3) var(--luft-4); }
+  /* Zen-Modus: Die erste Zeile bleibt mit dem Knopf an seiner Stelle, die Woche darunter geht. */
+  body.zen .leiste { background: none; box-shadow: none; }
+  body.zen .leiste .wochenbalken { display: none; }
   .wsanteil { gap: var(--luft-1); }
   .wochensumme .ring { width: 18px; height: 18px; --dicke: 3px; }
 

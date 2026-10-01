@@ -40,26 +40,33 @@ body.ohnewoche .leiste::before { content: "Berichtsheft"; font-size: var(--schri
 }
 
 /* ---------- Zen-Modus (zen.js) ----------
-   Übrig bleiben die Tageskarte oder das Blatt und dieser Knopf, oben rechts über allem. Nicht
-   ausgeblendet wird eine Warnung in der Fußleiste: Die muss man sehen. */
+   Übrig bleiben die Tageskarte oder das Blatt und dieser Knopf. Die Kopfleiste bleibt dabei stehen,
+   nur unsichtbar: So steht der Knopf im Modus genau dort, wo man ihn gedrückt hat. Vorher sprang er
+   in die Ecke. Nicht ausgeblendet wird eine Warnung in der Fußleiste: Die muss man sehen. */
 /* Eine Lotusblüte; im Modus ist der Knopf ausgefüllt wie ein gedrückter Schalter. */
 .zenknopf svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
 .zenknopf[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--flaeche); }
 .zenknopf[aria-pressed="true"]:hover:not(:disabled) { background: var(--voll-hover); border-color: var(--voll-hover); }
 body.ohnewoche .zenknopf { display: none; }
-body.zen .leiste {
-  position: fixed; top: var(--luft-4); right: var(--luft-5); z-index: 30;
-  padding: 0; background: none; box-shadow: none;
-}
-body.zen .leiste > :not(.schub), body.zen .leiste .schub > :not(.zenknopf) { display: none; }
-body.zen .zenknopf { box-shadow: var(--schatten); }
+body.zen .leiste > :not(.schub), body.zen .leiste .schub > :not(.zenknopf) { visibility: hidden; }
 body.zen .reiter, body.zen .hinweise, body.zen .sektion.posten, body.zen .blattzeile, body.zen .wochenfeldhinweis,
 body.zen .fussleiste:not(.warn), body.zen .fussleiste .signatur { display: none; }
-/* Die Karte mittig und lesbar breit; links und rechts Platz, damit der Knopf nichts verdeckt. */
+/* Die Karte mittig und lesbar breit. */
 body.zen #tagbereich { margin-top: 0; }
-body.zen #tagbereich > .tagpanel { padding: var(--luft-5) 72px; }
 body.zen .tagflaeche:not(.blattwoche) { width: 100%; max-width: 880px; margin: 0 auto; }
 body.zen .tagpanel.frei { width: 100%; max-width: 880px; margin: 0 auto; }
+/* Der Wechsel als View Transition (zenUmschalten()): Die Karte gleitet an ihren neuen Platz, der
+   Knopf steht still, das Übrige blendet über. Das neue Bild legt sich über das stehende alte, so
+   scheint zwischendurch nichts vom Grund durch. Ohne diese Schnittstelle wechselt es in einem Schritt. */
+.zenwechsel .zenknopf { view-transition-name: zenknopf; }
+.zenwechsel .tagkarte, .zenwechsel .tagflaeche.blattwoche > .sektion.vorschau { view-transition-name: zenarbeit; }
+.zenwechsel::view-transition-old(root) { animation: none; }
+.zenwechsel::view-transition-new(root) { animation: zenein .26s cubic-bezier(.2, 0, 0, 1) both; }
+.zenwechsel::view-transition-group(zenarbeit) { animation-duration: .34s; animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+.zenwechsel::view-transition-old(zenarbeit) { animation: none; opacity: 0; }
+.zenwechsel::view-transition-new(zenarbeit) { animation: none; }
+.zenwechsel::view-transition-old(zenknopf), .zenwechsel::view-transition-new(zenknopf) { animation-duration: .2s; }
+@keyframes zenein { from { opacity: 0; } }
 
 .menuehalter { position: relative; display: flex; }
 .menue {

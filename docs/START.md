@@ -151,8 +151,8 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
   weiter je Tag; im Blatt steht jede Zeile einmal, freie Tage als eine Zeile am Ende („Urlaub am
   Mittwoch“). Wieder einschalten geht jederzeit.
 - **Zen-Modus:** Der Knopf mit der Lotusblüte neben hell/dunkel blendet alles aus außer dem, woran
-  du schreibst: am Tag nur die Karte mit **Fertig**, in der Woche nur das Blatt. Beenden mit
-  demselben Knopf oben rechts oder mit `Esc`.
+  du schreibst: am Tag nur die Karte mit **Fertig**, in der Woche nur das Blatt. Der Knopf bleibt
+  dabei, wo er ist; beenden mit demselben Knopf oder mit `Esc`.
 - **Tastatur:** `1`–`7` wählt den Tag, `8` den Reiter **Woche** (die Ziffer steht klein in der Ecke
   jedes Reiters), `Alt` + `←` / `→` blättert eine Woche zurück oder vor, `Strg` + `S` speichert das
   Wochenblatt, `Esc` beendet den Zen-Modus. Die Tasten gehen auch im Zen-Modus.
