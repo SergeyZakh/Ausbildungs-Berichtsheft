@@ -319,7 +319,7 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   await handy.click('.blattfeld.feld-schule');
   await handy.waitForTimeout(300);
   await handy.click('#schreiben-fertig');
-  await handy.waitForTimeout(400);
+  await handy.waitForTimeout(500);
   pruefe('Handy: „Fertig“ im großen Feld übernimmt die Themen', await handy.evaluate(() =>
     !document.getElementById('dlg-schreiben').open && window.__wochendaten()['2026-09-14'].schuleGeprueft === true));
   pruefe('Handy ohne JavaScript-Fehler', handyFehler.length === 0, handyFehler.join(' | '));

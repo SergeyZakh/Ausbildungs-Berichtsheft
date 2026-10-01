@@ -371,7 +371,11 @@ sie verdeckt, sagt `visualViewport` (`tastaturAbstand()`, `--tastatur`). Oben st
 trotzdem ins Feld im Blatt, dessen Eingabe speichert und neu zeichnet. „Fertig“ schließt; ist der
 Tag oder sind die Themen noch offen, übernimmt es sie auch, über den Knopf am Feld im Blatt. Wer
 nur nachsehen will, wischt das Feld am Griff nach unten, tippt daneben oder drückt Escape; das
-übernimmt nichts. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
+übernimmt nichts. Es kommt und geht mit Bewegung: herein mit einer Kurve, die schnell anläuft und
+lang ausläuft (`vonunten`, .38 s), hinaus nach unten, während der Hintergrund ausblendet
+(`schreibblattZu()`, Klasse `.geht`, zu ist es erst danach). Beim Wischen folgt es dem Finger;
+weit oder schnell genug nach unten fährt es hinaus, sonst schnappt es weich zurück. Vorher
+verschwand es von einem Bild aufs nächste. Mit „Bewegung reduzieren“ geht es sofort zu. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
 Text ›“ öffnet sich so, am Rechner wie am Handy: Im Blatt hat der Tag noch kein Feld; sobald er
 Text hat, steht er dort. Früher standen am Handy Karten über dem Blatt, man sah das Blatt erst
 nach dem Scrollen; ein erster Versuch mit einem Fenster oben und einer Knopfleiste darunter sah

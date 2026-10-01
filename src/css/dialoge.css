@@ -624,9 +624,15 @@
     max-height: calc(var(--sichtbar, 100dvh) - 24px);
     border-width: 1px 0 0; border-radius: 16px 16px 0 0;
     padding-bottom: env(safe-area-inset-bottom);
-    animation: vonunten .22s ease-out; transition: transform .15s;
+    /* Herein mit der Kurve eines Blatts, das sich aufschiebt: schnell an, lang auslaufend. Die
+       Tastatur verschiebt es danach weich mit (margin-bottom aus --tastatur). */
+    animation: vonunten .38s cubic-bezier(.32, .72, 0, 1);
+    transition: margin-bottom .25s ease-out;
   }
   #dlg-schreiben::backdrop { background: rgba(0, 0, 0, .35); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  #dlg-schreiben[open]::backdrop { animation: einblenden .3s ease-out; }
+  /* Hinaus (schreibblattZu()): das Feld per transform, der Hintergrund blendet mit aus. */
+  #dlg-schreiben.geht::backdrop { animation: ausblenden .26s ease-in forwards; }
   .schreiben-griff { display: block; width: 40px; height: 5px; margin: var(--luft-2) auto 0; border-radius: 3px; background: var(--linie-fest); }
   #dlg-schreiben .dkopf { padding: var(--luft-2) var(--luft-4) var(--luft-1); }
   #dlg-schreiben .dkopf h2 { font-size: var(--schrift-gross); }
@@ -636,3 +642,4 @@
   #schreiben-text.einzeilig { min-height: 0; }
 }
 @keyframes vonunten { from { transform: translateY(100%); } }
+@keyframes ausblenden { to { opacity: 0; } }

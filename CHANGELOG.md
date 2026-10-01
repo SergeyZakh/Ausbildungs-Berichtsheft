@@ -6,6 +6,15 @@ Ein Tag `vX.Y.Z` erzeugt das Release mit `Berichtsheft.html` (`.github/workflows
 Solange die Version bei `0.x` steht, kann sich zwischen zwei Ausgaben noch ändern, wie das
 Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
+## [Unveröffentlicht]
+
+### Geändert
+
+- **Schreibfeld am Handy weicher:** Es fährt mit einer weichen Kurve herein und beim Schließen
+  wieder nach unten hinaus, der Hintergrund blendet mit. Beim Wischen folgt es dem Finger; ein
+  kurzer, schneller Wisch reicht zum Schließen, sonst schnappt es zurück. Vorher verschwand es
+  schlagartig.
+
 ## [0.4.1] – 2026-10-01
 
 ### Geändert
@@ -280,6 +289,7 @@ Erste öffentliche Version.
 - **Nachprüfbar:** Das Release nennt die SHA-256-Prüfsumme von `Berichtsheft.html`. Der Build
   bricht ab, wenn im eigenen Code eine fremde Adresse, `eval` oder `new Function` steht.
 
+[Unveröffentlicht]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.1...HEAD
 [0.4.1]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/SergeyZakh/Ausbildungs-Berichtsheft/compare/v0.2.0...v0.3.0
