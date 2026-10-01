@@ -232,23 +232,23 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 .blattzeile .textfuss { padding: 0; border: 0; gap: var(--luft-3); }
 .blattzeile .textstand { margin-left: 0; }
 
-/* Die Felder im Blatt. Das Blatt ist weiß, auch im Dunkeln, deshalb feste Farben. Die Felder der
-   Woche tragen einen feinen grauen Rahmen, die Tage zeigen ihn erst beim Drüberfahren: Ein gelber
-   Rahmen um jedes Feld war zu laut, und das Blatt sah nicht mehr aus wie gedruckt. Beim Schreiben
-   ein weißes Feld mit dem Text, der gleich im Blatt steht. */
+/* Die Felder im Blatt, ohne Rahmen: Das Blatt sieht aus wie gedruckt. Ein gelber Rahmen mit
+   Fläche um jedes Feld war zu laut, ein feiner grauer immer noch Unruhe über dem Vordruck. Wo man
+   schreiben kann, sagt die Zeile darüber; beim Drüberfahren tönt das Feld sich leicht grau, ein
+   leeres sagt es in blassem Grau. Das Blatt ist weiß, auch im Dunkeln, deshalb feste Farben. Beim
+   Schreiben ein weißes Feld mit dem Text, der gleich im Blatt steht. */
 .blattlage { position: absolute; inset: 0; pointer-events: none; }
 .blattfeld {
   position: absolute; pointer-events: auto; cursor: text; border-radius: 2px;
-  outline: 1px dashed #C4C8CE; outline-offset: 2px; background: transparent;
-  transition: background-color .15s, outline-color .15s;
+  outline: 1.5px solid transparent; outline-offset: 2px; background: transparent;
+  transition: background-color .15s;
 }
-.blattfeld.feld-tag { z-index: 1; outline-color: transparent; }
+.blattfeld.feld-tag { z-index: 1; }
 @media (hover: hover) {
-  .blattfeld:hover { background: rgba(30, 40, 60, .04); outline-color: #979EA8; }
+  .blattfeld:hover { background: rgba(30, 40, 60, .045); }
 }
 .blattfeld:focus-within {
-  z-index: 3; outline: 1.5px solid #6B7280; outline-offset: 2px; background: #fff;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, .14);
+  z-index: 3; outline-color: #6B7280; background: #fff; box-shadow: 0 8px 28px rgba(0, 0, 0, .14);
 }
 /* .tagpanel davor: Die Regel für Textfelder im Tag (.tagpanel textarea, weiter unten) setzte sonst
    Schrift, Abstände und im Dunkeln eine dunkle Fläche mit heller Schrift, mitten im weißen Blatt. */
@@ -261,18 +261,10 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 .tagpanel .blattfeld textarea:focus, .tagpanel .blattfeld input:focus { border: 0; box-shadow: none; outline: none; }
 .blattleer {
   position: absolute; inset: 0; display: none; align-items: center; justify-content: center; padding: var(--luft-1) var(--luft-2);
-  text-align: center; font-size: var(--schrift-klein); color: #8A9099; pointer-events: none;
+  text-align: center; font-size: var(--schrift-klein); font-style: italic; color: #A3A8AF; pointer-events: none;
 }
 .blattfeld.leer .blattleer { display: flex; }
 .blattfeld.leer:focus-within .blattleer { display: none; }
-/* „✎“ klein und grau in der Ecke: an leeren Feldern immer, sonst beim Drüberfahren. */
-.blattstift {
-  position: absolute; top: 1px; right: 3px; font-size: 12px; line-height: 1; color: #979EA8;
-  opacity: 0; transition: opacity .15s; pointer-events: none;
-}
-.blattfeld.leer .blattstift { opacity: 1; }
-@media (hover: hover) { .blattfeld:hover .blattstift { opacity: 1; } }
-.blattfeld:focus-within .blattstift { display: none; }
 .blattknoepfe {
   position: absolute; right: var(--luft-2); bottom: var(--luft-2); z-index: 3;
   display: flex; gap: var(--luft-2); pointer-events: auto;
@@ -284,7 +276,6 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 /* Die Abteilung ist nur eine Zeile im Kopf des Blatts. */
 .blattfeld.feld-abteilung { outline-offset: 1px; }
 .blattfeld.feld-abteilung .blattleer { font-size: var(--schrift-fein); }
-.blattfeld.feld-abteilung .blattstift { top: -1px; right: 1px; font-size: 10px; }
 .blatthinweis .schmal, .blattleer .schmal { display: none; }
 
 /* Ein Klick auf den Kopf eines Tages öffnet ihn ganz; ein offener trägt eine Marke, die dazu
