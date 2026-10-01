@@ -138,6 +138,37 @@
   .postenliste .pzeit { flex: none; font-size: var(--schrift-klein); }
   .postenliste p:has(.pdazu) { padding-right: var(--luft-8); }
   .pdazu { width: 34px; height: 34px; font-size: var(--schrift-titel); }
+  /* Buchungen eingeklappt, sobald der Tag Text hat (postenSektion): im Kopf Zahl und Stunden,
+     der ganze Kopf klappt. Aufgeklappt oben der Balken, wohin die Zeit ging, in Grau. */
+  .sektion.posten > .sektionskopf { cursor: pointer; flex-wrap: nowrap; }
+  .sektion.posten > .sektionskopf > span:first-child { flex: 1 1 auto; min-width: 0; }
+  .sektion.posten.zu > .sektionskopf { border-bottom: 0; }
+  .sektion.posten.zu > .sektionsleib { display: none; }
+  .postenklapp {
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    width: 28px; height: 28px; margin: -2px -4px -2px 0; padding: 0; border: 0; border-radius: 50%;
+    background: none; color: var(--schiefer); font: inherit; font-size: var(--schrift-text); cursor: pointer;
+  }
+  .postenklapp::before { content: "\25BE"; transition: transform .2s; }
+  .sektion.posten.zu .postenklapp::before { transform: rotate(-90deg); }
+  .zeitbalken {
+    display: block; padding: var(--luft-3) var(--luft-3) var(--luft-2);
+    background: var(--posten-grund); border-bottom: 1px solid var(--linie-leise);
+  }
+  .zbleiste { display: flex; gap: 2px; height: 8px; border-radius: var(--rund-voll); overflow: hidden; }
+  .zblegende {
+    margin: var(--luft-2) 0 0; display: flex; flex-wrap: wrap; gap: var(--luft-1) var(--luft-3);
+    font-size: var(--schrift-klein); color: var(--schiefer); font-variant-numeric: tabular-nums;
+  }
+  .zblegende span { white-space: nowrap; }
+  .zblegende span::before {
+    content: ""; display: inline-block; width: 8px; height: 8px; margin-right: var(--luft-1);
+    border-radius: 2px; vertical-align: 0;
+  }
+  .zbleiste .zb0, .zblegende .zb0::before { background: color-mix(in srgb, var(--text) 72%, transparent); }
+  .zbleiste .zb1, .zblegende .zb1::before { background: color-mix(in srgb, var(--text) 46%, transparent); }
+  .zbleiste .zb2, .zblegende .zb2::before { background: color-mix(in srgb, var(--text) 28%, transparent); }
+  .zbleiste .zb3, .zblegende .zb3::before { background: color-mix(in srgb, var(--text) 16%, transparent); }
   .leerbild { margin: var(--luft-1) var(--luft-3); padding: var(--luft-7) var(--luft-6); }
 
   /* Der Hinweis scrollt mit weg; die Reiter darunter halten mit ihrem oberen Rand Abstand. */
@@ -255,6 +286,8 @@
    Sonst brach die Kopfleiste auf drei Zeilen um. */
 @media (max-width: 360px) {
   .wochensumme .wswort, .wochensumme .wsstunden { display: none; }
+  /* Sonst bricht der Kopf der Buchungen um; die Punkte allein sagen genug, aria-label bleibt. */
+  .herkunftknopf .hktext { display: none; }
 }
 
 @media (max-width: 620px) {

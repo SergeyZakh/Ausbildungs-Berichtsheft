@@ -448,6 +448,8 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
   transition: background-color .15s, border-color .15s;
 }
 .pdazu:hover { background: var(--band); border-color: var(--linie-fest); }
+/* Einklappen und Zeitbalken gibt es nur am Handy (handy.css). */
+.postenklapp, .zeitbalken { display: none; }
 
 /* ---------- Herkunft (herkunft.js) ----------
    Hinter dem Textfeld ein Spiegel mit demselben Text: Schrift unsichtbar, nur die Striche

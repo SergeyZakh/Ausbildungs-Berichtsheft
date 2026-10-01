@@ -136,6 +136,47 @@ async function durchgang(browser, breite) {
     [...document.querySelectorAll('#reiter button')].every((k) => getComputedStyle(k, '::before').content === 'none')));
   await nichtsRaus('Tag');
   await nichtsDarunter('Tag');
+  // Die Buchungen stehen unter dem Text und waren lang zu scrollen: Hat der Tag Text, sind sie
+  // eingeklappt, im Kopf Zahl und Stunden in einer Zeile; aufgeklappt steht oben der Balken, wohin
+  // die Zeit ging.
+  const klapp = () => page.evaluate(() => {
+    const s = document.querySelector('.sektion.posten'), k = s.querySelector('.sektionskopf');
+    const mitten = [...k.children].map((c) => c.getBoundingClientRect()).filter((r) => r.width).map((r) => (r.top + r.bottom) / 2);
+    const leiste = s.querySelector('.zbleiste');
+    return { zu: s.classList.contains('zu'), liste: !!s.querySelector('.postenliste').offsetParent,
+      knopf: s.querySelector('.postenklapp').getAttribute('aria-expanded'), zahl: s.querySelector('.postenzahl').innerText,
+      eineZeile: Math.max(...mitten) - Math.min(...mitten) < 6,
+      legende: [...s.querySelectorAll('.zblegende span')].map((x) => x.textContent),
+      balken: Math.round([...s.querySelectorAll('.zbleiste span')].reduce((n, x) => n + x.getBoundingClientRect().width, 0)),
+      leiste: leiste ? Math.round(leiste.getBoundingClientRect().width) : 0 };
+  });
+  const zu = await klapp();
+  pruefe('Buchungen mit Text eingeklappt, im Kopf Zahl und Stunden in einer Zeile' + bei,
+    zu.zu && !zu.liste && zu.knopf === 'false' && zu.zahl.includes('7,75') && zu.eineZeile, JSON.stringify(zu));
+  await page.locator('.sektion.posten .sektionskopf > span').first().tap();
+  const auf = await klapp();
+  pruefe('Ein Tipp auf den Kopf klappt auf, oben der Balken nach Projekt' + bei,
+    !auf.zu && auf.liste && auf.knopf === 'true' && auf.legende.length === 4 &&
+    auf.legende[0] === 'Infrastruktur 3,75\u00a0h' && Math.abs(auf.balken + 6 - auf.leiste) <= 2, JSON.stringify(auf));
+  await nichtsRaus('Buchungen aufgeklappt');
+  await page.locator('#reiter button').nth(1).click();
+  await page.waitForTimeout(300);
+  pruefe('Aufgeklappt bleibt aufgeklappt, auch am nächsten Tag' + bei, !(await klapp()).zu);
+  // Nach dem Neuladen und ohne Text stehen sie offen: Dann braucht man sie zum Schreiben.
+  await page.reload();
+  await page.waitForSelector('#reiter button');
+  await page.locator('#reiter button').nth(0).click();
+  await page.waitForTimeout(300);
+  const montag = await page.inputValue('.tagpanel textarea');
+  await page.fill('.tagpanel textarea', '');
+  await page.locator('#reiter button').nth(1).click();
+  await page.waitForTimeout(200);
+  const dienstag = (await klapp()).zu;
+  await page.locator('#reiter button').nth(0).click();
+  await page.waitForTimeout(200);
+  pruefe('Ohne Text stehen die Buchungen offen, mit Text eingeklappt' + bei, !(await klapp()).zu && dienstag);
+  await page.fill('.tagpanel textarea', montag);
+  await page.evaluate(() => { const z = document.querySelector('.hinweiszu'); if (z) z.click(); const n = document.getElementById('notiz-zu'); if (n) n.click(); });
   // Die Wochentage saßen auf der Trennlinie der Kopfleiste, ihr oberer Rand war abgeschnitten.
   const reiter = await page.evaluate(() => {
     const leiste = document.querySelector('.leiste').getBoundingClientRect().bottom;
