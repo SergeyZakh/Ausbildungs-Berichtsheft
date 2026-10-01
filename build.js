@@ -37,6 +37,7 @@ const JS = [
   'ansicht/ansicht-woche.js',
   'ansicht/reiter.js',
   'ansicht/ansicht-tag.js',
+  'ansicht/herkunft.js',
   'ansicht/wochenblatt.js',
   'ansicht/schulwoche.js',
   'ausgabe/word.js',

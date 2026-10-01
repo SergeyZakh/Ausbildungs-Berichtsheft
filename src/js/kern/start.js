@@ -34,6 +34,7 @@ window.__csvAnalysieren = function (text) {
            sicher: a.sicher, gruende: a.gruende, buchungen: buchungenLesen(a).buchungen };
 };
 window.__faecherListe = faecherListe;
+window.__herkunftFinden = function (text, posten) { return herkunftFinden(text, posten); };
 window.__sage = function (text, art) { sage(text, art); };
 window.__schultagAusBuchungen = function (datumIso, posten) { return schultagAusBuchungen(datumIso, posten); };
 window.__kiTageDerWoche = function (montagIso) { return kiTageDerWoche(montagIso).map(function (x) { return x.key; }); };

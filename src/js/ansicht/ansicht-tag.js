@@ -406,12 +406,22 @@ function kiKnopf(key, t) {
  * Wer den Entwurf gelöscht hat und neu schreibt, holt sich so einzelne Zeilen zurück, ohne
  * Kundennamen und Ticketnummern abzutippen. Steht die Zeile schon im Text, fällt das Plus weg:
  * Ein Haken an jeder Buchung sah nach „erledigt“ aus und machte die Liste unruhig.
+ * Welche Wörter im Text aus welcher Buchung kommen, zeigen farbige Striche (herkunft.js).
  */
 function postenSektion(posten, ta) {
   var s = sektion("Buchungen", "posten");
   var zahl = document.createElement("span");
   zahl.className = "postenzahl";
   zahl.textContent = posten.length === 1 ? "1 Posten" : posten.length + " Posten";
+  // Schaltet die farbigen Striche (herkunft.js) für diesen Browser an und aus.
+  var schalter = null;
+  if (ta) {
+    schalter = document.createElement("button");
+    schalter.type = "button";
+    schalter.className = "herkunftknopf";
+    schalter.innerHTML = '<span class="hkpunkte" aria-hidden="true"><i></i><i></i><i></i></span>Herkunft';
+    s.kopf.appendChild(schalter);
+  }
   s.kopf.appendChild(zahl);
 
   var liste = document.createElement("div");
@@ -471,6 +481,7 @@ function postenSektion(posten, ta) {
   }
   if (ta) ta.addEventListener("input", postenAbgleichen);
   postenAbgleichen();
+  if (ta) herkunftAnlegen(ta, posten, liste, schalter);
   return s.wurzel;
 }
 

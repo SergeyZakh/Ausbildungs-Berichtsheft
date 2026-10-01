@@ -449,6 +449,50 @@ body.ohnewoche .leerbild { margin: var(--luft-2) var(--luft-5); }
 }
 .pdazu:hover { background: var(--band); border-color: var(--linie-fest); }
 
+/* ---------- Herkunft (herkunft.js) ----------
+   Hinter dem Textfeld ein Spiegel mit demselben Text: Schrift unsichtbar, nur die Striche
+   sichtbar. Das Feld liegt durchsichtig darüber; Schrift, Ränder und Größe übernimmt der Spiegel
+   per Skript vom Feld, damit die Zeilen an derselben Stelle umbrechen. */
+.herkunftrahmen {
+  position: relative; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
+  background: var(--flaeche);
+}
+.tagpanel .herkunftrahmen > textarea,
+.tagpanel .herkunftrahmen > textarea[readonly] { position: relative; background: transparent; }
+.herkunft {
+  position: absolute; box-sizing: border-box; margin: 0; border: 0; overflow: hidden; pointer-events: none;
+  white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; color: transparent;
+}
+.herkunftrahmen.aus .herkunft { display: none; }
+.herkunft .hk {
+  text-decoration: underline 2px var(--hk); text-underline-offset: 4px; text-decoration-skip-ink: none;
+  border-radius: 3px; transition: background-color .15s, text-decoration-color .15s;
+}
+/* Zeigt man auf eine Buchung, treten die anderen zurück und ihre Wörter leuchten wie Textmarker. */
+.herkunft.zeigt .hk { text-decoration-color: color-mix(in srgb, var(--hk) 28%, transparent); }
+.herkunft.zeigt .hk.an { text-decoration-color: var(--hk); background: color-mix(in srgb, var(--hk) 20%, transparent); }
+.hkf0 { --hk: var(--hk-0); } .hkf1 { --hk: var(--hk-1); } .hkf2 { --hk: var(--hk-2); }
+.hkf3 { --hk: var(--hk-3); } .hkf4 { --hk: var(--hk-4); } .hkf5 { --hk: var(--hk-5); }
+/* In der Liste der Strich am Rand; blass, solange nichts von der Buchung im Text steht. */
+.postenliste.mitherkunft p { padding-left: var(--luft-3); margin-left: calc(-1 * var(--luft-1)); border-left: 3px solid transparent; }
+.postenliste.mitherkunft p[class*="hkf"] { border-left-color: var(--hk); }
+.postenliste.mitherkunft p.nichtimtext { border-left-color: color-mix(in srgb, var(--hk) 30%, transparent); }
+.postenliste.mitherkunft p.hier { background: color-mix(in srgb, var(--hk) 10%, transparent); }
+/* Schalter im Kopf der Buchungen: drei Punkte in den ersten Farben, gedrückt voll, sonst grau. */
+.herkunftknopf {
+  flex: none; display: inline-flex; align-items: center; gap: var(--luft-1); height: 24px;
+  padding: 0 var(--luft-2); border-radius: var(--rund-voll); cursor: pointer;
+  font: inherit; font-size: var(--schrift-fein); font-weight: 400; color: var(--schiefer);
+  background: var(--flaeche); border: 1px solid var(--linie);
+}
+.herkunftknopf[aria-pressed="true"] { color: var(--text); }
+@media (hover: hover) { .herkunftknopf:hover { border-color: var(--linie-fest); color: var(--text); } }
+.hkpunkte { display: inline-flex; gap: 2px; }
+.hkpunkte i { width: 6px; height: 6px; border-radius: 50%; background: var(--blass); }
+.herkunftknopf[aria-pressed="true"] .hkpunkte i:nth-child(1) { background: var(--hk-0); }
+.herkunftknopf[aria-pressed="true"] .hkpunkte i:nth-child(2) { background: var(--hk-2); }
+.herkunftknopf[aria-pressed="true"] .hkpunkte i:nth-child(3) { background: var(--hk-3); }
+
 /* ---------- Hinweis über den Reitern (hinweise.js) ----------
    Eine Karte wie der Fortschritt darunter. Rot nur im Titel: Der Hinweis soll auffallen, aber
    nicht aussehen wie ein Tag, der gegengelesen werden muss. */
