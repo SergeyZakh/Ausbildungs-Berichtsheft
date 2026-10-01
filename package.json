@@ -1,6 +1,6 @@
 {
   "name": "berichtsheft",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Ausbildungsnachweis (IHK-Berichtsheft) aus dem CSV-Export deiner Zeiterfassung – im Browser oder mit Server für Betriebe",
   "license": "MIT",
   "private": true,
