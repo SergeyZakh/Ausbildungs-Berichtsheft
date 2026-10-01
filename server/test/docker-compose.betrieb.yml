@@ -39,7 +39,7 @@ services:
     profiles: ["nie"]
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.7.4
+    image: quay.io/keycloak/keycloak:26.7.5
     command: ["start-dev", "--import-realm"]
     ports:
       - "127.0.0.1:${KEYCLOAK_PORT:-8180}:8080"
