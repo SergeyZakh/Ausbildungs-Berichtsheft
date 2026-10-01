@@ -386,7 +386,8 @@ Ging der Fokus an „Fertig“, schob der Browser den Knopf sofort ins Bild, und
 weg; so sprang das Feld ruckartig auf. Am Touchgerät holt das Öffnen auch nicht die Tastatur, erst
 ein Tipp ins Textfeld: Sonst fuhren Tastatur, Seite und Feld gleichzeitig los. Beim Wischen folgt
 das Blatt dem Finger, der Schleier wird heller; weit oder schnell genug nach unten fährt es hinaus,
-sonst schnappt es zurück. Mit „Bewegung reduzieren“ geht es sofort zu. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
+sonst schnappt es zurück. Nach oben gibt es höchstens 40 px nach; darunter hängt eine Schürze in der
+Farbe des Blatts (`.schreiben-blatt::after`), sonst schien dort die Seite durch. Mit „Bewegung reduzieren“ geht es sofort zu. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
 Text ›“ öffnet sich so, am Rechner wie am Handy: Im Blatt hat der Tag noch kein Feld; sobald er
 Text hat, steht er dort. Früher standen am Handy Karten über dem Blatt, man sah das Blatt erst
 nach dem Scrollen; ein erster Versuch mit einem Fenster oben und einer Knopfleiste darunter sah

@@ -652,8 +652,8 @@ $("dlg-schreiben").addEventListener("cancel", function (e) { e.preventDefault();
   blatt.addEventListener("touchmove", function (e) {
     if (start == null) return;
     var dy = e.touches[0].clientY - start;
-    // Nach oben gibt es nach, aber kaum: Das Blatt steht schon, wo es hingehört.
-    weg = dy > 0 ? dy : dy / 6;
+    // Nach oben gibt es nach, aber kaum und höchstens 40 px: Das Blatt steht schon, wo es hingehört.
+    weg = dy > 0 ? dy : Math.max(-40, dy / 6);
     blatt.style.transform = "translateY(" + weg + "px)";
     schleier.style.opacity = String(Math.max(0, 1 - Math.max(0, weg) / blatt.offsetHeight));
   }, { passive: true });
