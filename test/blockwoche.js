@@ -298,7 +298,7 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
   pruefe('Handy: ein breiter Reiter, nichts ragt über den Rand', breit.seite <= 390 && breit.reiter > 300, JSON.stringify(breit));
   // Auch am Handy liegen die Themen im Blatt; ein Tipp öffnet sie groß.
   await handy.click('.blattfeld.feld-schule');
-  await handy.waitForTimeout(300);
+  await h.schreibfeldSteht(handy);
   const handyThemen = await handy.evaluate(() => ({
     offen: document.getElementById('dlg-schreiben').open, titel: document.getElementById('schreiben-titel').textContent,
     unter: document.getElementById('schreiben-unter').textContent,
@@ -317,7 +317,7 @@ const auf = (page, fn, arg) => page.evaluate(fn, arg);
     !handyDanach.offen && handyDanach.w.schule === 'LF7: Datensicherung' && !handyDanach.w.schuleGeprueft &&
     handyDanach.blatt.includes('LF7: Datensicherung'), JSON.stringify(handyDanach));
   await handy.click('.blattfeld.feld-schule');
-  await handy.waitForTimeout(300);
+  await h.schreibfeldSteht(handy);
   await handy.click('#schreiben-fertig');
   await handy.waitForTimeout(500);
   pruefe('Handy: „Fertig“ im großen Feld übernimmt die Themen', await handy.evaluate(() =>

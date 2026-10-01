@@ -636,7 +636,7 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.evaluate(() => { const r = document.querySelectorAll('#reiter button'); r[r.length - 1].click(); });
     await page.waitForTimeout(900);
     await page.click('.blattfeld.feld-tag[data-datum="2026-09-09"]');
-    await page.waitForTimeout(300);
+    await h.schreibfeldSteht(page);
     const handyTag = await page.evaluate(() => {
       const d = document.getElementById('dlg-schreiben').getBoundingClientRect();
       return {
@@ -656,7 +656,7 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     pruefe('… daneben tippen schließt, ohne den Tag zu übernehmen', await page.evaluate(() =>
       !document.getElementById('dlg-schreiben').open && !window.__tage()['2026-09-09'].geprueft));
     await page.click('.blattfeld.feld-tag[data-datum="2026-09-09"]');
-    await page.waitForTimeout(300);
+    await h.schreibfeldSteht(page);
     await page.click('#schreiben-fertig');
     await page.waitForTimeout(500);
     const handyFertig = await page.evaluate(() => ({

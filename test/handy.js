@@ -245,7 +245,7 @@ async function durchgang(browser, breite) {
   const kommt = await page.evaluate(() =>
     document.getElementById('dlg-schreiben').getAnimations().some((a) => a.animationName === 'vonunten'));
   pruefe('Woche: das große Feld fährt von unten herein' + bei, kommt);
-  await page.waitForTimeout(450);
+  await h.schreibfeldSteht(page);
   const gross = await page.evaluate(() => {
     const d = document.getElementById('dlg-schreiben'), r = d.getBoundingClientRect();
     return { offen: d.open, oben: Math.round(r.top), unten: Math.round(r.bottom), bild: innerHeight,
