@@ -336,8 +336,8 @@ function wochenSeite(nummer, montag, s) {
 /* ---------- Tägliche Notierung ---------- */
 
 function taeglich(s) { return !!s && s.vordruck === "taeglich"; }
-/** Wöchentlich, aber nur die Tätigkeiten, ohne Überschrift je Tag (ohneTage()). */
-function ohneWochentage(s) { return !!s && s.vordruck === "ohnetage"; }
+/** Wöchentlich, aber nur die Tätigkeiten, ohne Überschrift je Tag (ohneTage(), Schalter über dem Blatt). */
+function ohneWochentage(s) { return !!s && !taeglich(s) && (s.ohneTage === "ja" || s.vordruck === "ohnetage"); }
 
 /** Untertitel des Deckblatts, je nach Vordruck. */
 function notierungTitel(s) {

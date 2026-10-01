@@ -146,6 +146,7 @@ function blattVorschau(imBlatt) {
     fehlt.hidden = true;
     leiste.appendChild(schreiben);
     leiste.appendChild(tagHinweis);
+    leiste.appendChild(tageSchalterBauen());
     leiste.appendChild(fehlt);
     leiste.appendChild(fuss);
     s.leib.appendChild(leiste);
@@ -153,6 +154,31 @@ function blattVorschau(imBlatt) {
   } else {
     s.leib.appendChild(buehne);
     s.leib.appendChild(fuss);
+  }
+
+  /**
+   * Wochentage ins Blatt oder nicht: Manche Ausbilder wollen nur die Tätigkeiten der Woche
+   * untereinander sehen (ohneTage()). Der Schalter sitzt am Blatt, wo man die Wirkung sieht; als
+   * dritter Eintrag in der Auswahl des Vordrucks unter „Deine Daten“ stand er neben „Täglich“,
+   * einem ganz anderen Vordruck, und wurde verwechselt. Gespeichert in f-ohne-tage.
+   */
+  function tageSchalterBauen() {
+    var k = document.createElement("button");
+    k.type = "button";
+    k.className = "tageschalter";
+    k.setAttribute("role", "switch");
+    k.innerHTML = '<span class="knips" aria-hidden="true"></span>Wochentage';
+    var an = $("f-ohne-tage").value !== "ja";
+    k.setAttribute("aria-checked", String(an));
+    k.title = an ? "Wochentage weglassen: nur die Tätigkeiten untereinander" : "Wochentage wieder über die Tätigkeiten setzen";
+    k.addEventListener("click", function () {
+      $("f-ohne-tage").value = an ? "ja" : "";
+      merken();
+      zeichneTag();
+      var neu = document.querySelector(".tageschalter");
+      if (neu) neu.focus();
+    });
+    return k;
   }
 
   var felder = [], tagFeld = {}, fehltAm = null;
