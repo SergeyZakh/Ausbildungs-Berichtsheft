@@ -329,7 +329,7 @@ function sichtbarerText(xml) {
 async function schreibfeldSteht(page) {
   await page.waitForFunction(() => {
     const d = document.getElementById('dlg-schreiben');
-    return d.open && d.getAnimations().every((a) => a.playState === 'finished');
+    return d.open && d.classList.contains('da') && d.getAnimations({ subtree: true }).every((a) => a.playState === 'finished');
   }, null, { timeout: 3000 });
 }
 

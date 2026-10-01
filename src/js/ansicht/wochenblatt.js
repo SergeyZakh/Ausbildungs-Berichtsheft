@@ -483,23 +483,24 @@ var schreibblatt = null;
 
 /**
  * Ein Feld aus dem Blatt groß zum Schreiben. Am Handy ist das Blatt auf ein Drittel verkleinert;
- * darin zu schreiben hieße, in Fünf-Pixel-Schrift zu tippen. Dort fährt das Feld von unten hoch,
- * über der Tastatur: oben sein Titel mit „Fertig“, darunter, wohin der Text im Blatt kommt.
- * Geschrieben wird trotzdem ins Feld im Blatt (`schreiben`), das speichert und das Blatt nachzieht.
- * „Fertig“ schließt; ist der Tag oder sind die Themen noch offen, übernimmt es sie auch, wie
- * „Fertig“ überall sonst (der Knopf dafür bleibt am Feld, `knoepfe`). Wer nur nachsehen will,
- * wischt das Feld nach unten oder tippt daneben. Ein Tag ohne Text öffnet sich so auch am Rechner:
- * Im Blatt hat er noch kein Feld.
+ * darin zu schreiben hieße, in Fünf-Pixel-Schrift zu tippen. Dort fährt das Feld von unten hoch:
+ * oben sein Titel mit „Fertig“, darunter, wohin der Text im Blatt kommt. Geschrieben wird trotzdem
+ * ins Feld im Blatt (`schreiben`), das speichert und das Blatt nachzieht. „Fertig“ schließt; ist
+ * der Tag oder sind die Themen noch offen, übernimmt es sie auch, wie „Fertig“ überall sonst (der
+ * Knopf dafür bleibt am Feld, `knoepfe`). Wer nur nachsehen will, wischt das Feld nach unten oder
+ * tippt daneben. Ein Tag ohne Text öffnet sich so auch am Rechner: Im Blatt hat er noch kein Feld.
+ *
+ * Am Touchgerät kommt die Tastatur erst, wenn man ins Textfeld tippt. Holte das Öffnen sie gleich,
+ * fuhren Tastatur, Seite und Feld gleichzeitig los, und das Feld sprang ruckartig auf; oft will
+ * man den Text auch nur lesen und „Fertig“ drücken.
  *
  * o: { titel, unter, wert, platzhalter, einzeilig, schreiben(text), knoepfe, datum (ein Tag), zu() }
  */
 function schreibblattOeffnen(o) {
   var dlg = $("dlg-schreiben"), ta = $("schreiben-text"), offen = dlg.open;
   // Fährt es gerade hinaus, bleibt es: Wer schnell das nächste Feld antippt, sieht kein Zucken.
-  if (dlg.classList.contains("geht")) {
-    clearTimeout(schreibblattUhr);
-    dlg.classList.remove("geht");
-  }
+  clearTimeout(schreibblattUhr);
+  dlg.classList.remove("geht");
   // Schon offen: das alte Feld gleich abschließen. Über close ginge es nicht, das Ereignis kommt
   // erst später und träfe dann das neue.
   if (offen) schreibblattAufraeumen();
@@ -511,36 +512,60 @@ function schreibblattOeffnen(o) {
   ta.classList.toggle("einzeilig", !!o.einzeilig);
   schreibblatt = { o: o, feld: o.feld || null };
   $("schreiben-tag").hidden = !o.datum;
-  dlg.style.transition = "";
-  dlg.style.transform = "";
-  if (!offen) dlg.showModal();
-  tastaturAbstand();
-  ta.focus();
-  try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {}
+  schreibblattLoslassen();
+  if (!offen) { dlg.classList.remove("da"); dlg.showModal(); }
+  schreibblattLage();
+  if (!dlg.classList.contains("da")) {
+    // Den Anfang (Blatt unten, Schleier aus) einmal berechnen lassen; ohne ihn sähe der Browser
+    // keinen Übergang, und das Blatt stünde schlagartig da.
+    void dlg.querySelector(".schreiben-blatt").offsetHeight;
+    dlg.classList.add("da");
+  }
+  // preventScroll: Ein Fokus während des Hereinfahrens schöbe das Blatt sonst sofort ins Bild.
+  // Am Touchgerät bleibt er beim Fenster selbst, nicht auf „Fertig“, das der Browser sonst wählt.
+  if (!grobZeiger()) {
+    ta.focus({ preventScroll: true });
+    try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {}
+  } else dlg.focus({ preventScroll: true });
 }
 
-/* Am Handy fährt das Feld hinaus, wie es gekommen ist, und der Hintergrund blendet aus; zu ist es
-   erst danach. Ohne das verschwand es von einem Bild aufs nächste. Die Kurve: schnell an, weich
-   aus, wie ein Blatt, das man loslässt. */
-var schreibblattUhr = null, SCHREIBBLATT_WEG_MS = 260;
+/* Hinaus mit derselben Bewegung wie herein, nur umgekehrt; der Schleier blendet mit aus, zu ist es
+   erst danach (dialoge.css: .da herein, .geht hinaus). Ohne das verschwand es von einem Bild aufs
+   nächste. */
+var schreibblattUhr = null, SCHREIBBLATT_WEG_MS = 280;
 
 function schreibblattZu() {
   var dlg = $("dlg-schreiben");
   if (!dlg.open || dlg.classList.contains("geht")) return;
   if (!meldungSchwebt() || bewegungAus()) { dlg.close(); return; }
+  // Die Tastatur geht mit, nicht erst hinterher.
+  if (dlg.contains(document.activeElement)) document.activeElement.blur();
+  schreibblattLoslassen();
+  dlg.classList.remove("da");
   dlg.classList.add("geht");
-  dlg.style.transition = "transform " + SCHREIBBLATT_WEG_MS + "ms cubic-bezier(.4, 0, 1, 1)";
-  dlg.style.transform = "translateY(100%)";
   schreibblattUhr = setTimeout(function () {
     dlg.classList.remove("geht");
-    dlg.style.transition = "";
-    dlg.style.transform = "";
     if (dlg.open) dlg.close();
   }, SCHREIBBLATT_WEG_MS + 20);
 }
 
+/** Was das Wischen von Hand gesetzt hat, wieder den Klassen überlassen. */
+function schreibblattLoslassen() {
+  var dlg = $("dlg-schreiben");
+  ["schreiben-blatt", "schreiben-schleier"].forEach(function (k) {
+    var el = dlg.querySelector("." + k);
+    el.style.transition = "";
+    el.style.transform = "";
+    el.style.opacity = "";
+  });
+}
+
 function bewegungAus() {
   try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; }
+}
+
+function grobZeiger() {
+  try { return window.matchMedia("(pointer: coarse)").matches; } catch (e) { return false; }
 }
 
 /** Das Blatt nachziehen; ein Tag ohne Feld im Blatt gibt seinen „Fertig“-Knopf wieder ab. */
@@ -553,17 +578,25 @@ function schreibblattAufraeumen() {
   if (sb.o.zu) sb.o.zu();
 }
 
-/* Am Handy schiebt die Tastatur sich über die Seite, ohne sie kleiner zu machen: Das Feld unten
-   läge dahinter. visualViewport sagt, wie viel sie verdeckt; um so viel rückt das Feld hoch. */
-function tastaturAbstand() {
-  var vv = window.visualViewport, dlg = $("dlg-schreiben");
-  if (!vv || !dlg.open) return;
-  dlg.style.setProperty("--tastatur", Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) + "px");
-  dlg.style.setProperty("--sichtbar", Math.round(vv.height) + "px");
+/* Am Handy liegt der Dialog genau über dem, was man sieht (visualViewport): Mit offener Tastatur
+   ist das weniger als das Fenster, und iOS schiebt die Seite dabei noch hin und her. Das Blatt sitzt
+   unten darin und damit immer direkt über der Tastatur. Nachgezogen wird ohne Übergang: Ein
+   weicher Abstand zur Tastatur hinkte hinterher, beim Scrollen blieb unten eine Lücke. */
+function schreibblattLage() {
+  var dlg = $("dlg-schreiben"), vv = window.visualViewport;
+  if (!dlg.open) return;
+  if (!vv || !meldungSchwebt()) { dlg.style.top = ""; dlg.style.height = ""; return; }
+  dlg.style.top = vv.offsetTop + "px";
+  dlg.style.height = vv.height + "px";
 }
 if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", tastaturAbstand);
-  window.visualViewport.addEventListener("scroll", tastaturAbstand);
+  var schreibblattBild = 0;
+  var schreibblattNachziehen = function () {
+    cancelAnimationFrame(schreibblattBild);
+    schreibblattBild = requestAnimationFrame(schreibblattLage);
+  };
+  window.visualViewport.addEventListener("resize", schreibblattNachziehen);
+  window.visualViewport.addEventListener("scroll", schreibblattNachziehen);
 }
 
 $("schreiben-text").addEventListener("input", function (e) {
@@ -584,43 +617,57 @@ $("schreiben-tag").addEventListener("click", function () {
   schreibblattZu();
   if (d) stelleZeigen(d);
 });
-$("dlg-schreiben").addEventListener("close", schreibblattAufraeumen);
-// Daneben tippen schließt, ohne etwas zu übernehmen. Das Feld selbst reicht bis an seine Kanten,
-// ein Klick auf den Dialog selbst kommt deshalb nur vom Hintergrund.
-$("dlg-schreiben").addEventListener("click", function (e) { if (e.target === this) schreibblattZu(); });
+$("dlg-schreiben").addEventListener("close", function () {
+  var dlg = $("dlg-schreiben");
+  clearTimeout(schreibblattUhr);
+  dlg.classList.remove("da", "geht");
+  dlg.style.top = "";
+  dlg.style.height = "";
+  schreibblattLoslassen();
+  schreibblattAufraeumen();
+});
+// Daneben tippen schließt, ohne etwas zu übernehmen: am Rechner der Hintergrund des Dialogs, am
+// Handy der Schleier über der Seite.
+$("dlg-schreiben").addEventListener("click", function (e) {
+  if (e.target === this || e.target.classList.contains("schreiben-schleier")) schreibblattZu();
+});
+// Escape schließt wie Wischen, mit derselben Bewegung.
+$("dlg-schreiben").addEventListener("cancel", function (e) { e.preventDefault(); schreibblattZu(); });
 
 /* Nach unten wischen schließt, wie bei jedem Blatt, das von unten kommt. Gegriffen wird oben, am
-   Griff und am Titel; im Textfeld scrollt ein Wischen den Text. Das Feld folgt dem Finger; weit
-   genug oder schnell genug nach unten fährt es hinaus, sonst schnappt es weich zurück. */
+   Griff und am Titel; im Textfeld scrollt ein Wischen den Text. Das Blatt folgt dem Finger, der
+   Schleier wird mit ihm heller; weit genug oder schnell genug nach unten fährt es hinaus, sonst
+   schnappt es weich zurück. */
 (function () {
-  var dlg = $("dlg-schreiben"), start = null, zeit = 0, weg = 0;
-  dlg.addEventListener("touchstart", function (e) {
-    start = e.target.closest && e.target.closest(".schreiben-griff, .dkopf") && !e.target.closest("button")
-      ? e.touches[0].clientY : null;
+  var dlg = $("dlg-schreiben"), blatt = dlg.querySelector(".schreiben-blatt"),
+    schleier = dlg.querySelector(".schreiben-schleier"), start = null, zeit = 0, weg = 0;
+  blatt.addEventListener("touchstart", function (e) {
+    start = e.target.closest(".schreiben-griff, .dkopf") && !e.target.closest("button") ? e.touches[0].clientY : null;
     zeit = Date.now();
     weg = 0;
-    if (start != null) dlg.style.transition = "none";
+    if (start == null) return;
+    blatt.style.transition = "none";
+    schleier.style.transition = "none";
   }, { passive: true });
-  dlg.addEventListener("touchmove", function (e) {
+  blatt.addEventListener("touchmove", function (e) {
     if (start == null) return;
     var dy = e.touches[0].clientY - start;
-    // Nach oben gibt es nach, aber kaum: Das Feld steht schon, wo es hingehört.
+    // Nach oben gibt es nach, aber kaum: Das Blatt steht schon, wo es hingehört.
     weg = dy > 0 ? dy : dy / 6;
-    dlg.style.transform = "translateY(" + weg + "px)";
+    blatt.style.transform = "translateY(" + weg + "px)";
+    schleier.style.opacity = String(Math.max(0, 1 - Math.max(0, weg) / blatt.offsetHeight));
   }, { passive: true });
   function los() {
     if (start == null) return;
     start = null;
     var schnell = weg > 20 && weg / Math.max(1, Date.now() - zeit) > 0.5;
-    if (weg > dlg.offsetHeight / 4 || schnell) { schreibblattZu(); return; }
-    dlg.style.transition = "transform .3s cubic-bezier(.32, .72, 0, 1)";
-    dlg.style.transform = "";
+    // Beides gibt die Hand an die Klassen zurück; der Übergang beginnt dort, wo der Finger war.
+    if (weg > blatt.offsetHeight / 4 || schnell) schreibblattZu();
+    else schreibblattLoslassen();
   }
-  dlg.addEventListener("touchend", los);
-  dlg.addEventListener("touchcancel", los);
+  blatt.addEventListener("touchend", los);
+  blatt.addEventListener("touchcancel", los);
 })();
-// Escape schließt wie Wischen, mit derselben Bewegung.
-$("dlg-schreiben").addEventListener("cancel", function (e) { e.preventDefault(); schreibblattZu(); });
 
 /**
  * Rechte Spalte neben dem Wochenblatt: ob es aufs Blatt passt und die KI für die

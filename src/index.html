@@ -509,17 +509,23 @@
   </div>
 </dialog>
 
-<!-- Ein Feld aus dem Wochenblatt groß zum Schreiben, am Handy von unten (wochenblatt.js) -->
-<dialog id="dlg-schreiben" aria-labelledby="schreiben-titel">
-  <div class="schreiben-griff" aria-hidden="true"></div>
-  <div class="dkopf">
-    <h2 id="schreiben-titel"></h2>
-    <button type="button" class="knopf voll" id="schreiben-fertig">Fertig</button>
-  </div>
-  <div class="dkoerper">
-    <p class="schreiben-unter" id="schreiben-unter"></p>
-    <textarea id="schreiben-text" aria-labelledby="schreiben-titel"></textarea>
-    <button type="button" class="schreiben-tag" id="schreiben-tag">Ganzen Tag öffnen ›</button>
+<!-- Ein Feld aus dem Wochenblatt groß zum Schreiben, am Handy von unten (wochenblatt.js). Am Handy
+     liegt der Dialog über dem ganzen sichtbaren Bereich: darin der Schleier und das Blatt. Der Fokus
+     geht beim Öffnen an den Dialog selbst (autofocus): Ging er an „Fertig“, scrollte der Browser
+     den Knopf ins Bild, solange das Blatt noch unten stand, und das Hereinfahren war weg. -->
+<dialog id="dlg-schreiben" aria-labelledby="schreiben-titel" tabindex="-1" autofocus>
+  <div class="schreiben-schleier" aria-hidden="true"></div>
+  <div class="schreiben-blatt">
+    <div class="schreiben-griff" aria-hidden="true"></div>
+    <div class="dkopf">
+      <h2 id="schreiben-titel"></h2>
+      <button type="button" class="knopf voll" id="schreiben-fertig">Fertig</button>
+    </div>
+    <div class="dkoerper">
+      <p class="schreiben-unter" id="schreiben-unter"></p>
+      <textarea id="schreiben-text" aria-labelledby="schreiben-titel"></textarea>
+      <button type="button" class="schreiben-tag" id="schreiben-tag">Ganzen Tag öffnen ›</button>
+    </div>
   </div>
 </dialog>
 
