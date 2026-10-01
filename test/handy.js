@@ -266,6 +266,21 @@ async function durchgang(browser, breite) {
     getComputedStyle(document.getElementById('schreiben-text')).touchAction === 'pan-y');
   pruefe('Woche: hinter dem Feld scrollt nichts mit, im Textfeld schon' + bei, gesperrt);
   await nichtsRaus('Schreibfeld');
+  // Am Griff nach oben ziehen: Das Blatt gibt ein Stück nach, darunter ist Blatt, nicht die Seite.
+  const hoch = await page.evaluate(() => {
+    const griff = document.querySelector('.schreiben-griff'), blatt = document.querySelector('.schreiben-blatt');
+    const g = griff.getBoundingClientRect(), x = g.left + 10, y = g.top + 2;
+    const t = (yy) => new Touch({ identifier: 1, target: griff, clientX: x, clientY: yy });
+    griff.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [t(y)], changedTouches: [t(y)] }));
+    for (let i = 1; i <= 10; i++) griff.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: [t(y - 40 * i)], changedTouches: [t(y - 40 * i)] }));
+    const r = { hoch: Math.round(innerHeight - blatt.getBoundingClientRect().bottom),
+      darunter: blatt.contains(document.elementFromPoint(innerWidth / 2, innerHeight - 4)) };
+    griff.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [] }));
+    return r;
+  });
+  pruefe('Woche: hochgezogen gibt das Feld kaum nach, und darunter ist keine Lücke' + bei,
+    hoch.hoch > 0 && hoch.hoch <= 40 && hoch.darunter, JSON.stringify(hoch));
+  await h.schreibfeldSteht(page);
   await page.fill('#schreiben-text', 'Unterweisung Arbeitssicherheit');
   await page.click('#schreiben-fertig');
   // Es fährt erst hinaus, dann ist es zu; vorher verschwand es von einem Bild aufs nächste.

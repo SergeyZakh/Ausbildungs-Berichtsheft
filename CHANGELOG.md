@@ -16,7 +16,8 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
   Textfeld tippt; so bewegen sich Tastatur und Feld nicht gleichzeitig.
 - **Keine Lücke unter dem Schreibfeld:** Beim Scrollen mit offenem Feld rutschte die Seite dahinter
   mit, und unter dem Feld blieb eine Lücke. Das Feld sitzt jetzt fest über der Tastatur, die Seite
-  dahinter scrollt nicht mehr mit.
+  dahinter scrollt nicht mehr mit. Zieht man es am Griff nach oben, gibt es höchstens ein kleines
+  Stück nach, und darunter ist Blatt statt Seite.
 
 ## [0.4.2] – 2026-10-01
 

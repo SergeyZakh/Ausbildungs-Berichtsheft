@@ -645,6 +645,11 @@
     transform: translateY(100%); transition: transform .42s cubic-bezier(.22, 1, .36, 1);
     will-change: transform;
   }
+  /* Unter dem Blatt eine Schürze in seiner Farbe: Zieht man es nach oben, gibt es ein Stück nach,
+     und darunter schien sonst die Seite durch. */
+  .schreiben-blatt::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 100vh; background: var(--flaeche);
+  }
   #dlg-schreiben.da .schreiben-schleier { opacity: 1; }
   #dlg-schreiben.da .schreiben-blatt { transform: none; }
   #dlg-schreiben.geht .schreiben-schleier { opacity: 0; transition: opacity .28s ease-in; }
