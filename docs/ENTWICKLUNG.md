@@ -381,13 +381,17 @@ Herein und hinaus ist dieselbe Bewegung, nur umgekehrt: Klasse `.da` (Blatt von 
 und lang auslaufend, .42 s; Schleier blendet ein), Klasse `.geht` (sanft an, schnell weg, .28 s),
 zu ist es erst danach (`schreibblattZu()`). Damit der Browser einen Anfang sieht, wird der Zustand
 „unten“ nach `showModal()` einmal berechnet, bevor `.da` kommt. Der Fokus geht dabei an den Dialog
-selbst (`autofocus`, `preventScroll`), und der Dialog ist kein Scrollbereich (`overflow: clip`):
+selbst (`autofocus`, `preventScroll`), und der Dialog ist kein Scrollbereich (`overflow: clip visible`):
 Ging der Fokus an „Fertig“, schob der Browser den Knopf sofort ins Bild, und das Hereinfahren war
 weg; so sprang das Feld ruckartig auf. Am Touchgerät holt das Öffnen auch nicht die Tastatur, erst
 ein Tipp ins Textfeld: Sonst fuhren Tastatur, Seite und Feld gleichzeitig los. Beim Wischen folgt
 das Blatt dem Finger, der Schleier wird heller; weit oder schnell genug nach unten fährt es hinaus,
 sonst schnappt es zurück. Nach oben gibt es höchstens 40 px nach; darunter hängt eine Schürze in der
-Farbe des Blatts (`.schreiben-blatt::after`), sonst schien dort die Seite durch. Mit „Bewegung reduzieren“ geht es sofort zu. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
+Farbe des Blatts (`.schreiben-blatt::after`), sonst schien dort die Seite durch. Nach unten schneidet
+der Dialog nicht ab: Safari ab iOS 26 meldet als sichtbar nur, was über seiner Leiste liegt
+(`visualViewport`), zeigt die Seite aber auch darunter. Schürze und Schleier gehen deshalb unter der
+Leiste weiter; vorher stand dort die helle Seite. `test/handy.js` stellt das mit einem kürzeren Dialog
+nach. Mit „Bewegung reduzieren“ geht es sofort zu. Bei einem Tag öffnet „Ganzen Tag öffnen ›“ den Tag. Auch „Donnerstag ohne
 Text ›“ öffnet sich so, am Rechner wie am Handy: Im Blatt hat der Tag noch kein Feld; sobald er
 Text hat, steht er dort. Früher standen am Handy Karten über dem Blatt, man sah das Blatt erst
 nach dem Scrollen; ein erster Versuch mit einem Fenster oben und einer Knopfleiste darunter sah
