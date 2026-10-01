@@ -38,9 +38,11 @@ function zeichneReiter() {
 
   // Eine Blockwoche hat keine Tage zum Anklicken, nur ihr Themenfeld im Reiter der Woche.
   var block = blockwoche(aktiveWoche);
+  if (block) aktiverTag = 7;
+  // Was die Reiter zeigen, zeigt im Zen-Modus die Leiste mit Tag zurück und weiter (zen.js).
+  zenStelleZeigen();
   reiter.classList.toggle("block", block);
   if (block) {
-    aktiverTag = 7;
     // Das Menü vor dem Reiter: Am Handy gilt manches nur für den letzten Knopf der Zeile.
     reiter.appendChild(blockTageMenue());
     reiter.appendChild(blockReiter(montag));

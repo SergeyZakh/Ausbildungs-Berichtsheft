@@ -22,6 +22,13 @@
 <body>
 
 <header class="leiste">
+  <!-- Nur im Zen-Modus (zen.js): Tag zurück und weiter, dazwischen der offene Tag. Liegt über der
+       unsichtbaren Leiste, damit der Zen-Knopf nicht verrutscht. -->
+  <div class="zennav" id="zennav">
+    <button type="button" class="rundknopf" id="zen-zurueck" aria-label="Tag zurück" title="Tag zurück"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <span class="zenstelle" id="zen-stelle" aria-live="polite"></span>
+    <button type="button" class="rundknopf" id="zen-weiter" aria-label="Tag weiter" title="Tag weiter"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
   <div class="wochenbalken">
     <!-- Am Rechner erst die Pfeile, dann die Woche als Titel; am Handy ‹ Woche › (handy.css). -->
     <div class="wochenschalter">
