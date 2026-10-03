@@ -39,6 +39,10 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ### Behoben
 
+- **PDF schnitt lange Schulwochen ab:** Unterweisungen und Berufsschule standen ganz auf dem
+  letzten Blatt der Woche. Waren sie länger als eine Seite, etwa bei vielen Schultagen oder ohne
+  Wochentage, schnitten Firefox und Safari alles nach dem ersten Blatt ab, Chrome brach ohne
+  Kopfleiste um. Jetzt laufen alle drei Felder über so viele Blätter wie nötig, jedes mit Kopf.
 - **Abgleich:** Ging die Uhr eines Geräts nach, verwarf der Server eine Änderung still, wenn der
   Stand vorher von einem Gerät mit vorgehender Uhr kam. Eine Änderung zählt jetzt immer als neuer
   als der Stand, den man geändert hat.

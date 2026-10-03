@@ -115,16 +115,26 @@ var DRUCK_UNTERSCHRIFTEN = '<div class="unterschriften">' +
   "<div>Gesetzlicher Vertreter / Datum</div>" +
 "</div>";
 
+var DRUCK_FELDER = {
+  betrieb: ["Betriebliche Tätigkeit", "gross"],
+  unterweisung: ["Unterweisungen, Lehrgespräche, betrieblicher Unterricht, sonstige Schulungsveranstaltungen", "klein"],
+  schule: ["Berufsschule (Unterrichtsthemen)", "klein"]
+};
+
+/**
+ * Ein Blatt des wöchentlichen Vordrucks. Gewöhnlich steht auf jedem Blatt der Kasten „Betriebliche
+ * Tätigkeit“ und auf dem letzten die beiden kleinen Felder. Laufen auch die über (druckBlatt()),
+ * sagt `texte.felder`, welche Felder auf diesem Blatt stehen.
+ */
 function druckBlattSeite(nummer, montag, s, texte, fortsetzung, letzte) {
+  var felder = texte.felder || (letzte ? ["betrieb", "unterweisung", "schule"] : ["betrieb"]);
   return '<article class="blatt dicht-' + dichte(texte) + (fortsetzung ? " fortsetzung" : "") + '">' +
     "<h1>Ausbildungsnachweis" + (fortsetzung ? " – Fortsetzung" : "") + "</h1>" +
     druckKopfleiste(nummer, montag, s) +
-    druckAbschnitt("Betriebliche Tätigkeit", texte.betrieb, "gross", "betrieb") +
-    (letzte ?
-      druckAbschnitt("Unterweisungen, Lehrgespräche, betrieblicher Unterricht, sonstige Schulungsveranstaltungen",
-                     texte.unterweisung, "klein", "unterweisung") +
-      druckAbschnitt("Berufsschule (Unterrichtsthemen)", texte.schule, "klein", "schule") +
-      DRUCK_UNTERSCHRIFTEN : "") +
+    felder.map(function (f) {
+      return druckAbschnitt(DRUCK_FELDER[f][0], texte[f], DRUCK_FELDER[f][1], f);
+    }).join("") +
+    (letzte ? DRUCK_UNTERSCHRIFTEN : "") +
     "</article>";
 }
 
@@ -206,12 +216,35 @@ function druckBlatt(nummer, montag, s) {
   }
 
   var texte = wochenTexte(montag, s);
-  return druckAufteilen(druckEinheiten(texte.betrieb), function (teil, fortsetzung, letzte) {
+  var seiten = druckSeiten(druckEinheiten(texte.betrieb), function (teil, fortsetzung, letzte) {
     return druckBlattSeite(nummer, montag, s, {
       betrieb: druckBuendeln(teil),
       unterweisung: letzte ? texte.unterweisung : [],
       schule: letzte ? texte.schule : []
     }, fortsetzung, letzte);
+  });
+  if (passtAufEineSeite(seiten[seiten.length - 1])) return seiten.join("");
+
+  /* Unterweisungen und Berufsschule stehen ganz auf dem letzten Blatt. Sind sie zu lang (viele
+     Schultage, eine Blockwoche ohne betriebliche Tätigkeit), lief dieses Blatt über A4 hinaus: Der
+     Browser brach es selbst um, ohne Kopfleiste, oder schnitt den Rest ab. Dann laufen alle drei
+     Felder der Reihe nach über die Blätter, wie in Word. Ein leeres Feld bleibt als eine Einheit
+     ohne Text in der Reihe, damit sein leerer Kasten an seiner Stelle steht. */
+  var alle = [];
+  ["betrieb", "unterweisung", "schule"].forEach(function (f) {
+    var teile = druckEinheiten(texte[f]);
+    if (!teile.length) teile = [{ kopf: "", text: "", leer: true }];
+    teile.forEach(function (e) { e.feld = f; alle.push(e); });
+  });
+  return druckAufteilen(alle, function (teil, fortsetzung, letzte) {
+    var blatt = { felder: [], betrieb: [], unterweisung: [], schule: [] };
+    ["betrieb", "unterweisung", "schule"].forEach(function (f) {
+      var eigene = teil.filter(function (e) { return e.feld === f; });
+      if (!eigene.length) return;
+      blatt.felder.push(f);
+      blatt[f] = druckBuendeln(eigene.filter(function (e) { return !e.leer; }));
+    });
+    return druckBlattSeite(nummer, montag, s, blatt, fortsetzung, letzte);
   });
 }
 
@@ -222,6 +255,11 @@ function druckBlatt(nummer, montag, s) {
  * leeren Blatt.
  */
 function druckAufteilen(rest, bauen) {
+  return druckSeiten(rest, bauen).join("");
+}
+
+/** Wie druckAufteilen, aber jedes Blatt einzeln, damit sich das letzte nachmessen lässt. */
+function druckSeiten(rest, bauen) {
   var seiten = [], wache = 0;
   while (rest.length && wache++ < 200) {
     var fortsetzung = seiten.length > 0;
@@ -238,7 +276,7 @@ function druckAufteilen(rest, bauen) {
 
   return seiten.map(function (teil, i) {
     return bauen(teil, i > 0, i === seiten.length - 1);
-  }).join("");
+  });
 }
 
 /* ---------- Tägliche Notierung ----------

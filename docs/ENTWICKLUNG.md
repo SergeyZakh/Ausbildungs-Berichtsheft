@@ -742,6 +742,9 @@ Folgeseiten. Das Gesamtheft beginnt mit Deckblatt und Ausbildungsgang.
 **Druck:** Passt eine Woche gemessen nicht auf ein Blatt (`#messung`,
 `SATZ_HOEHE_MM`), teilt `druckBlatt()` den Kasten „Betriebliche Tätigkeit“
 auf mehrere Blätter; Schlussfelder und Unterschriften stehen auf dem letzten.
+Passt auch das letzte Blatt nicht (lange Berufsschule, Blockwoche), laufen alle drei
+Felder der Reihe nach über die Blätter, wie in Word. Ein Feld höher als eine Seite
+schnitten Firefox und Safari sonst ab (`break-inside: avoid`).
 
 **Vorschau:** Der Wochenreiter zeigt das Blatt aus `druckBlattSicher()`,
 verkleinert per `transform`. Dieselbe Quelle wie der Druck, also auch

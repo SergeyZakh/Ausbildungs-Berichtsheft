@@ -155,6 +155,36 @@ const TAGE = /Montag|Dienstag|Donnerstag|Freitag/;
     (await page.inputValue('#f-vordruck')) === '' && (await blatt()).koepfe === 0 &&
       (await page.getAttribute('.tageschalter', 'aria-checked')) === 'false');
 
+  /* ---------- Lange Berufsschule im PDF ----------
+     Unterweisungen und Berufsschule standen ganz auf dem letzten Blatt. Waren sie länger als eine
+     Seite, schnitten Firefox und Safari ab, was nicht passte (break-inside: avoid). */
+  await page.evaluate(() => {
+    const lang = (tag) => Array.from({ length: 18 }, (_, i) => tag + ': Unterrichtsthema Nummer ' + (i + 1) +
+      ' mit einer Beschreibung, die über die halbe Zeile hinausgeht und Platz braucht').join('\n');
+    ['2026-09-07', '2026-09-08', '2026-09-10', '2026-09-11'].forEach((d, i) =>
+      window.__tagSetzen(d, { art: 'Berufsschule', text: lang('Schule ' + i) }));
+    window.print = () => {};
+  });
+  await page.click('#btn-export');
+  await page.click('#btn-pdf-woche');
+  await h.exportTrotzdem(page);
+  await page.waitForTimeout(500);
+  const schule = await page.evaluate(() => {
+    const bl = [...document.querySelectorAll('#druck .blatt')];
+    const sp = [...document.querySelectorAll('#druck .sp')].map((p) => p.textContent);
+    return {
+      blaetter: bl.length,
+      passen: bl.every((b) => window.__blattHoehe(b.outerHTML) <= window.__satzHoehe() + 1),
+      koepfe: bl.every((b) => !!b.querySelector('.kopfleiste')),
+      unterschrift: bl.map((b) => !!b.querySelector('.unterschriften')).join(','),
+      zeilen: [0, 1, 2, 3].map((i) => sp.filter((t) => t.includes('Schule ' + i + ':')).length).join(','),
+    };
+  });
+  pruefe('PDF: lange Berufsschule läuft über mehrere Blätter, jedes passt, keine Zeile fehlt',
+    schule.blaetter >= 2 && schule.passen && schule.koepfe && schule.zeilen === '18,18,18,18' &&
+      schule.unterschrift === Array.from({ length: schule.blaetter }, (_, i) => i === schule.blaetter - 1).join(','),
+    JSON.stringify(schule));
+
   // Beim täglichen Vordruck gibt es keine Wochentage zum Weglassen, also auch keinen Schalter.
   await h.stammdatenOeffnen(page);
   await h.stammReiter(page, '#f-vordruck');
