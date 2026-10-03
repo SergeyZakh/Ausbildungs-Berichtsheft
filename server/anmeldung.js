@@ -73,7 +73,12 @@ function cookiesLesen(anfrage) {
   const cookies = {};
   for (const teil of kopf.split(';')) {
     const stelle = teil.indexOf('=');
-    if (stelle > 0) cookies[teil.slice(0, stelle).trim()] = decodeURIComponent(teil.slice(stelle + 1).trim());
+    if (stelle <= 0) continue;
+    // Auch Cookies anderer Werkzeuge derselben Domain kommen hier an. Trägt eines ein loses „%“,
+    // warf decodeURIComponent, und jede Anfrage dieses Browsers endete mit Fehler 500.
+    let wert = teil.slice(stelle + 1).trim();
+    try { wert = decodeURIComponent(wert); } catch (e) { /* bleibt, wie es kam */ }
+    cookies[teil.slice(0, stelle).trim()] = wert;
   }
   return cookies;
 }

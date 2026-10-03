@@ -244,6 +244,14 @@ async function anmelden(claims, tokenEinstellungen) {
   cookies.set(anmeldung.SITZUNG_COOKIE, encodeURIComponent(echt));
   pruefe('Das echte Cookie gilt weiter', (await (await ruf('/api/ich')).json()).rolle === 'azubi');
 
+  // Ein anderes Werkzeug derselben Domain setzt ein Cookie mit losem „%“. Früher warf das Lesen
+  // der Cookies, und jede Anfrage dieses Browsers scheiterte.
+  cookies.set('rabatt', '50%');
+  const mitFremdem = await ruf('/api/ich');
+  pruefe('Ein fremdes Cookie mit losem % stört die Sitzung nicht',
+    mitFremdem.status === 200 && (await mitFremdem.json()).rolle === 'azubi', mitFremdem.status);
+  cookies.delete('rabatt');
+
   const abgelaufen = { ...daten, rolle: 'azubi', bis: Date.now() - 1000 };
   const alt = Buffer.from(JSON.stringify(abgelaufen)).toString('base64url');
   const hmac = crypto.createHmac('sha256', process.env.SITZUNG_GEHEIMNIS).update(alt).digest('base64url');
