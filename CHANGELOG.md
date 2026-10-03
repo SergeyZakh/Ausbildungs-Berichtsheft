@@ -39,6 +39,15 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ### Behoben
 
+- **Abgleich:** Ging die Uhr eines Geräts nach, verwarf der Server eine Änderung still, wenn der
+  Stand vorher von einem Gerät mit vorgehender Uhr kam. Eine Änderung zählt jetzt immer als neuer
+  als der Stand, den man geändert hat.
+- **Server:** Anfragen an die API mit Inhalt nimmt er nur noch als JSON an. Ein Formular auf einer
+  anderen Seite derselben Domain konnte sonst mit dem Sitzungs-Cookie Daten schicken.
+- **Ausbilder:** Nach „Zurück“ zur Liste und erneutem Öffnen zeigte ein Heft den Stand vom ersten
+  Öffnen statt den aktuellen.
+- **Anmeldung:** Ein fremdes Cookie derselben Domain mit einem losen „%“ ließ jede Anfrage mit
+  Fehler 500 enden.
 - **Lange Woche am Handy abgeschnitten:** Brauchte eine Woche zwei Blätter, war im Reiter „Woche“
   das zweite halb verdeckt, und weiter scrollen ging nicht. Die Fläche mit den Blättern war noch auf
   80 % der Bildschirmhöhe begrenzt. Hat iOS die Seite für die Tastatur verschoben, rückt sie danach
