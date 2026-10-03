@@ -188,7 +188,9 @@ hinweise { gesichert, sicherungSpaeter, homeBildschirm }  nur dieser Browser, ni
 
 `geaendert` setzt niemand von Hand: `zeitstempelPflegen()` in `zustand.js` vergleicht vor dem
 Speichern mit dem zuletzt gesicherten Stand und stempelt, was sich im Nachweis geändert hat.
-Ältere Stände ohne Stempel bekommen beim ersten Speichern einen. `start.js` liest die Stempel beim
+Ältere Stände ohne Stempel bekommen beim ersten Speichern einen. Ein neuer Stempel liegt immer nach
+dem bisherigen (`stempelNach()`): Kam der Tag von einem Gerät, dessen Uhr vorgeht, verwarf der Server
+sonst still die Änderung eines Geräts mit richtiger Uhr. `start.js` liest die Stempel beim
 Laden zurück (`stempelLaden()`); ohne sie galt nach jedem Neuladen alles als eben geändert und
 überschrieb im Konto, was ein anderes Gerät inzwischen geschrieben hatte.
 

@@ -269,6 +269,8 @@ In der Kopfleiste steht, wo die Einträge liegen: **im Konto gesichert** oder **
   dem Gerät. **Der neuere Stand gewinnt**, auf dem Server und auf jedem Gerät. Innerhalb eines Tages
   oder einer Woche wird nichts zusammengeführt. Hochgeladen wird nur, was sich geändert hat: Wer an
   einem Gerät eine Woche ausfüllt, überschreibt nicht, was ein anderes in eine andere Woche schrieb.
+  Wer einen Stand ändert, stempelt immer später als dieser Stand, auch wenn die Uhr seines Geräts
+  hinter der des Geräts zurückliegt, von dem der Stand kam.
 
 - Heruntergeladen wird, was seit dem letzten Abgleich **beim Server eingegangen** ist, nicht was
   seitdem geschrieben wurde. Sonst käme ein Tag, den ein Gerät morgens offline geschrieben und

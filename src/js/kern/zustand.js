@@ -465,13 +465,23 @@ function wocheKennung(w) {
 }
 var LEERE_WOCHE = wocheKennung(null);
 
+/**
+ * Der Stempel einer Änderung: jetzt, aber immer nach dem bisherigen. Wer einen Stand ändert, hat
+ * ihn gesehen, also muss seine Änderung gewinnen. Kam der Stand von einem Gerät, dessen Uhr
+ * vorgeht, lag „jetzt“ davor, und der Server verwarf die Änderung still.
+ */
+function stempelNach(alt, jetzt) {
+  var vorher = Date.parse(alt || "");
+  return vorher >= Date.parse(jetzt) ? new Date(vorher + 1).toISOString() : jetzt;
+}
+
 function zeitstempelPflegen() {
   var jetzt = new Date().toISOString();
   // Beim ersten Durchlauf nach dem Laden nur stempeln, was noch keinen Stempel hat:
   // Sonst sähe ein alter Stand nach dem Öffnen frischer aus als der auf dem Server.
   var stempeln = function (schluessel, kennung, hatStempel, setzen) {
     if (zuletztGesichert[schluessel] === kennung) return;
-    if (zuletztGesichert[schluessel] !== undefined || !hatStempel) setzen(jetzt);
+    if (zuletztGesichert[schluessel] !== undefined || !hatStempel) setzen(stempelNach(hatStempel, jetzt));
     zuletztGesichert[schluessel] = kennung;
   };
   Object.keys(tage).forEach(function (k) {

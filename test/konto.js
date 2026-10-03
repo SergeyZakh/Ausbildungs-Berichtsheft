@@ -168,6 +168,25 @@ async function warteAuf(pruefung, was, versuche = 50) {
     pruefe('Keine JavaScript-Fehler auf beiden Geräten',
       azubi.fehler.length === 0 && zweitesGeraet.fehler.length === 0, azubi.fehler.concat(zweitesGeraet.fehler).join(' | '));
 
+    // Zwei Uhren: Der Rechner geht zehn Minuten vor, das Handy richtig. Was das Handy an einem Tag
+    // vom Rechner ändert, trug früher einen älteren Stempel als der Tag im Konto. Der Server verwarf
+    // es still, das Handy zeigte „im Konto gesichert“, und der Ausbilder sah den alten Text.
+    const UHR = { 'X-Person': 'azubi-t3', 'X-Name': 'Cem Azubi', 'X-Rolle': 'azubi' };
+    await api(UHR, 'abgleich', { tage: [{ datum: '2026-09-21', text: 'Am Rechner geschrieben', art: '', stunden: 8,
+      geprueft: false, geaendert: new Date(Date.now() + 10 * 60 * 1000).toISOString() }] });
+    const handy = await seite(UHR);
+    await warteAuf(() => handy.p.evaluate(() => (window.__tage()['2026-09-21'] || {}).text === 'Am Rechner geschrieben'), 'Tag vom Rechner am Handy');
+    await ruhig(handy);
+    await handy.p.evaluate(() => window.__tagSetzen('2026-09-21', { text: 'Am Handy verbessert', geprueft: true }));
+    await ruhig(handy);
+    await handy.p.evaluate(() => window.__kontoAbgleichen());
+    await ruhig(handy);
+    const nachHandy = (await api(UHR, 'abgleich', {})).daten.tage.find((t) => t.datum === '2026-09-21') || {};
+    pruefe('Ein Gerät mit nachgehender Uhr ändert einen Tag trotzdem im Konto',
+      nachHandy.text === 'Am Handy verbessert' && nachHandy.geprueft === true, JSON.stringify(nachHandy));
+    pruefe('Keine JavaScript-Fehler am Handy', handy.fehler.length === 0, handy.fehler.join(' | '));
+    await handy.kontext.close();
+
     // „Alles löschen“ mit Konto leert nur diesen Browser. Früher blieb die Marke des letzten
     // Abgleichs stehen: Der Browser blieb leer, das Konto voll, und die nächste Eingabe schrieb
     // leere Stammdaten ins Konto.
