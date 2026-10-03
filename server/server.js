@@ -85,6 +85,13 @@ function antworten(antwort, status, daten) {
 }
 
 function koerperLesen(anfrage) {
+  // Ein Formular auf einer anderen Seite derselben Site (etwa ein anderer Host unter firma.intern)
+  // schickt das Sitzungs-Cookie trotz SameSite=Lax mit, und mit enctype="text/plain" ist sein Körper
+  // gültiges JSON. Den Typ application/json kann es nicht setzen; fetch von fremder Herkunft bräuchte
+  // dafür eine CORS-Freigabe, die der Server nie gibt.
+  if (!/^application\/json\s*(;|$)/i.test(anfrage.headers['content-type'] || '')) {
+    return Promise.reject(new Fehler(415, 'Nur JSON (Content-Type: application/json)'));
+  }
   return new Promise((fertig, fehler) => {
     const teile = [];
     let laenge = 0;

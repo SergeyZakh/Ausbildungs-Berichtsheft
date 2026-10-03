@@ -356,7 +356,8 @@ oder `+`, etwa wenn Authentik die E-Mail als `sub` schickt.
 
 Fremde Hefte gibt es nicht: Ein Azubi erreicht nur sein eigenes, ein Ausbilder nur die seiner
 Gruppe (sonst 404). Anfragen sind auf 2 MB begrenzt; drei Ausbildungsjahre mit vollen Tagen
-sind knapp 500 KB.
+sind knapp 500 KB. `POST` nimmt nur `Content-Type: application/json` an (sonst 415), siehe
+„Sicherheit“.
 
 ## Sicherung
 
@@ -404,6 +405,7 @@ starten und die Sicherung einspielen. Dependabot schlägt ihn deshalb nicht vor
 | nginx | wie ohne Server (docs/KI.md, B5); CSP erlaubt nur die eigene Herkunft |
 | Datenbank | kein Port nach außen, Passwort aus `DB_PASSWORD` |
 | Cookie | signiert (HMAC-SHA256), `HttpOnly`, `SameSite=Lax`, bei https `Secure` |
+| Fremde Formulare | `SameSite=Lax` hält nur andere Sites ab, nicht andere Hosts derselben Firma. Deren Formulare schicken das Cookie mit, können aber kein `application/json` senden; der Server weist jeden `POST` ohne diesen Typ ab (415). |
 | Testanmeldung | Nur für automatische Tests. `TESTANMELDUNG=1` schaltet die Anmeldung ab, der Server glaubt dann den HTTP-Headern `X-Person`, `X-Name` und `X-Rolle`. Das Server-Image verweigert damit den Start. |
 
 ## Tests

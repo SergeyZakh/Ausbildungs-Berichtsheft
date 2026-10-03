@@ -258,6 +258,23 @@ const WOCHE = ['2026-09-07', '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-
   pruefe('Kaputtes Datum wird abgewiesen (400)',
     (await ruf(AZUBI, '/api/abgleich', { koerper: { von: WOCHE[0], bis: WOCHE[4], tage: [{ datum: '07.09.2026', text: 'x' }] } })).status === 400);
 
+  // Ein Formular einer anderen Seite (enctype="text/plain") schickt name=wert, das zusammen gültiges
+  // JSON ergibt, und das Cookie gleich mit. Früher sperrte so ein Stempel aus dem Jahr 9999 den Tag.
+  const formular = await fetch(adresse + '/api/abgleich', {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain', 'X-Person': AZUBI.id, 'X-Name': AZUBI.name, 'X-Rolle': AZUBI.rolle },
+    body: `{"tage":[{"datum":"${WOCHE[0]}","text":"untergeschoben","geaendert":"9999-01-01T00:00:00Z","x":"="}]}`,
+  });
+  const nachFormular = await pool.query('SELECT text FROM tage WHERE person_id = $1 AND datum = $2', [AZUBI.id, WOCHE[0]]);
+  pruefe('Ein Körper ohne Content-Type JSON wird abgewiesen (415) und nicht geschrieben',
+    formular.status === 415 && nachFormular.rows[0].text === 'Arbeitsplatz eingerichtet',
+    { status: formular.status, text: nachFormular.rows[0].text });
+  pruefe('… auch bei der Gruppe des Ausbilders', (await fetch(adresse + '/api/gruppe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Person': AUSBILDER.id, 'X-Rolle': 'ausbilder' },
+    body: 'azubi_id=' + AZUBI2.id,
+  })).status === 415);
+
   abschnitt('Ausbilder sieht seine Azubis');
 
   await ruf(AZUBI2, '/api/ich');
