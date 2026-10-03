@@ -169,6 +169,9 @@ function azubiWaehlen(id) {
 
 function zurueckZurAuswahl() {
   AUSBILDER.gewaehlt = null;
+  // Die Auswahl lädt neu; gemerkte Hefte auch, sonst zeigte die Liste den neuen Stand und das
+  // Heft daneben den vom ersten Öffnen.
+  AUSBILDER.stand = {};
   ausbilderListe();
 }
 

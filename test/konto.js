@@ -344,8 +344,15 @@ async function warteAuf(pruefung, was, versuche = 50) {
     await ausbilder.p.click('#a-zurueck-liste');
     await ausbilder.p.waitForSelector('.aauswahl');
     pruefe('Zurück führt zur Auswahl', (await ausbilder.p.locator('#a-inhalt').innerText()).includes('Alex Azubi'));
+    // Inzwischen trägt der Azubi etwas nach. Die Auswahl lädt bei „Zurück“ neu, das Heft zeigte
+    // früher aber bis zum Neuladen der Seite den Stand vom ersten Öffnen.
+    await api(AZUBI, 'abgleich', { tage: [{ datum: WOCHE[4], text: 'Switch im Lager getauscht', art: '', stunden: 8,
+      geprueft: false, geaendert: new Date(Date.now() + 1000).toISOString() }] });
     await ausbilder.p.click('[data-azubi="azubi-t1"]');
     await ausbilder.p.waitForSelector('.vorschaubuehne .bogen');
+    const nachgetragen = await ausbilder.p.locator('#a-inhalt').innerText();
+    pruefe('Nach „Zurück“ zeigt das Heft, was der Azubi inzwischen geschrieben hat',
+      nachgetragen.includes('Switch im Lager getauscht'), nachgetragen.slice(0, 300));
     pruefe('Bea bleibt außen vor', !woche.includes('Bea'));
 
     // Export: dieselben Bausteine wie im Heft, nur mit den Daten des Azubis.
