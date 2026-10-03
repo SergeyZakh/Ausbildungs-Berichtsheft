@@ -3,8 +3,11 @@
  * Aktivität bei GitHub (Spalten Wochen, Zeilen Mo–Fr), dazu die Tage in der Berufsschule,
  * im Urlaub und krank
  *
- * Die Farben sind dieselben wie im Monatsraster: grün fertig, rot ungelesen, blassrot fehlt.
+ * Die Farben sind dieselben wie im Monatsraster: grün fertig, rot ungelesen, blassrot fehlt Text
+ * (im Monatsraster ein Ring, gestrichelt, wenn gar nichts eingetragen ist).
  * Ein Klick auf ein Feld öffnet den Tag. Am Rechner passen drei Jahre ohne Scrollen hinein.
+ * Am Handy steht die Übersicht im Kalender, als Ansicht „Ausbildung“ neben dem Monat
+ * (ansicht-woche.js); dort öffnet ein Monatsname seinen Monat.
  * ========================================================== */
 
 /* Welche Arten gezählt werden, in dieser Reihenfolge. */
@@ -59,8 +62,9 @@ function tagFeld(key, z, heute) {
  * Das Raster eines Ausbildungsjahrs: oben die Monate, links Mo, Mi, Fr, je Woche eine Spalte.
  * Die Felder sind Spalte für Spalte angeordnet (Woche 1 Mo–Fr, Woche 2 …), gesetzt über die
  * Rasterposition. Klicks fängt das Raster selbst ab, statt Hunderte Knöpfe zu verdrahten.
+ * Mit `monatWahl` sind die Monatsnamen Knöpfe, die den Monat im Kalender zeigen.
  */
-function jahresRaster(j, z) {
+function jahresRaster(j, z, monatWahl) {
   var heute = iso(new Date());
   var raster = document.createElement("div");
   raster.className = "uraster";
@@ -77,9 +81,14 @@ function jahresRaster(j, z) {
     // Der Monat steht über seiner ersten Woche; zu dicht aufeinander nicht.
     var neu = s === 0 || monatVon(w) !== monatVon(j.wochen[s - 1]);
     if (neu && s - zuletzt >= 3) {
-      var monat = document.createElement("span");
+      var monat = document.createElement(monatWahl ? "button" : "span");
       monat.className = "umonat";
       monat.textContent = MON_KURZ[monatVon(w)];
+      if (monatWahl) {
+        monat.type = "button";
+        monat.setAttribute("data-monat", iso(plus(montag, 3)));
+        monat.setAttribute("aria-label", MONATE[monatVon(w)] + " im Kalender zeigen");
+      }
       monat.style.gridColumn = String(s + 2);
       raster.appendChild(monat);
       zuletzt = s;
@@ -106,6 +115,8 @@ function jahresRaster(j, z) {
     raster.appendChild(name);
   });
   raster.addEventListener("click", function (e) {
+    var monat = e.target.closest("[data-monat]");
+    if (monat) { monatWahl(vonIso(monat.getAttribute("data-monat"))); return; }
     var feld = e.target.closest("[data-datum]");
     if (!feld) return;
     $("dlg-uebersicht").close();
@@ -162,8 +173,9 @@ function uebersichtDaten() {
   return liste.sort(function (a, b) { return a.jahr - b.jahr; });
 }
 
-function uebersichtZeichnen() {
-  var inhalt = $("ueb-inhalt");
+/** In den Dialog „Übersicht“ oder, mit `ziel` und `monatWahl`, in den Kalender am Handy. */
+function uebersichtZeichnen(ziel, monatWahl) {
+  var inhalt = ziel || $("ueb-inhalt");
   inhalt.innerHTML = "";
   var jahre = uebersichtDaten();
   if (!jahre.length) {
@@ -228,7 +240,7 @@ function uebersichtZeichnen() {
         (kommen ? ", " + kommen + " kommen noch" : "")
       : kommen ? mehrzahl(kommen, " Woche kommt", " Wochen kommen") + " noch"
       : "Die Wochen zählen zum Jahr davor.";
-    if (j.wochen.length) teil.appendChild(jahresRaster(j, z));
+    if (j.wochen.length) teil.appendChild(jahresRaster(j, z, monatWahl));
 
     var arten = UEBERSICHT_ARTEN.filter(function (a) { return j.tage[a]; });
     var tageZeile = document.createElement("p");
@@ -248,7 +260,8 @@ function uebersichtZeichnen() {
   legende.className = "ulegende";
   legende.innerHTML = ["fertig", "pruefen", "luecke", "frei", "kommt"].map(function (k) {
     return '<span><i class="utag ' + k + '"></i>' + KAESTCHEN_WORTE[k] + "</span>";
-  }).join("") + '<span class="leise">Ein Klick auf einen Tag öffnet ihn. Tage gezählt bis heute, ' +
+  }).join("") + '<span class="leise">Ein Klick auf einen Tag öffnet ihn' +
+    (monatWahl ? ", einer auf den Monat zeigt ihn im Kalender" : "") + ". Tage gezählt bis heute, " +
     "Berufsschule auch laut Schulplan.</span>";
   inhalt.appendChild(legende);
 }
@@ -256,8 +269,15 @@ function uebersichtZeichnen() {
 $("btn-uebersicht").addEventListener("click", uebersichtOeffnen);
 $("ueb-zu").addEventListener("click", function () { $("dlg-uebersicht").close(); });
 
-function uebersichtOeffnen() {
+function uebersichtOeffnen(e) {
   menueSchliessen();
+  // Am Handy ist die Übersicht eine Ansicht des Kalenders. Der Klick darf nicht bis zum Dokument
+  // steigen, das schlösse den eben geöffneten Kalender wieder (bedienung.js).
+  if (kalenderAlsFenster()) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    wochenwahlOeffnen("ausbildung");
+    return;
+  }
   wochenwahlSchliessen();
   uebersichtZeichnen();
   $("dlg-uebersicht").showModal();

@@ -109,48 +109,54 @@
   <button type="button" class="notizzu" id="notiz-zu" aria-label="Meldung schließen">×</button>
 </footer>
 
-<!-- Wochenwahl: Monatsraster unter dem Wochenknopf -->
-<div class="wpopover" id="dlg-wochen" hidden role="dialog" aria-labelledby="wtitel">
-  <div class="dkopf">
-    <h2 id="wtitel">Woche wählen</h2>
+<!-- Kalender: am Rechner ein Monatsraster unter dem Wochenknopf, am Handy ein Fenster in der Mitte
+     mit Grund dahinter und zwei Ansichten, Monat und Ausbildung (ansicht-woche.js, handy.css) -->
+<div class="wgrund" id="wochen-grund" hidden></div>
+<div class="wpopover" id="dlg-wochen" hidden role="dialog" aria-label="Kalender">
+  <div class="dkopf wkopfzeile">
+    <button type="button" class="rundknopf wnav" id="monat-zurueck" aria-label="Voriger Monat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h2 class="wnav" id="monatslabel" aria-live="polite"></h2>
+    <button type="button" class="rundknopf wnav" id="monat-vor" aria-label="Nächster Monat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    <h2 class="wtitel-ausbildung">Ausbildung</h2>
+    <span class="wluecke"></span>
+    <button type="button" class="rundknopf wnav" id="w-hilfe" aria-label="Was heißen die Marken?" title="Was heißen die Marken?" aria-expanded="false" aria-controls="w-marken">?</button>
+    <button type="button" class="knopf wnav nurgross" id="sprung-heute">Heute</button>
     <button type="button" class="rundknopf dlg-x" id="w-zu" aria-label="Schließen">×</button>
+    <!-- Nur am Handy: Monat oder die ganze Ausbildung (uebersicht.js) im selben Fenster. -->
+    <div class="wansicht" role="group" aria-label="Ansicht">
+      <button type="button" id="w-ansicht-monat" aria-pressed="true">Monat</button>
+      <button type="button" id="w-ansicht-ausbildung" aria-pressed="false">Ausbildung</button>
+    </div>
   </div>
   <div class="dkoerper">
-    <div class="monatszeile">
-      <button type="button" class="rundknopf" id="monat-zurueck" aria-label="Voriger Monat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-      <span id="monatslabel"></span>
-      <button type="button" class="rundknopf" id="monat-vor" aria-label="Nächster Monat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-    </div>
-    <div class="wochenliste" id="wochenliste"></div>
-    <!-- Am Handy gibt es kein Überfahren mit der Maus: Was Kreise und Marken heißen, steht hier.
-         Links die Marken der Reiter oben, rechts die Kreise dieses Rasters, je mit ihrem Muster. -->
-    <div class="legende">
-      <div>
+    <div class="wmonat">
+      <div class="wochenliste" id="wochenliste"></div>
+      <!-- Was die Kreise heißen, in einer Zeile. Am Handy gibt es kein Überfahren mit der Maus. -->
+      <div class="legende wlegende">
+        <span title="gegengelesen"><i class="lk fertig">7</i>fertig</span>
+        <span title="Text steht da, ist aber noch nicht gegengelesen"><i class="lk voll">7</i>gegenlesen</span>
+        <span title="Stunden eingetragen, aber noch kein Text"><i class="lk offen">7</i>Text fehlt</span>
+        <span title="Werktag der Ausbildung ohne jeden Eintrag"><i class="lk fehlt">7</i>leer</span>
+        <span title="Urlaub, krank, Feiertag"><i class="lk frei">7</i>frei</span>
+      </div>
+      <!-- Die Marken der Reiter oben, hinter dem „?“: Sie erklären die Reiter, nicht das Raster. -->
+      <div class="legende wmarken" id="w-marken" hidden>
         <p class="ltitel">Marken an den Tagen</p>
         <span><b class="lm rot">E</b>Entwurf</span>
         <span><b class="lm rot">KI</b>von der KI</span>
         <span><b class="lm rot">!</b>eigener Text</span>
         <span><b class="lm gruen">✓</b>fertig</span>
         <span><i class="lr"></i>Text fehlt</span>
+        <p class="whinweis">Ein Tag im Kalender öffnet den Tag, die Kalenderwoche die ganze Woche.</p>
       </div>
-      <div>
-        <p class="ltitel">Im Kalender</p>
-        <span><i class="lk voll">7</i>nicht gegengelesen</span>
-        <span><i class="lk fertig">7</i>fertig</span>
-        <span><i class="lk offen">7</i>Stunden ohne Text</span>
-        <span><i class="lk fehlt">7</i>nichts eingetragen</span>
-        <span><i class="lk frei">7</i>frei</span>
+      <div class="wfuss">
+        <button type="button" class="knopf nurklein" id="sprung-heute-handy">Heute</button>
+        <button type="button" class="knopf" id="sprung-offen">Erste offene Woche</button>
+        <input id="wochensuche" type="text" inputmode="numeric" autocomplete="off" placeholder="Gehe zu TT.MM.JJJJ" aria-label="Gehe zu Datum (TT.MM.JJJJ)">
       </div>
+      <p class="suchhinweis" id="suchhinweis"></p>
     </div>
-    <div class="sprungzeile">
-      <button type="button" class="knopf" id="sprung-offen">Erste offene Woche</button>
-      <button type="button" class="knopf" id="sprung-heute">Heute</button>
-    </div>
-    <label class="suchzeile">
-      <span>Datum</span>
-      <input id="wochensuche" type="text" inputmode="numeric" autocomplete="off" placeholder="TT.MM.JJJJ">
-    </label>
-    <p class="suchhinweis" id="suchhinweis"></p>
+    <div class="wausbildung" id="w-ausbildung"></div>
   </div>
 </div>
 

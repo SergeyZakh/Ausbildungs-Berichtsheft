@@ -70,6 +70,8 @@ einfach selbst.
   ein Tipp das Feld groß.
 - **Zen-Modus:** Ein Knopf neben hell/dunkel blendet alles aus außer der Karte, an der du
   schreibst, oder dem Blatt; `Esc` holt alles zurück.
+- **Kalender:** Ein Klick auf die Woche oben zeigt den Monat, jeder Tag als Kreis in der Farbe
+  seines Stands; ein Klick auf einen Tag öffnet ihn. Am Handy ein Fenster mit Monat und Ausbildung.
 - **Übersicht aller Wochen** wie die Aktivität bei GitHub: jeder Werktag ein Feld, grün fertig,
   rot offen, dazu Schul-, Urlaubs- und Krankheitstage je Ausbildungsjahr.
 - **Optional mit eigenem Sprachmodell:** [Ollama](https://ollama.com) fasst den Tag in so vielen

@@ -229,7 +229,7 @@ function hinweisWaehlen() {
       text: saetze.join(" "),
       knoepfe: [
         [letzte ? "Letzte Woche öffnen" : "Früheste öffnen", oeffnen, true],
-        ["Übersicht", function () { hinweisRuhe = true; hinweiseZeigen(); uebersichtOeffnen(); }]
+        ["Übersicht", function (e) { hinweisRuhe = true; hinweiseZeigen(); uebersichtOeffnen(e); }]
       ],
       kurz: {
         titel: "Noch offen:",

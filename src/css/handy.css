@@ -296,9 +296,64 @@
   #dlg-zuordnung .dkoerper { max-height: none; }
   .dfuss { flex-wrap: wrap; padding-top: var(--luft-4); border-top: 1px solid var(--linie); }
   .wpopover { width: calc(100vw - 12px); }
-  .wochenliste .wkopf, .wochenliste button { grid-template-columns: 28px repeat(7, 1fr) 44px; }
+  .wochenliste .wkopf, .wochenliste > button, .wochenliste .wzeile { grid-template-columns: 28px repeat(7, 1fr) 44px; }
   .wochenliste .wtag { height: 28px; }
   .wochenliste .wtag b { width: 21px; height: 21px; font-size: var(--schrift-fein); }
+  /* Im Kalender des Hefts größer, für den Finger. */
+  .wzeile .wtag { height: 34px; }
+  .wzeile .wtag b { width: 25px; height: 25px; }
+
+  /* Der Kalender ist hier ein Fenster in der Mitte mit Grund dahinter, wie die Dialoge. Unter dem
+     Kopf wählt man Monat oder Ausbildung (die Übersicht, uebersicht.js); „Heute“ steht unten neben
+     „Erste offene“, im Kopf ist dafür kein Platz. Vorher hing er unter dem Wochenknopf und füllte
+     mit der Legende fast den ganzen Schirm. */
+  .wgrund:not([hidden]) {
+    display: block; position: fixed; inset: 0; z-index: 49;
+    background: rgba(40, 38, 34, .3); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    animation: einblenden .16s ease-out;
+  }
+  #dlg-wochen {
+    position: fixed; inset: 0 10px; margin: auto 0; width: auto; max-width: none;
+    height: -webkit-fit-content; height: fit-content; max-height: calc(100dvh - 20px);
+    overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
+    background: var(--flaeche); border-color: var(--linie);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  #dlg-wochen .wkopfzeile {
+    position: sticky; top: 0; z-index: 2; flex-wrap: wrap; background: var(--flaeche);
+    padding: var(--luft-3);
+  }
+  #dlg-wochen .wkopfzeile h2 {
+    flex: 1 1 0; min-width: 0; font-size: var(--schrift-gross);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #dlg-wochen .wluecke, #dlg-wochen .nurgross { display: none; }
+  #dlg-wochen .nurklein { display: inline-flex; }
+  #dlg-wochen .dkoerper { padding: var(--luft-3); }
+  .wansicht {
+    display: flex; order: 9; flex: 1 1 100%; padding: 2px;
+    background: var(--band); border: 1px solid var(--linie); border-radius: var(--rund-voll);
+  }
+  .wansicht button {
+    flex: 1 1 0; padding: 6px var(--luft-3); border: none; border-radius: var(--rund-voll); background: none;
+    font: inherit; font-size: var(--schrift-klein); color: var(--schiefer);
+  }
+  .wansicht button[aria-pressed="true"] { background: var(--flaeche); color: var(--text); font-weight: 600; box-shadow: var(--schatten); }
+  #dlg-wochen .wochenliste { max-height: none; }
+  .wlegende { gap: var(--luft-2); }
+  .wfuss { flex-wrap: wrap; }
+  .wfuss .knopf { flex: 1 1 auto; justify-content: center; text-align: center; padding: var(--luft-2) var(--luft-3); }
+  .wfuss #sprung-heute-handy { flex: 0 1 30%; }
+  .wfuss input { flex: 1 1 100%; padding: var(--luft-2) var(--luft-3); }
+  /* Ausbildung: alle Jahre wie in der Übersicht, ein Tipp auf einen Monat zeigt ihn im Raster. */
+  #dlg-wochen.ausbildung .wnav, #dlg-wochen.ausbildung .wmonat { display: none; }
+  #dlg-wochen.ausbildung .wtitel-ausbildung { display: block; flex: 1 1 auto; text-align: left; font-size: var(--schrift-gross); }
+  #dlg-wochen.ausbildung .wausbildung { display: block; }
+  .wausbildung .ueb-kopf { margin-bottom: var(--luft-3); }
+  .wausbildung button.umonat {
+    margin: 0; padding: 0; border: none; background: none; font: inherit; font-size: var(--schrift-fein);
+    color: var(--text); text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+  }
   .onb-karte { width: calc(100vw - 24px); }
 
   /* Die Einrichtung füllt am Handy den Bildschirm: Sie ist das Erste, was man sieht. */
@@ -328,6 +383,12 @@
 }
 @media (max-width: 380px) {
   .wochensumme .wswort { display: none; }
+}
+
+/* Bei 320 px passte das × nicht mehr neben Monat, Pfeile und „?“ und rutschte in eine zweite Zeile. */
+@media (max-width: 360px) {
+  #dlg-wochen .wkopfzeile { gap: var(--luft-1); }
+  #dlg-wochen .wkopfzeile h2 { font-size: var(--schrift-text); }
 }
 
 /* Ganz schmal (320 px) passen neben fünf Knöpfe nur Ring und Anteil; die Stunden stehen im Tageskopf.

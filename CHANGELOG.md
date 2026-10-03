@@ -23,6 +23,15 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 ### Geändert
 
+- **Kalender aufgeräumt:** Ein Klick auf einen Tag öffnet genau diesen Tag, ein Klick auf die
+  Kalenderwoche die ganze Woche; vorher landete man immer am Montag. Heute hat einen Ring, Tage
+  des Monats davor und danach sind blass, Werktage ganz ohne Eintrag gestrichelt statt blassrot.
+  Die Legende steht in einer Zeile, die Marken der Reiter hinter einem „?“, und „Erste offene“
+  nennt, wohin sie springt. Am Rechner ist der Kalender damit gut halb so hoch. Mit Tab und den
+  Pfeiltasten geht es durchs Raster.
+- **Kalender am Handy als Fenster:** in der Mitte, mit Grund dahinter, und mit dem Umschalter
+  „Monat | Ausbildung“. „Ausbildung“ zeigt die Übersicht aller Wochen, ein Tipp auf einen Monat
+  zeigt ihn im Raster; ⋯ → Übersicht öffnet am Handy diese Ansicht.
 - **Tage am Handy als Kalenderleiste:** Jeder Tag ist gleich breit, über dem Datum im Kreis steht
   das Kürzel. Die Farbe des Kreises zeigt den Stand (rot gegenlesen, grün fertig), der gewählte Tag
   ist ausgefüllt, „Woche“ steht als eigener Knopf daneben. Vorher war ein leeres Wochenende

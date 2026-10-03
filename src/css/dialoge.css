@@ -2,13 +2,17 @@
  * Dialoge und Überlagerungen: Monatsraster, Deine Daten, Zuordnung, Rundgang
  * ========================================================== */
 
-/* ---------- Wochenwahl: Monatsraster ---------- */
+/* ---------- Kalender: Monatsraster (ansicht-woche.js, beim Ausbilder ausbilder.js) ----------
+   Am Rechner schwebt er unter dem Wochenknopf, am Handy steht er als Fenster in der Mitte (handy.css). */
 .wpopover {
   position: absolute; z-index: 50; width: 420px; max-width: calc(100vw - 16px);
   background: var(--popover); border: 1px solid var(--glas-kante); border-radius: var(--rund);
   -webkit-backdrop-filter: var(--unschaerfe); backdrop-filter: var(--unschaerfe);
   box-shadow: var(--schatten-hoch);
 }
+#dlg-wochen { left: var(--links, 6px); top: var(--oben, 60px); }
+/* Der Grund hinter dem Kalender gilt nur am Handy (handy.css). */
+.wgrund { display: none; }
 .wpopover .dkopf { border-bottom-color: var(--linie); padding: var(--luft-3) var(--luft-3) var(--luft-3) var(--luft-5); }
 .wpopover .dkoerper { padding: var(--luft-4); }
 .monatszeile {
@@ -16,13 +20,34 @@
 }
 .monatszeile span { flex: 1 1 auto; text-align: center; font-size: var(--schrift-text); font-weight: 600; }
 
-/* Eine Zeile je Woche: Kalenderwoche, sieben Tageszellen, Stunden. */
+/* Kopf: ‹ Monat › links, rechts ?, Heute und ×. Vorher stand oben „Woche wählen“ und darunter
+   noch einmal der Monat zwischen den Pfeilen. */
+.wpopover .wkopfzeile { justify-content: flex-start; gap: var(--luft-2); padding: var(--luft-3) var(--luft-3) var(--luft-3) var(--luft-4); }
+.wkopfzeile h2 {
+  min-width: 116px; font-size: var(--schrift-text); font-weight: 600; letter-spacing: normal; text-align: center;
+}
+.wkopfzeile .wluecke { flex: 1 1 auto; }
+.wkopfzeile .knopf { padding: var(--luft-1) var(--luft-3); font-size: var(--schrift-klein); }
+.wkopfzeile #monat-zurueck, .wkopfzeile #monat-vor { border: none; background: var(--hauch); }
+.wkopfzeile #monat-zurueck:hover, .wkopfzeile #monat-vor:hover { background: var(--band); }
+.wkopfzeile .rundknopf svg {
+  width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.wkopfzeile #w-hilfe { font-size: var(--schrift-klein); font-weight: 600; color: var(--schiefer); }
+.wkopfzeile #w-hilfe[aria-expanded="true"] { background: var(--text); border-color: var(--text); color: var(--flaeche); }
+/* Was nur am Handy gilt: Umschalter Monat/Ausbildung, Titel der Ausbildung, „Heute“ unten. */
+.wansicht, .wtitel-ausbildung, .wausbildung, .nurklein { display: none; }
+
+/* Eine Zeile je Woche: Kalenderwoche, sieben Tage, Stunden. Beim Ausbilder ist die Zeile ein
+   Knopf, im Heft ein Rahmen mit einem Knopf je Tag (.wzeile). */
 .wochenliste {
   max-height: 320px; overflow-y: auto;
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund);
 }
 .wochenliste .wkopf,
-.wochenliste button {
+.wochenliste > button,
+.wochenliste .wzeile {
   display: grid; grid-template-columns: 34px repeat(7, 1fr) 52px;
   width: 100%; align-items: center; text-align: left;
   background: var(--flaeche); border: none; border-bottom: 1px solid var(--linie-leise);
@@ -33,19 +58,34 @@
   text-transform: uppercase; color: var(--schiefer); position: sticky; top: 0; z-index: 1;
 }
 .wochenliste .wkopf span { padding: var(--luft-1) 0; text-align: center; }
-.wochenliste button:last-child { border-bottom: none; }
-.wochenliste button:hover:not(:disabled) { background: var(--band); }
-.wochenliste button:disabled { color: var(--blass); cursor: not-allowed; }
-/* Leere Woche: blass, mit "+" statt Stunden; ein Klick legt sie an. */
-.wochenliste button.neu, .wochenliste button.neu .wkw { color: var(--blass); }
-.wochenliste button.neu .wstd { color: var(--blass); font-size: var(--schrift-text); }
-.wochenliste button.neu:hover, .wochenliste button.neu:hover .wkw, .wochenliste button.neu:hover .wstd { color: var(--text); }
+.wochenliste > :last-child { border-bottom: none; }
+.wochenliste > button:hover:not(:disabled) { background: var(--band); }
+.wochenliste > button:disabled { color: var(--blass); cursor: not-allowed; }
+/* Leere Woche: blass; ein Klick legt sie an. */
+.wochenliste .neu, .wochenliste .neu .wkw { color: var(--blass); }
+.wochenliste > button.neu .wstd { color: var(--blass); font-size: var(--schrift-text); }
+.wochenliste > button.neu:hover, .wochenliste > button.neu:hover .wkw, .wochenliste > button.neu:hover .wstd { color: var(--text); }
 .wochenliste .wkw { font-size: var(--schrift-fein); color: var(--schiefer); text-align: center; font-variant-numeric: tabular-nums; }
 .wochenliste .wstd {
   font-size: var(--schrift-klein); text-align: center; color: var(--schiefer);
   font-variant-numeric: tabular-nums; padding-right: var(--luft-1);
 }
 .wochenliste .leerzeile { padding: var(--luft-4) var(--luft-3); font-size: var(--schrift-klein); color: var(--schiefer); }
+
+/* Im Heft ist jeder Tag ein Knopf und die Kalenderwoche einer (ganze Woche). Ohne eigenen Grund,
+   damit die Farbe der Zeile durchscheint; der Rahmen beim Überfahren sitzt am Kreis. */
+.wzeile button {
+  height: 32px; margin: 0; padding: 0; border: none; background: none;
+  font: inherit; color: inherit; cursor: pointer;
+}
+.wzeile .wkw { height: 100%; font-size: var(--schrift-fein); }
+.wzeile button:focus-visible { outline: none; }
+.wzeile .wkw:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; border-radius: var(--rund-klein); }
+.wzeile .wtag:focus-visible b { outline: 2px solid var(--text); outline-offset: 2px; }
+@media (hover: hover) {
+  .wzeile .wtag:hover b { outline: 2px solid var(--linie-fest); outline-offset: 1px; }
+  .wzeile .wkw:hover { color: var(--text); text-decoration: underline; }
+}
 
 /* Tageszelle als Kreis: rot = Text ungelesen, grün = gegengelesen, Ring = Stunden ohne Text,
    blassrot = Werktag der Ausbildung ohne Eintrag, durchgestrichen = frei. */
@@ -63,66 +103,82 @@
 .wochenliste .wtag.frei b   { color: var(--blass); text-decoration: line-through; }
 .wochenliste .wtag.nichts b { color: var(--blass); }
 .wochenliste .wtag.fehlt b  { background: var(--acht-hell); color: var(--acht); }
+/* Im Heft ist ein Werktag ohne Eintrag gestrichelt statt blassrot: Ein leerer Monat sah sonst aus
+   wie ein Alarm, und Rot hieß zweierlei. Tage aus dem Monat davor und danach blass, heute mit Ring.
+   Beim Ausbilder (ausbilder.js) bleibt das Raster, wie es war. */
+.wzeile .wtag b        { box-sizing: border-box; }
+.wzeile .wtag.fehlt b  { background: none; border: 1.5px dashed var(--gefahr-kante); }
+.wzeile .wtag.aussen b { opacity: .4; }
+.wzeile .wtag.heute b  { font-weight: 600; box-shadow: 0 0 0 2px var(--flaeche), 0 0 0 3.5px var(--text); }
 
-.wochenliste button.pruefen,
-.wochenliste button.pruefen .wkw,
-.wochenliste button.pruefen .wstd { color: var(--acht); }
-.wochenliste button.fertig,
-.wochenliste button.fertig .wkw,
-.wochenliste button.fertig .wstd { color: var(--gut); }
-.wochenliste button.pruefen:hover:not(:disabled) { background: var(--acht-hell); }
-.wochenliste button.fertig:hover:not(:disabled) { background: var(--gut-hell); }
+.wochenliste .pruefen,
+.wochenliste .pruefen .wkw,
+.wochenliste .pruefen .wstd { color: var(--acht); }
+.wochenliste .fertig,
+.wochenliste .fertig .wkw,
+.wochenliste .fertig .wstd { color: var(--gut); }
+.wochenliste > button.pruefen:hover:not(:disabled) { background: var(--acht-hell); }
+.wochenliste > button.fertig:hover:not(:disabled) { background: var(--gut-hell); }
 
 /* Die gewählte Woche bekommt einen Balken links statt einer anderen
    Grundfarbe, damit die Tagesfarben in jeder Zeile gleich bleiben. */
-.wochenliste button[aria-current="true"] {
+.wochenliste [aria-current="true"] {
   background: var(--band); box-shadow: inset 3px 0 0 0 var(--text); font-weight: 600;
 }
-.wochenliste button.pruefen[aria-current="true"] { background: var(--acht-hell); box-shadow: inset 3px 0 0 0 var(--acht); }
-.wochenliste button.fertig[aria-current="true"]  { background: var(--gut-hell); box-shadow: inset 3px 0 0 0 var(--gut); }
+.wochenliste .pruefen[aria-current="true"] { background: var(--acht-hell); box-shadow: inset 3px 0 0 0 var(--acht); }
+.wochenliste .fertig[aria-current="true"]  { background: var(--gut-hell); box-shadow: inset 3px 0 0 0 var(--gut); }
 
-/* Legende unter dem Raster in zwei Spalten: links die Marken der Reiter, rechts die Kreise des
-   Rasters mit demselben Aussehen. Vorher standen beide in einer Reihe durcheinander. */
-.legende {
-  display: grid; grid-template-columns: 1fr 1fr; gap: var(--luft-4); margin-top: var(--luft-3);
-  padding-top: var(--luft-3); border-top: 1px solid var(--linie);
-  font-size: var(--schrift-klein); color: var(--schiefer);
+/* Legende in einer Zeile: die Kreise des Rasters mit kurzem Wort. Vorher standen darunter zwei
+   Spalten mit zehn Einträgen, höher als das Raster selbst. Die Marken der Reiter (E, KI, !)
+   stehen hinter dem „?“ im Kopf (.wmarken). */
+.legende { font-size: var(--schrift-fein); color: var(--schiefer); }
+.legende span { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.wlegende { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--luft-2) var(--luft-3); margin-top: var(--luft-3); }
+.wmarken {
+  display: flex; flex-wrap: wrap; gap: var(--luft-2) var(--luft-4); margin-top: var(--luft-3);
+  padding: var(--luft-3); background: var(--band); border-radius: var(--rund-klein);
 }
-.legende > div { display: flex; flex-direction: column; gap: var(--luft-2); min-width: 0; }
+.wmarken[hidden] { display: none; }
 .legende .ltitel {
-  margin: 0; font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung);
+  flex: 1 1 100%; margin: 0; font-size: var(--schrift-fein); font-weight: 600; letter-spacing: var(--sperrung);
   text-transform: uppercase; color: var(--schiefer);
 }
-.legende span { display: flex; align-items: center; gap: var(--luft-2); white-space: nowrap; }
-/* Muster und Marke in gleich breiter Spalte, damit die Wörter untereinander beginnen. */
-.legende span > :first-child { flex: none; width: 20px; }
+.wmarken .whinweis { flex: 1 1 100%; margin: 0; }
+/* Muster und Marke in gleich breiter Spalte. */
+.legende span > :first-child { flex: none; width: 18px; }
 .legende .lm {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
   min-width: 16px; height: 16px; padding: 0 var(--luft-1); border-radius: var(--rund-voll);
   font-size: var(--schrift-marke); font-weight: 600; line-height: 1; color: var(--auf-farbe);
 }
 .legende .lm.rot { background: var(--acht); }
 .legende .lm.gruen { background: var(--gut); font-size: var(--schrift-marke); }
-.legende .lr { width: 10px !important; height: 10px; margin: 0 5px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid currentColor; }
+.legende .lr { width: 10px !important; height: 10px; margin: 0 4px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid currentColor; }
 /* Ein Tag des Rasters im Kleinen (.wtag weiter oben). */
 .legende .lk {
-  display: inline-flex; align-items: center; justify-content: center; height: 20px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; height: 18px; border-radius: 50%;
   font-size: var(--schrift-marke); font-style: normal; font-variant-numeric: tabular-nums;
 }
 .legende .lk.voll   { background: var(--acht); color: #fff; }
 .legende .lk.fertig { background: var(--gut); color: #fff; }
-.legende .lk.offen  { box-sizing: border-box; border: 1.5px solid var(--text); color: var(--text); }
-.legende .lk.fehlt  { background: var(--acht-hell); color: var(--acht); }
+.legende .lk.offen  { border: 1.5px solid var(--text); color: var(--text); }
+.legende .lk.fehlt  { border: 1.5px dashed var(--gefahr-kante); color: var(--acht); }
 .legende .lk.frei   { color: var(--blass); text-decoration: line-through; }
+
+/* Unten: die früheste offene Woche mit ihrem Datum und ein Feld für ein Datum. */
+.wfuss {
+  display: flex; align-items: center; gap: var(--luft-2); margin-top: var(--luft-3);
+  padding-top: var(--luft-3); border-top: 1px solid var(--linie);
+}
+.wfuss .knopf { flex: none; padding: 6px var(--luft-3); font-size: var(--schrift-klein); white-space: nowrap; }
+.wfuss input {
+  flex: 1 1 auto; min-width: 0; font: inherit; font-size: var(--schrift-klein); padding: 6px var(--luft-3);
+  border: 1px solid var(--linie); border-radius: var(--rund-klein); background: var(--flaeche); color: var(--text);
+}
 .sprungzeile { display: flex; gap: var(--luft-2); margin-top: var(--luft-3); }
 .sprungzeile .knopf { flex: 1 1 0; font-size: var(--schrift-klein); padding: var(--luft-2); }
-.suchzeile { display: flex; align-items: center; gap: var(--luft-3); margin-top: var(--luft-3); }
-.suchzeile span { font-size: var(--schrift-klein); color: var(--schiefer); white-space: nowrap; }
-.suchzeile input {
-  flex: 1 1 auto; font: inherit; font-size: var(--schrift-text); padding: var(--luft-2) var(--luft-3);
-  border: 1px solid var(--linie); border-radius: var(--rund-klein); background: var(--flaeche);
-}
-.suchhinweis { margin: var(--luft-2) 0 0; font-size: var(--schrift-klein); color: var(--schiefer); min-height: 18px; }
+.suchhinweis { margin: var(--luft-2) 0 0; font-size: var(--schrift-klein); color: var(--schiefer); }
+.suchhinweis:empty { display: none; }
 
 /* ---------- Dialog "Deine Daten" ----------
    Feste Höhe, damit das Fenster beim Reiterwechsel nicht springt. */

@@ -1,5 +1,5 @@
 /* ============================================================
- * Wochenbalken und Wochenwahl (Monatsraster)
+ * Wochenbalken und Kalender (Monatsraster)
  * ========================================================== */
 
 /* Welcher Monat im Raster steht; bleibt beim Blättern erhalten. */
@@ -8,6 +8,11 @@ var monatAnker = null;
 /* Die Winkel der Blätterpfeile, gleich wie in index.html; die Striche kommen aus leiste.css. */
 var PFEIL_LINKS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
 var PFEIL_RECHTS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+
+/* Was ein Kreis im Raster heißt, für Vorleser und als Titel beim Überfahren. */
+var TAG_WORTE = {
+  voll: "nicht gegengelesen", fertig: "gegengelesen", offen: "Stunden ohne Text", fehlt: "nichts eingetragen"
+};
 
 /** Wochenknopf, Blätterpfeile und Stundensumme. wochen[] ist absteigend sortiert. */
 function zeichneWochenwahl() {
@@ -41,7 +46,11 @@ function zeichneWochenwahl() {
   if (wochenwahlOffen()) zeichneWochenliste();
 }
 
-/** Das Monatsraster: eine Zeile je Woche, die den Monat berührt. */
+/**
+ * Das Monatsraster: eine Zeile je Woche, die den Monat berührt. Jeder Tag ist ein eigener Knopf
+ * und öffnet sich selbst, die Kalenderwoche öffnet die ganze Woche. Vorher war die Zeile ein
+ * einziger Knopf: Wer auf die 17 klickte, landete am Montag.
+ */
 function zeichneWochenliste() {
   var liste = $("wochenliste");
   liste.innerHTML = "";
@@ -53,16 +62,18 @@ function zeichneWochenliste() {
 
   var kopf = document.createElement("div");
   kopf.className = "wkopf";
+  kopf.setAttribute("aria-hidden", "true");
   kopf.innerHTML = "<span>KW</span>" +
     ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map(function (k) {
       return "<span>" + k + "</span>";
     }).join("") + "<span>Std</span>";
   liste.appendChild(kopf);
 
+  var heute = iso(new Date());
   var letzter = new Date(monatAnker.getFullYear(), monatAnker.getMonth() + 1, 0);
   var montag = montagVon(monatAnker), reihen = 0;
   while (montag <= letzter && reihen < 7) {
-    liste.appendChild(wochenzeile(montag));
+    liste.appendChild(wochenzeile(montag, monatAnker.getMonth(), heute));
     montag = plus(montag, 7);
     reihen++;
   }
@@ -73,38 +84,101 @@ function zeichneWochenliste() {
     leer.textContent = "Noch keine Woche mit Einträgen.";
     liste.appendChild(leer);
   }
+  kalenderTabstopp();
+  sprungOffenZeigen();
 }
 
-function wochenzeile(montag) {
-  var montagIso = iso(montag);
+function wochenzeile(montag, monat, heute) {
+  var montagIso = iso(montag), kw = kalenderwoche(montag);
   var hatDaten = wochen.indexOf(montagIso) !== -1;
   var l = lage(montagIso);
-  var b = document.createElement("button");
-  b.type = "button";
-  if (!hatDaten) b.className = "neu";
-  b.setAttribute("aria-current", String(montagIso === aktiveWoche));
-
+  var zeile = document.createElement("div");
   var wstand = hatDaten ? wochenStand(montagIso) : "";
-  if (wstand) b.className = wstand;
+  // Leere Woche: blass; ein Klick auf einen ihrer Tage legt sie an.
+  zeile.className = "wzeile" + (wstand ? " " + wstand : hatDaten ? "" : " neu");
+  zeile.setAttribute("role", "group");
+  zeile.setAttribute("aria-current", String(montagIso === aktiveWoche));
   var wortlaut = wstand === "pruefen" ? " — noch nicht gegengelesen"
     : wstand === "fertig" ? " — gegengelesen"
     : l.offen ? " — " + l.offen + " offen" : " — vollständig";
-  b.title = langSpanne(montag) + (hatDaten ? wortlaut : " — noch leer");
+  var wochenText = langSpanne(montag) + (hatDaten ? wortlaut : " — noch leer");
+  zeile.setAttribute("aria-label", "KW " + kw + ", " + wochenText);
 
-  var teile = ['<span class="wkw">' + kalenderwoche(montag) + "</span>"];
+  var kwKnopf = document.createElement("button");
+  kwKnopf.type = "button";
+  kwKnopf.className = "wkw";
+  kwKnopf.textContent = kw;
+  kwKnopf.title = wochenText + " · ganze Woche öffnen";
+  kwKnopf.setAttribute("aria-label", "KW " + kw + ", ganze Woche öffnen");
+  kwKnopf.setAttribute("data-montag", montagIso);
+  kwKnopf.setAttribute("data-tag", String(TAGE_JE_WOCHE));
+  zeile.appendChild(kwKnopf);
+
   for (var d = 0; d < TAGE_JE_WOCHE; d++) {
-    var tag = plus(montag, d);
-    var zustand = hatDaten ? tagLage(iso(tag)) : "nichts";
+    var tag = plus(montag, d), key = iso(tag);
+    var zustand = hatDaten ? tagLage(key) : "nichts";
     // Ein Werktag der Ausbildung bis heute ohne jeden Eintrag fehlt im Heft, auch in einer Woche
     // ganz ohne Daten: So sieht man im Raster, wo noch gar nichts steht (fehlenderWerktag()).
-    if (zustand === "nichts" && fehlenderWerktag(iso(tag))) zustand = "fehlt";
-    teile.push('<span class="wtag ' + zustand + '"><b>' + tag.getDate() + "</b></span>");
+    if (zustand === "nichts" && fehlenderWerktag(key)) zustand = "fehlt";
+    // Tage des Monats davor und danach blass, heute mit Ring (dialoge.css).
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "wtag " + zustand + (tag.getMonth() !== monat ? " aussen" : "") + (key === heute ? " heute" : "");
+    b.innerHTML = "<b>" + tag.getDate() + "</b>";
+    var wort = zustand === "frei" ? tage[key].art : TAG_WORTE[zustand];
+    var name = WOCHENTAGE[tag.getDay()] + ", " + dm(tag) + (key === heute ? " (heute)" : "") + (wort ? ": " + wort : "");
+    b.title = name;
+    b.setAttribute("aria-label", name);
+    b.setAttribute("data-montag", montagIso);
+    b.setAttribute("data-tag", String(d));
+    zeile.appendChild(b);
   }
-  teile.push('<span class="wstd">' + (hatDaten ? (l.summe ? stundenText(l.summe) : "") : "+") + "</span>");
-  b.innerHTML = teile.join("");
 
-  b.addEventListener("click", function () { wocheZeigen(montagIso); });
-  return b;
+  var std = document.createElement("span");
+  std.className = "wstd";
+  std.textContent = hatDaten && l.summe ? stundenText(l.summe) : "";
+  zeile.appendChild(std);
+  return zeile;
+}
+
+/**
+ * Nur ein Knopf des Rasters ist mit Tab erreichbar, weiter geht es mit den Pfeiltasten: sonst
+ * wären es bis zu 48 Tabstopps. Es ist der offene Tag, sonst heute, sonst der Erste des Monats.
+ */
+function kalenderTabstopp(ziel) {
+  var liste = $("wochenliste");
+  var knoepfe = [].slice.call(liste.querySelectorAll(".wzeile button"));
+  if (!ziel && aktiveWoche) {
+    ziel = liste.querySelector('button[data-montag="' + aktiveWoche + '"][data-tag="' + aktiverTag + '"]');
+  }
+  ziel = ziel || liste.querySelector(".wtag.heute") || liste.querySelector(".wtag:not(.aussen)");
+  knoepfe.forEach(function (k) { k.tabIndex = k === ziel ? 0 : -1; });
+}
+
+$("wochenliste").addEventListener("click", function (e) {
+  var k = e.target.closest("button[data-montag]");
+  if (k) wocheZeigen(k.getAttribute("data-montag"), +k.getAttribute("data-tag"));
+});
+$("wochenliste").addEventListener("keydown", function (e) {
+  var schritt = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] }[e.key];
+  var k = e.target.closest(".wzeile button");
+  if (!schritt || !k) return;
+  e.preventDefault();
+  var zeilen = [].slice.call($("wochenliste").querySelectorAll(".wzeile"));
+  var z = Math.max(0, Math.min(zeilen.length - 1, zeilen.indexOf(k.parentNode) + schritt[0]));
+  var spalte = [].indexOf.call(k.parentNode.querySelectorAll("button"), k) + schritt[1];
+  var reihe = zeilen[z].querySelectorAll("button");
+  var neu = reihe[Math.max(0, Math.min(reihe.length - 1, spalte))];
+  kalenderTabstopp(neu);
+  neu.focus();
+});
+
+/** Der Knopf nennt sein Ziel, damit man vorher weiß, wohin er springt. */
+function sprungOffenZeigen() {
+  var ziel = ersteOffeneWoche(), k = $("sprung-offen");
+  k.textContent = ziel ? "Erste offene: " + kurzSpanne(vonIso(ziel)) + " \u2192" : "Alles fertig";
+  k.title = ziel ? "Die früheste Woche, in der noch Text fehlt oder etwas gegenzulesen ist"
+    : "Alle geladenen Wochen sind ausgefüllt und übernommen.";
 }
 
 function monatBlaettern(schritt) {
@@ -113,10 +187,10 @@ function monatBlaettern(schritt) {
   zeichneWochenliste();
 }
 
-/** Eine Woche öffnen. `tag` ist der Index in der Woche, sonst Montag. */
+/** Eine Woche öffnen. `tag` ist der Index in der Woche (7 der Reiter „Woche“), sonst Montag. */
 function wocheZeigen(montagIso, tag) {
   aktiveWoche = montagIso;
-  aktiverTag = (tag >= 0 && tag <= 6) ? tag : 0;
+  aktiverTag = (tag >= 0 && tag <= TAGE_JE_WOCHE) ? tag : 0;
   monatAnker = null;
   wochenwahlSchliessen();
   zeichnen();
@@ -203,28 +277,61 @@ function wocheWechseln(schritt) {
   merken();
 }
 
-/* ---------- Popover unter dem Wochenknopf ---------- */
+/* ---------- Der Kalender: am Rechner unter dem Wochenknopf, am Handy ein Fenster ---------- */
+
+/** Am Handy steht der Kalender als Fenster in der Mitte, mit Grund dahinter (handy.css). */
+function kalenderAlsFenster() {
+  try { return window.matchMedia("(max-width: 820px)").matches; } catch (e) { return false; }
+}
 
 function wochenwahlOffen() { return !$("dlg-wochen").hidden; }
 
 function wochenwahlSchliessen() {
   $("dlg-wochen").hidden = true;
+  $("wochen-grund").hidden = true;
   $("wochenlabel").setAttribute("aria-expanded", "false");
 }
 
-function wochenwahlOeffnen() {
+/** `ansicht` "ausbildung" zeigt am Handy gleich alle Wochen; am Rechner gibt es nur den Monat. */
+function wochenwahlOeffnen(ansicht) {
   var pop = $("dlg-wochen"), knopf = $("wochenlabel");
   $("suchhinweis").textContent = "";
+  $("wochensuche").value = "";
   monatAnker = null;
   zeichneWochenliste();
+  kalenderAnsichtSetzen(ansicht === "ausbildung" ? "ausbildung" : "monat");
   pop.hidden = false;
+  // Der Grund steht nur am Handy da (handy.css); ein Tipp darauf schließt wie ein Klick daneben.
+  $("wochen-grund").hidden = false;
   knopf.setAttribute("aria-expanded", "true");
-  // Unter dem Knopf ausrichten, ohne aus dem Fenster zu laufen.
+  // Unter dem Knopf ausrichten, ohne aus dem Fenster zu laufen. Als Variablen, nicht als left/top:
+  // Am Handy setzt handy.css die Lage, und ein Stil am Element ginge dort vor.
   var r = knopf.getBoundingClientRect();
-  var breite = pop.offsetWidth;
-  var links = Math.max(6, Math.min(r.left, window.innerWidth - breite - 6));
-  pop.style.left = links + "px";
-  pop.style.top = (r.bottom + 2) + "px";
+  var links = Math.max(6, Math.min(r.left, window.innerWidth - pop.offsetWidth - 6));
+  pop.style.setProperty("--links", links + "px");
+  pop.style.setProperty("--oben", (r.bottom + 2) + "px");
+}
+
+/** Monat oder Ausbildung (die Übersicht, uebersicht.js); die Umschaltung gibt es nur am Handy. */
+function kalenderAnsichtSetzen(ansicht) {
+  var pop = $("dlg-wochen");
+  pop.classList.toggle("ausbildung", ansicht === "ausbildung");
+  $("w-ansicht-monat").setAttribute("aria-pressed", String(ansicht === "monat"));
+  $("w-ansicht-ausbildung").setAttribute("aria-pressed", String(ansicht === "ausbildung"));
+  if (ansicht === "ausbildung") uebersichtZeichnen($("w-ausbildung"), monatImKalender);
+  pop.scrollTop = 0;
+}
+
+/** Aus der Ausbildung in einen Monat: Ein Tipp auf den Monatsnamen zeigt ihn im Raster. */
+function monatImKalender(datum) {
+  monatAnker = new Date(datum.getFullYear(), datum.getMonth(), 1);
+  zeichneWochenliste();
+  kalenderAnsichtSetzen("monat");
+}
+
+function heuteZeigen() {
+  var heute = new Date();
+  wocheZeigen(iso(montagVon(heute)), tagIndex(heute));
 }
 
 $("wochenlabel").addEventListener("click", function (e) {
@@ -235,6 +342,13 @@ $("wochenlabel").addEventListener("click", function (e) {
 });
 $("dlg-wochen").addEventListener("click", function (e) { e.stopPropagation(); });
 $("w-zu").addEventListener("click", wochenwahlSchliessen);
+$("w-ansicht-monat").addEventListener("click", function () { kalenderAnsichtSetzen("monat"); });
+$("w-ansicht-ausbildung").addEventListener("click", function () { kalenderAnsichtSetzen("ausbildung"); });
+$("w-hilfe").addEventListener("click", function () {
+  var marken = $("w-marken");
+  marken.hidden = !marken.hidden;
+  $("w-hilfe").setAttribute("aria-expanded", String(!marken.hidden));
+});
 
 /* Getipptes Datum: Sobald es vollständig ist, wird gesprungen. Enter bei
    einer unvollständigen oder unmöglichen Angabe sagt, was nicht stimmt. */
@@ -260,11 +374,11 @@ $("monat-vor").addEventListener("click", function () { monatBlaettern(1); });
 $("sprung-offen").addEventListener("click", function () {
   var ziel = ersteOffeneWoche();
   if (!ziel) { $("suchhinweis").textContent = "Alle geladenen Wochen sind ausgefüllt und übernommen."; return; }
-  wocheZeigen(ziel);
+  // Gleich auf den ersten offenen Tag der Woche, nicht auf ihren Montag.
+  wocheZeigen(ziel, Math.max(0, wochenBilanz(ziel).erster));
 });
-$("sprung-heute").addEventListener("click", function () {
-  var heute = new Date();
-  wocheZeigen(iso(montagVon(heute)), tagIndex(heute));
-});
+// Am Rechner steht „Heute“ oben neben dem Monat, am Handy unten neben „Erste offene“ (handy.css).
+$("sprung-heute").addEventListener("click", heuteZeigen);
+$("sprung-heute-handy").addEventListener("click", heuteZeigen);
 $("woche-zurueck").addEventListener("click", function () { wocheWechseln(1); });
 $("woche-vor").addEventListener("click", function () { wocheWechseln(-1); });

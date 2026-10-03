@@ -44,12 +44,12 @@ const NAME = 'Mustermann, Max';
   await page.waitForTimeout(300);
   // Jede Kalenderwoche lässt sich öffnen; Wochen ohne Daten tragen die Klasse "neu".
   const anzahlWochen = await page.evaluate(() =>
-    [...document.querySelectorAll('#wochenliste button')].filter((b) => !b.classList.contains('neu')).length);
+    [...document.querySelectorAll('#wochenliste .wzeile')].filter((b) => !b.classList.contains('neu')).length);
   pruefe('Zwei Wochen aus dem Export erkannt', anzahlWochen === 2, 'gefunden: ' + anzahlWochen);
   pruefe('Monatsraster zeigt auch die Wochen ohne Zeiten, zum Öffnen',
-    (await page.locator('#wochenliste button.neu:not([disabled])').count()) >= 1);
+    (await page.locator('#wochenliste .wzeile.neu button:not([disabled])').count()) >= 1);
   pruefe('Jede Wochenzeile trägt sieben Tageszellen',
-    (await page.locator('#wochenliste button >> nth=0 >> .wtag').count()) === 7);
+    (await page.locator('#wochenliste .wzeile >> nth=0 >> .wtag').count()) === 7);
   pruefe('Tageszellen zeigen ihren Zustand',
     (await page.locator('#wochenliste .wtag.voll, #wochenliste .wtag.offen').count()) >= 1);
 
@@ -69,6 +69,77 @@ const NAME = 'Mustermann, Max';
   // Ohne Ausbildungsbeginn fängt der Zeitraum beim ersten Eintrag an (hier 31.08.), sonst wären
   // die Werktage davor beim Azubi Lücken und beim Ausbilder nicht.
   pruefe('Werktag vor dem ersten Eintrag zählt nicht als Lücke', luecken.vorDemErsten === false, JSON.stringify(luecken));
+
+  // Der Kalender am Rechner: oben ‹ Monat › mit „?“, „Heute“ und ×, darunter das Raster, die
+  // Legende in einer Zeile und unten „Erste offene“ mit ihrem Datum. Vorher war er mit zwei
+  // Spalten Legende rund 625 px hoch, das Raster davon knapp ein Drittel.
+  const kal = await page.evaluate(() => {
+    const sichtbar = (s) => { const r = document.querySelector(s).getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+    const erste = document.querySelector('#wochenliste .wzeile').querySelectorAll('.wtag');
+    return {
+      hoehe: Math.round(document.getElementById('dlg-wochen').getBoundingClientRect().height),
+      monat: document.getElementById('monatslabel').textContent,
+      legende: new Set([...document.querySelectorAll('.wlegende span')].map((s) => Math.round(s.getBoundingClientRect().top))).size,
+      marken: sichtbar('#w-marken'), umschalter: sichtbar('.wansicht'), grund: sichtbar('#wochen-grund'),
+      heuteOben: sichtbar('#sprung-heute'), heuteUnten: sichtbar('#sprung-heute-handy'),
+      aussen: [erste[0].textContent, erste[0].classList.contains('aussen'), erste[1].classList.contains('aussen')],
+      tabstopps: document.querySelectorAll('#wochenliste [tabindex="0"]').length,
+      offen: document.getElementById('sprung-offen').textContent,
+    };
+  });
+  pruefe('Kalender am Rechner: kompakt, Legende in einer Zeile, Marken der Reiter hinter dem „?“',
+    kal.hoehe < 420 && kal.legende === 1 && !kal.marken, JSON.stringify(kal));
+  pruefe('Kalender am Rechner: kein Umschalter, kein Grund dahinter, „Heute“ im Kopf',
+    !kal.umschalter && !kal.grund && kal.heuteOben && !kal.heuteUnten, JSON.stringify(kal));
+  pruefe('Tage aus dem Monat davor stehen blass da', kal.monat === 'September 2026' &&
+    kal.aussen[0] === '31' && kal.aussen[1] && !kal.aussen[2], JSON.stringify(kal));
+  pruefe('„Erste offene“ nennt, wohin sie springt', /^Erste offene: \d/.test(kal.offen), kal.offen);
+  await page.click('#w-hilfe');
+  const marken = await page.locator('#w-marken').innerText();
+  pruefe('Das „?“ zeigt die Marken der Reiter', /Entwurf/.test(marken) && /eigener Text/.test(marken) &&
+    (await page.getAttribute('#w-hilfe', 'aria-expanded')) === 'true', marken);
+  await page.click('#w-hilfe');
+
+  // Nur ein Knopf im Raster ist mit Tab erreichbar, weiter geht es mit den Pfeiltasten.
+  pruefe('Ein einziger Tabstopp im Raster', kal.tabstopps === 1, JSON.stringify(kal));
+  await page.focus('#wochenliste [tabindex="0"]');
+  const vonFokus = await page.evaluate(() => [document.activeElement.dataset.montag, document.activeElement.dataset.tag]);
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowDown');
+  const nachFokus = await page.evaluate(() => [document.activeElement.dataset.montag, document.activeElement.dataset.tag,
+    document.activeElement.tabIndex, document.querySelectorAll('#wochenliste [tabindex="0"]').length]);
+  const plus7 = (s) => { const d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + 7); return d.toISOString().slice(0, 10); };
+  pruefe('Pfeiltasten wandern durchs Raster, der Tabstopp wandert mit',
+    nachFokus[0] === plus7(vonFokus[0]) && +nachFokus[1] === +vonFokus[1] + 1 && nachFokus[2] === 0 && nachFokus[3] === 1,
+    JSON.stringify([vonFokus, nachFokus]));
+
+  // Ein Tag öffnet sich selbst, nicht den Montag seiner Woche; die Kalenderwoche öffnet die Woche.
+  const wocheVorKlick = await page.locator('#wochenlabel').textContent();
+  await page.click('#wochenliste .wzeile[aria-current="true"] .wtag[data-tag="2"]');
+  await page.waitForTimeout(300);
+  const nachTag = await page.evaluate(() => ({
+    offen: !document.getElementById('dlg-wochen').hidden,
+    reiter: [...document.querySelectorAll('#reiter button')].findIndex((b) => b.getAttribute('aria-selected') === 'true'),
+  }));
+  pruefe('Ein Klick auf einen Tag öffnet genau diesen Tag',
+    !nachTag.offen && nachTag.reiter === 2 && (await page.locator('#wochenlabel').textContent()) === wocheVorKlick, JSON.stringify(nachTag));
+  await page.click('#wochenlabel');
+  await page.waitForTimeout(200);
+  await page.click('#wochenliste .wzeile[aria-current="true"] .wkw');
+  await page.waitForTimeout(300);
+  pruefe('Ein Klick auf die Kalenderwoche öffnet die ganze Woche',
+    (await page.getAttribute('#reiter-woche', 'aria-selected')) === 'true', await page.locator('#reiter').innerText());
+
+  // „Heute“ springt in die Woche von heute; dort trägt der Tag einen Ring.
+  await page.click('#wochenlabel');
+  await page.waitForTimeout(200);
+  await page.click('#sprung-heute');
+  await page.waitForTimeout(300);
+  await page.click('#wochenlabel');
+  await page.waitForTimeout(200);
+  const heute = await page.evaluate(() => [...document.querySelectorAll('#wochenliste .wtag.heute')].map((t) => t.textContent));
+  pruefe('„Heute“ zeigt den Monat von heute, der Tag hat einen Ring',
+    heute.length === 1 && +heute[0] === new Date().getDate(), JSON.stringify(heute));
 
   /* ---------- 4. Datumssuche ---------- */
   await page.fill('#wochensuche', '2026-09-02');

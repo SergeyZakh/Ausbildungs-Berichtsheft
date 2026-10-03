@@ -353,12 +353,16 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
 
     await page.click('#wochenlabel');
     await page.waitForTimeout(250);
-    const legende = await page.locator('#dlg-wochen .legende').innerText();
-    pruefe('Kalender erklärt die Marken', /Entwurf/.test(legende) && /KI/.test(legende) && /eigener Text/.test(legende) &&
-      /fertig/.test(legende) && /Text fehlt/.test(legende) && /nichts eingetragen/.test(legende), legende);
+    const legende = await page.locator('#dlg-wochen .wlegende').innerText();
+    await page.click('#w-hilfe');
+    const marken = await page.locator('#w-marken').innerText();
+    pruefe('Kalender erklärt Kreise und, hinter dem „?“, die Marken', /fertig/.test(legende) && /gegenlesen/.test(legende) &&
+      /Text fehlt/.test(legende) && /leer/.test(legende) && /frei/.test(legende) &&
+      /Entwurf/.test(marken) && /KI/.test(marken) && /eigener Text/.test(marken), legende + ' | ' + marken);
     // Das Beispiel beginnt die Ausbildung am 1.8.2025; die Woche vor den Beispielwochen ist leer.
-    const ersteZeile = await page.$$eval('#wochenliste button:first-of-type .wtag', (t) => t.map((x) => x.className));
-    pruefe('Werktage der Ausbildung ohne Eintrag sind im Kalender blassrot, das Wochenende nicht',
+    const ersteZeile = await page.evaluate(() =>
+      [...document.querySelector('#wochenliste .wzeile').querySelectorAll('.wtag')].map((x) => x.className));
+    pruefe('Werktage der Ausbildung ohne Eintrag sind im Kalender gestrichelt, das Wochenende nicht',
       ersteZeile.slice(0, 5).every((k) => /\bfehlt\b/.test(k)) && ersteZeile.slice(5).every((k) => !/\bfehlt\b/.test(k)),
       JSON.stringify(ersteZeile));
     await page.click('#w-zu');

@@ -403,6 +403,66 @@ async function durchgang(browser, breite) {
     !danach.offen && danach.feld === 'Unterweisung Arbeitssicherheit' && danach.blatt.includes('Unterweisung Arbeitssicherheit'),
     JSON.stringify(danach));
 
+  // Kalender: ein Fenster in der Mitte mit Grund dahinter, oben Monat oder Ausbildung. Vorher hing
+  // er unter dem Wochenknopf und füllte mit zwei Spalten Legende fast den ganzen Schirm.
+  const kalenderFenster = () => page.evaluate(() => {
+    const sichtbar = (s) => { const r = document.querySelector(s).getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+    const r = (s) => document.querySelector(s).getBoundingClientRect();
+    const pop = r('#dlg-wochen');
+    return {
+      offen: sichtbar('#dlg-wochen'), links: Math.round(pop.left), rechts: Math.round(innerWidth - pop.right),
+      imBild: pop.top >= 0 && pop.bottom <= innerHeight + 1, grund: sichtbar('#wochen-grund'),
+      ausbildung: document.getElementById('dlg-wochen').classList.contains('ausbildung'),
+      raster: sichtbar('#wochenliste'), jahre: sichtbar('#w-ausbildung') ? document.querySelectorAll('#w-ausbildung .ujahr').length : 0,
+      umschalter: sichtbar('.wansicht'), heuteOben: sichtbar('#sprung-heute'), heuteUnten: sichtbar('#sprung-heute-handy'),
+      kopfEineZeile: Math.abs(r('#w-zu').top - r('#monat-zurueck').top) < 2,
+      legende: new Set([...document.querySelectorAll('.wlegende span')].map((s) => Math.round(s.getBoundingClientRect().top))).size,
+      monat: document.getElementById('monatslabel').textContent,
+      dialog: document.getElementById('dlg-uebersicht').open,
+    };
+  });
+  await page.click('#wochenlabel');
+  await page.waitForTimeout(300);
+  const kal = await kalenderFenster();
+  pruefe('Kalender: Fenster in der Mitte, ganz im Bild, Grund dahinter' + bei,
+    kal.offen && kal.links === 10 && kal.rechts === 10 && kal.imBild && kal.grund, JSON.stringify(kal));
+  pruefe('Kalender: Umschalter Monat/Ausbildung, „Heute“ unten statt im Kopf' + bei,
+    kal.umschalter && !kal.ausbildung && kal.raster && !kal.heuteOben && kal.heuteUnten, JSON.stringify(kal));
+  // Bei 320 px bricht die Legende in zwei Zeilen; der Kopf bleibt eine.
+  pruefe('Kalender: Kopf in einer Zeile, Legende kurz' + bei,
+    kal.kopfEineZeile && kal.legende <= (breite < 360 ? 2 : 1), JSON.stringify(kal));
+  await nichtsRaus('Kalender');
+  await page.click('#wochenliste .wzeile[aria-current="true"] .wtag[data-tag="2"]');
+  await page.waitForTimeout(300);
+  pruefe('Kalender: ein Tipp auf einen Tag öffnet ihn' + bei, !(await kalenderFenster()).offen &&
+    /^Mittwoch/.test(await page.getAttribute('#reiter [aria-selected="true"]', 'aria-label')));
+
+  await page.click('#wochenlabel');
+  await page.waitForTimeout(200);
+  await page.click('#w-ansicht-ausbildung');
+  await page.waitForTimeout(300);
+  const ausb = await kalenderFenster();
+  pruefe('Kalender: „Ausbildung“ zeigt alle Jahre statt des Monats' + bei,
+    ausb.ausbildung && !ausb.raster && ausb.jahre >= 1 && ausb.imBild, JSON.stringify(ausb));
+  await nichtsRaus('Kalender, Ausbildung');
+  const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  const monatZiel = await page.getAttribute('#w-ausbildung button.umonat >> nth=1', 'data-monat');
+  await page.click('#w-ausbildung button.umonat >> nth=1');
+  await page.waitForTimeout(300);
+  const zumMonat = await kalenderFenster();
+  pruefe('Kalender: ein Tipp auf einen Monat zeigt ihn im Raster' + bei, !zumMonat.ausbildung && zumMonat.raster &&
+    zumMonat.monat === MONATE[+monatZiel.slice(5, 7) - 1] + ' ' + monatZiel.slice(0, 4), monatZiel + ' ' + JSON.stringify(zumMonat));
+  await page.mouse.click(3, 3);
+  await page.waitForTimeout(200);
+  pruefe('Kalender: ein Tipp auf den Grund schließt ihn' + bei, !(await kalenderFenster()).offen);
+  await page.click('#btn-mehr');
+  await page.click('#btn-uebersicht');
+  await page.waitForTimeout(300);
+  const ueb = await kalenderFenster();
+  pruefe('Übersicht aus dem Menü öffnet den Kalender auf „Ausbildung“' + bei,
+    ueb.offen && ueb.ausbildung && ueb.jahre >= 1 && !ueb.dialog, JSON.stringify(ueb));
+  await page.click('#w-zu');
+
   await page.setInputFiles('#datei', path.join(__dirname, 'daten', 'formate', 'kimai-schule.csv'));
   await page.waitForTimeout(700);
   pruefe('Nach dem Import: Karte oben mit „Spalten prüfen“, keine schwebende Meldung darüber' + bei,
