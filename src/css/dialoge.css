@@ -103,11 +103,11 @@
 .wochenliste .wtag.frei b   { color: var(--blass); text-decoration: line-through; }
 .wochenliste .wtag.nichts b { color: var(--blass); }
 .wochenliste .wtag.fehlt b  { background: var(--acht-hell); color: var(--acht); }
-/* Im Heft ist ein Werktag ohne Eintrag gestrichelt statt blassrot: Ein leerer Monat sah sonst aus
-   wie ein Alarm, und Rot hieß zweierlei. Tage aus dem Monat davor und danach blass, heute mit Ring.
-   Beim Ausbilder (ausbilder.js) bleibt das Raster, wie es war. */
+/* Im Heft ist jeder Tag rot, der noch etwas braucht: ausgefüllt zum Gegenlesen, als roter Ring auf
+   Blassrot, wenn noch Text fehlt, mit oder ohne Stunden (ansicht-woche.js). Tage aus dem Monat
+   davor und danach blass, heute mit Ring. Beim Ausbilder (ausbilder.js) bleibt das Raster, wie es war. */
 .wzeile .wtag b        { box-sizing: border-box; }
-.wzeile .wtag.fehlt b  { background: none; border: 1.5px dashed var(--gefahr-kante); }
+.wzeile .wtag.fehlt b  { border: 1.5px solid var(--acht); }
 .wzeile .wtag.aussen b { opacity: .4; }
 .wzeile .wtag.heute b  { font-weight: 600; box-shadow: 0 0 0 2px var(--flaeche), 0 0 0 3.5px var(--text); }
 
@@ -153,7 +153,7 @@
 }
 .legende .lm.rot { background: var(--acht); }
 .legende .lm.gruen { background: var(--gut); font-size: var(--schrift-marke); }
-.legende .lr { width: 10px !important; height: 10px; margin: 0 4px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid currentColor; }
+.legende .lr { width: 10px !important; height: 10px; margin: 0 4px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--acht); }
 /* Ein Tag des Rasters im Kleinen (.wtag weiter oben). */
 .legende .lk {
   display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; height: 18px; border-radius: 50%;
@@ -161,8 +161,7 @@
 }
 .legende .lk.voll   { background: var(--acht); color: #fff; }
 .legende .lk.fertig { background: var(--gut); color: #fff; }
-.legende .lk.offen  { border: 1.5px solid var(--text); color: var(--text); }
-.legende .lk.fehlt  { border: 1.5px dashed var(--gefahr-kante); color: var(--acht); }
+.legende .lk.fehlt  { background: var(--acht-hell); border: 1.5px solid var(--acht); color: var(--acht); }
 .legende .lk.frei   { color: var(--blass); text-decoration: line-through; }
 
 /* Unten: die früheste offene Woche mit ihrem Datum und ein Feld für ein Datum. */

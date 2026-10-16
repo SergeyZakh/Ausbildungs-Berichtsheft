@@ -25,10 +25,16 @@ Werkzeug arbeitet. Was im Browser gespeichert ist, bleibt ladbar.
 
 - **Kalender aufgeräumt:** Ein Klick auf einen Tag öffnet genau diesen Tag, ein Klick auf die
   Kalenderwoche die ganze Woche; vorher landete man immer am Montag. Heute hat einen Ring, Tage
-  des Monats davor und danach sind blass, Werktage ganz ohne Eintrag gestrichelt statt blassrot.
-  Die Legende steht in einer Zeile, die Marken der Reiter hinter einem „?“, und „Erste offene“
-  nennt, wohin sie springt. Am Rechner ist der Kalender damit gut halb so hoch. Mit Tab und den
+  des Monats davor und danach sind blass. Die Legende steht in einer Zeile, die Marken der Reiter
+  hinter einem „?“, und „Erste offene“ nennt, wohin sie springt. Am Rechner ist der Kalender damit gut halb so hoch. Mit Tab und den
   Pfeiltasten geht es durchs Raster.
+- **Rot ist alles, was noch offen ist:** Seit Ausbildungsbeginn bis heute ist im Kalender jeder
+  Werktag rot, der noch etwas braucht: ausgefüllt, wenn Text zum Gegenlesen dasteht, als roter
+  Ring, wenn noch keiner da ist. Vorher stand ein Tag mit Stunden, aber ohne Text, als schwarzer
+  Ring da. In den Reitern und in der Kalenderleiste am Handy trägt ein Werktag ganz ohne Eintrag
+  jetzt ebenfalls den roten Ring „noch kein Text“; vorher stand er ohne Marke da. „Erste offene“
+  springt auf den frühesten offenen Tag seit Ausbildungsbeginn wie der Hinweis „Noch offen“, nicht
+  mehr nur in Wochen mit Einträgen.
 - **Kalender am Handy als Fenster:** in der Mitte, mit Grund dahinter, und mit dem Umschalter
   „Monat | Ausbildung“. „Ausbildung“ zeigt die Übersicht aller Wochen, ein Tipp auf einen Monat
   zeigt ihn im Raster; ⋯ → Übersicht öffnet am Handy diese Ansicht.

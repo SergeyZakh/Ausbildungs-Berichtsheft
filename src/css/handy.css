@@ -50,8 +50,8 @@
   .wochensumme .ring { width: 18px; height: 18px; --dicke: 3px; }
 
   /* Reihe 3: die Woche als Kalenderleiste. Jeder Tag gleich breit, oben das Kürzel, darunter der
-     Tag des Monats im Kreis; dessen Farbe ist der Stand: rot gegenlesen, grün fertig, ein Ring fehlt
-     noch Text, blass frei oder leeres Wochenende. Der gewählte Tag ist ausgefüllt. Vorher standen
+     Tag des Monats im Kreis; dessen Farbe ist der Stand: rot gegenlesen, grün fertig, ein roter Ring
+     fehlt noch Text (auch ganz ohne Eintrag), blass frei oder leeres Wochenende. Der gewählte Tag ist ausgefüllt. Vorher standen
      die Tage als Kästchen mit Marken da, ein leeres Wochenende schmaler, und angetippt sprang es auf
      volle Breite. Die Woche ist eine eigene Pille rechts. Art und Stunden nennt der Tageskopf.
      Oben Abstand zur Kopfleiste: Ohne ihn saßen die Reiter auf deren Trennlinie. */
@@ -71,11 +71,12 @@
   }
   #reiter .tagreiter:active .rzahl { transform: scale(.92); }
   #reiter .tagreiter.leerwe .rzahl, #reiter .tagreiter.frei .rzahl { color: var(--blass); }
-  #reiter .tagreiter.fehlt .rzahl { box-shadow: inset 0 0 0 1.5px var(--linie-fest); }
+  #reiter .tagreiter.fehlt .rzahl { box-shadow: inset 0 0 0 1.5px var(--acht); color: var(--acht); }
   #reiter .tagreiter.pruefen .rzahl { background: var(--acht-hell); color: var(--acht); }
   #reiter .tagreiter.fertig .rzahl { background: var(--gut-hell); color: var(--gut); }
   #reiter .tagreiter[aria-selected="true"] .rzahl { background: var(--gewaehlt-grau); color: #fff; box-shadow: none; }
-  #reiter .tagreiter.pruefen[aria-selected="true"] .rzahl { background: var(--acht); }
+  #reiter .tagreiter.pruefen[aria-selected="true"] .rzahl,
+  #reiter .tagreiter.fehlt[aria-selected="true"] .rzahl { background: var(--acht); }
   #reiter .tagreiter.fertig[aria-selected="true"] .rzahl { background: var(--gut); }
   /* Das Sprachmodell kürzt diesen Tag: ein Ring dreht sich um den Kreis. */
   #reiter .tagreiter.laeuft .rzahl::after {

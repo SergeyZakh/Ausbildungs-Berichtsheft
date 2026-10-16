@@ -76,8 +76,9 @@ Im Startbild: **1** Zeiterfassung laden (Schritt 4), **2** selbst schreiben, ohn
 
 5. **Tage durchgehen.** Für jeden Tag steht ein Entwurf aus deinen Buchungen da. Lies ihn, ändere
    ihn bei Bedarf und klicke **Fertig**. Rot heißt offen, grün heißt fertig; was die Zeichen in den
-   Reitern heißen, erklärt das **?** im Kalender (ein Klick auf die Woche oben); gestrichelt sind dort Werktage, an denen
-   noch gar nichts steht. Im Reiter **Woche** steht dein Wochenblatt, und du schreibst direkt
+   Reitern heißen, erklärt das **?** im Kalender (ein Klick auf die Woche oben). Dort ist seit
+   Ausbildungsbeginn bis heute jeder Werktag rot, der noch etwas braucht: ausgefüllt, wenn Text zum
+   Gegenlesen dasteht, als roter Ring, wenn noch keiner da ist. Im Reiter **Woche** steht dein Wochenblatt, und du schreibst direkt
    hinein, in jedes Feld: Abteilung, Unterweisungen, in einer Blockwoche die Themen der
    Berufsschule und den Text jedes Tages. Solange ein Tag offen ist, steht beim Schreiben **Fertig**
    darunter. Ein Klick auf den Namen eines Tages im Blatt („Montag“, „Dienstag“ …) öffnet den ganzen

@@ -86,7 +86,7 @@ Die Ordner ordnen nach Aufgabe; für den Build zählt allein die Liste `JS` in `
 | Datei | Inhalt |
 | --- | --- |
 | `ansicht-woche.js` | Wochenbalken, Kalender mit Monatsraster (`zeichneWochenliste()`, `wochenwahlOeffnen()`, siehe „Kalender“), Navigation durch jede Kalenderwoche, nach „Fertig“ weiter zum nächsten offenen Tag (`weiterNachFertig()`) |
-| `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“; in einer Blockwoche nur der Reiter „Blockwoche“, der die Tage der Woche als Menü öffnet. Am Handy eine Kalenderleiste: jeder Tag gleich breit, Kürzel über dem Tag des Monats im Kreis (`.rzahl`), dessen Farbe der Stand ist (`.pruefen` rot, `.fertig` grün, `.fehlt` Ring, `.leerwe`/`.frei` blass), gewählt ausgefüllt; „Woche“ als Pille daneben. Marke und Stunden nennt dort `aria-label` |
+| `reiter.js` | `zeichnen()`, Reiterzeile: je Werktag ein Reiter, dazu der Reiter „Woche“; in einer Blockwoche nur der Reiter „Blockwoche“, der die Tage der Woche als Menü öffnet. Am Handy eine Kalenderleiste: jeder Tag gleich breit, Kürzel über dem Tag des Monats im Kreis (`.rzahl`), dessen Farbe der Stand ist (`.pruefen` rot, `.fertig` grün, `.fehlt` roter Ring, auch für einen Werktag der Ausbildung bis heute ganz ohne Eintrag, `.leerwe`/`.frei` blass), gewählt ausgefüllt; „Woche“ als Pille daneben. Marke und Stunden nennt dort `aria-label` |
 | `ansicht-tag.js` | Bausteine der Karten (`sektion()` mit kurzem Titel fürs Handy, `mitRueckfrage()`) und der Tagbereich: eine Karte je Tag (`textSektion()`, im Kopf Datum, Art und Stunden aus `tagFelder()`, über dem Text das Feld des Vordrucks), Buchungen mit Plus zum Übernehmen (am Handy eingeklappt, sobald der Tag Text hat, aufgeklappt mit Balken nach Projekt, `zeitBalken()`), KI-Knopf, Startkarte ohne Woche; ein freier Tag hat nur seinen Kopf (`artSektion()`) |
 | `herkunft.js` | Farbige Striche unter Wörtern aus Buchungen: Zuordnung (`herkunftFinden()`), Spiegel hinter dem Tagestext und Farbstrich in der Buchungsliste (`herkunftAnlegen()`), Schalter „Herkunft“ |
 | `wochenblatt.js` | Reiter „Woche“: das Blatt (`blattVorschau()`), in dem jedes Feld beschreibbar ist, auch der Text jedes Tages, darüber eine ruhige Zeile; am Handy öffnet ein Tipp das Feld groß (`schreibblattOeffnen()`), und `fensterZurueck()` holt das Fenster zurück, wenn iOS es für die Tastatur verschoben hat (dort scrollt allein `.mitte`); `seitenspalte()` nur noch beim Ausbilder |
@@ -254,8 +254,9 @@ vergleicht beide Seiten Fall für Fall.
   Feld im Vordruck.
 - Ein Werktag im Ausbildungszeitraum ohne Text ist eine Lücke, ob ganz ohne Eintrag oder mit
   geleertem Text. Ein gesetzlicher Feiertag ohne Text fehlt nicht, Tage in der Zukunft auch nicht.
-  Im Monatsraster sind solche Tage ganz ohne Eintrag gestrichelt umrandet, beim Ausbilder blassrot
-  (`fehlenderWerktag()`), auch in Wochen ohne Daten.
+  Im Monatsraster sind solche Tage rot umrandet wie Tage mit Stunden ohne Text, beim Ausbilder
+  blassrot (`fehlenderWerktag()`), auch in Wochen ohne Daten; in den Reitern tragen sie den roten
+  Ring „noch kein Text“.
 - Hat die Woche Themen für die Berufsschule (`wochen.schule`), steht jeder Werktag ohne eigenen
   Text, der nicht frei ist, unter ihnen und hat ihren Stand (`tagImWochenfeld()`). Das gilt für
   jeden solchen Tag, nicht nur für Schultage laut Plan: Der Server kennt den Plan nicht.
@@ -465,16 +466,22 @@ schließt ihn (`bedienung.js`), Esc auch.
   ist dafür kein Platz; darunter der Umschalter **Monat | Ausbildung**.
 - **Raster:** eine Zeile je Woche, die den Monat berührt (`.wzeile`). Jeder Tag ist ein Knopf und
   öffnet sich selbst, die Kalenderwoche öffnet den Reiter „Woche“ (`data-tag` 7); vorher war die
-  Zeile ein Knopf und man landete immer am Montag. Farben nach `tagLage()`: rot nicht
-  gegengelesen, grün fertig, Ring Stunden ohne Text, gestrichelt ein Werktag ganz ohne Eintrag
-  (`fehlenderWerktag()`), durchgestrichen frei. Tage des Monats davor und danach sind blass
+  Zeile ein Knopf und man landete immer am Montag. Rot ist jeder Tag, der noch etwas braucht
+  (dieselben Tage wie `tagBrauchtNoch()`): rot ausgefüllt, wenn Text zum Gegenlesen dasteht
+  (`voll`), roter Ring auf Blassrot, wenn noch keiner da ist (`fehlt`: Stunden oder Schule ohne
+  Text, `tagLage()` „offen“, und jeder Werktag seit Ausbildungsbeginn bis heute ganz ohne Eintrag,
+  `fehlenderWerktag()`). Grün ist fertig, durchgestrichen frei, grau ein gesetzlicher Feiertag,
+  das Wochenende und alles nach heute. Vorher stand „Stunden ohne Text“ als schwarzer Ring da und
+  ein leerer Werktag gestrichelt; beides sah nicht nach „offen“ aus. Tage des Monats davor und danach sind blass
   (`.aussen`), heute hat einen Ring (`.heute`). Nur ein Knopf ist mit Tab erreichbar (der offene
   Tag, sonst heute, sonst der Erste des Monats, `kalenderTabstopp()`), weiter geht es mit den
   Pfeiltasten.
 - **Legende** in einer Zeile unter dem Raster. Vorher standen dort zwei Spalten mit zehn Einträgen,
   und das Fenster war rund 625 px hoch, das Raster davon knapp ein Drittel; jetzt gut 360 px.
-- **Fuß:** „Erste offene: 14.–20. Sep →“ nennt sein Ziel (`sprungOffenZeigen()`, `ersteOffeneWoche()`)
-  und öffnet dort den ersten offenen Tag (`wochenBilanz().erster`); daneben „Gehe zu“ für ein
+- **Fuß:** „Erste offene: Fr 01.08. 2025 →“ nennt sein Ziel (`sprungOffenZeigen()`) und öffnet
+  den frühesten Tag seit Ausbildungsbeginn, der noch etwas braucht (`ersterOffenerTag()`), wie der
+  Hinweis „Noch offen“. Vorher zählten nur Wochen mit Einträgen (`ersteOffeneWoche()`), und der
+  Knopf sprang über leere Monate am Anfang der Ausbildung hinweg. Daneben „Gehe zu“ für ein
   getipptes Datum, das beim Öffnen leer ist.
 - **Ausbildung** (nur am Handy): die Übersicht im selben Fenster (`kalenderAnsichtSetzen()`,
   `uebersichtZeichnen()` mit Ziel). Ein Tipp auf einen Monatsnamen zeigt den Monat im Raster
@@ -829,13 +836,13 @@ npm test
 | `test/import.js` | Formate unter `test/daten/formate/`, Werte, Zeichensatz, Zuordnungsdialog, gemerkte Zuordnung, Berufsschultage aus Kimai als Vorschlag (Komma, Zeilen, Schulplan, übernehmen, abwählen, „Alles Betrieb“, Zusammenführen, erneuter Import, alte selbst gesetzte Schultage), CSV ohne Kopfzeile, Beispiel |
 | `test/vorbehandlung.js` | Bereinigung gegen `test/korpus.js`, Vorlage für das Modell |
 | `test/ki.js` | Anbindung gegen einen nachgebauten Ollama: Prompt, Warnungen, Fehler, Wochenlauf, Abbruch; Anfragen nur an das eigene Ollama |
-| `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start (Vor- und Nachname, Berufsliste und Fachrichtung), Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen; Kalender am Rechner (kompakt, Legende in einer Zeile, „?“, Tage anderer Monate blass, „Erste offene“ mit Ziel, ein Tabstopp und Pfeiltasten, Tag und Kalenderwoche öffnen sich selbst, „Heute“ mit Ring) |
+| `test/lauf.js` | Oberfläche von Import bis Word und Druck, Import-Zusammenführung, Einrichtung beim ersten Start (Vor- und Nachname, Berufsliste und Fachrichtung), Löschen; Feiertage und Wochenstand gleich wie auf dem Server, auch in Blockwochen; Kalender am Rechner (kompakt, Legende in einer Zeile, „?“, Tage anderer Monate blass, „Erste offene“ mit Ziel ab Ausbildungsbeginn, ein Tabstopp und Pfeiltasten, Tag und Kalenderwoche öffnen sich selbst, „Heute“ mit Ring) |
 | `test/sicherung.js` | Sicherung speichern, in einem leeren Browser und in Firefox laden, Rückfrage beim Ersetzen, fremde Datei, Stempel aus älteren Sicherungen |
 | `test/schulplan.js` | Feste Schultage, Blockunterricht und Schulferien: welche Tage der Plan trifft (Feiertag, Wochenende, Vertragslaufzeit, Tage mit Buchungen, Ferien), Kalender für Zeiträume (auch am Handy), Marken, Zusammenlegen, Unlesbares aus alten Ständen, Speichern erst beim Schreiben, „Arbeitstag“ von Hand übersteht Neuladen und Import, Beispiel |
 | `test/vordruck.js` | Tägliche Notierung: Umschalten unter „Deine Daten“, neben der Vorschau kein zweiter Schalter und keine Knöpfe, Zeilen je Tag ohne Stunden, Unterweisungen, Word, Gesamtheft, Druck, Aufteilen einer vollen Woche, Wahl übersteht Neuladen |
 | `test/ohnetage.js` | Wochenblatt ohne Wochentage: Auswahl des Vordrucks nur wöchentlich und täglich, Schalter „Wochentage“ über dem Blatt und gemerkt, keine Tagesköpfe, gleiche Zeilen einmal, Reihenfolge der Tage, Urlaub als Zeile am Ende, Berufsschule ohne Wochentag, Felder je Tag im Blatt und darin schreiben, kein falsches „ohne Text“, Word, Druck, volle Woche auf mehreren Blättern, Neuladen, wieder an, alter Stand mit „ohnetage“, kein Schalter beim täglichen Vordruck |
 | `test/blockwoche.js` | Blockwoche erkennen (Feiertag darin, ein einzelner Schultag, eigener Tagestext, Arbeitstag von Hand, tägliche Notierung), die Tage als Menü hinter dem Reiter, Themen schreiben und mit „Fertig“ am Feld übernehmen, übernommen im Blatt weiter beschreibbar, Stand 5/5, Wochenblatt und tägliches Blatt, Neuladen; nichts über dem Schreibfeld; „Fertig“ springt nur nach vorn weiter, „Zurück“, sonst Knopf zum frühesten offenen Tag; am Handy die Themen im Blatt, groß zum Schreiben, Escape schließt ohne, „Fertig“ mit Übernahme |
-| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone, am Handy kurz, „Wie?“ zeigt alles), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende des Kalenders und Marken hinter dem „?“, dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, keine Leiste darüber, Marke am offenen Tag, ins Blatt schreiben, jeder Tag ein Feld über seinen Zeilen, darin schreiben und „Fertig“, Tageskopf öffnet den Tag, Tag ohne Text über dem Blatt öffnet sich groß, schmales Fenster bleibt Blatt, Blatt scrollt bis unter die Reiter; am Handy öffnet ein Tag im Blatt sich groß von unten, daneben tippen schließt nur, „Fertig“ übernimmt |
+| `test/hinweise.js` | Hinweise beim Öffnen (was fehlt, Sicherung fällig, iPhone, am Handy kurz, „Wie?“ zeigt alles), Übersicht mit Tagen je Art und Ausbildungsjahr, Buchung übernehmen, Start ohne Woche, Legende des Kalenders und Marken hinter dem „?“, rot seit Ausbildungsbeginn bis heute jeder Tag, der noch etwas braucht (Kalender, Reiter, Kalenderleiste am Handy, „Erste offene“), dunkler Modus vom Gerät und per Knopf (gleiche Farben), am Handy schwebende Meldung (geht nach vier Sekunden, Warnung bleibt, Tippen und Wischen schließen) und kurzer Titel; Reiter „Woche“ am Rechner: Felder auf ihren Kästen im Blatt, keine Leiste darüber, Marke am offenen Tag, ins Blatt schreiben, jeder Tag ein Feld über seinen Zeilen, darin schreiben und „Fertig“, Tageskopf öffnet den Tag, Tag ohne Text über dem Blatt öffnet sich groß, schmales Fenster bleibt Blatt, Blatt scrollt bis unter die Reiter; am Handy öffnet ein Tag im Blatt sich groß von unten, daneben tippen schließt nur, „Fertig“ übernimmt |
 | `test/zen.js` | Zen-Modus: kein Knopf ohne Woche, Knopf neben hell/dunkel, Wechsel als View Transition, alles weg außer Karte und „Fertig“, ‹ › blättern über das leere Wochenende in die nächste Woche und zurück, Karte mittig, Knopf bleibt an seiner Stelle (auch nach Esc und am Handy), schreiben, Tasten 2 und 8 und Alt+←, Esc beendet, Esc schließt erst ein Fenster, Knopf beendet, „Fertig“ springt im Zen weiter, nach Neuladen aus; am Handy bei 390 und 320 px Knopf über der Karte |
 | `test/herkunft.js` | Zuordnung (Zeile zur Buchung, Wort aus zwei Buchungen, Füllwörter, eigene Zeilen, Endungen, Rechnernamen, zusammengefasste Zeile, Farben bei vielen Buchungen), Spiegel deckungsgleich, gleich umbrochen und mitscrollend, Plus färbt, Zeigen und Cursor, Schalter übersteht Neuladen, fertiger Tag, nichts im Blatt, am Rechner kein Einklappen, Handy und dunkel |
 | `test/handy.js` | Bei 390 und 320 px: Einrichtung im Vollbild, keine Sperre, nichts ragt über den Rand, Kopfleiste in zwei Zeilen ohne Lücke, Woche in voller Breite, Inhalt bis unten und Meldung schwebend ganz lesbar, Reiter in einer Zeile, Kalenderleiste (alle Tage gleich breit, auch gewählt, Kreisfarben, Name für Vorleser), Woche als Blatt in voller Breite mit den Feldern darin, ohne Leiste und Karten, eine Woche mit zwei Blättern ganz zu sehen und bis unten scrollbar, ein Tipp öffnet das Feld groß von unten, Buchungen mit Text eingeklappt (Zahl und Stunden in einer Zeile), aufgeklappt mit Zeitbalken, Wahl gilt für die Sitzung, ohne Text offen, Import-Karte kurz mit Knöpfen in einer Zeile, Knöpfe im Zuordnungsdialog nicht auf dem scrollenden Bereich, Kalender als Fenster in der Mitte (Grund, Umschalter Monat/Ausbildung, „Heute“ unten, Kopf in einer Zeile, Tipp auf Tag, Monat und Grund, Übersicht aus dem Menü) |

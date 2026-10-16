@@ -10,9 +10,7 @@ var PFEIL_LINKS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6
 var PFEIL_RECHTS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 
 /* Was ein Kreis im Raster heißt, für Vorleser und als Titel beim Überfahren. */
-var TAG_WORTE = {
-  voll: "nicht gegengelesen", fertig: "gegengelesen", offen: "Stunden ohne Text", fehlt: "nichts eingetragen"
-};
+var TAG_WORTE = { voll: "nicht gegengelesen", fertig: "gegengelesen", fehlt: "noch kein Text" };
 
 /** Wochenknopf, Blätterpfeile und Stundensumme. wochen[] ist absteigend sortiert. */
 function zeichneWochenwahl() {
@@ -117,9 +115,11 @@ function wochenzeile(montag, monat, heute) {
   for (var d = 0; d < TAGE_JE_WOCHE; d++) {
     var tag = plus(montag, d), key = iso(tag);
     var zustand = hatDaten ? tagLage(key) : "nichts";
-    // Ein Werktag der Ausbildung bis heute ohne jeden Eintrag fehlt im Heft, auch in einer Woche
-    // ganz ohne Daten: So sieht man im Raster, wo noch gar nichts steht (fehlenderWerktag()).
-    if (zustand === "nichts" && fehlenderWerktag(key)) zustand = "fehlt";
+    // Rot ist jeder Tag, der noch etwas braucht (tagBrauchtNoch()): ausgefüllt, wenn Text zum
+    // Gegenlesen dasteht, als Ring, wenn noch keiner da ist. Ohne Text fehlt ein Tag mit Stunden
+    // oder Schule genauso wie ein Werktag der Ausbildung bis heute ganz ohne Eintrag, auch in einer
+    // Woche ohne Daten (fehlenderWerktag()). Vorher stand „Stunden ohne Text“ als schwarzer Ring da.
+    if (zustand === "offen" || (zustand === "nichts" && fehlenderWerktag(key))) zustand = "fehlt";
     // Tage des Monats davor und danach blass, heute mit Ring (dialoge.css).
     var b = document.createElement("button");
     b.type = "button";
@@ -173,12 +173,17 @@ $("wochenliste").addEventListener("keydown", function (e) {
   neu.focus();
 });
 
-/** Der Knopf nennt sein Ziel, damit man vorher weiß, wohin er springt. */
+/**
+ * Der Knopf nennt sein Ziel, damit man vorher weiß, wohin er springt: der früheste Tag seit
+ * Ausbildungsbeginn, der noch etwas braucht, wie im Hinweis „Noch offen“. Vorher zählten nur
+ * Wochen mit Einträgen, und er sprang über leere Monate am Anfang der Ausbildung hinweg.
+ */
 function sprungOffenZeigen() {
-  var ziel = ersteOffeneWoche(), k = $("sprung-offen");
-  k.textContent = ziel ? "Erste offene: " + kurzSpanne(vonIso(ziel)) + " \u2192" : "Alles fertig";
-  k.title = ziel ? "Die früheste Woche, in der noch Text fehlt oder etwas gegenzulesen ist"
-    : "Alle geladenen Wochen sind ausgefüllt und übernommen.";
+  var ziel = ersterOffenerTag(), k = $("sprung-offen");
+  var jahr = ziel && vonIso(ziel).getFullYear() !== new Date().getFullYear() ? " " + vonIso(ziel).getFullYear() : "";
+  k.textContent = ziel ? "Erste offene: " + stelleKurz(ziel) + jahr + " \u2192" : "Alles fertig";
+  k.title = ziel ? "Der früheste Tag seit Ausbildungsbeginn, an dem Text fehlt oder etwas gegenzulesen ist"
+    : "Seit Ausbildungsbeginn ist alles geschrieben und gegengelesen.";
 }
 
 function monatBlaettern(schritt) {
@@ -372,10 +377,9 @@ $("wochensuche").addEventListener("keydown", function (e) {
 $("monat-zurueck").addEventListener("click", function () { monatBlaettern(-1); });
 $("monat-vor").addEventListener("click", function () { monatBlaettern(1); });
 $("sprung-offen").addEventListener("click", function () {
-  var ziel = ersteOffeneWoche();
-  if (!ziel) { $("suchhinweis").textContent = "Alle geladenen Wochen sind ausgefüllt und übernommen."; return; }
-  // Gleich auf den ersten offenen Tag der Woche, nicht auf ihren Montag.
-  wocheZeigen(ziel, Math.max(0, wochenBilanz(ziel).erster));
+  var ziel = ersterOffenerTag();
+  if (!ziel) { $("suchhinweis").textContent = "Seit Ausbildungsbeginn ist alles geschrieben und gegengelesen."; return; }
+  stelleZeigen(ziel);
 });
 // Am Rechner steht „Heute“ oben neben dem Monat, am Handy unten neben „Erste offene“ (handy.css).
 $("sprung-heute").addEventListener("click", heuteZeigen);

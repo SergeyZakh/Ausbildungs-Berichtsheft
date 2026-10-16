@@ -97,7 +97,10 @@ function tagReiter(montag, i) {
   var art = tagArt(iso(datum));
   var schule = istSchultag(art);
   var frei = !!art && !schule;
-  var fehlt = !frei && !!(t && (t.stunden || schule)) && !((t && t.text ? t.text : "").trim());
+  // Ohne Text fehlt ein Tag mit Stunden oder Schule und jeder Werktag der Ausbildung bis heute,
+  // auch ganz ohne Eintrag, wie im Kalender; nicht, wenn die Themen der Woche für ihn stehen.
+  var fehlt = !frei && !((t && t.text ? t.text : "").trim()) && (!!(t && (t.stunden || schule)) ||
+    (fehlenderWerktag(iso(datum)) && !tagImWochenfeld(iso(datum))));
   var laeuftHier = kiLaufIndex() === i;
 
   var b = document.createElement("button");

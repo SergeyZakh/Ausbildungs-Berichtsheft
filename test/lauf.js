@@ -51,7 +51,7 @@ const NAME = 'Mustermann, Max';
   pruefe('Jede Wochenzeile trägt sieben Tageszellen',
     (await page.locator('#wochenliste .wzeile >> nth=0 >> .wtag').count()) === 7);
   pruefe('Tageszellen zeigen ihren Zustand',
-    (await page.locator('#wochenliste .wtag.voll, #wochenliste .wtag.offen').count()) >= 1);
+    (await page.locator('#wochenliste .wtag.voll, #wochenliste .wtag.fehlt').count()) >= 1);
 
   // Ein Werktag ganz ohne Eintrag ist eine Lücke – dieselbe Regel wie auf dem Server
   // (server/stand.js). Sonst sieht der Azubi eine grüne Woche, wo der Ausbilder eine
@@ -93,7 +93,7 @@ const NAME = 'Mustermann, Max';
     !kal.umschalter && !kal.grund && kal.heuteOben && !kal.heuteUnten, JSON.stringify(kal));
   pruefe('Tage aus dem Monat davor stehen blass da', kal.monat === 'September 2026' &&
     kal.aussen[0] === '31' && kal.aussen[1] && !kal.aussen[2], JSON.stringify(kal));
-  pruefe('„Erste offene“ nennt, wohin sie springt', /^Erste offene: \d/.test(kal.offen), kal.offen);
+  pruefe('„Erste offene“ nennt, wohin sie springt', /^Erste offene: (Mo|Di|Mi|Do|Fr) \d\d\.\d\d\./.test(kal.offen), kal.offen);
   await page.click('#w-hilfe');
   const marken = await page.locator('#w-marken').innerText();
   pruefe('Das „?“ zeigt die Marken der Reiter', /Entwurf/.test(marken) && /eigener Text/.test(marken) &&

@@ -212,6 +212,95 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await ctx.close();
   }
 
+  /* ---------- Rot seit Ausbildungsbeginn ---------- */
+  {
+    // Ab dem Ausbildungsbeginn ist bis heute jeder Werktag rot, der noch etwas braucht: ausgefüllt
+    // mit Text zum Gegenlesen, als Ring ohne Text, mit oder ohne Stunden, auch ganz ohne Eintrag.
+    // Vorher stand „Stunden ohne Text“ schwarz da, in den Reitern ein leerer Werktag ohne Marke,
+    // und „Erste offene“ übersprang die leeren Monate am Anfang. Feste Uhr: Freitag, 16.10.2026.
+    const ROT = 'rgb(180, 35, 24)';
+    const stand = {
+      stamm: { beginn: '2025-08-01', ende: '2028-07-31', land: 'NW', schultage: 'Do' },
+      tage: {
+        '2026-10-05': tag('Server eingerichtet', { stunden: 8 }),
+        '2026-10-06': tag('Netzwerk dokumentiert', { stunden: 8, geprueft: true }),
+        '2026-10-07': tag('', { stunden: 7.5 }),
+        '2026-10-08': tag('', { art: 'Berufsschule' }),
+        '2026-10-09': tag('', { art: 'Urlaub' }),
+        '2026-10-12': tag('Tickets bearbeitet', { stunden: 8 }),
+      },
+      wochen: {}, hinweise: { gesichert: vorTagen(0) }, aktiveWoche: '2026-10-12',
+    };
+    const ctx = await browser.newContext({ viewport: { width: 1300, height: 850 } });
+    const page = await mitStand(ctx, stand);
+    const fehler = h.fehlerSammeln(page);
+    await page.clock.setFixedTime(new Date('2026-10-16T10:00:00'));
+    await h.oeffnen(page);
+    await page.waitForTimeout(700);
+
+    // Jeder Tag des Rasters von Oktober 2026 zurück bis Juli 2025 mit seinem Zustand.
+    await page.click('#wochenlabel');
+    await page.waitForTimeout(200);
+    const felder = {};
+    for (let i = 0; i < 16; i++) {
+      Object.assign(felder, await page.evaluate(() => Object.fromEntries(
+        [...document.querySelectorAll('#wochenliste .wtag:not(.aussen)')].map((b) => {
+          const d = new Date(b.dataset.montag + 'T12:00:00Z');
+          d.setUTCDate(d.getUTCDate() + +b.dataset.tag);
+          return [d.toISOString().slice(0, 10), b.className.replace(/\b(wtag|heute)\b/g, '').trim()];
+        }))));
+      await page.click('#monat-zurueck');
+    }
+    const falsch = await page.evaluate((f) => {
+      const raus = [];
+      for (let d = new Date(2025, 7, 1); ; d.setDate(d.getDate() + 1)) {
+        const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        if (k > '2026-10-16') break;
+        if (d.getDay() === 0 || d.getDay() === 6) continue;
+        const ok = window.__feiertagAn(k, 'NW') ? f[k] === 'nichts' : /^(voll|fehlt|fertig|frei)$/.test(f[k]);
+        if (!ok) raus.push(k + ' ' + f[k]);
+      }
+      return raus;
+    }, felder);
+    const einzeln = ['2026-10-05', '2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-13', '2026-10-16',
+      '2026-06-04', '2026-10-19', '2025-07-31'].map((k) => k + ' ' + felder[k]).join(', ');
+    pruefe('Rot seit Ausbildungsbeginn: jeder Werktag bis heute ist rot, außer fertig, frei und Feiertag',
+      falsch.length === 0, falsch.slice(0, 8).join(' | '));
+    pruefe('Rot ausgefüllt mit Text, rot umrandet ohne (auch mit Stunden oder Schule), grau Feiertag, Zukunft und vor Beginn',
+      einzeln === '2026-10-05 voll, 2026-10-06 fertig, 2026-10-07 fehlt, 2026-10-08 fehlt, 2026-10-09 frei, ' +
+        '2026-10-13 fehlt, 2026-10-16 fehlt, 2026-06-04 nichts, 2026-10-19 nichts, 2025-07-31 nichts', einzeln);
+    const offenText = await page.locator('#sprung-offen').textContent();
+    await page.click('#sprung-offen');
+    await page.waitForTimeout(300);
+    pruefe('„Erste offene“ springt auf den ersten Werktag seit Ausbildungsbeginn',
+      offenText === 'Erste offene: Fr 01.08. 2025 \u2192' &&
+        /^Freitag, 01\.08\./.test(await page.getAttribute('#reiter [aria-selected="true"]', 'aria-label')), offenText);
+
+    await page.click('#wochenlabel');
+    await page.fill('#wochensuche', '12.10.2026');
+    await page.waitForTimeout(300);
+    const reiter = await page.evaluate(() => ({
+      klassen: [...document.querySelectorAll('#reiter .tagreiter')].slice(0, 5).map((b) => b.className.replace('tagreiter', '').trim()),
+      punkt: getComputedStyle(document.querySelector('#reiter .tagreiter.fehlt:not([aria-selected="true"]) .punkt')).borderTopColor,
+    }));
+    pruefe('Reiter: Ein Werktag ohne Text trägt den roten Ring, auch ganz ohne Eintrag',
+      reiter.klassen.join() === 'pruefen,fehlt,fehlt,fehlt,fehlt' && reiter.punkt === ROT, JSON.stringify(reiter));
+    pruefe('Rot seit Ausbildungsbeginn: keine JavaScript-Fehler', fehler.length === 0, fehler.join(' | '));
+    await ctx.close();
+
+    // Am Handy: In der Kalenderleiste ist ein leerer Werktag ein roter Ring wie im Kalender.
+    const hctx = await browser.newContext({ viewport: { width: 390, height: 780 }, isMobile: true, hasTouch: true });
+    const hp = await mitStand(hctx, stand);
+    await hp.clock.setFixedTime(new Date('2026-10-16T10:00:00'));
+    await h.oeffnen(hp);
+    await hp.waitForTimeout(700);
+    const leiste = await hp.evaluate(() => [...document.querySelectorAll('#reiter .tagreiter')].slice(1, 5)
+      .map((b) => getComputedStyle(b.querySelector('.rzahl')).boxShadow));
+    pruefe('Handy: Kalenderleiste zeigt Werktage ohne Text als roten Ring',
+      leiste.length === 4 && leiste.every((s) => s.includes(ROT)), JSON.stringify(leiste));
+    await hctx.close();
+  }
+
   /* ---------- Sicherung fällig ---------- */
   {
     const ctx = await browser.newContext({ viewport: { width: 1300, height: 850 }, acceptDownloads: true });
@@ -357,12 +446,12 @@ const tag = (text, extra = {}) => ({ text, art: '', pausen: [], posten: [], geae
     await page.click('#w-hilfe');
     const marken = await page.locator('#w-marken').innerText();
     pruefe('Kalender erklärt Kreise und, hinter dem „?“, die Marken', /fertig/.test(legende) && /gegenlesen/.test(legende) &&
-      /Text fehlt/.test(legende) && /leer/.test(legende) && /frei/.test(legende) &&
+      /Text fehlt/.test(legende) && /frei/.test(legende) &&
       /Entwurf/.test(marken) && /KI/.test(marken) && /eigener Text/.test(marken), legende + ' | ' + marken);
     // Das Beispiel beginnt die Ausbildung am 1.8.2025; die Woche vor den Beispielwochen ist leer.
     const ersteZeile = await page.evaluate(() =>
       [...document.querySelector('#wochenliste .wzeile').querySelectorAll('.wtag')].map((x) => x.className));
-    pruefe('Werktage der Ausbildung ohne Eintrag sind im Kalender gestrichelt, das Wochenende nicht',
+    pruefe('Werktage der Ausbildung ohne Eintrag sind im Kalender rot umrandet, das Wochenende nicht',
       ersteZeile.slice(0, 5).every((k) => /\bfehlt\b/.test(k)) && ersteZeile.slice(5).every((k) => !/\bfehlt\b/.test(k)),
       JSON.stringify(ersteZeile));
     await page.click('#w-zu');
